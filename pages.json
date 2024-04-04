@@ -1,17 +1,11 @@
 {
 	"pages": [{
-		"path": "pages/index/index",
-		"style": {
-			"navigationBarTitleText": "",
-			"enablePullDownRefresh": false
-		}
+		"path": "pages/app/app"
 	}],
 	"globalStyle": {
-		"app-plus": {
-			"titleNView": false
-		}
+		"navigationStyle": "custom"
 	},
-  "h5": {
-      "favicon": "/static/favicon/favicon.png" // 这里指定你的图标文件路径
-    }
+	"h5": {
+		"favicon": "/static/favicon/favicon.png"
+	}
 }

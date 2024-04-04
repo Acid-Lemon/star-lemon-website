@@ -4,8 +4,17 @@
 
 	export default {
 		data() {
-			return {};
+			return {
+				show: {}
+			};
 		},
+		onLoad() {
+			this.$watch("$route", (to, _from) => {
+				console.log(to, _from)
+				this.show = to?.meta?.show;
+			});
+		},
+		methods: {},
 		components: {
 			NavigationBar,
 			Copyright
@@ -16,12 +25,12 @@
 <template>
 	<NavigationBar></NavigationBar>
 	<router-view></router-view>
-	<Copyright></Copyright>
+	<Copyright v-if="show ? show.copyright: true"></Copyright>
 </template>
 
 <style>
-	/*每个页面公共css */
-  @import '/static/font/font.css';
+	@import "/static/font/font.css";
+
 	page {
 		height: 100%
 	}

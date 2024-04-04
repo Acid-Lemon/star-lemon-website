@@ -1,0 +1,15 @@
+{
+	"id": "uni-cloud-router",
+	"description": " 基于 koa 风格的 uniCloud 云函数路由库，同时支持 uniCloud 客户端及 URL",
+	"engines": {
+		"HBuilderX": "^3.1.0"
+	},
+	"author": ["fxy060608", "star"],
+	"files": ["uniCloud", "changelog.md", "readme.md"],
+	"dcloudext": {
+		"category": [
+			"uniCloud",
+			"云函数模板"
+		]
+	}
+}

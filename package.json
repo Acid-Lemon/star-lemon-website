@@ -1,0 +1,18 @@
+{
+  "devDependencies": {
+    "@dcloudio/types": "^3.4.8",
+    "@types/node": "^20.12.2",
+    "autoprefixer": "^10.4.19",
+    "postcss": "^8.4.38",
+    "tailwindcss": "^3.4.3",
+    "vite": "^5.2.7"
+  },
+  "scripts": {
+    "tailwind-build": "tailwindcss -i ./tailwind-input.css -o tailwind-build.css --minify",
+    "tailwind-dev": "tailwindcss -i ./tailwind-input.css -o tailwind-build.css --watch"
+  },
+  "dependencies": {
+    "element-plus": "^2.6.3",
+    "vue-router": "^4.3.0"
+  }
+}

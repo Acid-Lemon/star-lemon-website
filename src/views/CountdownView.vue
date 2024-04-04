@@ -3,10 +3,10 @@
     data() {
       return {
         time: 1717689600000,
-        day: 0,
-        hour: 0,
-        minute: 0,
-        second: 0,
+        day: null,
+        hour: null,
+        minute: null,
+        second: null,
         timer: null
       };
     },
@@ -37,11 +37,9 @@
 </script>
 
 <template>
-  <div class="h-full w-full">
-    <div class="bg-[url('/static/background/14.jpg')] bg-cover flex flex-row items-center content-center">
-      <p class="text-[#FFFFFF]">距离2024年高考还有{{day}}天{{hour}}小时{{minute}}分钟{{second}}秒</p>
+    <div class="bg-[url('/static/background/14.jpg')] bg-cover w-full h-full flex flex-row justify-center items-center">
+      <span class="text-[#FFFFFF] font-['RGBZ'] md:text-[3vw] text-[9vw] mx-[40px]">距离2024年高考还有{{day}}天{{hour}}时{{minute}}分{{second}}秒</span>
     </div>
-  </div>
 </template>
 
 <style scoped>

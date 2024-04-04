@@ -1,130 +1,204 @@
 const {
-    Controller
+	Controller
 } = require("uni-cloud-router");
 
 const error = require("../../types/error");
 
 const bcrypt = require("bcryptjs");
 
-const {validate} = require("../../utils/args_check");
+const {
+	validate
+} = require("../../utils/args_check");
 
 module.exports = class LoginController extends Controller {
-    async register_by_user() {
+	async register_by_user() {
 		let {
 			username,
 			password
-		} = this.ctx.event.data;
+		} = this.ctx.event.args;
 
-		validate({username, password}, {
-			username: {type: "string", length: {max: 20, min: 2}},
-			password: {type: "string", length: {max: 30, min: 5}}
+		validate({
+			username,
+			password
+		}, {
+			username: {
+				type: "string",
+				length: {
+					max: 20,
+					min: 2
+				}
+			},
+			password: {
+				type: "string",
+				length: {
+					max: 30,
+					min: 5
+				}
+			}
 		});
 
 		let user = await this.service.db.user.find_user_by_username(username);
 		if (user) {
-            this.throw(error.codes.exist_user_name, "username already exists");
+			this.throw(error.codes.exist_user_name, "username already exists");
 		}
 
 		return await this.service.user.login.create_user({
-            username,
-            password
-        });
-    }
+			username,
+			password
+		});
+	}
 
-    async register_by_sms() {
-        let {
-            username,
-            password,
-            phone_number,
-            code
-        } = this.ctx.event.data;
+	async register_by_sms() {
+		let {
+			username,
+			password,
+			phone_number,
+			code
+		} = this.ctx.event.args;
 
-        validate({phone_number, code, username, password}, {
-            phone_number: {type: "string", regex: /^1[3456789]\d{9}$/},
-            code: {type: "string", not_null: true},
-            username: {type: "string", length: {max: 20, min: 2}},
-            password: {type: "string", length: {max: 30, min: 5}}
-        });
+		validate({
+			phone_number,
+			code,
+			username,
+			password
+		}, {
+			phone_number: {
+				type: "string",
+				regex: /^1[3456789]\d{9}$/
+			},
+			code: {
+				type: "string",
+				not_null: true
+			},
+			username: {
+				type: "string",
+				length: {
+					max: 20,
+					min: 2
+				}
+			},
+			password: {
+				type: "string",
+				length: {
+					max: 30,
+					min: 5
+				}
+			}
+		});
 
-        let code_record = await this.service.db.user.find_code(phone_number);
-        console.info("code_record: ", code_record);
+		let code_record = await this.service.db.user.find_code(phone_number);
+		console.info("code_record: ", code_record);
 
-        this.service.user.login.verify_code(code, code_record);
+		this.service.user.login.verify_code(code, code_record);
 
-        return await this.service.user.login.create_user({
-            phone_number,
-            username,
-            password
-        });
-    }
+		return await this.service.user.login.create_user({
+			phone_number,
+			username,
+			password
+		});
+	}
 
-    async login_by_user() {
-        let {
-            username,
-            password
-        } = this.ctx.event.data;
+	async login_by_user() {
+		let {
+			username,
+			password
+		} = this.ctx.event.args;
 
-        validate({username, password}, {
-            username: {type: "string", not_null: true},
-            password: {type: "string", not_null: true}
-        });
+		validate({
+			username,
+			password
+		}, {
+			username: {
+				type: "string",
+				not_null: true
+			},
+			password: {
+				type: "string",
+				not_null: true
+			}
+		});
 
-        let user = await this.service.db.user.find_user_by_username(username);
-        if (!user) {
-            this.throw(error.codes.no_user, "user not found");
-        }
+		let user = await this.service.db.user.find_user_by_username(username);
 
-        if (!await this.service.user.login.compare_password(password, user.hash)) {
-            this.throw(error.codes.invalid_password, "password wrong");
-        }
+		if (!user) {
+			this.throw(error.codes.no_user, "user not found");
+		}
 
-        return {token: this.service.user.login.create_token(user)};
-    }
+		if (!await this.service.user.login.compare_password(password, user.hash)) {
+			this.throw(error.codes.invalid_password, "password wrong");
+		}
 
-    async login_by_sms() {
-        let {
-            phone_number,
-            code
-        } = this.ctx.event.data;
+		return {
+			token: this.service.user.login.create_token(user)
+		};
+	}
 
-        validate({phone_number, code}, {
-            phone_number: {type: "string", regex: /^1[3456789]\d{9}$/},
-            code: {type: "string", not_null: true}
-        });
+	async login_by_sms() {
+		let {
+			phone_number,
+			code
+		} = this.ctx.event.args;
 
-        let code_record = await this.service.db.user.find_code(phone_number);
-        console.info("code_record: ", code_record);
+		validate({
+			phone_number,
+			code
+		}, {
+			phone_number: {
+				type: "string",
+				regex: /^1[3456789]\d{9}$/
+			},
+			code: {
+				type: "string",
+				not_null: true
+			}
+		});
 
-        if (!code_record) {
-            this.throw(error.codes.no_sms_code, "sms code not found");
-        }
+		let code_record = await this.service.db.user.find_code(phone_number);
+		console.info("code_record: ", code_record);
 
-        if (code !== code_record.code) {
-            this.throw(error.codes.invalid_sms_code, "sms code wrong");
-        }
+		if (!code_record) {
+			this.throw(error.codes.no_sms_code, "sms code not found");
+		}
 
-        let user = await this.service.db.user.find_user_by_phone_number(phone_number);
-        if (!user) {
-            this.throw(error.codes.no_user, "user not found");
-        }
+		if (code !== code_record.code) {
+			this.throw(error.codes.invalid_sms_code, "sms code wrong");
+		}
 
-        return {token: this.service.user.login.create_token(user)};
-    }
+		let user = await this.service.db.user.find_user_by_phone_number(phone_number);
+		if (!user) {
+			this.throw(error.codes.no_user, "user not found");
+		}
 
-    async send_code() {
-        let {phone_number} = this.ctx.event.data;
-        validate({phone_number}, {phone_number: {type: "string", regex: /^1[3456789]\d{9}$/}});
+		return {
+			token: this.service.user.login.create_token(user)
+		};
+	}
 
-        let code = this.service.user.login.create_code();
-        let send_res = await this.service.user.login.send_code(phone_number, code);
-        if (!send_res.success) {
-            console.log(send_res);
+	async send_code() {
+		let {
+			phone_number
+		} = this.ctx.event.args;
+		validate({
+			phone_number
+		}, {
+			phone_number: {
+				type: "string",
+				regex: /^1[3456789]\d{9}$/
+			}
+		});
 
-            this.throw(send_res.code, send_res.message);
-        }
+		let code = this.service.user.login.create_code();
+		let send_res = await this.service.user.login.send_code(phone_number, code);
+		if (!send_res.success) {
+			console.log(send_res);
 
-        await this.service.db.code.store_code(code, phone_number);
+			this.throw(send_res.code, send_res.message);
+		}
 
-        return {data: null};
-    }
+		await this.service.db.code.store_code(code, phone_number);
+
+		return {
+			data: null
+		};
+	}
 };

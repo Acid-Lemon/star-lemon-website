@@ -1,5 +1,6 @@
 <template>
-	<div class="bg-[url('/static/background/22.jpg')] h-dvh bg-cover flex flex-row justify-between items-center p-[5vh]">
+	<div
+		class="bg-[url('/static/background/22.jpg')] h-dvh bg-cover flex flex-row justify-between items-center p-[5vh]">
 		<div class="md:block hidden w-[100%]">
 			<div class="flex flex-col items-center">
 				<span class="font-['RGBZ'] text-[5vw] text-[#FFFFFF]">“海阔凭鱼跃，</span>
@@ -13,22 +14,23 @@
 					<!--    注册或用户名密码登录        -->
 					<div class="flex flex-col" v-if="!state.value || (state.mode && state.value)">
 						<span class="my-[0.5vh] text-[2vh] font-['SJJS']">用户名：</span>
-						<input type="text" class="my-[0.5vh] text-[2vh] border border-[#000000] h-[3vh] font-['SJJS']" v-model="username"
-							:placeholder="username_tip" />
+						<input type="text" class="my-[0.5vh] text-[2vh] border border-[#000000] h-[3vh] font-['SJJS']"
+							v-model="username" :placeholder="username_tip" />
 					</div>
 					<!--    手机号登录注册或用户名注册        -->
 					<div class="flex flex-col" v-if="!state.mode || !state.value">
 						<span class="my-[0.5vh] text-[2vh] font-['SJJS']">手机号码：</span>
-						<input type="text" class="my-[0.5vh] text-[2vh] border border-[#000000] h-[3vh] font-['SJJS']" v-model="phone_number"
-							:placeholder="phone_number_tip" />
+						<input type="text" class="my-[0.5vh] text-[2vh] border border-[#000000] h-[3vh] font-['SJJS']"
+							v-model="phone_number" :placeholder="phone_number_tip" />
 					</div>
 					<!--    手机号登录注册或用户名注册        -->
 					<div class="flex flex-col" v-if="!state.mode || !state.value">
 						<span class="my-[0.5vh] text-[2vh] font-['SJJS']">验证码：</span>
 						<div class="flex flex-row justify-between">
-							<input type="text" class="my-[0.5vh] w-[40%] border border-[#000000] h-[3vh] font-['SJJS']" v-model="code"
-								:placeholder="code_tip" />
-							<button class="w-[50%] h-[3.2vh] leading-[3.2vh] m-1 border rounded-full border-[#000000] text-[1.5vh] font-['SJJS']"
+							<input type="text" class="my-[0.5vh] w-[40%] border border-[#000000] h-[3vh] font-['SJJS']"
+								v-model="code" :placeholder="code_tip" />
+							<button
+								class="w-[50%] h-[3.2vh] leading-[3.2vh] m-1 border rounded-full border-[#000000] text-[1.5vh] font-['SJJS']"
 								@click="send_code">
 								获取验证码
 							</button>
@@ -37,17 +39,19 @@
 					<!--     注册或用户名密码登录       -->
 					<div class="flex flex-col" v-if="!state.value || (state.mode && state.value)">
 						<span class="my-1 text-[2vh] font-['SJJS']">密码：</span>
-						<input type="password" class="my-1 border border-[#000000] h-[3vh] font-['SJJS']" v-model="password"
-							:placeholder="password_tip" />
+                        <input type="password" class="my-1 border border-[#000000] h-[3vh] font-['SJJS']"
+							v-model="password" :placeholder="password_tip" />
 					</div>
 					<!--      注册      -->
 					<div class="flex flex-col" v-if="!state.value">
 						<span class="my-1 text-[2vh] font-['SJJS']">确认密码：</span>
-						<input type="password" class="my-1 border border-[#000000] h-[3vh] font-['SJJS']" v-model="confirm_password"
-							:placeholder="confirm_password_tip" />
+						<input type="password" class="my-1 border border-[#000000] h-[3vh] font-['SJJS']"
+							v-model="confirm_password" :placeholder="confirm_password_tip" />
 					</div>
 				</div>
-				<button class="my-1 w-full rounded-full border border-[#000000] text-[2vh] font-['SJJS'] h-[4vh] leading-[4vh] font-['SJJS']" @click="login">
+				<button
+					class="my-1 w-full rounded-full border border-[#000000] text-[2vh] font-['SJJS'] h-[4vh] leading-[4vh]"
+					@click="login">
 					{{ state.text }}
 				</button>
 				<!--    用户名密码登录      -->
@@ -140,9 +144,8 @@
 					return;
 				}
 
-				let res = await call_api("loginWithSms", {
-					phone_number: this.phone_number,
-					type: "send"
+				let res = await call_api("user/login/send_code", {
+					phone_number: this.phone_number
 				});
 
 				if (res.success) {
@@ -187,18 +190,16 @@
 				let loading = ElLoading.service();
 				let res;
 				if (this.state.mode === true) {
-					res = await call_api("loginWithUser", {
+					res = await call_api(`user/login/${this.state.value === true ? "login" : "register"}_by_user`, {
 						username: this.username,
-						password: this.password,
-						type: this.state.value === true ? "login" : "register",
+						password: this.password
 					});
 				} else {
-					res = await call_api("loginWithSms", {
+					res = await call_api(`user/login/${this.state.value === true ? "login" : "register"}_by_sms`, {
 						username: this.username,
 						password: this.password,
 						phone_number: this.phone_number,
-						code: this.code,
-						type: this.state.value === true ? "login" : "register",
+						code: this.code
 					});
 				}
 
@@ -222,7 +223,6 @@
 					return;
 				}
 
-				store_user(res.data.user);
 				ElMessageBox({
 					type: "success",
 					message: "登录成功",

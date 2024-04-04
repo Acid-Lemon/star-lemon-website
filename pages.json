@@ -1,6 +1,6 @@
 {
 	"pages": [{
-		"path": "pages/app/app"
+		"path": "src/app"
 	}],
 	"globalStyle": {
 		"navigationStyle": "custom"

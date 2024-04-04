@@ -10,7 +10,6 @@
 		},
 		onLoad() {
 			this.$watch("$route", (to, _from) => {
-				console.log(to, _from)
 				this.show = to?.meta?.show;
 			});
 		},
@@ -30,8 +29,4 @@
 
 <style>
 	@import "/static/font/font.css";
-
-	page {
-		height: 100%
-	}
 </style>

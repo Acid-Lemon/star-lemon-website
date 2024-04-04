@@ -12,7 +12,7 @@ console.log(`[tailwindcss] 开始${tailwindMode === 'production' ? '生产环境
 child_process.execSync('npm run tailwind-build', {
 	cwd: __dirname
 });
-if (tailwindMode !== 'production') {
+if (tailwindMode !== 'development') {
 	child_process.exec(
 		'npm run tailwind-dev', {
 			cwd: __dirname, // 切换目录到当前项目，必须

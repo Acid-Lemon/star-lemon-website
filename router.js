@@ -53,6 +53,11 @@ const router = createRouter({
     {
       path: "/admin",
       name: "admin",
+      meta: {
+        show: {
+          navigation_bar: false
+        }
+      },
       component: () => import("@/src/views/AdminView.vue")
     },
     {

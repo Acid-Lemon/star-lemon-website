@@ -5,7 +5,7 @@
 	export default {
 		data() {
 			return {
-				show: {}
+				show: this.$route?.meta?.show
 			};
 		},
 		onLoad() {
@@ -22,9 +22,9 @@
 </script>
 
 <template>
-	<NavigationBar></NavigationBar>
+	<NavigationBar v-if="show?.hasOwnProperty('navigation_bar') ? show.navigation_bar: true"></NavigationBar>
 	<router-view></router-view>
-	<Copyright v-if="show ? show.copyright: true"></Copyright>
+	<Copyright v-if="show?.hasOwnProperty('copyright') ? show.copyright: true"></Copyright>
 </template>
 
 <style>

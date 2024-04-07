@@ -66,8 +66,8 @@ const router = createRouter({
       meta: {
         navigation_bar: {
           name: "用户名",
-          svg: "/static/favicon/favicon.png"
-        },
+          svg: "/static/svg/登录.svg"
+        }
       },
       component: () => import("@/src/views/User.vue")
     },
@@ -80,7 +80,7 @@ const router = createRouter({
         }
       },
       component: () => import("@/src/views/CountdownView.vue")
-    }
+    },
   ],
 });
 

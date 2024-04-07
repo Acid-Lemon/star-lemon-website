@@ -20,13 +20,21 @@
 				message_list: [],
 				buttonDisabled: false,
 				style_mode: false,
-				pages: 1
+				pages: 1,
+        loadText: {
+          contentdown: "更多留言",
+          contentrefresh: "正在加载",
+          contentnomore: "没有惹"
+          }
 			};
 		},
 		async mounted() {
 			await this.get_messages();
 		},
 		methods: {
+      Load() {
+        console.log("ok")
+      },
 			onFocus() {
 				this.style_mode = true;
 			},
@@ -173,9 +181,7 @@
 					<p class="m-[1vh]">{{ message.content }}</p>
 				</div>
 			</div>
-			<div class="w-[10%] h-[5vh] border-[#000000] flex flex-row items-center justify-center rounded-full border font-['SYST']">
-				更多留言
-			</div>
+				<uni-load-more class="w-[10%] h-[5vh] border-[#000000] flex flex-row items-center justify-center rounded-full border font-['SYST']" status="more" @clickLoadMore="Load" :content-text="loadText"/>
 		</div>
 		<div class="my-[3vh] flex flex-col justify-center md:w-[70%] w-[85%]">
 			<div class="mb-[3vh] relative">

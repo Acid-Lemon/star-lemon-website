@@ -71,12 +71,12 @@
         <div class="w-full flex flex-row items-center justify-center">
           <div class="w-[50%] my-[5px]">
             <span>头像：</span>
-            <uni-file-picker v-model="avatar" fileMediatype="image" mode="grid" @select="select" @progress="progress"
+            <uni-file-picker :limit="1" v-model="avatar" fileMediatype="image" mode="grid" @select="select" @progress="progress"
               @success="success" @fail="fail" />
           </div>
           <div class="w-[50%] my-[5px]">
             <span>个人背景：</span>
-            <uni-file-picker v-model="background" fileMediatype="image" mode="grid" @select="select"
+            <uni-file-picker :limit="1" v-model="background" fileMediatype="image" mode="grid" @select="select"
               @progress="progress" @success="success" @fail="fail" />
           </div>
         </div>

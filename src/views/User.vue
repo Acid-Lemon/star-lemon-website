@@ -1,5 +1,6 @@
 <script>
   import {
+    ElMessage,
     ElMessageBox
   } from "element-plus";
 
@@ -9,8 +10,9 @@
         dialogVisible: false,
         date: null,
         username: null,
-        motto: null
-
+        motto: null,
+        fileList: null,
+        imageValue: []
       };
     },
     methods: {
@@ -23,6 +25,24 @@
             done();
           })
           .catch(() => {});
+      },
+      // 获取上传状态
+      select(e) {
+        console.log('选择文件：', e)
+      },
+      // 获取上传进度
+      progress(e) {
+        console.log('上传进度：', e)
+      },
+
+      // 上传成功
+      success(e) {
+        console.log('上传成功')
+      },
+
+      // 上传失败
+      fail(e) {
+        console.log('上传失败：', e)
       }
     },
   }
@@ -45,25 +65,31 @@
       <el-button class="absolute bottom-[-5vh] right-[10vw]" plain @click="dialogVisible = true">
         编辑信息
       </el-button>
-      <el-dialog title="编辑个人信息" v-model="dialogVisible" center :before-close="handleClose" class="flex flex-col items-center justify-center h-[320px]" width="30%">
+      <el-dialog title="编辑个人信息" v-model="dialogVisible" center :before-close="handleClose"
+        class="flex flex-col items-center justify-center h-[400px]" width="30%">
+        <div class="w-full my-[5px]">
+          <span>修改头像：</span>
+          <uni-file-picker v-model="imageValue" fileMediatype="image" mode="grid" @select="select" @progress="progress"
+            @success="success" @fail="fail" />
+        </div>
+        <div class="w-full my-[5px]">
+          <span>用户名：</span>
+          <el-input v-model="username" class="w-full" />
+        </div>
+        <div class="w-full my-[5px]">
+          <span>生日：</span>
           <div class="w-full my-[5px]">
-            <span>用户名：</span>
-            <el-input v-model="username" class="w-full" />
+            <el-date-picker v-model="date" type="date" size="default" style="width: 100%" />
           </div>
-          <div class="w-full my-[5px]">
-            <span>生日：</span>
-            <div class="w-full my-[5px]">
-              <el-date-picker v-model="date" type="date" size="default" style="width: 100%" />
-            </div>
-          </div>
-          <div class="w-full my-[5px]">
-            <span>个性签名：</span>
-            <el-input v-model="motto" class="w-full" />
-          </div>
+        </div>
+        <div class="w-full my-[5px]">
+          <span>个性签名：</span>
+          <el-input v-model="motto" class="w-full" />
+        </div>
         <template #footer>
           <div class="dialog-footer">
             <el-button @click="dialogVisible = false" class="mx-[40px]">取消</el-button>
-            <el-button type="primary" @click="dialogVisible = false"  class="mx-[40px]">确定</el-button>
+            <el-button type="primary" @click="dialogVisible = false" class="mx-[40px]">确定</el-button>
           </div>
         </template>
       </el-dialog>
@@ -71,4 +97,7 @@
   </div>
 </template>
 <style scoped>
+  .so {
+    width: 100%;
+  }
 </style>

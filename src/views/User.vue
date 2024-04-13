@@ -12,7 +12,8 @@
         username: null,
         motto: null,
         fileList: null,
-        imageValue: []
+        avatar: [],
+        background: []
       };
     },
     methods: {
@@ -66,25 +67,32 @@
         编辑信息
       </el-button>
       <el-dialog title="编辑个人信息" v-model="dialogVisible" center :before-close="handleClose"
-        class="flex flex-col items-center justify-center h-[400px]" width="30%">
-        <div class="w-full my-[5px]">
-          <span>修改头像：</span>
-          <uni-file-picker v-model="imageValue" fileMediatype="image" mode="grid" @select="select" @progress="progress"
-            @success="success" @fail="fail" />
-        </div>
-        <div class="w-full my-[5px]">
-          <span>用户名：</span>
-          <el-input v-model="username" class="w-full" />
-        </div>
-        <div class="w-full my-[5px]">
-          <span>生日：</span>
-          <div class="w-full my-[5px]">
-            <el-date-picker v-model="date" type="date" size="default" style="width: 100%" />
+        class="flex flex-col items-center justify-center h-[400px]" width="60%">
+        <div class="w-full flex flex-row items-center justify-center">
+          <div class="w-[50%] my-[5px]">
+            <span>头像：</span>
+            <uni-file-picker v-model="avatar" fileMediatype="image" mode="grid" @select="select" @progress="progress"
+              @success="success" @fail="fail" />
+          </div>
+          <div class="w-[50%] my-[5px]">
+            <span>个人背景：</span>
+            <uni-file-picker v-model="background" fileMediatype="image" mode="grid" @select="select"
+              @progress="progress" @success="success" @fail="fail" />
           </div>
         </div>
-        <div class="w-full my-[5px]">
-          <span>个性签名：</span>
-          <el-input v-model="motto" class="w-full" />
+        <div class="w-full flex flex-row items-center justify-between">
+          <div class="w-[30%] my-[5px]">
+            <span>用户名：</span>
+            <el-input v-model="username" class="w-full" />
+          </div>
+          <div class="w-[30%] my-[5px]">
+            <span>生日：</span>
+              <el-date-picker v-model="date" type="date" size="default" style="width: 100%" />
+          </div>
+          <div class="w-[30%] my-[5px]">
+            <span>个性签名：</span>
+            <el-input v-model="motto" class="w-full" />
+          </div>
         </div>
         <template #footer>
           <div class="dialog-footer">

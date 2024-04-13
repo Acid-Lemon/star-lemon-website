@@ -1,53 +1,73 @@
 <script>
-	export default {
-		methods: {
-			open() {
-				this.$refs.popup.open()
-			},
-			/**
-			 * 点击取消按钮触发
-			 * @param {Object} done
-			 */
-			close() {
-				// TODO 做一些其他的事情，before-close 为true的情况下，手动执行 close 才会关闭对话框
-				// ...
-				this.$refs.popup.close()
-			},
-			/**
-			 * 点击确认按钮触发
-			 * @param {Object} done
-			 * @param {Object} value
-			 */
-			confirm(value) {
-				// 输入框的值
-				console.log(value)
-				// TODO 做一些其他的事情，手动执行 close 才会关闭对话框
-				// ...
-				this.$refs.popup.close()
-			}
-		}
-	}
+  export default {
+    data() {
+      return {
+        dialogVisible: false,
+        date: null,
+        username:null,
+        motto:null
+        
+      };
+    },
+    methods: {
+      handleClose(done) {
+        this.$confirm('确认关闭？(未提交内容不会保存)')
+          .then(() => {
+            done();
+          })
+          .catch(() => {
+          });
+      }
+    },
+  }
 </script>
 
 <template>
-	<div class="h-full w-full">
+  <div class="h-full w-full">
     <div class="bg-[url('/static/background/12.jpg')] bg-cover h-[40%] relative">
       <div class="absolute bottom-[-5vh] left-[10vw] flex flex-row items-end">
-      <img src="/static/favicon/favicon.png" class="h-[10vh] w-[10vh] rounded-full mr-[10px]" />
-      <p class="font-['SYST'] text-[24px] mr-[20px] leading-none pb-[5px]">Lemon</p>
-      <p class="font-['SYST'] text-[18px] mr-[10px] leading-none pb-[5px]">ID：552545</p>
-      <div class="bg-[#36BDB4] rounded-md mb-[3px] mr-[20px] text-[12px] h-[20px] w-[50px] flex flex-row justify-center items-center">
-        管理员
+        <img src="/static/favicon/favicon.png" class="h-[10vh] w-[10vh] rounded-full mr-[10px]" />
+        <p class="font-['SYST'] text-[24px] mr-[20px] leading-none pb-[5px]">Lemon</p>
+        <p class="font-['SYST'] text-[18px] mr-[10px] leading-none pb-[5px]">ID：552545</p>
+        <div
+          class="bg-[#36BDB4] rounded-md mb-[3px] mr-[20px] text-[12px] h-[20px] w-[50px] flex flex-row justify-center items-center">
+          管理员
+        </div>
+        <p class="font-['SYST'] text-[14px] mr-[20px] leading-none pb-[5px]">生日：2006年3月1日</p>
+        <p class="font-['SYST'] text-[14px] opacity-50 leading-none pb-[5px]">Hi！希望你开心～</p>
       </div>
-      <p class="font-['SYST'] text-[14px] mr-[20px] leading-none pb-[5px]">生日：2006年3月1日</p>
-      <p class="font-['SYST'] text-[14px] opacity-50 leading-none pb-[5px]">Hi！希望你开心～</p>
-      </div>
-      <button class="absolute bottom-[-5vh] right-[10vw] h-[30px] w-[100px] bg-[#83C0E5] leading-none flex flex-row justify-center items-center" @click="open">
+      <el-button
+        class="absolute bottom-[-5vh] right-[10vw]" plain @click="dialogVisible = true">
         编辑信息
-      </button>
-      <uni-popup ref="popup" type="dialog">
-      	<uni-popup-dialog mode="input" message="成功消息" :duration="2000" :before-close="true" @close="close" @confirm="confirm"></uni-popup-dialog>
-      </uni-popup>
+      </el-button>
+      <el-dialog title="编辑个人信息" v-model="dialogVisible" width="30%" center :before-close="handleClose">
+        <div class="flex flex-col justify-between items-start h-[180px] w-[80%]">
+        <div class="w-full">
+          <span>用户名：</span>
+          <el-input v-model="username" class="w-full" />
+        </div>
+        <div class="w-full">
+        <span>生日：</span>
+        <div class="w-full">
+        <el-date-picker
+          v-model="date"
+          type="date"
+          size="default"
+        />
+        </div>
+        </div>
+        <div class="w-full">
+        <span>个性签名：</span>
+        <el-input v-model="motto" class="w-full" />
+        </div>
+        </div>
+        <template #footer>
+        <div class="dialog-footer flex flex-row justify-around">
+          <el-button type="primary" @click="dialogVisible = false">确定</el-button>
+          <el-button @click="dialogVisible = false">取消</el-button>
+        </div>
+        </template>
+      </el-dialog>
     </div>
   </div>
 </template>

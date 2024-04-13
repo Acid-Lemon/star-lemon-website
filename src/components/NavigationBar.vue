@@ -34,7 +34,7 @@ export default {
 
 <template>
   <div
-      class="fixed top-[2.5%] left-[2.5%] w-[95%] md:h-[50px] h-[50px] hover:bg-white hover:bg-opacity-50 duration-700 rounded-md flex flex-row justify-between items-center p-[3vh]">
+      class="fixed top-[2.5%] left-[2.5%] w-[95%] md:h-[50px] h-[50px] hover:bg-white hover:bg-opacity-50 duration-700 rounded-md flex flex-row justify-between items-center p-[3vh] z-[1000]">
     <router-link to="/">
       <span class="md:text-[26px] text-[20px] font-['ZKXW'] hover:text-[#44cef6] duration-700">star和lemon的小站</span>
     </router-link>

@@ -1,63 +1,102 @@
 <script>
-  import {
-    ElMessage,
-    ElMessageBox
-  } from "element-plus";
+import {
+  ElMessageBox
+} from "element-plus";
 
-  export default {
-    data() {
-      return {
-        dialogVisible: false,
-        date: null,
-        username: null,
-        motto: null,
-        fileList: null,
-        avatar: [],
-        background: []
-      };
+export default {
+  data() {
+    return {
+      dialogVisible: false,
+      date: null,
+      username: null,
+      motto: null,
+      fileList: null,
+      avatar: [],
+      avatarUrl: [
+        '/static/avatar/1.jpg',
+        '/static/avatar/2.jpg',
+        '/static/avatar/3.jpg',
+        '/static/avatar/4.jpg',
+        '/static/avatar/5.jpg',
+        '/static/avatar/6.jpg',
+        '/static/avatar/7.jpg',
+        '/static/avatar/8.jpg',
+        '/static/avatar/9.jpg',
+        '/static/avatar/10.jpg',
+        '/static/avatar/11.jpg',
+        '/static/avatar/12.jpg',
+        '/static/avatar/13.jpg',
+        '/static/avatar/14.jpg',
+        '/static/avatar/15.jpg',
+      ],
+      avatarName: '',
+      background: [],
+      avatarStyles: {
+        width: 128,
+        height: 128,
+        border: {
+          color: "#000000",
+          width: 2,
+          style: 'dashed',
+          radius: '2px'
+        }
+      },
+      backgroundStyles: {
+        width: 256,
+        height: 128,
+        border: {
+          color: "#000000",
+          width: 2,
+          style: 'dashed',
+          radius: '2px'
+        }
+      },
+
+    };
+  },
+  methods: {
+    handleClose(done) {
+      ElMessageBox.confirm('确认关闭？（未提交的信息不会保存）', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        done();
+      })
+          .catch(() => {
+          });
     },
-    methods: {
-      handleClose(done) {
-        ElMessageBox.confirm('确认关闭？（未提交的信息不会保存）', '提示', {
-            confirmButtonText: '确定',
-            cancelButtonText: '取消',
-            type: 'warning'
-          }).then(() => {
-            done();
-          })
-          .catch(() => {});
-      },
-      // 获取上传状态
-      select(e) {
-        console.log('选择文件：', e)
-      },
-      // 获取上传进度
-      progress(e) {
-        console.log('上传进度：', e)
-      },
-
-      // 上传成功
-      success(e) {
-        console.log('上传成功')
-      },
-
-      // 上传失败
-      fail(e) {
-        console.log('上传失败：', e)
-      }
+    // 获取上传状态
+    select(e) {
+      console.log('选择文件：', e)
     },
-  }
+    // 获取上传进度
+    progress(e) {
+      console.log('上传进度：', e)
+    },
+
+    // 上传成功
+    success(e) {
+      console.log('上传成功')
+    },
+
+    // 上传失败
+    fail(e) {
+      console.log('上传失败：', e)
+    },
+  },
+}
 </script>
 
 <template>
   <div class="h-full w-full">
     <div class="bg-[url('/static/background/12.jpg')] bg-cover h-[40%] relative">
       <div class="absolute bottom-[-5vh] left-[10vw] flex flex-row items-end">
-        <img src="/static/favicon/favicon.png" class="h-[10vh] w-[10vh] rounded-full mr-[10px]" />
+        <img src="/static/favicon/favicon.png" class="h-[10vh] w-[10vh] rounded-full mr-[10px]" alt="头像"/>
         <p class="font-['SYST'] text-[24px] mr-[20px] leading-none pb-[5px]">Lemon</p>
         <p class="font-['SYST'] text-[18px] mr-[10px] leading-none pb-[5px]">ID：552545</p>
         <div
-          class="bg-[#36BDB4] rounded-md mb-[3px] mr-[20px] text-[12px] h-[20px] w-[50px] flex flex-row justify-center items-center">
+            class="bg-[#36BDB4] rounded-md mb-[3px] mr-[20px] text-[12px] h-[20px] w-[50px] flex flex-row justify-center items-center">
           管理员
         </div>
         <p class="font-['SYST'] text-[14px] mr-[20px] leading-none pb-[5px]">生日：2006年3月1日</p>
@@ -67,31 +106,46 @@
         编辑信息
       </el-button>
       <el-dialog title="编辑个人信息" v-model="dialogVisible" center :before-close="handleClose"
-        class="flex flex-col items-center justify-center h-[400px]" width="60%">
+                 class="flex flex-col items-center justify-center h-[500px]" width="60%">
         <div class="w-full flex flex-row items-center justify-center">
-          <div class="w-[50%] my-[5px]">
+          <div class="w-[20%] my-[5px]">
             <span>头像：</span>
-            <uni-file-picker :limit="1" v-model="avatar" fileMediatype="image" mode="grid" @select="select" @progress="progress"
-              @success="success" @fail="fail" />
+            <uni-file-picker :limit="1" v-model="avatar" fileMediatype="image" mode="grid" @select="select"
+                             :image-styles="avatarStyles"
+                             @progress="progress"
+                             @success="success" @fail="fail"/>
           </div>
-          <div class="w-[50%] my-[5px]">
+          <div class="w-[30%] my-[5px]">
             <span>个人背景：</span>
             <uni-file-picker :limit="1" v-model="background" fileMediatype="image" mode="grid" @select="select"
-              @progress="progress" @success="success" @fail="fail" />
+                             :image-styles="backgroundStyles"
+                             @progress="progress" @success="success" @fail="fail"/>
+          </div>
+          <div class="w-[50%] my-[5px]">
+            <el-scrollbar height="250px">
+              <div class="grid gap-x-4 gap-y-[20px] grid-cols-4 auto-rows-auto w-full h-full">
+                <div v-for="avatar in avatarUrl" :key="avatar" class="w-full shadow-md">
+                  <div>
+                    <el-image class="w-full h-full" :src="avatar" fit="cover"/>
+                    <span>{{ avatar.match(/[0-9]+.jpg/) }}</span>
+                  </div>
+                </div>
+              </div>
+            </el-scrollbar>
           </div>
         </div>
         <div class="w-full flex flex-row items-center justify-between">
           <div class="w-[30%] my-[5px]">
             <span>用户名：</span>
-            <el-input v-model="username" class="w-full" />
+            <el-input v-model="username" class="w-full"/>
           </div>
           <div class="w-[30%] my-[5px]">
             <span>生日：</span>
-              <el-date-picker v-model="date" type="date" size="default" style="width: 100%" />
+            <el-date-picker v-model="date" type="date" size="default" style="width: 100%"/>
           </div>
           <div class="w-[30%] my-[5px]">
             <span>个性签名：</span>
-            <el-input v-model="motto" class="w-full" />
+            <el-input v-model="motto" class="w-full"/>
           </div>
         </div>
         <template #footer>
@@ -105,7 +159,4 @@
   </div>
 </template>
 <style scoped>
-  .so {
-    width: 100%;
-  }
 </style>

@@ -1,5 +1,5 @@
 <script>
-import SideNavigationBar from "../../components/SideNavigationBar.vue";
+import SideNavigationBar from "../components/SideNavigationBar.vue";
 
 export default {
   components: {SideNavigationBar},

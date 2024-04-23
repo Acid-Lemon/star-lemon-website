@@ -49,7 +49,7 @@ export default {
           radius: '2px'
         }
       },
-
+      clickFlag: -1,
     };
   },
   methods: {
@@ -82,13 +82,16 @@ export default {
     fail(e) {
       console.log('上传失败：', e)
     },
+    choose(index) {
+      this.clickFlag = index
+    }
   },
 }
 </script>
 
 <template>
   <div class="h-full w-full">
-    <div class="bg-[url('/static/background/12.jpg')] bg-cover h-[40%] relative">
+    <div class="bg-[url('/static/background/12.jpg')] bg-cover bg-center h-[40%] relative">
       <div class="absolute bottom-[-5vh] left-[10vw] flex flex-row items-end">
         <img alt="头像" class="h-[10vh] w-[10vh] rounded-full mr-[10px]" src="/static/favicon/favicon.png"/>
         <p class="font-['SYST'] text-[24px] mr-[20px] leading-none pb-[5px]">Lemon</p>
@@ -121,11 +124,11 @@ export default {
           <div class="w-[50%] my-[5px]">
             <el-scrollbar height="250px">
               <div class="grid gap-x-4 gap-y-[20px] grid-cols-4 auto-rows-auto w-full h-full">
-                <div v-for="avatar in avatarUrl" :key="avatar" class="w-full shadow-md">
-                  <div>
-                    <el-image :src="avatar" class="w-full h-full" fit="cover"/>
-                    <span>{{ avatar.match(/[0-9]+.jpg/) }}</span>
-                  </div>
+                <div v-for="(avatar,index) in avatarUrl" :key="avatar"
+                     :class="{'border-[2px]':clickFlag === index,'border-[#000000]':clickFlag === index,'border-dashed':clickFlag === index}"
+                     class="w-full shadow-md"
+                     @click="choose(index)">
+                  <el-image :src="avatar" class="w-full h-full" fit="cover"/>
                 </div>
               </div>
             </el-scrollbar>

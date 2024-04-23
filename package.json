@@ -10,10 +10,11 @@
     "vite": "^5.2.7"
   },
   "scripts": {
-    "tailwind-build": "tailwindcss -i ./tailwind-input.css -o tailwind-build.css --minify",
+    "tailwind-build": "tailwindcss -i ./tailwind-input.css -o tailwind-build.css",
     "tailwind-dev": "tailwindcss -i ./tailwind-input.css -o tailwind-build.css --watch"
   },
   "dependencies": {
+    "@dcloudio/vite-plugin-uni": "^3.0.0-alpha-3000020210727002",
     "element-plus": "^2.6.3",
     "vue-router": "^4.3.0"
   }

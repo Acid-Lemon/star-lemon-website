@@ -1,7 +1,4 @@
-import {
-    createRouter,
-    createWebHashHistory
-} from "vue-router";
+import {createRouter, createWebHashHistory} from "vue-router";
 
 const router = createRouter({
     history: createWebHashHistory(import.meta.env.BASE_URL),
@@ -25,6 +22,15 @@ const router = createRouter({
             }
         },
         component: () => import("@/src/views/image/ImageView.vue")
+    }, {
+        path: "/image-admin",
+        name: "image-admin",
+        meta: {
+            show: {
+                navigation_bar: false
+            },
+        },
+        component: () => import("@/src/views/image/ImageAdminView.vue")
     }, {
         path: "/developer",
         name: "developer",

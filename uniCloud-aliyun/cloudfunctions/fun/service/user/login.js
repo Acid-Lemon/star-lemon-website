@@ -7,10 +7,6 @@ const jwt_secret = require("uni-config-center")({ pluginId: "fun" }).config("JWT
 
 const bcrypt = require("bcryptjs");
 
-const {
-	AliClient
-} = require("../../utils/alicloud");
-
 const config = require('uni-config-center')({ pluginId: "fun" }).config();
 
 const error = require("../../types/error");
@@ -25,18 +21,19 @@ module.exports = class LoginService extends Service {
 		return code;
 	}
 
-	async send_code(phone_number, code) {
-		let res = await AliClient.send_sms_code(AliClient.createDysmsapiClient(config["ALIBABA_CLOUD_ACCESS_KEY_ID"], config["ALIBABA_CLOUD_ACCESS_KEY_SECRET"]), {
-			phone_number,
-			sign_name: config["ALIBABA_CLOUD_SMS_SIGN_NAME"],
-			template_id: config["ALIBABA_CLOUD_SMS_TEMPLATE_ID"],
-			template_code: config["ALIBABA_CLOUD_SMS_TEMPLATE_ID"],
-			template_param: JSON.stringify({code})
+	async send_code(phone_number, code, mode) {
+		let res = await uniCloud.sendSms({
+			appid: config["UNIAPP_ID"],
+			phone: phone_number,
+			templateId: config["UNICLOUD_SMS_TEMPLATE_ID"],
+			data: {
+				mode,
+				code: this.create_code(),
+				exp_minute: config["UNICLOUD_SMS_EXP_MINUTE"]
+			}
 		});
 
-		if (!res.success) {
-			return res;
-		}
+		console.log(res);
 
 		return res;
 	}
@@ -46,7 +43,6 @@ module.exports = class LoginService extends Service {
 	}
 
 	create_token(user) {
-		console.log(jwt_secret)
 		return "Bearer " + jwt.sign({
 			id: user["_id"]
 		}, jwt_secret);

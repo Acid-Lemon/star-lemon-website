@@ -1,16 +1,16 @@
 {
 	"name": "fun",
 	"dependencies": {
-		"@alicloud/dysmsapi20170525": "^2.0.24",
-		"@alicloud/openapi-client": "^0.4.8",
-		"@alicloud/tea-util": "^1.4.7",
 		"bcryptjs": "^2.4.3",
 		"jsonwebtoken": "^9.0.2",
 		"uni-cloud-router": "file:../../../uni_modules/uni-cloud-router/uniCloud/cloudfunctions/common/uni-cloud-router",
 		"uni-config-center": "file:../../../uni_modules/uni-config-center/uniCloud/cloudfunctions/common/uni-config-center"
 	},
 	"cloudfunction-config": {
-		"runtime": "Nodejs12"
+		"runtime": "Nodejs16"
 	},
-	"extensions": {}
+	"extensions": {
+		"uni-cloud-sms": {},
+		"uni-cloud-ext-storage": {}
+	}
 }

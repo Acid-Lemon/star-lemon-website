@@ -175,17 +175,17 @@ module.exports = class LoginController extends Controller {
 	async send_code() {
 		let {
 			phone_number,
-			mode_str
+			mode
 		} = this.ctx.event.args;
 		validate({
 			phone_number,
-			mode_str
+			mode
 		}, {
 			phone_number: {
 				type: "string",
 				regex: /^1[3456789]\d{9}$/
 			},
-			mode_str: {
+			mode: {
 				type: "string",
 				not_null: true,
 				customize: (args, name) => {
@@ -195,12 +195,7 @@ module.exports = class LoginController extends Controller {
 		});
 
 		let code = this.service.user.login.create_code();
-		let send_res = await this.service.user.login.send_code(phone_number, code, mode_str);
-		if (!send_res.success) {
-			console.log(send_res);
-
-			this.throw(send_res.code, send_res.message);
-		}
+		await this.service.user.login.send_code(phone_number, code, mode_str);
 
 		await this.service.db.sms_code.store_code(code, phone_number);
 

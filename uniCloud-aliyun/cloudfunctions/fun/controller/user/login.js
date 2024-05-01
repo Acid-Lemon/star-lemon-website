@@ -8,7 +8,7 @@ const {
 	validate
 } = require("../../utils/args_check");
 
-module.exports = class LoginController extends Controller {
+module.exports = class Controller_User_Login extends Controller {
 	async register_by_user() {
 		let {
 			username,

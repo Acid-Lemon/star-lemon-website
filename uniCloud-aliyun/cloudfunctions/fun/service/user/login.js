@@ -11,7 +11,7 @@ const config = require('uni-config-center')({ pluginId: "fun" }).config();
 
 const error = require("../../types/error");
 
-module.exports = class LoginService extends Service {
+module.exports = class Service_User_Login extends Service {
 	create_code() {
 		let code = "";
 		for (let i = 0; i < 6; i++) {

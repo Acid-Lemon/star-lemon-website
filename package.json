@@ -14,8 +14,8 @@
     "tailwind-dev": "tailwindcss -i ./tailwind-input.css -o tailwind-build.css --watch"
   },
   "dependencies": {
-    "@dcloudio/vite-plugin-uni": "^3.0.0-alpha-3000020210727002",
-    "element-plus": "^2.6.3",
+    "element-plus": "^2.7.2",
+    "pinia": "^2.1.7",
     "vue-router": "^4.3.0"
   }
 }

@@ -4,8 +4,6 @@ const {
 
 const error = require("../../types/error");
 
-const bcrypt = require("bcryptjs");
-
 const {
 	validate
 } = require("../../utils/args_check");
@@ -176,26 +174,35 @@ module.exports = class LoginController extends Controller {
 
 	async send_code() {
 		let {
-			phone_number
+			phone_number,
+			mode_str
 		} = this.ctx.event.args;
 		validate({
-			phone_number
+			phone_number,
+			mode_str
 		}, {
 			phone_number: {
 				type: "string",
 				regex: /^1[3456789]\d{9}$/
+			},
+			mode_str: {
+				type: "string",
+				not_null: true,
+				customize: (args, name) => {
+					return args[name] === "登录" || args[name] === "注册";
+				}
 			}
 		});
 
 		let code = this.service.user.login.create_code();
-		let send_res = await this.service.user.login.send_code(phone_number, code);
+		let send_res = await this.service.user.login.send_code(phone_number, code, mode_str);
 		if (!send_res.success) {
 			console.log(send_res);
 
 			this.throw(send_res.code, send_res.message);
 		}
 
-		await this.service.db.code.store_code(code, phone_number);
+		await this.service.db.sms_code.store_code(code, phone_number);
 
 		return {
 			data: null

@@ -9,3 +9,4 @@
 /uniCloud-aliyun/cloudfunctions/**/node_modules/
 
 /tailwind-build.css
+/components.d.ts

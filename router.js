@@ -70,7 +70,7 @@ const router = createRouter({
                 navigation_bar: false
             },
         },
-        component: () => import("@/src/views/AdminView.vue")
+        component: () => import("@/src/views/IndexAdminView.vue")
     }, {
         path: "/user",
         name: "user",
@@ -90,6 +90,15 @@ const router = createRouter({
             },
         },
         component: () => import("@/src/views/CountdownView.vue")
+    }, {
+        path: "/404",
+        name: "404",
+        meta: {
+            show: {
+                navigation_bar: false
+            },
+        },
+        component: () => import("@/src/views/404View.vue")
     },
     ],
 });

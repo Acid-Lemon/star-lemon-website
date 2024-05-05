@@ -35,15 +35,19 @@ module.exports = class Controller_User_Login extends Controller {
 			}
 		});
 
-		let user = await this.service.db.user.find_user_by_username(username);
-		if (user) {
+		let exist_user = await this.service.db.user.find_user_by_name(username);
+		if (exist_user) {
 			this.throw(error.codes.exist_user_name, "username already exists");
 		}
 
-		return await this.service.user.login.create_user({
-			username,
+		let user = await this.service.user.login.create_user({
+			name: username,
 			password
 		});
+
+		return {
+			data: user
+		};
 	}
 
 	async register_by_sms() {
@@ -89,11 +93,15 @@ module.exports = class Controller_User_Login extends Controller {
 
 		this.service.user.login.verify_code(code, code_record);
 
-		return await this.service.user.login.create_user({
+		let user = await this.service.user.login.create_user({
 			phone_number,
 			username,
 			password
 		});
+
+		return {
+			data: user
+		};
 	}
 
 	async login_by_user() {
@@ -116,7 +124,7 @@ module.exports = class Controller_User_Login extends Controller {
 			}
 		});
 
-		let user = await this.service.db.user.find_user_by_username(username);
+		let user = await this.service.db.user.find_user_by_name(username);
 
 		if (!user) {
 			this.throw(error.codes.no_user, "user not found");
@@ -199,8 +207,6 @@ module.exports = class Controller_User_Login extends Controller {
 
 		await this.service.db.sms_code.store_code(code, phone_number);
 
-		return {
-			data: null
-		};
+		return {};
 	}
 };

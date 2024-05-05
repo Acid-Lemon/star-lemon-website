@@ -5,7 +5,7 @@ const error = require("./types/error");
 
 exports.main = async (event, context) => {
 	let res = await router.serve(event, context);
-	console.info(res)
+	console.info(res);
 
 	if (res.success === false) {
 		if (!res.customize) {

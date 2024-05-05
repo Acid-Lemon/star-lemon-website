@@ -44,7 +44,7 @@ module.exports = class Service_User_Login extends Service {
 
 	create_token(user) {
 		return "Bearer " + jwt.sign({
-			id: user["_id"]
+			user_id: user.id
 		}, jwt_secret);
 	}
 

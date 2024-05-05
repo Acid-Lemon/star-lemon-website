@@ -3,6 +3,7 @@
 /node_modules/
 /unpackage/
 /uni_modules/uni-config-center/**/config.json
+/uniCloud-aliyun/.idea/
 /uniCloud-aliyun/database/
 /uniCloud-aliyun/cloudfunctions/common/uni-config-center/**/config.json
 /uniCloud-aliyun/cloudfunctions/**/node_modules/

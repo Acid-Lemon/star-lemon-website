@@ -6,23 +6,28 @@ const {
     tables
 } = require("./tables");
 
+const { id_name_format } = require("../../utils/db_result_format");
+
 module.exports = class DBService_User extends Service {
     async find_user_by_id(id) {
-        return (await this.db.collection(tables.user).doc(id).get()).data[0];
+        return id_name_format((await this.db.collection(tables.user).doc(id).get()).data[0]);
     }
 
-    async find_user_by_username(username) {
-        return (await this.db.collection(tables.user).where({username}).get()).data[0];
+    async find_user_by_name(name) {
+        return id_name_format((await this.db.collection(tables.user).where({name}).get()).data[0]);
     }
 
     async find_user_by_phone_number(phone_number) {
-        return (await this.db.collection(tables.user).where({phone_number}).get()).data[0];
+        return id_name_format((await this.db.collection(tables.user).where({phone_number}).get()).data[0]);
     }
 
     async create_user(user) {
-        return await this.db.collection(tables.user).add({
+        let record_id = await this.db.collection(tables.user).add({
             ...user,
             create_at: Date.now()
         });
+
+        return {id: record_id};
     }
 }
+

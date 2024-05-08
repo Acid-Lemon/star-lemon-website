@@ -17,19 +17,20 @@ module.exports = () => {
 			return;
 		}
 
+		let auth_info;
 		try {
-			let auth = jwt.verify(token.replace("Bearer ", ""), jwt_secret);
+			auth_info = jwt.verify(token.replace("Bearer ", ""), jwt_secret);
 		} catch (err) {
-			if (err instanceof jwt.JsonWebTokenError) {
-				ctx.throw(error.codes.invalid_token, "invalid token");
-			}
-
 			if (err instanceof jwt.TokenExpiredError) {
 				ctx.throw(error.codes.token_expire, "token expired. login again");
 			}
+
+			ctx.throw(error.codes.invalid_token, "invalid token");
 		}
 
-		ctx.auth = auth;
+		console.log("auth_info:", auth_info);
+
+		ctx.auth = auth_info;
 		await next();
 	}
 }

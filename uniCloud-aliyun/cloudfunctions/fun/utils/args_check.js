@@ -63,6 +63,38 @@ class RuleHandler {
         }
     }
 
+    math(args, name, rules) {
+        if (!(rules instanceof Object)) {
+            throw TypeError(`rules[${name}]: value of rule[length] is not an object`);
+        }
+
+        let arg = args[name];
+
+        for (let rule of Object.entries(Object(rules))) {
+            let [math_rule_name, math_rule_val] = rule;
+            switch (math_rule_name) {
+                case "equal":
+                    if (arg !== math_rule_val) {
+                        throw_handle_error(`args[${name}] invalid. expect length ${math_rule_val}, but got length ${arg}`);
+                    }
+                    return;
+                case "min":
+                    if (arg < math_rule_val) {
+                        throw_handle_error(`args[${name}] invalid. expect length >= ${math_rule_val}, but got length ${arg}`);
+                    }
+                    break;
+
+                case "max":
+                    if (arg > math_rule_val) {
+                        throw_handle_error(`args[${name}] invalid. expect length <= ${math_rule_val}, but got length ${arg}`);
+                    }
+                    break;
+                default:
+                    throw TypeError(`rules[${name}]>rules[length]: unknown rule[${math_rule_name}]`);
+            }
+        }
+    }
+
     regex(args, name, re) {
         if (!(re instanceof RegExp)) {
             if (!re instanceof String) {
@@ -132,4 +164,3 @@ function validate(args, rules) {
 module.exports = {
     validate
 };
-

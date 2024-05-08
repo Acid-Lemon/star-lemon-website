@@ -49,6 +49,10 @@
 			},
 
 			async messages_format(messages) {
+				if (!messages) {
+					return [];
+				}
+				
 				return await Promise.all(messages.map((message) => {
 					return new Promise((resolve) => {
 						message.user.avatar_filename = message.user.avatar + ".jpg"
@@ -58,7 +62,9 @@
 				}));
 			},
 			async get_messages() {
-				let res = await call_api("getMessages");
+				let res = await call_api("message_board/get_messages", {
+					message_number: 20
+				});
 
 				if (!res.success) {
 					await ElMessageBox({
@@ -70,7 +76,7 @@
 
 					return;
 				}
-
+				
 				this.message_list = await this.messages_format(res.data.messages);
 			},
 
@@ -96,7 +102,7 @@
 					return;
 				}
 
-				let res = await call_api("publishMessage", {
+				let res = await call_api("message_board/create_message", {
 					content: message
 				});
 

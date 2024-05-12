@@ -31,9 +31,21 @@ export default {
     </div>
     <div class="w-full h-[20%]">
       <div class="text-[30px] font-['SYST']">
-        此网站所用到的技术
+        此网站主要所用到的技术
       </div>
-      <img alt="Vue" class="w-[8vh] h-[8vh] m-[5px]" src="/static/svg/Vue.svg"/>
+      <div class="flex flex-row">
+        <img alt="html" class="w-[8vh] h-[8vh] m-[5px]" src="/static/svg/html.svg"/>
+        <img alt="加号" class="w-[8vh] h-[8vh] m-[5px]" src="/static/svg/加号.svg"/>
+        <img alt="css" class="w-[8vh] h-[8vh] m-[5px]" src="/static/svg/css.svg"/>
+        <img alt="加号" class="w-[8vh] h-[8vh] m-[5px]" src="/static/svg/加号.svg"/>
+        <img alt="javascript" class="w-[8vh] h-[8vh] m-[5px]" src="/static/svg/javascript.svg"/>
+        <img alt="加号" class="w-[8vh] h-[8vh] m-[5px]" src="/static/svg/加号.svg"/>
+        <img alt="Vue" class="w-[8vh] h-[8vh] m-[5px]" src="/static/svg/Vue.svg"/>
+        <img alt="加号" class="w-[8vh] h-[8vh] m-[5px]" src="/static/svg/加号.svg"/>
+        <img alt="element-UI" class="w-[8vh] h-[8vh] m-[5px]" src="/static/svg/element-UI.svg"/>
+        <img alt="加号" class="w-[8vh] h-[8vh] m-[5px]" src="/static/svg/加号.svg"/>
+        <img alt="tailwind-css" class="w-[8vh] h-[8vh] m-[5px]" src="/static/svg/tailwind-css.svg"/>
+      </div>
     </div>
     <div class="w-full h-[30%] flex flex-row items-center content-center">
       <div class="w-[15%] h-full flex flex-col justify-center items-center">

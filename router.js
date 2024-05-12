@@ -11,7 +11,7 @@ const router = createRouter({
                 svg: "/static/svg/首页.svg"
             },
         },
-        component: () => import("@/src/views/IndexView.vue")
+        component: () => import("@/src/views/index/IndexView.vue")
     }, {
         path: "/image",
         name: "image",
@@ -70,7 +70,7 @@ const router = createRouter({
                 navigation_bar: false
             },
         },
-        component: () => import("@/src/views/IndexAdminView.vue")
+        component: () => import("@/src/views/AdminView.vue")
     }, {
         path: "/user",
         name: "user",

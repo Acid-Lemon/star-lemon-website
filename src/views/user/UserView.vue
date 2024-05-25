@@ -125,7 +125,7 @@ export default {
             <el-scrollbar height="250px">
               <div class="grid gap-x-4 gap-y-[20px] grid-cols-4 auto-rows-auto w-full h-full">
                 <div v-for="(avatar,index) in avatarUrl" :key="avatar"
-                     :class="{'border-[2px]':clickFlag === index,'border-[#000000]':clickFlag === index,'border-dashed':clickFlag === index}"
+                     :class="{'border-[2px]':clickFlag === index,'border-[#08d9d6]':clickFlag === index}"
                      class="w-full shadow-md"
                      @click="choose(index)">
                   <el-image :src="avatar" class="w-full h-full" fit="cover"/>
@@ -135,15 +135,15 @@ export default {
           </div>
         </div>
         <div class="w-full flex flex-row items-center justify-between">
-          <div class="w-[30%] my-[5px]">
+          <div class="w-[20%] my-[5px]">
             <span>用户名：</span>
             <el-input v-model="username" class="w-full"/>
           </div>
-          <div class="w-[30%] my-[5px]">
+          <div class="w-[20%] my-[5px]">
             <span>生日：</span>
             <el-date-picker v-model="date" size="default" style="width: 100%" type="date"/>
           </div>
-          <div class="w-[30%] my-[5px]">
+          <div class="w-[50%] my-[5px]">
             <span>个性签名：</span>
             <el-input v-model="motto" class="w-full"/>
           </div>

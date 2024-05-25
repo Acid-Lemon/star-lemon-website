@@ -4,6 +4,7 @@ import {ElMessageBox} from "element-plus";
 
 import {date_format} from "@/src/utils/time";
 import {get_user} from "@/src/utils/user_info";
+import axios from "axios";
 
 export default {
   data() {
@@ -17,13 +18,27 @@ export default {
         contentdown: "更多留言",
         contentrefresh: "正在加载",
         contentnomore: "没有惹"
-      }
+      },
+      sentences: null
     };
   },
   async mounted() {
     await this.get_messages();
+    await this.get_sentences();
   },
   methods: {
+    async get_sentences() {
+      if (window.sessionStorage.getItem("sentences") === null) {
+        axios.get(
+            'https://v1.hitokoto.cn?c=j&encode=json'
+        ).then((res) => {
+          this.sentences = res.data;
+          window.sessionStorage.setItem("sentences", JSON.stringify(res.data))
+        });
+      } else {
+        this.sentences = JSON.parse(window.sessionStorage.getItem("sentences"));
+      }
+    },
     Load() {
       console.log("ok")
     },
@@ -151,9 +166,9 @@ export default {
       </div>
       <div class="w-full h-full flex flex-col items-center justify-center">
         <p class="text-[2.4vh] m-[2vh] font-['SJJS']">
-          希望你别像风，在我这里掀起了万般波澜，却又跟云去了远方。
+          {{ sentences.hitokoto }}
         </p>
-        <p class="text-[1.9vh] m-[2vh] font-['SJJS']">——网易云音乐热评《如风过境》</p>
+        <p class="text-[1.9vh] m-[2vh] font-['SJJS']">——{{ sentences.from }}</p>
       </div>
     </div>
     <p class="mx-[2vh] font-serif text-[2.4vh]">
@@ -181,7 +196,8 @@ export default {
       </div>
       <uni-load-more
           :content-text="loadText"
-          class="w-[10%] h-[5vh] border-[#000000] flex flex-row items-center justify-center rounded-full border font-['SYST']" status="more" @clickLoadMore="Load"/>
+          class="w-[10%] h-[5vh] border-[#000000] flex flex-row items-center justify-center rounded-full border font-['SYST']"
+          status="more" @clickLoadMore="Load"/>
     </div>
     <div class="my-[3vh] flex flex-col justify-center md:w-[70%] w-[85%]">
       <div class="mb-[3vh] relative">
@@ -194,7 +210,8 @@ export default {
                   type="text" @blur="onBlur" @focus="onFocus"></textarea>
       </div>
       <div class="w-full flex flex-row justify-around">
-        <button :disabled="buttonDisabled" class="w-[20%] h-[5vh] border border-[#000000] rounded-full disabled:border-[#E1FF00]"
+        <button :disabled="buttonDisabled"
+                class="w-[20%] h-[5vh] border border-[#000000] rounded-full disabled:border-[#E1FF00]"
                 @click="publish_message">
           发送
         </button>

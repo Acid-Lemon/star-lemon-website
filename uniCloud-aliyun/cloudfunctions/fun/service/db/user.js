@@ -6,7 +6,7 @@ const {
     tables
 } = require("./tables");
 
-const { id_name_format } = require("../../utils/db_result_format");
+const { id_name_format } = require("../../utils/db/result_format");
 
 module.exports = class DBService_User extends Service {
     async find_user_by_id(id) {

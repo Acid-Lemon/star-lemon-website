@@ -17,6 +17,7 @@
     "axios": "^1.6.8",
     "element-plus": "^2.7.2",
     "pinia": "^2.1.7",
+    "vue-hooks-plus": "^2.1.0",
     "vue-router": "^4.3.0"
   }
 }

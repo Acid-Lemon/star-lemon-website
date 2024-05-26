@@ -20,6 +20,30 @@ export default {
         }],
         say: "二十多岁的年纪，有人继续就学，有人考公考编，恋爱结婚。大家穿着不同的鞋子，注定要走不同的路。好像二十几岁的生活被按了加速键，我的身边充斥着各种声音，你该如何如何，于是内心一直不坚定，生怕赶不上别人。二十几岁是兵荒马乱的年纪，想要得太多，就会乱了阵脚。有时候摧毁一些东西，毫不费力，我时常问自己，到底想要成为什么样的人。人生是旷野，而非既定轨道。一生的时间太漫长，让树成树，让花成花。允许一切如其所是，大家都在各自的时区里，没有快慢。所以我应该不用追赶，不用慌乱害怕。好好感受当下，做好当下的事才是最重要的。小时候不懂事，总觉得一个人太孤单。后来一个人走了很远的路，时常感叹人生无常，不停后悔说过的话，做过的事，很难往前走，我不在期待谁能与我在一起，度过我人生中的每一分钟。事事难料，随遇而安，珍惜当下。改天是哪天，下次是哪次。以后是多远，山高路远，独善其身，看世界，也找自己。欲买桂花同载酒，终不似少年游。"
       },
+      power: [
+        {
+          name: "html",
+          svg: "/static/svg/html.svg",
+        }, {
+          name: "css",
+          svg: "/static/svg/css.svg",
+        }, {
+          name: "javascript",
+          svg: "/static/svg/javascript.svg",
+        }, {
+          name: "Vue",
+          svg: "/static/svg/Vue.svg",
+        }, {
+          name: "element-UI",
+          svg: "/static/svg/element-UI.svg",
+        }, {
+          name: "tailwind-css",
+          svg: "/static/svg/tailwind-css.svg",
+        }, {
+          name: "pinia",
+          svg: "/static/svg/pinia.svg",
+        }
+      ]
     };
   },
 };
@@ -34,17 +58,11 @@ export default {
         此网站主要所用到的技术
       </div>
       <div class="flex flex-row">
-        <img alt="html" class="w-[8vh] h-[8vh] m-[5px]" src="/static/svg/html.svg"/>
-        <img alt="加号" class="w-[8vh] h-[8vh] m-[5px]" src="/static/svg/加号.svg"/>
-        <img alt="css" class="w-[8vh] h-[8vh] m-[5px]" src="/static/svg/css.svg"/>
-        <img alt="加号" class="w-[8vh] h-[8vh] m-[5px]" src="/static/svg/加号.svg"/>
-        <img alt="javascript" class="w-[8vh] h-[8vh] m-[5px]" src="/static/svg/javascript.svg"/>
-        <img alt="加号" class="w-[8vh] h-[8vh] m-[5px]" src="/static/svg/加号.svg"/>
-        <img alt="Vue" class="w-[8vh] h-[8vh] m-[5px]" src="/static/svg/Vue.svg"/>
-        <img alt="加号" class="w-[8vh] h-[8vh] m-[5px]" src="/static/svg/加号.svg"/>
-        <img alt="element-UI" class="w-[8vh] h-[8vh] m-[5px]" src="/static/svg/element-UI.svg"/>
-        <img alt="加号" class="w-[8vh] h-[8vh] m-[5px]" src="/static/svg/加号.svg"/>
-        <img alt="tailwind-css" class="w-[8vh] h-[8vh] m-[5px]" src="/static/svg/tailwind-css.svg"/>
+        <div v-for="i in power" class="flex flex-row">
+          <img :alt="i.name" :src="i.svg" class="w-[8vh] h-[8vh] m-[5px]"/>
+          <img alt="加号" class="w-[8vh] h-[8vh] m-[5px]" src="/static/svg/加号.svg"/>
+        </div>
+        <img alt="省略号" class="w-[8vh] h-[8vh] m-[5px]" src="/static/svg/省略号.svg"/>
       </div>
     </div>
     <div class="w-full h-[30%] flex flex-row items-center content-center">

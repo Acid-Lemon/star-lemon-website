@@ -52,13 +52,13 @@ export default {
             <span>网络状态</span>
           </div>
         </template>
-        <div>网络状态：{{ NetworkState.online ? "在线" : "离线" }}</div>
-        <div>往返时延：{{ NetworkState.rtt }} ms</div>
-        <div>网络类型：{{ NetworkState.effectiveType }}</div>
-        <div>下行速度：{{ NetworkState.downlink / 8 }} MB/s</div>
+        <div>网络状态：{{ NetworkState?.online ? "在线" : "离线" }}</div>
+        <div>往返时延：{{ NetworkState?.rtt }} ms</div>
+        <div>网络类型：{{ NetworkState?.effectiveType }}</div>
+        <div>下行速度：{{ NetworkState?.downlink / 8 }} MB/s</div>
         <template #footer></template>
       </el-card>
-      
+
     </div>
   </div>
 </template>

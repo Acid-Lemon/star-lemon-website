@@ -72,6 +72,7 @@ export default {
       let res = await call_api("message_board/get_messages", {
         message_number: 20
       });
+      console.log(res)
 
       if (!res.success) {
         ElNotification({
@@ -89,6 +90,7 @@ export default {
     check_message(message) {
       if (message.length === 0) {
         ElNotification({
+          title: 'Error',
           type: "error",
           message: "留言不能为空噢!",
         });
@@ -117,6 +119,7 @@ export default {
 
       if (!res.success) {
         ElNotification({
+          title: 'Error',
           type: "error",
           message: res.error_message,
         });
@@ -137,6 +140,7 @@ export default {
       this.message_list.push(new_message_format);
 
       ElNotification({
+        title: 'Success',
         type: "success",
         message: "发送成功"
       });
@@ -163,9 +167,9 @@ export default {
         </div>
         <div class="w-full h-full flex flex-col items-center justify-center">
           <p class="text-[2.4vh] m-[2vh] font-['SJJS']">
-            {{ sentences.hitokoto }}
+            {{ sentences?.hitokoto }}
           </p>
-          <p class="text-[1.9vh] m-[2vh] font-['SJJS']">——{{ sentences.from }}</p>
+          <p class="text-[1.9vh] m-[2vh] font-['SJJS']">——{{ sentences?.from }}</p>
         </div>
       </div>
       <p class="mx-[2vh] font-serif text-[2.4vh]">

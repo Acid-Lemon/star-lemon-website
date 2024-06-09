@@ -10,7 +10,16 @@ export default {
         "/static/picture/IMG_0075.JPG",
         "/static/picture/IMG_0074.JPG",
       ],
-      NetworkState: null
+      NetworkState: null,
+      list: [
+        {
+          name: 'Young',
+          url: '/static/music/Young-The_Chainsmokers.mp3',
+          img:
+              '',
+          singer: 'The_Chainsmokers',
+        },
+      ],
     };
   },
   async mounted() {
@@ -49,6 +58,7 @@ export default {
         <div>下行速度：{{ NetworkState.downlink / 8 }} MB/s</div>
         <template #footer></template>
       </el-card>
+      
     </div>
   </div>
 </template>

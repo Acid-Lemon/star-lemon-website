@@ -11,6 +11,7 @@ module.exports = () => {
 		
 		if (ctx.event.action.indexOf("login") !== -1) {
 			await next();
+			return;
 		}
 		
 		if (!token) {

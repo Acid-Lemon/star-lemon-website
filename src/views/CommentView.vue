@@ -1,6 +1,6 @@
 <script>
 import {call_api} from "@/src/utils/cloud";
-import {ElMessageBox, ElNotification} from "element-plus";
+import {ElNotification} from "element-plus";
 
 import {date_format} from "@/src/utils/time";
 import {get_user} from "@/src/utils/user_info";
@@ -116,11 +116,9 @@ export default {
       }
 
       if (!res.success) {
-        await ElMessageBox({
+        ElNotification({
           type: "error",
           message: res.error_message,
-          confirmButtonText: "确定",
-          autofocus: true
         });
 
         return;
@@ -138,7 +136,7 @@ export default {
       let new_message_format = (await this.messages_format([new_message]))[0];
       this.message_list.push(new_message_format);
 
-      await ElMessageBox({
+      ElNotification({
         type: "success",
         message: "发送成功"
       });

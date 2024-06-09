@@ -1,9 +1,10 @@
 <script>
 import {call_api} from "@/src/utils/cloud";
-import {ElMessageBox} from "element-plus";
+import {ElNotification} from "element-plus";
 
 import {date_format} from "@/src/utils/time";
 import {get_user} from "@/src/utils/user_info";
+import axios from "axios";
 
 export default {
   data() {
@@ -17,13 +18,27 @@ export default {
         contentdown: "更多留言",
         contentrefresh: "正在加载",
         contentnomore: "没有惹"
-      }
+      },
+      sentences: null
     };
   },
   async mounted() {
     await this.get_messages();
+    await this.get_sentences();
   },
   methods: {
+    async get_sentences() {
+      if (window.sessionStorage.getItem("sentences") === null) {
+        axios.get(
+            'https://v1.hitokoto.cn?c=j&encode=json'
+        ).then((res) => {
+          this.sentences = res.data;
+          window.sessionStorage.setItem("sentences", JSON.stringify(res.data))
+        });
+      } else {
+        this.sentences = JSON.parse(window.sessionStorage.getItem("sentences"));
+      }
+    },
     Load() {
       console.log("ok")
     },
@@ -57,13 +72,13 @@ export default {
       let res = await call_api("message_board/get_messages", {
         message_number: 20
       });
+      console.log(res)
 
       if (!res.success) {
-        await ElMessageBox({
-          type: "error",
-          message: "获取留言失败",
-          confirmButtonText: "确定",
-          autofocus: true
+        ElNotification({
+          title: 'Error',
+          message: '获取留言失败',
+          type: 'error',
         });
 
         return;
@@ -74,11 +89,10 @@ export default {
 
     check_message(message) {
       if (message.length === 0) {
-        ElMessageBox({
+        ElNotification({
+          title: 'Error',
           type: "error",
-          message: "留言不能为空哦!",
-          confirmButtonText: "确定",
-          autofocus: true
+          message: "留言不能为空噢!",
         });
         return false;
       }
@@ -95,21 +109,21 @@ export default {
       }
 
       let res = await call_api("message_board/create_message", {
-        content: message
+        content: message,
       });
 
       if (res.api_call_success) {
         this.value = "";
+        this.buttonDisabled = false;
       }
 
       if (!res.success) {
-        await ElMessageBox({
+        ElNotification({
+          title: 'Error',
           type: "error",
           message: res.error_message,
-          confirmButtonText: "确定",
-          autofocus: true
         });
-        this.buttonDisabled = false;
+
         return;
       }
 
@@ -125,7 +139,8 @@ export default {
       let new_message_format = (await this.messages_format([new_message]))[0];
       this.message_list.push(new_message_format);
 
-      await ElMessageBox({
+      ElNotification({
+        title: 'Success',
         type: "success",
         message: "发送成功"
       });
@@ -137,74 +152,78 @@ export default {
 </script>
 
 <template>
-  <div
-      class="bg-[url('/static/background/11.jpg')] bg-cover w-full md:h-[40%] flex flex-col items-center justify-center h-[30%]">
-    <p class="text-[#000000] font-['SYST'] text-[6vh] hover:text-[#44cef6] duration-700">
-      留言板
-    </p>
-  </div>
-  <div class="flex flex-col items-center justify-center">
+  <div class="w-full h-full">
     <div
-        class="border border-[#000000] m-[5vh] h-[30vh] md:w-[70%] w-[85%] flex flex-col items-center justify-center">
-      <div class="relative top-[-2.5vh] bg-white">
-        <p class="mx-[1vw] text-[3.6vh] font-['RGBZ']">网易云音乐热评</p>
-      </div>
-      <div class="w-full h-full flex flex-col items-center justify-center">
-        <p class="text-[2.4vh] m-[2vh] font-['SJJS']">
-          希望你别像风，在我这里掀起了万般波澜，却又跟云去了远方。
-        </p>
-        <p class="text-[1.9vh] m-[2vh] font-['SJJS']">——网易云音乐热评《如风过境》</p>
-      </div>
+        class="bg-[url('/static/background/11.jpg')] bg-cover w-full md:h-[40%] flex flex-col items-center justify-center h-[30%]">
+      <p class="text-[#000000] font-['SYST'] text-[6vh] hover:text-[#44cef6] duration-700">
+        留言板
+      </p>
     </div>
-    <p class="mx-[2vh] font-serif text-[2.4vh]">
-      很感谢你能访问该页面，如果你有什么和我们说的，或者有什么问题想问的，可以随时在下面评论噢~！我们看见了会第一时间回复你的。
-    </p>
-    <div class="flex flex-row md:w-[70%] w-[85%] mt-[2vh] border-b-[1px] border-[#000000]">
-      <div class="flex flex-row items-end">
-        <span class="text-[4vh] font-bold font-['RGBZ']">comment</span><span
-          class="text-[2vh] mb-[1vh] mx-[2vh] font-['SJJS']">{{ message_list.length }}条评论</span>
-      </div>
-    </div>
-    <div v-for="page in pages" class="my-[1em] flex flex-col items-center w-full">
-      <div v-for="message in message_list" :key="message.id" class="my-[1em] flex flex-col items-center w-full">
-        <div class="border border-[#000000] md:w-[70%] w-[85%]">
-          <div class="flex flex-row mt-[1vh] ml-[1vh]">
-            <img :src="`/avatar/${message.user.avatar_filename}`"
-                 alt="头像" class="w-[6vh] h-[6vh] mr-[1vh] rounded-full"/>
-            <div class="flex flex-col">
-              <p class="text-[2.4vh]">{{ message.user.name }}</p>
-              <p class="text-[1.8vh]">发布于{{ message.create_at_format_str }}</p>
-            </div>
-          </div>
-          <p class="m-[1vh]">{{ message.content }}</p>
+    <div class="flex flex-col items-center justify-center">
+      <div
+          class="border border-[#000000] m-[5vh] h-[30vh] md:w-[70%] w-[85%] flex flex-col items-center justify-center">
+        <div class="relative top-[-2.5vh] bg-white">
+          <p class="mx-[1vw] text-[3.6vh] font-['RGBZ']">网易云音乐热评</p>
+        </div>
+        <div class="w-full h-full flex flex-col items-center justify-center">
+          <p class="text-[2.4vh] m-[2vh] font-['SJJS']">
+            {{ sentences?.hitokoto }}
+          </p>
+          <p class="text-[1.9vh] m-[2vh] font-['SJJS']">——{{ sentences?.from }}</p>
         </div>
       </div>
-      <uni-load-more
-          :content-text="loadText"
-          class="w-[10%] h-[5vh] border-[#000000] flex flex-row items-center justify-center rounded-full border font-['SYST']" status="more" @clickLoadMore="Load"/>
-    </div>
-    <div class="my-[3vh] flex flex-col justify-center md:w-[70%] w-[85%]">
-      <div class="mb-[3vh] relative">
-        <p :class="{'text-[#FFFFFF]':style_mode,'bg-black':style_mode,'text-[1.8vh]':style_mode,'top-[-1.2vh]':style_mode,'left-[1.4vh]':style_mode,
+      <p class="mx-[2vh] font-serif text-[2.4vh]">
+        很感谢你能访问该页面，如果你有什么和我们说的，或者有什么问题想问的，可以随时在下面评论噢~！我们看见了会第一时间回复你的。
+      </p>
+      <div class="flex flex-row md:w-[70%] w-[85%] mt-[2vh] border-b-[1px] border-[#000000]">
+        <div class="flex flex-row items-end">
+          <span class="text-[4vh] font-bold font-['RGBZ']">comment</span><span
+            class="text-[2vh] mb-[1vh] mx-[2vh] font-['SJJS']">{{ message_list.length }}条评论</span>
+        </div>
+      </div>
+      <div v-for="page in pages" class="my-[1em] flex flex-col items-center w-full">
+        <div v-for="message in message_list" :key="message.id" class="my-[1em] flex flex-col items-center w-full">
+          <div class="border border-[#000000] md:w-[70%] w-[85%]">
+            <div class="flex flex-row mt-[1vh] ml-[1vh]">
+              <img :src="`/avatar/${message.user.avatar_filename}`"
+                   alt="头像" class="w-[6vh] h-[6vh] mr-[1vh] rounded-full"/>
+              <div class="flex flex-col">
+                <p class="text-[2.4vh]">{{ message.user.name }}</p>
+                <p class="text-[1.8vh]">发布于{{ message.create_at_format_str }}</p>
+              </div>
+            </div>
+            <p class="m-[1vh]">{{ message.content }}</p>
+          </div>
+        </div>
+        <uni-load-more
+            :content-text="loadText"
+            class="w-[10%] h-[5vh] border-[#000000] flex flex-row items-center justify-center rounded-full border font-['SYST']"
+            status="more" @clickLoadMore="Load"/>
+      </div>
+      <div class="my-[3vh] flex flex-col justify-center md:w-[70%] w-[85%]">
+        <div class="mb-[3vh] relative">
+          <p :class="{'text-[#FFFFFF]':style_mode,'bg-black':style_mode,'text-[1.8vh]':style_mode,'top-[-1.2vh]':style_mode,'left-[1.4vh]':style_mode,
             'text-[#000000]':!style_mode,'bg-white':!style_mode,'text-[2.2vh]':!style_mode,'top-[1vh]':!style_mode,'left-[1vh]':!style_mode}
             " class="absolute pointer-events-none px-[1vh] duration-700 z-50">
-          你是我一生只会遇见一次的惊喜...
-        </p>
-        <textarea id="pl" v-model="value" class="w-full h-[20vh] p-[2vh] border border-[#000000] min-h-[20vh]"
-                  type="text" @blur="onBlur" @focus="onFocus"></textarea>
-      </div>
-      <div class="w-full flex flex-row justify-around">
-        <button :disabled="buttonDisabled" class="w-[20%] h-[5vh] border border-[#000000] rounded-full disabled:border-[#E1FF00]"
-                @click="publish_message">
-          发送
-        </button>
-        <button class="w-[20%] h-[5vh] border border-[#000000] rounded-full" @click="clear">
-          清除
-        </button>
+            你是我一生只会遇见一次的惊喜...
+          </p>
+          <textarea id="pl" v-model="value" class="w-full h-[20vh] p-[2vh] border border-[#000000] min-h-[20vh]"
+                    type="text" @blur="onBlur" @focus="onFocus"></textarea>
+        </div>
+        <div class="w-full flex flex-row justify-around">
+          <button :disabled="buttonDisabled"
+                  class="w-[20%] h-[5vh] border border-[#000000] rounded-full disabled:border-[#E1FF00]"
+                  @click="publish_message">
+            发布
+          </button>
+          <button class="w-[20%] h-[5vh] border border-[#000000] rounded-full" @click="clear">
+            清除
+          </button>
+        </div>
       </div>
     </div>
+    <div class="h-[20px]"></div>
   </div>
-  <div class="h-[20px]"></div>
 </template>
 <style scoped>
 </style>

@@ -1,6 +1,162 @@
+<script>
+import {call_api} from "@/src/utils/cloud.js";
+
+import {ElLoading, ElNotification} from "element-plus";
+
+export default {
+  data() {
+    return {
+      state: {
+        text: "登录",
+        id: "login",
+        // 登录和注册，登陆状态是true，注册状态是false
+        value: true,
+        // 用户名登录和手机号登录，用户名登录是true，手机号登录是false
+        mode: true,
+      },
+      username: "",
+      password: "",
+      confirm_password: "",
+      phone_number: "",
+      code: "",
+      username_tip: "",
+      password_tip: "",
+      confirm_password_tip: "",
+      phone_number_tip: "如若没有可不填",
+      code_tip: ""
+    };
+  },
+  methods: {
+    register_mode() {
+      this.state.value = false;
+      this.state.text = "注册";
+      this.state.id = "register";
+    },
+    phone_number_mode() {
+      this.state.mode = false;
+      this.phone_number_tip = "";
+    },
+    check() {
+      if (this.username.length < 1 || this.username.length > 15) {
+        this.username_tip = "用户名不符合要求";
+        this.username = "";
+        return false;
+      }
+      if (this.password.length < 5 || this.password.length > 25) {
+        this.password_tip = "密码不符合要求";
+        this.password = "";
+        this.confirm_password = "";
+        return false;
+      }
+      if (this.password !== this.confirm_password) {
+        this.confirm_password_tip = "前后密码不一致";
+        this.confirm_password = "";
+        return false;
+      }
+      return true;
+    },
+    async send_code() {
+      if (!(/^1[3456789]\d{9}$/.test(this.phone_number))) {
+        ElNotification({
+          title: 'Warning',
+          type: "warning",
+          message: "手机号格式错误",
+        });
+        return;
+      }
+
+      let res = await call_api("user/login/send_code", {
+        phone_number: this.phone_number,
+        mode: this.state.text
+      });
+
+      if (res.success) {
+        ElNotification({
+          title: 'Success',
+          type: "success",
+          message: "发送成功",
+        });
+      } else {
+        ElNotification({
+          title: 'Error',
+          type: "error",
+          message: "发送失败：" + res.error_message,
+        });
+      }
+    },
+    async login() {
+      if (this.state.value === false) {
+        if (!this.check()) {
+          return;
+        }
+      }
+
+      if (this.phone_number && !this.code) {
+        ElNotification({
+          title: 'Warning',
+          type: "warning",
+          message: "未获取验证码",
+        });
+
+        return;
+      }
+
+      if (this.state.value === false) {
+        // noinspection RedundantConditionalExpressionJS
+        this.state.mode = this.phone_number ? false : true;
+      }
+
+      let loading = ElLoading.service();
+      let res;
+      if (this.state.mode === true) {
+        res = await call_api(`user/login/${this.state.value === true ? "login" : "register"}_by_user`, {
+          username: this.username,
+          password: this.password
+        });
+      } else {
+        res = await call_api(`user/login/${this.state.value === true ? "login" : "register"}_by_sms`, {
+          username: this.username,
+          password: this.password,
+          phone_number: this.phone_number,
+          code: this.code
+        });
+      }
+
+      loading.close();
+
+      if (res.success === false) {
+        // 显示错误
+        ElNotification({
+          title: 'Error',
+          type: "error",
+          message: res.error_message,
+        });
+
+        if (!res.api_call_success) {
+          this.username = "";
+          this.password = "";
+          this.confirm_password = "";
+        }
+
+        return;
+      }
+
+      ElNotification({
+        title: 'Success',
+        type: "success",
+        message: "登录成功",
+        callback: () => {
+          this.$router.back();
+        }
+      }).catch();
+    }
+  }
+}
+</script>
+
 <template>
   <div
-      class="bg-[url('/static/background/22.jpg')] h-dvh bg-cover flex flex-row justify-between items-center p-[5vh]">
+      class="bg-[url('/static/background/22.jpg')] h-full w-full bg-cover flex flex-row justify-between items-center p-[5vh]">
     <div class="md:block hidden w-[100%]">
       <div class="flex flex-col items-center">
         <span class="font-['RGBZ'] text-[5vw] text-[#FFFFFF]">“海阔凭鱼跃，</span>
@@ -67,166 +223,3 @@
     </div>
   </div>
 </template>
-
-<script>
-import {call_api} from "@/src/utils/cloud.js";
-
-import {ElLoading, ElMessageBox} from "element-plus";
-
-export default {
-  data() {
-    return {
-      state: {
-        text: "登录",
-        id: "login",
-        // 登录和注册，登陆状态是true，注册状态是false
-        value: true,
-        // 用户名登录和手机号登录，用户名登录是true，手机号登录是false
-        mode: true,
-      },
-      username: "",
-      password: "",
-      confirm_password: "",
-      phone_number: "",
-      code: "",
-      username_tip: "",
-      password_tip: "",
-      confirm_password_tip: "",
-      phone_number_tip: "如若没有可不填",
-      code_tip: ""
-    };
-  },
-  methods: {
-    register_mode() {
-      this.state.value = false;
-      this.state.text = "注册";
-      this.state.id = "register";
-    },
-    phone_number_mode() {
-      this.state.mode = false;
-      this.phone_number_tip = "";
-    },
-    check() {
-      if (this.username.length < 1 || this.username.length > 15) {
-        this.username_tip = "用户名不符合要求";
-        this.username = "";
-        return false;
-      }
-      if (this.password.length < 5 || this.password.length > 25) {
-        this.password_tip = "密码不符合要求";
-        this.password = "";
-        this.confirm_password = "";
-        return false;
-      }
-      if (this.password !== this.confirm_password) {
-        this.confirm_password_tip = "前后密码不一致";
-        this.confirm_password = "";
-        return false;
-      }
-      return true;
-    },
-    async send_code() {
-      if (!(/^1[3456789]\d{9}$/.test(this.phone_number))) {
-        await ElMessageBox({
-          type: "warning",
-          message: "手机号格式错误",
-          confirmButtonText: "确定",
-          autofocus: true
-        });
-        return;
-      }
-
-      let res = await call_api("user/login/send_code", {
-        phone_number: this.phone_number,
-        mode: this.state.text
-      });
-
-      if (res.success) {
-        await ElMessageBox({
-          type: "success",
-          message: "发送成功",
-          confirmButtonText: "确定",
-          autofocus: true
-        });
-      } else {
-        await ElMessageBox({
-          type: "error",
-          message: "发送失败：" + res.error_message,
-          confirmButtonText: "确定",
-          autofocus: true
-        });
-      }
-    },
-    async login() {
-      if (this.state.value === false) {
-        if (!this.check()) {
-          return;
-        }
-      }
-
-      if (this.phone_number && !this.code) {
-        await ElMessageBox({
-          type: "warning",
-          message: "未获取验证码",
-          confirmButtonText: "确定",
-          autofocus: true
-        });
-
-        return;
-      }
-
-      if (this.state.value === false) {
-        // noinspection RedundantConditionalExpressionJS
-        this.state.mode = this.phone_number ? false : true;
-      }
-
-      let loading = ElLoading.service();
-      let res;
-      if (this.state.mode === true) {
-        res = await call_api(`user/login/${this.state.value === true ? "login" : "register"}_by_user`, {
-          username: this.username,
-          password: this.password
-        });
-      } else {
-        res = await call_api(`user/login/${this.state.value === true ? "login" : "register"}_by_sms`, {
-          username: this.username,
-          password: this.password,
-          phone_number: this.phone_number,
-          code: this.code
-        });
-      }
-
-      loading.close();
-
-      if (res.success === false) {
-        // 显示错误
-        await ElMessageBox({
-          type: "error",
-          message: res.error_message,
-          confirmButtonText: "确定",
-          autofocus: true
-        });
-
-        if (!res.api_call_success) {
-          this.username = "";
-          this.password = "";
-          this.confirm_password = "";
-        }
-
-        return;
-      }
-
-      ElMessageBox({
-        type: "success",
-        message: "登录成功",
-        showCancelButton: false,
-        confirmButtonText: "确定",
-        autofocus: true,
-        callback: () => {
-          this.$router.back();
-        }
-      }).catch();
-    }
-  }
-}
-</script>

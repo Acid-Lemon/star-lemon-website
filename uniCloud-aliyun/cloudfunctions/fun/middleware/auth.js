@@ -8,13 +8,13 @@ const error = require("../types/error");
 module.exports = () => {
 	return async function auth(ctx, next) {
 		let token = ctx.event.token;
-		if (!token) {
-			if (ctx.event.action.indexOf("login") === -1) {
-				ctx.throw(error.codes.no_token, "no token for the api");
-			}
-
+		
+		if (ctx.event.action.indexOf("login") !== -1) {
 			await next();
-			return;
+		}
+		
+		if (!token) {
+			ctx.throw(error.codes.no_token, "no token for the api");
 		}
 
 		let auth_info;

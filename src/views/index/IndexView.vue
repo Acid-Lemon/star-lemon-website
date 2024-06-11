@@ -46,7 +46,7 @@ export default {
       </el-carousel>
     </div>
     <div class="w-[500px] ml-[20px] mt-[20px]">
-      <el-card style="max-width: 480px">
+      <el-card>
         <template #header>
           <div class="card-header">
             <span>网络状态</span>

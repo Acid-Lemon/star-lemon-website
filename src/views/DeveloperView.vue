@@ -51,13 +51,13 @@ export default {
 
 <template>
   <div class="w-full h-full flex flex-col px-[20px]">
-    <div class="w-full h-[20%]">
+    <div class="w-full h-[10%]">
     </div>
     <div class="w-full h-[20%]">
-      <div class="text-[30px] font-['SYST']">
+      <div class="text-[30px] font-['SYST'] my-[20px]">
         此网站主要所用到的技术
       </div>
-      <div class="flex flex-row">
+      <div class="flex flex-row my-[20px]">
         <div v-for="i in power" class="flex flex-row">
           <img :alt="i.name" :src="i.svg" class="w-[8vh] h-[8vh] m-[5px]"/>
           <img alt="加号" class="w-[8vh] h-[8vh] m-[5px]" src="/static/svg/加号.svg"/>
@@ -65,7 +65,7 @@ export default {
         <img alt="省略号" class="w-[8vh] h-[8vh] m-[5px]" src="/static/svg/省略号.svg"/>
       </div>
     </div>
-    <div class="w-full h-[30%] flex flex-row items-center content-center">
+    <div class="w-full h-[35%] flex flex-row items-center content-center">
       <div class="w-[15%] h-full flex flex-col justify-center items-center">
         <img alt="头像"
              class="w-[15vh] h-[15vh] rounded-full hover:rotate-[360deg] duration-700 border border-[#dedede]"
@@ -85,7 +85,7 @@ export default {
         </div>
       </div>
     </div>
-    <div class="w-full h-[30%] flex flex-row items-center content-center">
+    <div class="w-full h-[35%] flex flex-row items-center content-center">
       <div class="w-[85%] h-full p-[20px]">
         <div class="w-full h-full bg-[#dedede] rounded-[25px] p-[20px] text-[20px] font-['SJJS']">
           {{ lemon.say }}

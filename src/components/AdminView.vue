@@ -7,7 +7,7 @@ export default {
 
 <template>
   <div
-      class="flex flex-row items-center pl-[10px] w-full h-[50px] text-[#000000] text-[20px] font-['SYST']">
+      class="flex flex-row items-center pl-[10px] w-full h-[50px] text-[#000000] text-[20px] font-['SYST'] shadow-md">
     star和lemon的小站：后台管理系统
   </div>
 </template>

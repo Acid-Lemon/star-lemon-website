@@ -1,5 +1,4 @@
 <script>
-
 export default {
   data() {
     return {};
@@ -12,9 +11,7 @@ export default {
 </script>
 
 <template>
-  <div class="w-full h-full bg-[#F8FAFD]">
 
-  </div>
 </template>
 
 <style scoped>

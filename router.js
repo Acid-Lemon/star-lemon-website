@@ -13,7 +13,6 @@ const router = createRouter({
                 },
                 show: {
                     side_navigation_bar: false,
-                    admin_view: false
                 }
             },
             component: () => import("@/src/views/index/IndexView.vue")
@@ -28,22 +27,9 @@ const router = createRouter({
                 },
                 show: {
                     side_navigation_bar: false,
-                    admin_view: false
                 }
             },
             component: () => import("@/src/views/image/ImageView.vue")
-        },
-        {
-            path: "/admin/image",
-            name: "image-admin",
-            meta: {
-                show: {
-                    navigation_bar: false,
-                    side_navigation_bar: false,
-                    admin_view: false
-                },
-            },
-            component: () => import("@/src/views/image/ImageAdminView.vue")
         },
         {
             path: "/developer",
@@ -55,7 +41,6 @@ const router = createRouter({
                 },
                 show: {
                     side_navigation_bar: false,
-                    admin_view: false
                 }
             },
             component: () => import("@/src/views/DeveloperView.vue")
@@ -70,7 +55,6 @@ const router = createRouter({
                 },
                 show: {
                     side_navigation_bar: false,
-                    admin_view: false
                 }
             },
             component: () => import("@/src/views/CommentView.vue")
@@ -85,7 +69,6 @@ const router = createRouter({
                 },
                 show: {
                     side_navigation_bar: false,
-                    admin_view: false
                 },
                 login: false
             },
@@ -95,11 +78,29 @@ const router = createRouter({
             path: "/admin",
             name: "admin",
             meta: {
+                side_navigation_bar: {
+                    name: "首页",
+                    svg: "/static/svg/首页.svg"
+                },
                 show: {
                     navigation_bar: false
                 },
             },
             component: () => import("@/src/views/index/IndexAdminView.vue")
+        },
+        {
+            path: "/admin/image",
+            name: "image-admin",
+            meta: {
+                side_navigation_bar: {
+                    name: "相册",
+                    svg: "/static/svg/相册.svg"
+                },
+                show: {
+                    navigation_bar: false,
+                },
+            },
+            component: () => import("@/src/views/image/ImageAdminView.vue")
         },
         {
             path: "/user",
@@ -111,7 +112,6 @@ const router = createRouter({
                 },
                 show: {
                     side_navigation_bar: false,
-                    admin_view: false
                 }
             },
             component: () => import("@/src/views/user/UserView.vue")
@@ -123,7 +123,6 @@ const router = createRouter({
                 show: {
                     navigation_bar: false,
                     side_navigation_bar: false,
-                    admin_view: false
                 },
 
             },
@@ -136,7 +135,6 @@ const router = createRouter({
                 show: {
                     navigation_bar: false,
                     side_navigation_bar: false,
-                    admin_view: false
                 },
             },
             component: () => import("@/src/views/404View.vue")

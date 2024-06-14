@@ -1,13 +1,20 @@
 <script>
 import {ElMessageBox} from "element-plus";
+import {useWebConfigStore} from "../../stores/webConfig";
 
 export default {
+  components: {
+    ElMessageBox
+  },
   data() {
     return {
-      WebName: "star和lemon的小站",
-      newWebName: "star和lemon的小站",
+      webName: useWebConfigStore().webName,
+      newWebName: useWebConfigStore().webName,
+      webIcon: "https://starlemon.oss-cn-beijing.aliyuncs.com/img/202303191645712.png",
+      newWebIcon: "https://starlemon.oss-cn-beijing.aliyuncs.com/img/202303191645712.png",
       username: "lemon",
-      dialogVisible: false,
+      webNameDialog: false,
+      webIconDialog: false,
       timeState: "",
     };
   },
@@ -16,7 +23,7 @@ export default {
   },
   methods: {
     handleClose(done) {
-      ElMessageBox.confirm('你确定关闭吗?（信息将不会被保存）')
+      ElMessageBox.confirm('你确定取消更改吗?（已输入的内容不会被保存）')
           .then(() => {
             done()
           })
@@ -24,6 +31,7 @@ export default {
             // catch error
           })
     }
+
   }
 };
 </script>
@@ -36,11 +44,12 @@ export default {
           <span>网站信息</span>
         </div>
       </template>
-      <span @click="dialogVisible = true">网站名称：{{ WebName }}</span>
+      <div @click="webNameDialog = true">网站名称：{{ webName }}</div>
+      <div @click="webIconDialog = true">网站图标：{{ webIcon }}</div>
       <template #footer>{{ username }}上午好！</template>
     </el-card>
     <el-dialog
-        v-model="dialogVisible"
+        v-model="webNameDialog"
         :before-close="handleClose"
         title="修改信息"
         width="500"
@@ -48,8 +57,30 @@ export default {
       <el-input v-model="newWebName" class="w-[240px]" placeholder="请输入新的网站名称"/>
       <template #footer>
         <div class="dialog-footer">
-          <el-button @click="dialogVisible = false; newWebName = WebName">取消</el-button>
-          <el-button type="primary" @click="dialogVisible = false; WebName = newWebName">
+          <el-button
+              @click="webNameDialog = false; newWebName = webName">取消
+          </el-button>
+          <el-button type="primary"
+                     @click="webNameDialog = false; webName = newWebName">
+            确定
+          </el-button>
+        </div>
+      </template>
+    </el-dialog>
+    <el-dialog
+        v-model="webIconDialog"
+        :before-close="handleClose"
+        title="修改信息"
+        width="500"
+    >
+      <el-input v-model="newWebIcon" class="w-[240px]" placeholder="请输入新的网站图标链接"/>
+      <template #footer>
+        <div class="dialog-footer">
+          <el-button
+              @click="webIconDialog = false; newWebIcon = webIcon">取消
+          </el-button>
+          <el-button type="primary"
+                     @click="webIconDialog = false; webIcon = newWebIcon">
             确定
           </el-button>
         </div>

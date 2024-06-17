@@ -45,7 +45,9 @@ export default {
         </div>
       </template>
       <div @click="webNameDialog = true">网站名称：{{ webName }}</div>
-      <div @click="webIconDialog = true">网站图标：{{ webIcon }}</div>
+      <div style="width:100%;white-space:nowrap;text-overflow:ellipsis;overflow:hidden" @click="webIconDialog = true">
+        网站图标：{{ webIcon }}
+      </div>
       <template #footer>{{ username }}上午好！</template>
     </el-card>
     <el-dialog

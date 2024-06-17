@@ -88,7 +88,7 @@ export default {
 </script>
 
 <template>
-  <div class="w-full h-full flex flex-col overflow-y-hidden">
+  <div class="w-full h-full flex flex-col overflow-y-hidden bg-[#F8FAFD]">
     <div class="h-[10%] w-full"></div>
     <div class="w-full h-[90%] flex flex-row">
       <div class="w-full h-full flex flex-col p-[20px]">

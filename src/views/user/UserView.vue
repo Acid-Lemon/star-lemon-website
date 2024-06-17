@@ -90,7 +90,7 @@ export default {
 </script>
 
 <template>
-  <div class="h-full w-full">
+  <div class="h-full w-full bg-[#F8FAFD]">
     <div class="bg-[url('/static/background/12.jpg')] bg-cover bg-center h-[40%] relative">
       <div class="absolute bottom-[-5vh] left-[10vw] flex flex-row items-end">
         <img alt="头像" class="h-[10vh] w-[10vh] rounded-full mr-[10px]" src="/static/favicon/favicon.png"/>

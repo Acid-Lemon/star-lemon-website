@@ -50,7 +50,7 @@ export default {
 </script>
 
 <template>
-  <div class="w-full h-full flex flex-col px-[20px]">
+  <div class="w-full h-full flex flex-col px-[20px] bg-[#F8FAFD]">
     <div class="w-full h-[10%]">
     </div>
     <div class="w-full h-[20%]">
@@ -80,14 +80,14 @@ export default {
         </div>
       </div>
       <div class="w-[85%] h-full p-[20px] ">
-        <div class="w-full h-full bg-[#dedede] rounded-[25px] p-[20px] text-[20px] font-['SJJS']">
+        <div class="w-full h-full bg-[#FFFFFF] rounded-[25px] p-[20px] text-[20px] font-['SJJS']">
           {{ star.say }}
         </div>
       </div>
     </div>
     <div class="w-full h-[35%] flex flex-row items-center content-center">
       <div class="w-[85%] h-full p-[20px]">
-        <div class="w-full h-full bg-[#dedede] rounded-[25px] p-[20px] text-[20px] font-['SJJS']">
+        <div class="w-full h-full bg-[#FFFFFF] rounded-[25px] p-[20px] text-[20px] font-['SJJS']">
           {{ lemon.say }}
         </div>
       </div>

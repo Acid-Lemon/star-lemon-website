@@ -160,7 +160,7 @@ export default {
 </script>
 
 <template>
-  <div class="w-full h-full">
+  <div class="w-full h-full bg-[#F8FAFD]">
     <div
         class="bg-[url('/static/background/11.jpg')] bg-cover w-full md:h-[40%] flex flex-col items-center justify-center h-[30%]">
       <p class="text-[#000000] font-['SYST'] text-[6vh] hover:text-[#44cef6] duration-700">
@@ -170,7 +170,7 @@ export default {
     <div class="flex flex-col items-center justify-center">
       <div
           class="border border-[#000000] m-[5vh] h-[30vh] md:w-[70%] w-[85%] flex flex-col items-center justify-center">
-        <div class="relative top-[-2.5vh] bg-white">
+        <div class="relative top-[-2.5vh] bg-[#F8FAFD]">
           <p class="mx-[1vw] text-[3.6vh] font-['RGBZ']">网易云音乐热评</p>
         </div>
         <div class="w-full h-full flex flex-col items-center justify-center">
@@ -190,8 +190,9 @@ export default {
         </div>
       </div>
       <div v-for="page in pages" class="my-[1em] flex flex-col items-center w-full">
-        <div v-for="message in message_list" :key="message.id" class="my-[1em] flex flex-col items-center w-full">
-          <div class="border border-[#000000] md:w-[70%] w-[85%]">
+        <div v-for="message in message_list" :key="message.id"
+             class="my-[1em] flex flex-col items-center w-full">
+          <div class="border border-[#000000] md:w-[70%] w-[85%] shadow-md bg-[#FFFFFF]">
             <div class="flex flex-row mt-[1vh] ml-[1vh]">
               <img :src="`/avatar/${message.user.avatar_filename}`"
                    alt="头像" class="w-[6vh] h-[6vh] mr-[1vh] rounded-full"/>
@@ -215,22 +216,17 @@ export default {
             " class="absolute pointer-events-none px-[1vh] duration-700 z-50">
             你是我一生只会遇见一次的惊喜...
           </p>
-          <textarea id="pl" v-model="value" class="w-full h-[20vh] p-[2vh] border border-[#000000] min-h-[20vh]"
+          <textarea id="pl" v-model="value"
+                    class="w-full h-[20vh] p-[2vh] border border-[#000000] min-h-[20vh] bg-[#FFFFFF] shadow-md"
                     type="text" @blur="onBlur" @focus="onFocus"></textarea>
         </div>
         <div class="w-full flex flex-row justify-around">
-          <button :disabled="buttonDisabled"
-                  class="w-[20%] h-[5vh] border border-[#000000] rounded-full disabled:border-[#E1FF00]"
-                  @click="publish_message">
-            发布
-          </button>
-          <button class="w-[20%] h-[5vh] border border-[#000000] rounded-full" @click="clear">
-            清除
-          </button>
+          <el-button round style="width: 200px;height: 40px" type="primary" @click="publish_message">发布</el-button>
+          <el-button round style="width: 200px;height: 40px" @click="clear">清除</el-button>
         </div>
+        <div class="h-[50px] w-full my-[50px]"></div>
       </div>
     </div>
-    <div class="h-[20px]"></div>
   </div>
 </template>
 <style scoped>

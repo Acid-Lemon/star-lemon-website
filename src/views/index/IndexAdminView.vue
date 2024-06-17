@@ -8,10 +8,10 @@ export default {
   },
   data() {
     return {
-      webName: useWebConfigStore().webName,
-      newWebName: useWebConfigStore().webName,
-      webIcon: "https://starlemon.oss-cn-beijing.aliyuncs.com/img/202303191645712.png",
-      newWebIcon: "https://starlemon.oss-cn-beijing.aliyuncs.com/img/202303191645712.png",
+      webName: useWebConfigStore()?.webName,
+      newWebName: useWebConfigStore()?.webName,
+      webIcon: "https://mp-9c25a9c3-8b6e-4390-be64-8d3056531359.cdn.bspapp.com/cloudstorage/icon/image.jpg",
+      newWebIcon: "https://mp-9c25a9c3-8b6e-4390-be64-8d3056531359.cdn.bspapp.com/cloudstorage/icon/image.jpg",
       username: "lemon",
       webNameDialog: false,
       webIconDialog: false,

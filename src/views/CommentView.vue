@@ -23,8 +23,8 @@ export default {
     };
   },
   async mounted() {
-    await this.get_messages();
     await this.get_sentences();
+    await this.get_messages();
   },
   methods: {
     async get_sentences() {
@@ -75,11 +75,19 @@ export default {
       console.log(res)
 
       if (!res.success) {
-        ElNotification({
-          title: 'Error',
-          message: '获取留言失败',
-          type: 'error',
-        });
+        if (res.code === "err_no_token") {
+          ElNotification({
+            title: 'Error',
+            message: '请检查您的登陆状态',
+            type: 'error',
+          })
+        } else {
+          ElNotification({
+            title: 'Error',
+            message: '获取留言失败',
+            type: 'error',
+          });
+        }
 
         return;
       }

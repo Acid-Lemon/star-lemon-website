@@ -35,7 +35,7 @@ export default {
 </script>
 
 <template>
-  <div class="bg-[url('/static/background/14.jpg')] bg-cover w-full h-full flex flex-col justify-center items-center">
+  <div class="bg-[url('/static/background/11.jpg')] bg-cover w-full h-full flex flex-col justify-center items-center">
     <span class="text-[#FFFFFF] font-['RGBZ'] md:text-[3vw] text-[9vw]">距离“star和lemon的小站”建站一周年纪念日</span>
     <span class="text-[#FFFFFF] font-['RGBZ'] md:text-[3vw] text-[9vw]">还有{{ time_str }}</span>
   </div>

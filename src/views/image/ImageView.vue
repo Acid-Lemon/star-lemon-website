@@ -9,52 +9,52 @@ export default {
       images: [
         {
           imgUrl: "/static/background/1.jpg",
-          id: "1",
+          id: 1,
           time: 1718640810456
         },
         {
           imgUrl: "/static/background/2.jpg",
-          id: "2",
+          id: 2,
           time: 1718640810456
         },
         {
           imgUrl: "/static/background/3.jpg",
-          id: "3",
+          id: 3,
           time: 1718640810456
         },
         {
           imgUrl: "/static/background/4.jpg",
-          id: "4",
+          id: 4,
           time: 1638547200000
         },
         {
           imgUrl: "/static/background/5.jpg",
-          id: "5",
+          id: 5,
           time: 1638547200000
         },
         {
           imgUrl: "/static/background/6.jpg",
-          id: "6",
+          id: 6,
           time: 1638547200000
         },
         {
           imgUrl: "/static/background/7.jpg",
-          id: "7",
+          id: 7,
           time: 1638547200000
         },
         {
           imgUrl: "/static/background/8.jpg",
-          id: "8",
+          id: 8,
           time: 1638547200000
         },
         {
           imgUrl: "/static/background/9.jpg",
-          id: "9",
+          id: 9,
           time: 1638547200000
         },
         {
           imgUrl: "/static/background/10.jpg",
-          id: "10",
+          id: 10,
           time: 1718639386000
         }
       ],
@@ -73,7 +73,7 @@ export default {
   },
   computed: {
     filteredImages() {
-      const searchContent = this.search_content;
+      const searchContent = Number(this.search_content);
       const dateRange = this.date_range;
 
       return this.images.filter(image => {
@@ -115,7 +115,8 @@ export default {
             <el-button @click="clear">重置</el-button>
           </div>
         </div>
-        <div class="grid gap-x-4 gap-y-[20px] grid-cols-4 auto-rows-auto overflow-y-scroll">
+        <div v-if="filteredImages.length > 0"
+             class="grid gap-x-4 gap-y-[20px] grid-cols-4 auto-rows-auto overflow-y-scroll">
           <div v-for="image in filteredImages"
                :key="image.id"
                class="shadow-md pb-[2px] flex flex-col justify-between">
@@ -130,6 +131,8 @@ export default {
             </div>
           </div>
         </div>
+        <div v-else class="w-full h-full flex flex-row items-center justify-center"><span
+            class="font-['RGBZ'] text-[40px]">没有找到符合筛选条件的图片</span></div>
       </div>
     </div>
   </div>

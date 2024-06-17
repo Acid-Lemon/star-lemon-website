@@ -55,7 +55,7 @@ export default {
           time: "2021-12-12"
         }
       ],
-      search_content: "",
+      search_content: "2",
       date_range: null,
     };
   },
@@ -88,7 +88,9 @@ export default {
           </div>
         </div>
         <div class="grid gap-x-4 gap-y-[20px] grid-cols-4 auto-rows-auto overflow-y-scroll">
-          <div v-for="image in images" :key="image" class="shadow-md pb-[2px] flex flex-col justify-between">
+          <div v-for="image in images.filter(image => image.id === this.search_content || this.search_content === '')"
+               :key="image.id"
+               class="shadow-md pb-[2px] flex flex-col justify-between">
             <div>
               <el-image :src="image.imgUrl" class="w-full h-full" fit="cover"/>
             </div>
@@ -97,6 +99,7 @@ export default {
               <div class="px-[10px] py-[2px]">日期：{{ image.time }}</div>
             </div>
           </div>
+          <div class="font-[RGBZ]">没有该图片</div>
         </div>
       </div>
     </div>

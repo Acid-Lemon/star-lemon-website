@@ -203,7 +203,7 @@ module.exports = class Controller_User_Login extends Controller {
 		});
 
 		let code = this.service.user.login.create_code();
-		await this.service.user.login.send_code(phone_number, code, mode_str);
+		await this.service.user.login.send_code(phone_number, code, mode);
 
 		await this.service.db.sms_code.store_code(code, phone_number);
 

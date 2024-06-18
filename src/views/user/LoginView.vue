@@ -170,34 +170,35 @@ export default {
           <!--    注册或用户名密码登录        -->
           <div v-if="!state.value || (state.mode && state.value)" class="flex flex-col">
             <span class="my-[0.5vh] text-[2vh] font-['SJJS']">用户名：</span>
-            <el-input v-model="username" :placeholder="username_tip" style="width: 100%;height:3vh"/>
+            <el-input v-model="username" :placeholder="username_tip"
+                      style="width: 100%;height:4vh;"/>
           </div>
           <!--    手机号登录注册或用户名注册        -->
           <div v-if="!state.mode || !state.value" class="flex flex-col">
             <span class="my-[0.5vh] text-[2vh] font-['SJJS']">手机号码：</span>
-            <el-input v-model="phone_number" :placeholder="phone_number_tip" style="width: 100%;height:3vh"/>
+            <el-input v-model="phone_number" :placeholder="phone_number_tip" style="width: 100%;height:4vh"/>
           </div>
           <!--    手机号登录注册或用户名注册        -->
           <div v-if="!state.mode || !state.value" class="flex flex-col">
             <span class="my-[0.5vh] text-[2vh] font-['SJJS']">验证码：</span>
             <div class="flex flex-row justify-between">
-              <el-input v-model="code" :placeholder="code_tip" style="width: 50%;height:3vh"/>
-              <el-button round style="width: 40%;height: 3vh" @click="send_code">获取验证码</el-button>
+              <el-input v-model="code" :placeholder="code_tip" style="width: 50%;height:4vh"/>
+              <el-button round style="width: 40%;height: 4vh" @click="send_code">获取验证码</el-button>
             </div>
           </div>
           <!--     注册或用户名密码登录       -->
           <div v-if="!state.value || (state.mode && state.value)" class="flex flex-col">
             <span class="my-1 text-[2vh] font-['SJJS']">密码：</span>
-            <el-input v-model="password" :placeholder="password_tip" style="width: 100%;height:3vh" type="password"/>
+            <el-input v-model="password" :placeholder="password_tip" style="width: 100%;height:4vh" type="password"/>
           </div>
           <!--      注册      -->
           <div v-if="!state.value" class="flex flex-col">
             <span class="my-1 text-[2vh] font-['SJJS']">确认密码：</span>
-            <el-input v-model="confirm_password" :placeholder="confirm_password_tip" style="width: 100%;height:3vh"
+            <el-input v-model="confirm_password" :placeholder="confirm_password_tip" style="width: 100%;height:4vh"
                       type="password"/>
           </div>
         </div>
-        <el-button round style="width: 100%;height: 3vh" type="primary" @click="login">{{ state.text }}</el-button>
+        <el-button round style="width: 100%;height: 4vh" type="primary" @click="login">{{ state.text }}</el-button>
         <!--    用户名密码登录      -->
         <div v-if="state.value && state.mode" class="flex flex-row justify-between">
           <div class="my-2" @click="register_mode">

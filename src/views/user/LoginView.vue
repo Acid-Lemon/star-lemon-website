@@ -163,7 +163,7 @@ export default {
         <span class="font-['RGBZ'] text-[5vw] text-[#FFFFFF] pl-[20%]">天高任鸟飞。”</span>
       </div>
     </div>
-    <div class="bg-[#FFFFFF]/50 md:w-[360px] w-[95vw] h-[85vh] shadow-sm rounded-lg p-[3vh] mt-[12vh] mb-[3vh]">
+    <div class="bg-[#FFFFFF]/80 md:w-[360px] w-[95vw] h-[85vh] shadow-sm rounded-lg p-[3vh] mt-[12vh] mb-[3vh]">
       <div class="w-full h-full">
         <span class="text-[4vh] font-['SYST']">{{ state.text }}</span>
         <div class="my-[2vh] flex flex-col justify-between align-top w-full">

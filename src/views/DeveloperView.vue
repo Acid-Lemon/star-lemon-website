@@ -79,15 +79,17 @@ export default {
           </div>
         </div>
       </div>
-      <div class="w-[85%] h-full p-[20px] ">
-        <div class="w-full h-full bg-[#FFFFFF] rounded-[25px] p-[20px] text-[20px] font-['SJJS']">
+      <div class="w-[85%] h-full p-[20px]">
+        <div
+            class="w-full h-full bg-[#FFFFFF] rounded-[25px] p-[20px] text-[20px] font-['SJJS'] border border-[#dedede] shadow-md">
           {{ star.say }}
         </div>
       </div>
     </div>
     <div class="w-full h-[35%] flex flex-row items-center content-center">
       <div class="w-[85%] h-full p-[20px]">
-        <div class="w-full h-full bg-[#FFFFFF] rounded-[25px] p-[20px] text-[20px] font-['SJJS']">
+        <div
+            class="w-full h-full bg-[#FFFFFF] rounded-[25px] p-[20px] text-[20px] font-['SJJS'] border border-[#dedede] shadow-md">
           {{ lemon.say }}
         </div>
       </div>

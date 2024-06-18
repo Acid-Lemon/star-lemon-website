@@ -160,14 +160,14 @@ export default {
 </script>
 
 <template>
-  <div class="w-full h-full bg-[#F8FAFD]">
+  <div class="w-full h-full">
     <div
         class="bg-[url('/static/background/11.jpg')] bg-cover w-full md:h-[40%] flex flex-col items-center justify-center h-[30%]">
       <p class="text-[#000000] font-['SYST'] text-[6vh] hover:text-[#44cef6] duration-700">
         留言板
       </p>
     </div>
-    <div class="flex flex-col items-center justify-center">
+    <div class="flex flex-col items-center justify-center bg-[#F8FAFD]">
       <div
           class="border border-[#000000] m-[5vh] h-[30vh] md:w-[70%] w-[85%] flex flex-col items-center justify-center">
         <div class="relative top-[-2.5vh] bg-[#F8FAFD]">

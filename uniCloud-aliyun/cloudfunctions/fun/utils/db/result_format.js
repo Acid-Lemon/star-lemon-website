@@ -1,5 +1,5 @@
 function id_name_format(result) {
-    if (!result._id) {
+    if (!result?._id) {
         return result;
     }
 

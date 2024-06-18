@@ -8,6 +8,8 @@ const {
 	validate
 } = require("../../utils/args_check");
 
+const config = require('uni-config-center')({ pluginId: "fun" }).config();
+
 module.exports = class Controller_User_Login extends Controller {
 	async register_by_user() {
 		let {
@@ -159,7 +161,7 @@ module.exports = class Controller_User_Login extends Controller {
 			}
 		});
 
-		let code_record = await this.service.db.user.find_code(phone_number);
+		let code_record = await this.service.db.sms_code.find_code(phone_number);
 		console.info("code_record: ", code_record);
 
 		if (!code_record) {
@@ -201,6 +203,17 @@ module.exports = class Controller_User_Login extends Controller {
 				}
 			}
 		});
+
+		let code_record = await this.service.db.sms_code.find_code(phone_number);
+
+		if (code_record) {
+			let diff = Date.now() - code_record.create_at;
+			if (diff >= config["UNICLOUD_SMS_EXP_MINUTE"] * 60 * 1000) {
+				await this.service.db.sms_code.delete_code(code_record.id);
+			} else {
+				this.throw(error.codes.sms_code_send_limit, `验证码发送频繁, 请${Math.ceil(diff / 1000 / 60)}分钟后再试`);
+			}
+		}
 
 		let code = this.service.user.login.create_code();
 		await this.service.user.login.send_code(phone_number, code, mode);

@@ -13,6 +13,7 @@ module.exports = {
         err_send_code: "err_send_code",
         token_expire: "err_token_expire",
         sms_code_expire: "err_sms_code_expire",
+        sms_code_send_limit: "err_sms_code_send_limit",
         err_serve: "err_serve"
     }
 };

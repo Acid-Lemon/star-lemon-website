@@ -1,26 +1,33 @@
 const jwt = require("jsonwebtoken");
-const jwt_secret = require("uni-config-center")({
+const config = require("uni-config-center")({
 	pluginId: "fun"
-}).config("JWT_SECRET");
+}).config();
 
 const error = require("../types/error");
 
 module.exports = () => {
 	return async function auth(ctx, next) {
-		let token = ctx.event.token;
-		
-		if (ctx.event.action.indexOf("login") !== -1) {
+		let public_vis = false;
+		for (let prefix of config["CLOUD_FUNCTION_PUBLIC_PATH_PREFIX"]) {
+			if (ctx.event.action.indexOf(prefix) === 0) {
+				public_vis = true;
+				break;
+			}
+		}
+		if (public_vis) {
 			await next();
 			return;
 		}
-		
+
+		let token = ctx.event.token;
+
 		if (!token) {
 			ctx.throw(error.codes.no_token, "no token for the api");
 		}
 
 		let auth_info;
 		try {
-			auth_info = jwt.verify(token.replace("Bearer ", ""), jwt_secret);
+			auth_info = jwt.verify(token.replace("Bearer ", ""), config.jwt_secret);
 		} catch (err) {
 			if (err instanceof jwt.TokenExpiredError) {
 				ctx.throw(error.codes.token_expire, "token expired. login again");

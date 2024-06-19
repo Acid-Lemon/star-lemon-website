@@ -18,7 +18,9 @@ export default {
   computed: {
     filteredPages() {
       return this.pages.filter(page => {
-        return !(page.name === "登录" && localStorage.getItem("token"));
+        const loginMatch = !(page.name === "登录" && localStorage.getItem("token"));
+        const userMatch = !(page.name === "个人" && !localStorage.getItem("token"));
+        return loginMatch && userMatch;
       });
     }
   },

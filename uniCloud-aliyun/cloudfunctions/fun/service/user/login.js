@@ -60,19 +60,13 @@ module.exports = class Service_User_Login extends Service {
 	}
 
 	verify_code(code, code_record) {
-		if (Date.now() - code_record.create > 1000 * 60 * 10) {
-			throw {
-				code: error.codes.sms_code_expire,
-				message: "the code is invalid. send a new one again."
-			};
+		if (Date.now() - code_record.create >= config["UNICLOUD_SMS_RENEW_MINUTE"] * 1000 * 60) {
+			this.throw(error.codes.sms_code_expire, "the code is invalid. send a new one again.");
 		}
 
 
 		if (code !== code_record.code) {
-			throw {
-				code: error.codes.invalid_sms_code,
-				message: "the code is invalid. send a new one again."
-			};
+			this.throw(error.codes.invalid_sms_code, "the code is invalid. send a new one again.");
 		}
 	}
 };

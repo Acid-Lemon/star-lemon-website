@@ -148,7 +148,7 @@ export default {
         callback: () => {
           this.$router.back();
         }
-      }).catch();
+      });
     }
   }
 }

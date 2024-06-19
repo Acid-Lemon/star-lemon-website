@@ -28,7 +28,7 @@ module.exports = class Service_User_Login extends Service {
 			templateId: config["UNICLOUD_SMS_TEMPLATE_ID"],
 			data: {
 				mode,
-				code: this.create_code(),
+				code,
 				exp_minute: config["UNICLOUD_SMS_EXP_MINUTE"]
 			}
 		});

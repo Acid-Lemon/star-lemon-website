@@ -18,6 +18,20 @@ const router = createRouter({
             component: () => import("@/src/views/index/IndexView.vue")
         },
         {
+            path: "/article",
+            name: "article",
+            meta: {
+                navigation_bar: {
+                    name: "文章",
+                    svg: "/static/svg/文章.svg"
+                },
+                show: {
+                    side_navigation_bar: false,
+                }
+            },
+            component: () => import("@/src/views/article/ArticleView.vue")
+        },
+        {
             path: "/image",
             name: "image",
             meta: {
@@ -87,6 +101,20 @@ const router = createRouter({
                 },
             },
             component: () => import("@/src/views/index/IndexAdminView.vue")
+        },
+        {
+            path: "/admin/article",
+            name: "article-admin",
+            meta: {
+                side_navigation_bar: {
+                    name: "文章",
+                    svg: "/static/svg/文章.svg"
+                },
+                show: {
+                    navigation_bar: false,
+                }
+            },
+            component: () => import("@/src/views/article/ArticleAdminView.vue")
         },
         {
             path: "/admin/image",

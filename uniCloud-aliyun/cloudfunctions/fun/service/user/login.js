@@ -3,7 +3,6 @@ const {
 } = require("uni-cloud-router");
 
 const jwt = require("jsonwebtoken");
-const jwt_secret = require("uni-config-center")({ pluginId: "fun" }).config("JWT_SECRET");
 
 const bcrypt = require("bcryptjs");
 
@@ -45,7 +44,7 @@ module.exports = class Service_User_Login extends Service {
 	create_token(user) {
 		return "Bearer " + jwt.sign({
 			user_id: user.id
-		}, jwt_secret);
+		}, config["JWT_SECRET"]);
 	}
 
 	async create_user(info) {

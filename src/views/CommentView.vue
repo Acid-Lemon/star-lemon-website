@@ -72,7 +72,6 @@ export default {
       let res = await call_api("message_board/get_messages", {
         message_number: 20
       });
-      console.log(res)
 
       if (!res.success) {
         if (res.code === "err_no_token") {
@@ -91,7 +90,7 @@ export default {
 
         return;
       }
-
+	  
       this.message_list = await this.messages_format(res.data.messages);
     },
 
@@ -135,14 +134,18 @@ export default {
         return;
       }
 
-      let new_message = res.data.message; // (await this.messages_format([res.data.message]))[0];
+      let new_message = {
+          id: res.data.id,
+		  content: message,
+		  create_at: res.data.create_at,
+		  public_state: res.data.public_state
+      };
       let user = get_user();
       new_message.user = {
         id: user.id,
         name: user.name,
         avatar: user.avatar
       };
-      delete new_message.user_id;
 
       let new_message_format = (await this.messages_format([new_message]))[0];
       this.message_list.push(new_message_format);

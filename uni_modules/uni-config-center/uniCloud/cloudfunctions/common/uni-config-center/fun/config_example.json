@@ -6,5 +6,6 @@
   "UNICLOUD_SMS_SEND_LIMIT": {
     "hour": 6,
     "minute": 1
-  }
+  },
+  "CLOUD_FUNCTION_PUBLIC_PATH_PREFIX": []
 }

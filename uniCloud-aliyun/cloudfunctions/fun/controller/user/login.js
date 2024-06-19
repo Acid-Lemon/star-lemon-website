@@ -99,6 +99,8 @@ module.exports = class Controller_User_Login extends Controller {
 			password
 		});
 
+		await this.service.db.sms_code.delete_code_by_id(code_record.id);
+
 		return {
 			data: user
 		};
@@ -174,6 +176,8 @@ module.exports = class Controller_User_Login extends Controller {
 		if (!user) {
 			this.throw(error.codes.no_user, "user not found");
 		}
+
+		await this.service.db.sms_code.delete_code_by_id(code_record.id);
 
 		return {
 			token: this.service.user.login.create_token(user)

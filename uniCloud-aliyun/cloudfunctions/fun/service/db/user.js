@@ -22,10 +22,10 @@ module.exports = class DBService_User extends Service {
     }
 
     async create_user(user) {
-        let record_id = await this.db.collection(tables.user).add({
+        let record_id = (await this.db.collection(tables.user).add({
             ...user,
             create_at: Date.now()
-        });
+        })).id;
 
         return {id: record_id};
     }

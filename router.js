@@ -135,7 +135,7 @@ const router = createRouter({
             name: "user",
             meta: {
                 navigation_bar: {
-                    name: "用户名",
+                    name: "个人",
                     svg: "/static/svg/登录.svg"
                 },
                 show: {

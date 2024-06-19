@@ -1,12 +1,18 @@
 <script>
 import {ElAutoResizer} from 'element-plus';
+import { UploadFilled } from '@element-plus/icons-vue'
 
 export default {
   name: "ImageAdminView",
-  components: {ElAutoResizer},
+  computed: {
+    UploadFilled() {
+      return UploadFilled
+    },
+  },
+  components: {ElAutoResizer,UploadFilled},
   data() {
     return {
-      images: [],
+      tempFilePaths: [],
       tableData: [
         {id: '1', dateTime: 10000000, photoAlbum: "相册3", uploadUsername: "lemon", downloadLink: "https://xxxxx/xxx/"},
         {id: '2', dateTime: 10000000, photoAlbum: "相册2", uploadUsername: "lemon", downloadLink: "https://xxxxx/xxx/"},
@@ -24,26 +30,30 @@ export default {
 
   },
   methods: {
-    // 获取上传状态
-    select(e) {
-      console.log('选择文件：', e)
+    choose() {
+      uni.chooseImage({
+        sizeType: ['original', 'compressed'], //可以指定是原图还是压缩图，默认二者都有
+        sourceType: ['album'], //从相册选择
+        success:  (res) => {
+          this.tempFilePaths = res.tempFilePaths;
+        }
+      });
     },
-    // 获取上传进度
-    progress(e) {
-      console.log('上传进度：', e)
-    },
-
-    // 上传成功
-    success(e) {
-      console.log('上传成功')
-    },
-
-    // 上传失败
-    fail(e) {
-      console.log('上传失败：', e)
-    },
+    upload() {
+      uni.uploadFile({
+        url: 'https://www.example.com/upload', //仅为示例，非真实的接口地址
+        filePath: this.tempFilePaths[0],
+        name: 'file',
+        formData: {
+          'user': 'test'
+        },
+        success: (uploadFileRes) => {
+          console.log(uploadFileRes.data);
+        }
+      });
+    }
   }
-};
+}
 </script>
 
 <template>
@@ -62,10 +72,10 @@ export default {
               :value="photoAlbum"
           />
         </el-select>
-        <uni-file-picker ref="files" :auto-upload="false" fileMediatype="image" mode="list"
-                         @fail="fail"
-                         @progress="progress"
-                         @select="select" @success="success"/>
+        <el-button @click="choose">选择图片</el-button>
+        <div>已选择{{ tempFilePaths.length }}张照片</div>
+        <el-button @click="this.tempFilePaths = []">清除</el-button>
+        <el-button type="primary" :icon="UploadFilled" @click="upload">上传</el-button>
       </div>
     </div>
     <div class="w-[95%] my-[20px]">

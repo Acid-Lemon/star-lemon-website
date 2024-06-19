@@ -15,6 +15,9 @@
     "tailwind-dev": "tailwindcss -i ./tailwind-input.css -o tailwind-build.css --watch"
   },
   "dependencies": {
+    "@element-plus/icons-vue": "^2.3.1",
+    "@wangeditor/editor": "^5.1.23",
+    "@wangeditor/editor-for-vue": "^5.1.12",
     "axios": "^1.6.8",
     "element-plus": "^2.7.2",
     "pinia": "^2.1.7",

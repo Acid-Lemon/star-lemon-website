@@ -44,7 +44,7 @@ module.exports = class Service_User_Login extends Service {
 	create_token(user) {
 		return "Bearer " + jwt.sign({
 			user_id: user.id
-		}, config.jwt_secret);
+		}, config["JWT_SECRET"]);
 	}
 
 	async create_user(info) {

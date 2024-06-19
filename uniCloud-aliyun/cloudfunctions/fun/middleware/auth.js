@@ -27,8 +27,9 @@ module.exports = () => {
 
 		let auth_info;
 		try {
-			auth_info = jwt.verify(token.replace("Bearer ", ""), config.jwt_secret);
+			auth_info = jwt.verify(token.replace("Bearer ", ""), config["JWT_SECRET"]);
 		} catch (err) {
+			console.log("auth error:", err);
 			if (err instanceof jwt.TokenExpiredError) {
 				ctx.throw(error.codes.token_expire, "token expired. login again");
 			}

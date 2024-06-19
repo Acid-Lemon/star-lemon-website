@@ -8,12 +8,18 @@ const {
 
 module.exports = class DBService_MessageBoard extends Service {
     async create_message(content, user_id, public_state) {
-        return await this.db.collection(tables.message_board).add({
+        let now_time = Date.now();
+        let id = await this.db.collection(tables.message_board).add({
             content,
             user_id,
             public_state,
-            create_at: Date.now()
+            create_at: now_time
         });
+
+        return {
+            id,
+            create_at: now_time
+        };
     }
 
     async change_public_state(id, new_state) {

@@ -18,7 +18,7 @@ module.exports = class DBService_SmsCode extends Service {
         return id_name_format((await this.db.collection(tables.sms_code).where({phone_number}).get()).data[0]) || null;
     }
 
-    async delete_code(id) {
+    async delete_code_by_id(id) {
         await this.db.collection(tables.sms_code).doc(id).remove();
     }
 
@@ -58,7 +58,7 @@ module.exports = class DBService_SmsCode extends Service {
                     if (valid_num + 1 > limit_hour) {
                         this.throw(error.codes.sms_code_send_limit, {
                             renew_time: now_time + (3600 * 1000 - (now_time - send_time_list[send_time_list.length - 1]))
-                        })
+                        });
                     }
                 }
 
@@ -69,7 +69,7 @@ module.exports = class DBService_SmsCode extends Service {
                     if (valid_num + 1 > limit_minute) {
                         this.throw(error.codes.sms_code_send_limit, {
                             renew_time: now_time + (60 * 1000 - (now_time - send_time_list[send_time_list.length - 1]))
-                        })
+                        });
                     }
                 }
 

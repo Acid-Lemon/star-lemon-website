@@ -23,7 +23,8 @@ export default {
       password_tip: "",
       confirm_password_tip: "",
       phone_number_tip: "如若没有可不填",
-      code_tip: ""
+      code_tip: "",
+      codeState:false
     };
   },
   methods: {
@@ -56,12 +57,16 @@ export default {
       return true;
     },
     async send_code() {
+      this.codeState = true;
+
       if (!(/^1[3456789]\d{9}$/.test(this.phone_number))) {
         ElNotification({
           title: 'Warning',
           type: "warning",
           message: "手机号格式错误",
         });
+
+        this.codeState = false;
         return;
       }
 
@@ -80,8 +85,9 @@ export default {
         ElNotification({
           title: 'Error',
           type: "error",
-          message: "发送失败：" + res.error_message,
+          message: "发送失败：" + res.code,
         });
+        this.codeState = false;
       }
     },
     async login() {
@@ -145,10 +151,9 @@ export default {
         title: 'Success',
         type: "success",
         message: "登录成功",
-        callback: () => {
-          this.$router.back();
-        }
-      });
+      })
+
+      this.$router.back();
     }
   }
 }
@@ -183,7 +188,7 @@ export default {
             <span class="my-[0.5vh] text-[2vh] font-['SJJS']">验证码：</span>
             <div class="flex flex-row justify-between">
               <el-input v-model="code" :placeholder="code_tip" style="width: 50%;height:4vh"/>
-              <el-button round style="width: 40%;height: 4vh" @click="send_code">获取验证码</el-button>
+              <el-button round style="width: 40%;height: 4vh" @click="send_code" :disabled="codeState">获取验证码</el-button>
             </div>
           </div>
           <!--     注册或用户名密码登录       -->

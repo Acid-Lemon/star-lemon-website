@@ -16,7 +16,7 @@ class RuleHandler {
         }
 
         if (typeof args[name] !== rule_type) {
-            throw_handle_error(`args[${name}] invalid. expect type ${typeof rule_type}, but got type ${typeof args[name]}`);
+            throw_handle_error(`args[${name}] invalid. expect type ${rule_type}, but got type ${typeof args[name]}`);
         }
     }
 

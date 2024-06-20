@@ -9,12 +9,13 @@ const {
 module.exports = class DBService_MessageBoard extends Service {
     async create_message(content, user_id, public_state) {
         let now_time = Date.now();
-        let id = await this.db.collection(tables.message_board).add({
+        let id = (await this.db.collection(tables.message_board).add({
             content,
             user_id,
             public_state,
             create_at: now_time
-        });
+        })).id;
+        console.info("message_id:", id);
 
         return {
             id,
@@ -30,9 +31,13 @@ module.exports = class DBService_MessageBoard extends Service {
 
     async get_messages(limit_num, from_time = 0) {
         return (await this.db.collection(tables.message_board).aggregate()
-            .match({
-                create_at: this.db.command.gt(from_time)
-            })
+            .match(this.db.command.and([
+                { create_at: this.db.command.gt(from_time) },
+                this.db.command.or([
+                    { public_state: true },
+                    { user_id: this.ctx?.auth.user_id ?? ""}
+                ])
+            ]))
             .limit(limit_num)
             .lookup({
                 from: tables.user,

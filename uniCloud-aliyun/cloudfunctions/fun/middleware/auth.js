@@ -7,21 +7,22 @@ const error = require("../types/error");
 
 module.exports = () => {
 	return async function auth(ctx, next) {
-		let public_vis = false;
-		for (let prefix of config["CLOUD_FUNCTION_PUBLIC_PATH_PREFIX"]) {
-			if (ctx.event.action.indexOf(prefix) === 0) {
-				public_vis = true;
-				break;
-			}
-		}
-		if (public_vis) {
-			await next();
-			return;
-		}
-
 		let token = ctx.event.token;
 
 		if (!token) {
+			let public_vis = false;
+			for (let prefix of config["CLOUD_FUNCTION_PUBLIC_PATH_PREFIX"]) {
+				if (ctx.event.action.indexOf(prefix) === 0) {
+					public_vis = true;
+					break;
+				}
+			}
+			
+			if (public_vis) {
+				await next();
+				return;
+			}
+			
 			ctx.throw(error.codes.no_token, "no token for the api");
 		}
 

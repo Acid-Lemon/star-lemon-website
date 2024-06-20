@@ -59,7 +59,7 @@ module.exports = class Service_User_Login extends Service {
 	}
 
 	verify_code(code, code_record) {
-		if (Date.now() - code_record.create >= config["UNICLOUD_SMS_RENEW_MINUTE"] * 1000 * 60) {
+		if (Date.now() - code_record.create >= config["UNICLOUD_SMS_EXP_MINUTE"] * 1000 * 60) {
 			this.throw(error.codes.sms_code_expire, "the code is invalid. send a new one again.");
 		}
 

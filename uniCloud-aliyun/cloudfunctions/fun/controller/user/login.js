@@ -91,6 +91,10 @@ module.exports = class Controller_User_Login extends Controller {
 		let code_record = await this.service.db.sms_code.find_code(phone_number);
 		console.info("code_record: ", code_record);
 
+		if (!code_record) {
+			this.throw(error.codes.no_sms_code, "no sms code. please send first");
+		}
+
 		this.service.user.login.verify_code(code, code_record);
 
 		let user = await this.service.user.login.create_user({

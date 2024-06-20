@@ -94,7 +94,7 @@ export default {
       this.loadingMore = true;
       let start_time = 0;
       if (page_num !== 1) {
-        start_time = this.message_list[this.message_list.length - 1];
+        start_time = this.message_list[this.message_list.length - 1].create_at;
       }
 
       let res = await call_api("message_board/get_messages", {

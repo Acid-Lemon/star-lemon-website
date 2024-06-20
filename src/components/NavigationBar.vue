@@ -1,4 +1,6 @@
 <script>
+import { useLoginStateStore } from '../stores/loginState'
+
 export default {
   name: "NavigationBar",
   beforeMount() {
@@ -22,6 +24,9 @@ export default {
         const userMatch = !(page.name === "个人" && !localStorage.getItem("token"));
         return loginMatch && userMatch;
       });
+    },loginState() {
+      const loginStateStore = useLoginStateStore();
+      return loginStateStore.loginState;
     }
   },
   methods: {
@@ -56,6 +61,9 @@ export default {
   },
   watch: {
     token() {
+      this.updatePages();
+    },
+    loginState() {
       this.updatePages();
     }
   }

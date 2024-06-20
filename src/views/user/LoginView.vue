@@ -1,5 +1,6 @@
 <script>
 import {call_api} from "@/src/utils/cloud.js";
+import { useLoginStateStore } from '../../stores/loginState';
 
 import {ElLoading, ElNotification} from "element-plus";
 
@@ -153,6 +154,10 @@ export default {
         message: "登录成功",
       })
 
+      const loginStateStore = useLoginStateStore();
+      loginStateStore.changeLoginState();
+
+      // 登录成功后跳转回原页面
       this.$router.back();
     }
   }

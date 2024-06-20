@@ -226,7 +226,7 @@ export default {
             class="text-[2vh] mb-[1vh] mx-[2vh] font-['SJJS']">{{ message_list.length }}条评论</span>
         </div>
       </div>
-      <div v-for="page in pages" class="my-[1em] flex flex-col items-center w-full">
+      <div v-for="page in pages" class="flex flex-col items-center w-full">
         <div v-for="message in message_list" :key="message.id"
              class="my-[1em] flex flex-col items-center w-full">
           <div class="border border-[#000000] md:w-[70%] w-[85%] shadow-md bg-[#FFFFFF]">
@@ -241,12 +241,12 @@ export default {
             <p class="m-[1vh]">{{ message.content }}</p>
           </div>
         </div>
-        <div style="margin-top: 8px;">
-          <el-button v-if="hasMore" @click="() => loadMore()" :disabled="loadingMore">
-            {{ loadingMore ? '加载中···' : '点击加载数据' }}
-          </el-button>
-          <p v-else> <span v-if="!hasMore">没有更多数据</span> </p>
-        </div>
+      </div>
+      <div style="margin-top: 8px;">
+        <el-button v-show="hasMore" @click="loadMore()">
+          {{ loadingMore ? '加载中···' : '点击加载数据' }}
+        </el-button>
+        <p v-show="!hasMore">没有更多数据</p>
       </div>
       <div class="my-[3vh] flex flex-col justify-center md:w-[70%] w-[85%]">
         <div class="mb-[3vh] relative">

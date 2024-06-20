@@ -1,12 +1,14 @@
 <script>
 import {call_api} from "@/src/utils/cloud";
 import {ElNotification} from "element-plus";
+import {useInfiniteScroll} from "vue-hooks-plus";
 
 import {date_format} from "@/src/utils/time";
 import {get_user} from "@/src/utils/user_info";
 import axios from "axios";
 
 export default {
+  components:{useInfiniteScroll},
   data() {
     return {
       value: "",
@@ -19,7 +21,9 @@ export default {
         contentrefresh: "正在加载",
         contentnomore: "没有惹"
       },
-      sentences: null
+      sentences: null,
+      loadingMore: false,
+      hasMore: true,
     };
   },
   async mounted() {
@@ -39,8 +43,26 @@ export default {
         this.sentences = JSON.parse(window.sessionStorage.getItem("sentences"));
       }
     },
-    Load() {
-      console.log("ok")
+    loadMore() {
+      this.pages += 1;
+      this.get_messages(this.pages);
+    },
+    async send_message() {
+      if (this.value === "") {
+        ElNotification({
+          title: 'Error',
+          message: '请输入内容',
+          type: 'error',
+        })
+        return;
+      }
+
+      let res = await call_api("message_board/send_message", {
+        message: this.value
+      });
+
+      if (res.success)
+        this.value = "";
     },
     onFocus() {
       this.style_mode = true;
@@ -68,8 +90,15 @@ export default {
         })
       }));
     },
-    async get_messages() {
+    async get_messages(page_num) {
+      this.loadingMore = true;
+      let start_time = 0;
+      if (page_num !== 1) {
+        start_time = this.message_list[this.message_list.length - 1];
+      }
+
       let res = await call_api("message_board/get_messages", {
+        start_time,
         message_number: 20
       });
 
@@ -87,11 +116,16 @@ export default {
             type: 'error',
           });
         }
-
+        this.loadingMore = false;
         return;
       }
-	  
-      this.message_list = await this.messages_format(res.data.messages);
+
+      this.loadingMore = false;
+      this.message_list.concat(await this.messages_format(res.data.messages));
+
+      if(res.data.messages.length === 0){
+        this.hasMore = false;
+      }
     },
 
     check_message(message) {
@@ -207,10 +241,12 @@ export default {
             <p class="m-[1vh]">{{ message.content }}</p>
           </div>
         </div>
-        <uni-load-more
-            :content-text="loadText"
-            class="w-[10%] h-[5vh] border-[#000000] flex flex-row items-center justify-center rounded-full border font-['SYST']"
-            status="more" @clickLoadMore="Load"/>
+        <div style="margin-top: 8px;">
+          <el-button v-if="hasMore" @click="() => loadMore()" :disabled="loadingMore">
+            {{ loadingMore ? '加载中···' : '点击加载数据' }}
+          </el-button>
+          <p v-else> <span v-if="!hasMore">没有更多数据</span> </p>
+        </div>
       </div>
       <div class="my-[3vh] flex flex-col justify-center md:w-[70%] w-[85%]">
         <div class="mb-[3vh] relative">

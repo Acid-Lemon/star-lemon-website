@@ -15,7 +15,7 @@ export default {
       message_list: [],
       buttonDisabled: false,
       style_mode: false,
-      pages: 1,
+      pages: 0,
       loadText: {
         contentdown: "更多留言",
         contentrefresh: "正在加载",
@@ -23,7 +23,7 @@ export default {
       },
       sentences: null,
       loadingMore: false,
-      hasMore: true,
+      hasMore: null,
     };
   },
   async mounted() {
@@ -44,25 +44,7 @@ export default {
       }
     },
     loadMore() {
-      this.pages += 1;
-      this.get_messages(this.pages);
-    },
-    async send_message() {
-      if (this.value === "") {
-        ElNotification({
-          title: 'Error',
-          message: '请输入内容',
-          type: 'error',
-        })
-        return;
-      }
-
-      let res = await call_api("message_board/send_message", {
-        message: this.value
-      });
-
-      if (res.success)
-        this.value = "";
+      this.get_messages();
     },
     onFocus() {
       this.style_mode = true;
@@ -90,10 +72,11 @@ export default {
         })
       }));
     },
-    async get_messages(page_num) {
+    async get_messages() {
+      this.pages += 1;
       this.loadingMore = true;
-      let start_time = 0;
-      if (page_num !== 1) {
+      let start_time = 1577808000000;
+      if (this.pages !== 1) {
         start_time = this.message_list[this.message_list.length - 1].create_at;
       }
 
@@ -116,15 +99,18 @@ export default {
             type: 'error',
           });
         }
+        this.pages -= 1;
         this.loadingMore = false;
         return;
       }
 
       this.loadingMore = false;
-      this.message_list.concat(await this.messages_format(res.data.messages));
+      this.hasMore = res.data.messages.length === 20;
 
-      if(res.data.messages.length === 0){
-        this.hasMore = false;
+      if (this.pages === 1) {
+        this.message_list = await this.messages_format(res.data.messages);
+      } else {
+        this.message_list = this.message_list.concat(await this.messages_format(res.data.messages));
       }
     },
 
@@ -226,7 +212,6 @@ export default {
             class="text-[2vh] mb-[1vh] mx-[2vh] font-['SJJS']">{{ message_list.length }}条评论</span>
         </div>
       </div>
-      <div v-for="page in pages" class="flex flex-col items-center w-full">
         <div v-for="message in message_list" :key="message.id"
              class="my-[1em] flex flex-col items-center w-full">
           <div class="border border-[#000000] md:w-[70%] w-[85%] shadow-md bg-[#FFFFFF]">
@@ -241,7 +226,6 @@ export default {
             <p class="m-[1vh]">{{ message.content }}</p>
           </div>
         </div>
-      </div>
       <div style="margin-top: 8px;">
         <el-button v-show="hasMore" @click="loadMore()">
           {{ loadingMore ? '加载中···' : '点击加载数据' }}

@@ -107,11 +107,7 @@ export default {
       this.loadingMore = false;
       this.hasMore = res.data.messages.length === 20;
 
-      if (this.pages === 1) {
-        this.message_list = await this.messages_format(res.data.messages);
-      } else {
-        this.message_list = this.message_list.concat(await this.messages_format(res.data.messages));
-      }
+      this.message_list = this.message_list.concat(await this.messages_format(res.data.messages));
     },
 
     check_message(message) {
@@ -208,20 +204,21 @@ export default {
       </p>
       <div class="flex flex-row md:w-[70%] w-[85%] mt-[2vh] border-b-[1px] border-[#000000]">
         <div class="flex flex-row items-end">
-          <span class="text-[4vh] font-bold font-['RGBZ']">comment</span><span
-            class="text-[2vh] mb-[1vh] mx-[2vh] font-['SJJS']">{{ message_list.length }}条评论</span>
+          <span class="text-[4vh] font-bold font-['RGBZ']">comment</span>
+          <span class="text-[2vh] mb-[1vh] mx-[2vh] font-['SJJS']">{{ message_list.length }}条评论</span>
         </div>
       </div>
-      <div v-infinite-scroll="get_messages" class="h-full w-full flex flex-col items-center">
+      <div v-infinite-scroll="get_messages" infinite-scroll-delay=1000 class="h-full w-full flex flex-col items-center">
         <div v-for="message in message_list" :key="message.id"
              class="my-[1em] flex flex-col items-center w-full">
           <div class="border border-[#000000] md:w-[70%] w-[85%] shadow-md bg-[#FFFFFF]">
             <div class="flex flex-row mt-[1vh] ml-[1vh]">
-              <img :src="`/avatar/${message.user.avatar_filename}`"
-                   alt="头像" class="w-[6vh] h-[6vh] mr-[1vh] rounded-full"/>
-              <div class="flex flex-col">
-                <p class="text-[2.4vh]">{{ message.user.name }}</p>
-                <p class="text-[1.8vh]">发布于{{ message.create_at_format_str }}</p>
+              <el-avatar style="width:5.4vh;height:5.4vh"
+                  src="https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png"
+              />
+              <div class="flex flex-col ml-[1vh]">
+                <p class="text-[2vh]">{{ message.user.name }}</p>
+                <p class="text-[1.6vh]">发布于{{ message.create_at_format_str }}</p>
               </div>
             </div>
             <p class="m-[1vh]">{{ message.content }}</p>

@@ -71,7 +71,7 @@ const router = createRouter({
                     side_navigation_bar: false,
                 }
             },
-            component: () => import("@/src/views/CommentView.vue")
+            component: () => import("@/src/views/comment/CommentView.vue")
         },
         {
             path: "/login",
@@ -131,6 +131,20 @@ const router = createRouter({
             component: () => import("@/src/views/image/ImageAdminView.vue")
         },
         {
+            path: "/admin/comment",
+            name: "comment-admin",
+            meta: {
+                side_navigation_bar: {
+                    name: "留言",
+                    svg: "/static/svg/留言板.svg"
+                },
+                show: {
+                    navigation_bar: false,
+                }
+            },
+            component: () => import("@/src/views/comment/CommentAdminView.vue")
+        },
+        {
             path: "/user",
             name: "user",
             meta: {
@@ -143,18 +157,6 @@ const router = createRouter({
                 }
             },
             component: () => import("@/src/views/user/UserView.vue")
-        },
-        {
-            path: "/countdown",
-            name: "countdown",
-            meta: {
-                show: {
-                    navigation_bar: false,
-                    side_navigation_bar: false,
-                },
-
-            },
-            component: () => import("@/src/views/CountdownView.vue")
         },
         {
             path: "/404",

@@ -212,6 +212,7 @@ export default {
             class="text-[2vh] mb-[1vh] mx-[2vh] font-['SJJS']">{{ message_list.length }}条评论</span>
         </div>
       </div>
+      <div v-infinite-scroll="get_messages" class="h-full w-full flex flex-col items-center">
         <div v-for="message in message_list" :key="message.id"
              class="my-[1em] flex flex-col items-center w-full">
           <div class="border border-[#000000] md:w-[70%] w-[85%] shadow-md bg-[#FFFFFF]">
@@ -226,16 +227,12 @@ export default {
             <p class="m-[1vh]">{{ message.content }}</p>
           </div>
         </div>
-      <div style="margin-top: 8px;">
-        <el-button v-show="hasMore" @click="loadMore()">
-          {{ loadingMore ? '加载中···' : '点击加载数据' }}
-        </el-button>
-        <p v-show="!hasMore">没有更多数据</p>
+        <div class="w-[70%]"><el-divider content-position="left">列车已到站</el-divider></div>
       </div>
       <div class="my-[3vh] flex flex-col justify-center md:w-[70%] w-[85%]">
         <div class="mb-[3vh] relative">
           <p :class="{'text-[#FFFFFF]':style_mode,'bg-black':style_mode,'text-[1.8vh]':style_mode,'top-[-1.2vh]':style_mode,'left-[1.4vh]':style_mode,
-            'text-[#000000]':!style_mode,'bg-white':!style_mode,'text-[2.2vh]':!style_mode,'top-[1vh]':!style_mode,'left-[1vh]':!style_mode}
+            'text-[#000000]':!style_mode,'bg-white':!style_mode,'text-[2vh]':!style_mode,'top-[1vh]':!style_mode,'left-[1vh]':!style_mode}
             " class="absolute pointer-events-none px-[1vh] duration-700 z-50">
             你是我一生只会遇见一次的惊喜...
           </p>

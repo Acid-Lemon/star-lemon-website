@@ -36,7 +36,7 @@ export default {
       <div class="flex flex-row w-full h-full">
         <SideNavigationBar
             v-if="show?.hasOwnProperty('side_navigation_bar') ? show.side_navigation_bar: true"></SideNavigationBar>
-        <router-view></router-view>
+        <router-view class="w-full h-full"></router-view>
       </div>
     </div>
     <Copyright v-if="show?.hasOwnProperty('copyright') ? show.copyright: true"></Copyright>

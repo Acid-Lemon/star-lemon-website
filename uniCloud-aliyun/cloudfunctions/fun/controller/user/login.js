@@ -99,7 +99,7 @@ module.exports = class Controller_User_Login extends Controller {
 
 		let user = await this.service.user.login.create_user({
 			phone_number,
-			username,
+			name: username,
 			password
 		});
 

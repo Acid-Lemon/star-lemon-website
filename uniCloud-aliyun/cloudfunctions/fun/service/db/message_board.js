@@ -35,7 +35,7 @@ module.exports = class DBService_MessageBoard extends Service {
                 { create_at: this.db.command.gt(from_time) },
                 this.db.command.or([
                     { public_state: true },
-                    { user_id: this.ctx?.auth.user_id ?? ""}
+                    { user_id: this.ctx.auth?.user_id ?? ""}
                 ])
             ]))
             .limit(limit_num)
@@ -61,7 +61,7 @@ module.exports = class DBService_MessageBoard extends Service {
                 id: "$_id",
                 _id: false,
                 content: true,
-                user: true,
+                user: this.db.command.aggregate.arrayElemAt(["$user", 0]),
                 create_at: true,
                 public_state: true
             })

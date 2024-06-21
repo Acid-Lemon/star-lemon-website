@@ -12,7 +12,7 @@ class RuleHandler {
 
     type(args, name, rule_type) {
         if (!rule_type instanceof String) {
-            throw TypeError(`rules[${name}]: value of rule[type] is ${rule_type}, not a string`);
+            throw TypeError(`rules[${name}]: value of rule[type] is ${typeof rule_type}, not a string`);
         }
 
         if (typeof args[name] !== rule_type) {

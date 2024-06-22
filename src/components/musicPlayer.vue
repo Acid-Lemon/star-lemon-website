@@ -134,7 +134,7 @@ export default {
       this.playState = 'pause'
     },
     musicTime(duration) {
-      const f = Math.round(duration / 60)
+      const f = Math.floor(duration / 60)
       const m = Math.round(duration % 60)
       return `${f}:${m}`
     },

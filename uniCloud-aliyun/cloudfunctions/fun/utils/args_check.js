@@ -113,6 +113,18 @@ class RuleHandler {
         }
     }
 
+    not_null(args, name, bool_val) {
+        if (bool_val) {
+            if (args[name] === null || args[name] === undefined) {
+                throw_handle_error(`args[${name}] invalid. expect not null`);
+            }
+        } else {
+            if (args[name] !== null && args[name] !== undefined) {
+                throw_handle_error(`args[${name}] invalid. expect null`);
+            }
+        }
+    }
+
     customize(args, name, func) {
         if (!(func instanceof Function)) {
             throw TypeError(`rules[${name}]: value of rule[customize] is not a function`);

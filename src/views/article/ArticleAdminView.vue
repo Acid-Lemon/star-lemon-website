@@ -26,7 +26,10 @@ export default {
       </div>
     <el-button type="primary">发布</el-button>
     </div>
-    <myEditor></myEditor>
+
+    <div class="h-full w-full">
+    <my-editor></my-editor>
+    </div>
   </div>
 </template>
 

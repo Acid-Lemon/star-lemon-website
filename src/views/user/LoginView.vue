@@ -1,5 +1,5 @@
 <script>
-import {call_api} from "@/src/utils/cloud.js";
+import {call_api} from "../../utils/cloud.js";
 import { useLoginStateStore } from '../../stores/loginState';
 
 import {ElLoading, ElNotification} from "element-plus";
@@ -10,10 +10,8 @@ export default {
       state: {
         text: "登录",
         id: "login",
-        // 登录和注册，登陆状态是true，注册状态是false
-        value: true,
-        // 用户名登录和手机号登录，用户名登录是true，手机号登录是false
-        mode: true,
+        value: true,// 登录和注册，登陆状态是true，注册状态是false
+        mode: true,// 用户名登录和手机号登录，用户名登录是true，手机号登录是false
       },
       username: "",
       password: "",
@@ -23,7 +21,7 @@ export default {
       username_tip: "",
       password_tip: "",
       confirm_password_tip: "",
-      phone_number_tip: "如若没有可不填",
+      phone_number_tip: "",
       code_tip: "",
       codeState:false
     };
@@ -33,10 +31,21 @@ export default {
       this.state.value = false;
       this.state.text = "注册";
       this.state.id = "register";
+      this.phone_number_tip="如若没有可不填";
+    },
+    username_mode() {
+      this.state.value = true;
+      this.state.mode = true;
+      this.state.text = "登录";
+      this.state.id = "login";
     },
     phone_number_mode() {
+      this.state.value = true;
       this.state.mode = false;
-      this.phone_number_tip = "";
+      this.state.text = "登录";
+      this.state.id = "login";
+      this.phone_number_tip="";
+
     },
     check() {
       if (this.username.length < 1 || this.username.length > 15) {
@@ -88,8 +97,8 @@ export default {
           type: "error",
           message: "发送失败：" + res.code,
         });
-        this.codeState = false;
       }
+      this.codeState = false;
     },
     async login() {
       if (this.state.value === false) {
@@ -179,18 +188,18 @@ export default {
         <div class="my-[2vh] flex flex-col justify-between align-top w-full">
           <!--    注册或用户名密码登录        -->
           <div v-if="!state.value || (state.mode && state.value)" class="flex flex-col">
-            <span class="my-[0.5vh] text-[2vh] font-['SJJS']">用户名：</span>
+            <span class="my-[0.5vh] text-[2vh] font-['FZSX']">用户名：</span>
             <el-input v-model="username" :placeholder="username_tip"
                       style="width: 100%;height:4vh;"/>
           </div>
           <!--    手机号登录注册或用户名注册        -->
           <div v-if="!state.mode || !state.value" class="flex flex-col">
-            <span class="my-[0.5vh] text-[2vh] font-['SJJS']">手机号码：</span>
+            <span class="my-[0.5vh] text-[2vh] font-['FZSX']">手机号码：</span>
             <el-input v-model="phone_number" :placeholder="phone_number_tip" style="width: 100%;height:4vh"/>
           </div>
           <!--    手机号登录注册或用户名注册        -->
           <div v-if="!state.mode || !state.value" class="flex flex-col">
-            <span class="my-[0.5vh] text-[2vh] font-['SJJS']">验证码：</span>
+            <span class="my-[0.5vh] text-[2vh] font-['FZSX']">验证码：</span>
             <div class="flex flex-row justify-between">
               <el-input v-model="code" :placeholder="code_tip" style="width: 50%;height:4vh"/>
               <el-button round style="width: 40%;height: 4vh" @click="send_code" :disabled="codeState">获取验证码</el-button>
@@ -198,12 +207,12 @@ export default {
           </div>
           <!--     注册或用户名密码登录       -->
           <div v-if="!state.value || (state.mode && state.value)" class="flex flex-col">
-            <span class="my-1 text-[2vh] font-['SJJS']">密码：</span>
+            <span class="my-1 text-[2vh] font-['FZSX']">密码：</span>
             <el-input v-model="password" :placeholder="password_tip" style="width: 100%;height:4vh" type="password"/>
           </div>
           <!--      注册      -->
           <div v-if="!state.value" class="flex flex-col">
-            <span class="my-1 text-[2vh] font-['SJJS']">确认密码：</span>
+            <span class="my-1 text-[2vh] font-['FZSX']">确认密码：</span>
             <el-input v-model="confirm_password" :placeholder="confirm_password_tip" style="width: 100%;height:4vh"
                       type="password"/>
           </div>
@@ -212,10 +221,26 @@ export default {
         <!--    用户名密码登录      -->
         <div v-if="state.value && state.mode" class="flex flex-row justify-between">
           <div class="my-2" @click="register_mode">
-            <span class="text-[#40A2E3] text-[1.8vh] font-['SJJS']">注册</span>
+            <span class="text-[#40A2E3] text-[1.8vh] font-['FZSX']">注册</span>
           </div>
           <div class="my-2" @click="phone_number_mode">
-            <span class="text-[#40A2E3] text-[1.8vh] font-['SJJS']">手机号登录</span>
+            <span class="text-[#40A2E3] text-[1.8vh] font-['FZSX']">手机号登录</span>
+          </div>
+        </div>
+        <div v-if="!state.value" class="flex flex-row justify-between">
+          <div class="my-2" @click="username_mode">
+            <span class="text-[#40A2E3] text-[1.8vh] font-['FZSX']">用户名登录</span>
+          </div>
+          <div class="my-2" @click="phone_number_mode">
+            <span class="text-[#40A2E3] text-[1.8vh] font-['FZSX']">手机号登录</span>
+          </div>
+        </div>
+        <div v-if="state.value && !state.mode" class="flex flex-row justify-between">
+          <div class="my-2" @click="register_mode">
+            <span class="text-[#40A2E3] text-[1.8vh] font-['FZSX']">注册</span>
+          </div>
+          <div class="my-2" @click="username_mode">
+            <span class="text-[#40A2E3] text-[1.8vh] font-['FZSX']">用户名登录</span>
           </div>
         </div>
       </div>

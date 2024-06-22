@@ -6,9 +6,10 @@ import {useInfiniteScroll} from "vue-hooks-plus";
 import {date_format} from "@/src/utils/time";
 import {get_user} from "@/src/utils/user_info";
 import axios from "axios";
+import {Message} from "@element-plus/icons-vue";
 
 export default {
-  components:{useInfiniteScroll},
+  components:{Message, useInfiniteScroll},
   data() {
     return {
       value: "",
@@ -16,14 +17,9 @@ export default {
       buttonDisabled: false,
       style_mode: false,
       pages: 0,
-      loadText: {
-        contentdown: "更多留言",
-        contentrefresh: "正在加载",
-        contentnomore: "没有惹"
-      },
       sentences: null,
       loadingMore: false,
-      hasMore: null,
+      hasMore: true,
     };
   },
   async mounted() {
@@ -107,11 +103,7 @@ export default {
       this.loadingMore = false;
       this.hasMore = res.data.messages.length === 20;
 
-      if (this.pages === 1) {
-        this.message_list = await this.messages_format(res.data.messages);
-      } else {
-        this.message_list = this.message_list.concat(await this.messages_format(res.data.messages));
-      }
+      this.message_list = this.message_list.concat(await this.messages_format(res.data.messages));
     },
 
     check_message(message) {
@@ -197,10 +189,10 @@ export default {
           <p class="mx-[1vw] text-[3.6vh] font-['RGBZ']">网易云音乐热评</p>
         </div>
         <div class="w-full h-full flex flex-col items-center justify-center">
-          <p class="text-[2.4vh] m-[2vh] font-['SJJS']">
+          <p class="text-[2.4vh] m-[2vh] font-['FZSX']">
             {{ sentences?.hitokoto }}
           </p>
-          <p class="text-[1.9vh] m-[2vh] font-['SJJS']">——{{ sentences?.from }}</p>
+          <p class="text-[1.9vh] m-[2vh] font-['FZSX']">——{{ sentences?.from }}</p>
         </div>
       </div>
       <p class="mx-[2vh] font-serif text-[2.4vh]">
@@ -208,30 +200,32 @@ export default {
       </p>
       <div class="flex flex-row md:w-[70%] w-[85%] mt-[2vh] border-b-[1px] border-[#000000]">
         <div class="flex flex-row items-end">
-          <span class="text-[4vh] font-bold font-['RGBZ']">comment</span><span
-            class="text-[2vh] mb-[1vh] mx-[2vh] font-['SJJS']">{{ message_list.length }}条评论</span>
+          <span class="text-[4vh] font-bold font-['RGBZ']">comment</span>
+          <span class="text-[2vh] mb-[1vh] mx-[2vh] font-['FZSX']">{{ message_list.length }}条评论</span>
         </div>
       </div>
-      <div v-infinite-scroll="get_messages" class="h-full w-full flex flex-col items-center">
+      <div v-infinite-scroll="get_messages" :infinite-scroll-disabled=!hasMore infinite-scroll-delay=1000 class="h-full w-full flex flex-col items-center">
         <div v-for="message in message_list" :key="message.id"
              class="my-[1em] flex flex-col items-center w-full">
           <div class="border border-[#000000] md:w-[70%] w-[85%] shadow-md bg-[#FFFFFF]">
             <div class="flex flex-row mt-[1vh] ml-[1vh]">
-              <img :src="`/avatar/${message.user.avatar_filename}`"
-                   alt="头像" class="w-[6vh] h-[6vh] mr-[1vh] rounded-full"/>
-              <div class="flex flex-col">
-                <p class="text-[2.4vh]">{{ message.user.name }}</p>
-                <p class="text-[1.8vh]">发布于{{ message.create_at_format_str }}</p>
+              <el-avatar style="width:5.4vh;height:5.4vh" :src="message.user.avatar_filename">{{ message.user.name }}
+              </el-avatar>
+              <div class="flex flex-col ml-[1vh]">
+                <p class="text-[2vh] font-['SYST']">{{ message.user.name }}</p>
+                <p class="text-[1.6vh] font-['SYST']">发布于{{ message.create_at_format_str }}</p>
               </div>
             </div>
-            <p class="m-[1vh]">{{ message.content }}</p>
+            <p class="m-[1vh] text-[2vh] font-['SYST']">{{ message.content }}</p>
           </div>
         </div>
+        <div class="text-[3vh] font-['RGBZ']" v-if="loadingMore">正在加载中</div>
+        <div class="text-[3vh] font-['RGBZ']" v-if="!hasMore">没有更多留言惹</div>
         <div class="w-[70%]"><el-divider content-position="left">列车已到站</el-divider></div>
       </div>
       <div class="my-[3vh] flex flex-col justify-center md:w-[70%] w-[85%]">
         <div class="mb-[3vh] relative">
-          <p :class="{'text-[#FFFFFF]':style_mode,'bg-black':style_mode,'text-[1.8vh]':style_mode,'top-[-1.2vh]':style_mode,'left-[1.4vh]':style_mode,
+          <p :class="{'text-[#FFFFFF]':style_mode,'bg-black':style_mode,'text-[1.6vh]':style_mode,'top-[-1.2vh]':style_mode,'left-[1.4vh]':style_mode,
             'text-[#000000]':!style_mode,'bg-white':!style_mode,'text-[2vh]':!style_mode,'top-[1vh]':!style_mode,'left-[1vh]':!style_mode}
             " class="absolute pointer-events-none px-[1vh] duration-700 z-50">
             你是我一生只会遇见一次的惊喜...

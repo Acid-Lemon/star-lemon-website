@@ -15,6 +15,9 @@ export default {
   data() {
     return {
       pages: [],
+      hoveredPage: null,
+      hoveredTimeout: null,
+      isHoveredSecondary: false,
     };
   },
   computed: {
@@ -27,6 +30,9 @@ export default {
     },loginState() {
       const loginStateStore = useLoginStateStore();
       return loginStateStore.loginState;
+    },
+    currentRoute() {
+      return this.$route.path;
     }
   },
   methods: {
@@ -57,6 +63,34 @@ export default {
       if (event.key === 'token') {
         this.updatePages();
       }
+    },
+    onMouseEnter(page) {
+      this.hoveredPage = page;
+    },
+    onMouseLeave() {
+      this.hoveredTimeout = setTimeout(() => {
+        if (!this.isHoveredSecondary) {
+          this.hoveredPage = null;
+        }
+      }, 300); // 延迟300ms
+    },
+    onSecondaryMouseEnter() {
+      clearTimeout(this.hoveredTimeout);
+      this.isHoveredSecondary = true;
+    },
+    onSecondaryMouseLeave() {
+      this.isHoveredSecondary = false;
+      this.hoveredTimeout = setTimeout(() => {
+        this.hoveredPage = null;
+      }, 300); // 延迟300ms
+    },
+    loginOut(){
+      localStorage.removeItem("token");
+      localStorage.removeItem("user");
+      this.updatePages();
+      if(this.$route.path === "/user"){
+        this.$router.push("/login");
+      }
     }
   },
   watch: {
@@ -77,8 +111,9 @@ export default {
       <span class="md:text-[26px] text-[20px] font-['ZKXW'] hover:text-[#44cef6] duration-700">star和lemon的小站</span>
     </router-link>
     <div class="flex flex-row justify-center items-center">
-      <div v-for="page in filteredPages" class="m-[1vh]">
-        <router-link :to="page.link" class="flex flex-row items-center">
+      <div v-for="page in filteredPages" class="m-[1vh] flex flex-col items-center" @mouseenter="onMouseEnter(page)"
+           @mouseleave="onMouseLeave">
+        <router-link :to="page.link" class="flex flex-row items-center relative">
           <img
               class="w-[3vh] m-[0.5vh]"
               :src="page.svg"
@@ -86,6 +121,10 @@ export default {
           />
           <span class="md:block hidden hover:text-[#44cef6] m-[0.5vh] font-['SYST'] duration-700">{{ page.name }}</span>
         </router-link>
+        <div v-show="page.name === '个人' && hoveredPage === page" class="absolute flex flex-col items-center justify-center bottom-[-5vh] w-[10vh] h-[4vh] bg-[#FFFFFF] bg-opacity-50 rounded shadow-md duration-700" @mouseenter="onSecondaryMouseEnter"
+             @mouseleave="onSecondaryMouseLeave" @click="loginOut">
+          取消登录
+        </div>
       </div>
     </div>
   </div>

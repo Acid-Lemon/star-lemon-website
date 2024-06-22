@@ -213,7 +213,7 @@ export default {
               </el-avatar>
               <div class="flex flex-col ml-[1vh]">
                 <p class="text-[2vh] font-['SYST']">{{ message.user.name }}</p>
-                <p class="text-[1.6vh] font-['SYST']">发布于{{ message.create_at_format_str }}</p>
+                <p class="text-[1.6vh] font-['SYST'] text-[#000000] opacity-80">{{ message.create_at_format_str }}</p>
               </div>
             </div>
             <p class="m-[1vh] text-[2vh] font-['SYST']">{{ message.content }}</p>

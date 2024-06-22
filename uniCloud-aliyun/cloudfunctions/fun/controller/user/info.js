@@ -10,4 +10,7 @@ module.exports = class Controller_User_Info extends Controller {
             }
         };
     }
+
+    async update_basic_info() {
+    }
 }

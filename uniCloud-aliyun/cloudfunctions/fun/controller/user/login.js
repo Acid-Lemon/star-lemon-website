@@ -13,12 +13,7 @@ module.exports = class Controller_User_Login extends Controller {
 		let {
 			username,
 			password
-		} = this.ctx.event.args;
-
-		validate({
-			username,
-			password
-		}, {
+		} = validate(this.ctx.event.args, {
 			username: {
 				type: "string",
 				length: {
@@ -56,14 +51,7 @@ module.exports = class Controller_User_Login extends Controller {
 			password,
 			phone_number,
 			code
-		} = this.ctx.event.args;
-
-		validate({
-			phone_number,
-			code,
-			username,
-			password
-		}, {
+		} = validate(this.ctx.event.args, {
 			phone_number: {
 				type: "string",
 				regex: /^1[3456789]\d{9}$/
@@ -114,12 +102,7 @@ module.exports = class Controller_User_Login extends Controller {
 		let {
 			username,
 			password
-		} = this.ctx.event.args;
-
-		validate({
-			username,
-			password
-		}, {
+		} = validate(this.ctx.event.args, {
 			username: {
 				type: "string",
 				not_null: true
@@ -149,12 +132,7 @@ module.exports = class Controller_User_Login extends Controller {
 		let {
 			phone_number,
 			code
-		} = this.ctx.event.args;
-
-		validate({
-			phone_number,
-			code
-		}, {
+		} = validate(this.ctx.event.args, {
 			phone_number: {
 				type: "string",
 				regex: /^1[3456789]\d{9}$/
@@ -192,11 +170,7 @@ module.exports = class Controller_User_Login extends Controller {
 		let {
 			phone_number,
 			mode
-		} = this.ctx.event.args;
-		validate({
-			phone_number,
-			mode
-		}, {
+		} = validate(this.ctx.event.args, {
 			phone_number: {
 				type: "string",
 				regex: /^1[3456789]\d{9}$/

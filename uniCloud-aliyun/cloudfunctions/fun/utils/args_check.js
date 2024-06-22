@@ -113,18 +113,6 @@ class RuleHandler {
         }
     }
 
-    not_null(args, name, bool_val) {
-        if (bool_val) {
-            if (args[name] === null || args[name] === undefined) {
-                throw_handle_error(`args[${name}] invalid. expect not null`);
-            }
-        } else {
-            if (args[name] !== null && args[name] !== undefined) {
-                throw_handle_error(`args[${name}] invalid. expect null`);
-            }
-        }
-    }
-
     customize(args, name, func) {
         if (!(func instanceof Function)) {
             throw TypeError(`rules[${name}]: value of rule[customize] is not a function`);
@@ -155,10 +143,32 @@ function validate(args, rules) {
             throw TypeError(`config of ${name} is not an object`);
         }
 
+        if (rule.hasOwnProperty("undefined_able")) {
+            if (rule["undefined_able"] === true && args[name] === undefined) {
+                continue;
+            }
+
+            delete rule["undefined_able"];
+        }
+
+        if (rule.hasOwnProperty("null_able")) {
+            if (rule["null_able"] === true && args[name] === null) {
+                continue;
+            }
+
+            delete rule["null_able"];
+        }
+
         for (let [rule_name, rule_val] of Object.entries(Object(rule))) {
             new RuleHandler(args, name, rule_name, rule_val);
         }
     }
+
+    let checked_obj = {};
+    for (let [name] of Object.entries(rules)) {
+        checked_obj[name] = args[name];
+    }
+    return checked_obj;
 }
 
 module.exports = {

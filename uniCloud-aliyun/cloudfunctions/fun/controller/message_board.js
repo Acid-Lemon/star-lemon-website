@@ -8,12 +8,9 @@ const {
 
 module.exports = class Controller_MessageBoard extends Controller {
     async create_message() {
-        let { content } = this.ctx.event.args;
-
-        validate({content}, {
+        let { content } = validate(this.ctx.event.args, {
             content: {
                 type: "string",
-                not_null: true,
                 length: {
                     max: 100,
                     min: 1
@@ -28,20 +25,14 @@ module.exports = class Controller_MessageBoard extends Controller {
     }
 
     async get_messages() {
-        let { start_time, message_number } = this.ctx.event.args;
-
-        if (start_time !== undefined && start_time !== null) {
-            validate({start_time}, {
-                start_time: {
-                    type: "number",
-                    math: {
-                        max: Date.now()
-                    }
-                }
-            });
-        }
-
-        validate({message_number}, {
+        let { start_time, message_number } = validate(this.ctx.event.args, {
+            start_time: {
+                undefined_able: true,
+                null_able: true,
+                type: "number",
+                math: {
+                    max: Date.now()
+                }},
             message_number: {
                 type: "number",
                 math: {

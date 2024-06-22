@@ -53,7 +53,7 @@ export default {
             </el-card>
           </div>
         </div>
-        <div class="w-[200px] h-[80px] bg-[#FFFFFF] ml-[20px]" @click=""></div>
+        <div></div>
       </div>
     </div>
   </div>

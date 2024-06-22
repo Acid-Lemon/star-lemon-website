@@ -97,8 +97,8 @@ export default {
           type: "error",
           message: "发送失败：" + res.code,
         });
-        this.codeState = false;
       }
+      this.codeState = false;
     },
     async login() {
       if (this.state.value === false) {

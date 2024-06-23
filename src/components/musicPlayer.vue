@@ -98,10 +98,14 @@ export default {
       this.duration = this.innerAudioContext.duration
     })
     this.innerAudioContext.onPlay(() => {
+      this.playState = 'play';
       this.innerAudioContext.onTimeUpdate(() => {
         this.currentTime = this.innerAudioContext.currentTime;
         this.value = this.currentTime;
       });
+    });
+    this.innerAudioContext.onPause(() => {
+      this.playState = 'pause'
     });
     this.innerAudioContext.onEnded(() => {
       this.switchMusic();

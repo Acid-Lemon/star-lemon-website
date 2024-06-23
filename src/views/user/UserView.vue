@@ -1,6 +1,5 @@
 <script>
 import {ElMessageBox} from "element-plus";
-import {get_user} from "../../utils/user_info";
 
 export default {
   data() {
@@ -54,9 +53,11 @@ export default {
     };
   },
   async mounted() {
-    await this.user_info();
   },
   methods: {
+    get_user() {
+      return get_user
+    },
     handleClose(done) {
       ElMessageBox.confirm('确认关闭？（未提交的信息不会保存）', '提示', {
         confirmButtonText: '确定',
@@ -89,10 +90,6 @@ export default {
     choose(index) {
       this.clickFlag = index
     },
-    user_info(){
-      const res = get_user();
-      this.username = res.name;
-    }
   },
 
 }
@@ -103,7 +100,7 @@ export default {
     <div class="bg-[url('/static/background/12.jpg')] bg-cover bg-center h-[40%] relative">
       <div class="absolute bottom-[-5vh] left-[10vw] flex flex-row items-end">
         <img alt="头像" class="h-[10vh] w-[10vh] rounded-full mr-[10px]" src="/static/favicon/favicon.png"/>
-        <p class="font-['SYST'] text-[24px] mr-[20px] leading-none pb-[5px]">{{ username }}</p>
+        <p class="font-['SYST'] text-[24px] mr-[20px] leading-none pb-[5px]"></p>
         <el-tag class="font-['SYST'] text-[18px] mr-[10px] leading-none pb-[5px]" type="primary">管理员</el-tag>
         <p class="font-['SYST'] text-[14px] mr-[20px] leading-none pb-[5px]">生日：2006年3月1日</p>
         <p class="font-['SYST'] text-[14px] opacity-50 leading-none pb-[5px]">Hi！希望你开心～</p>

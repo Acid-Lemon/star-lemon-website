@@ -32,12 +32,6 @@ module.exports = class Controller_User_Info extends Controller {
             }
         });
 
-        for (let [key, value] of Object.entries(new_basic_info)) {
-            if (value === null || value === undefined) {
-                delete new_basic_info[key];
-            }
-        }
-
         await this.service.db.user.update_user(this.ctx.auth.user_id, new_basic_info);
 
         return {

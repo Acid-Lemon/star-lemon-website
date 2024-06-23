@@ -131,11 +131,9 @@ export default {
   methods: {
     play() {
       this.innerAudioContext.play();
-      this.playState = 'play'
     },
     pause() {
       this.innerAudioContext.pause();
-      this.playState = 'pause'
     },
     musicTime(duration) {
       let f = Math.floor(duration / 60)

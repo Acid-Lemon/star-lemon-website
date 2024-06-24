@@ -98,10 +98,14 @@ export default {
       this.duration = this.innerAudioContext.duration
     })
     this.innerAudioContext.onPlay(() => {
+      this.playState = 'play';
       this.innerAudioContext.onTimeUpdate(() => {
         this.currentTime = this.innerAudioContext.currentTime;
         this.value = this.currentTime;
       });
+    });
+    this.innerAudioContext.onPause(() => {
+      this.playState = 'pause'
     });
     this.innerAudioContext.onEnded(() => {
       this.switchMusic();
@@ -115,23 +119,16 @@ export default {
   onUnload() {
   },
   computed: {
-    playerStyle() {
-      return {
-        left: this.displayState ? '0' : '-42vh',
-        transition: 'left 0.5s ease'
-      }
-    }
+
 
   },
   watch: {},
   methods: {
     play() {
       this.innerAudioContext.play();
-      this.playState = 'play'
     },
     pause() {
       this.innerAudioContext.pause();
-      this.playState = 'pause'
     },
     musicTime(duration) {
       let f = Math.floor(duration / 60)
@@ -201,8 +198,8 @@ export default {
 </script>
 
 <template>
-  <div :style="playerStyle"
-       class="fixed bottom-[40px] left-0 w-[44vh] h-[12vh] bg-white z-[1000] flex flex-row items-center justify-between shadow-md">
+  <div :class="{'left-0':displayState,'left-[-42vh]':!displayState}"
+       class="transition-all duration-500 fixed bottom-[40px] left-0 w-[44vh] h-[12vh] bg-white z-[1000] flex flex-row items-center justify-between shadow-md">
     <div class="ml-[2vh]">
       <div class="w-[38vh] flex flex-row justify-between items-center">
         <div class="flex flex-row">

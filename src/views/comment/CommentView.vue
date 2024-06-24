@@ -20,6 +20,7 @@ export default {
       sentences: null,
       loadingMore: false,
       hasMore: true,
+      username:"未登录"
     };
   },
   async mounted() {
@@ -169,7 +170,7 @@ export default {
       });
       this.buttonDisabled = false;
       this.style_mode = false;
-    }
+    },
   }
 }
 </script>
@@ -198,6 +199,28 @@ export default {
       <p class="mx-[2vh] font-serif text-[2.4vh]">
         很感谢你能访问该页面，如果你有什么和我们说的，或者有什么问题想问的，可以随时在下面评论噢~！我们看见了会第一时间回复你的。
       </p>
+      <div class="md:w-[70%] w-[85%] mt-[30px] flex flex-row justify-evenly items-center bg-[url('/static/background/17.jpg')] bg-cover rounded-xl shadow-md">
+        <div class="md:flex md:flex-col md:items-center md:justify-between h-[6vw] hidden self-start mt-[4vh]">
+        <el-avatar style="width: 4vw;height:4vw">未登录</el-avatar>
+        <div class="font-['SYST']">未登录</div>
+      </div>
+      <div class="my-[3vh] flex flex-col justify-center md:w-[85%] w-[90%]">
+        <div class="mb-[3vh] relative">
+          <p :class="{'text-[#FFFFFF]':style_mode,'bg-opacity-100':style_mode,'text-[1.6vh]':style_mode,'top-[-1.2vh]':style_mode,'left-[1.4vh]':style_mode,
+            'text-[#000000]':!style_mode,'bg-opacity-0':!style_mode,'text-[2vh]':!style_mode,'top-[1vh]':!style_mode,'left-[1vh]':!style_mode}
+            " class="absolute pointer-events-none px-[1vh] duration-700 z-50 bg-black">
+            你是我一生只会遇见一次的惊喜...
+          </p>
+          <textarea id="pl" v-model="value"
+                    class="w-full h-[20vh] p-[2vh] border border-[#000000] min-h-[20vh] bg-[#FFFFFF] shadow-md bg-opacity-50"
+                    type="text" @blur="onBlur" @focus="onFocus"></textarea>
+        </div>
+        <div class="w-full flex flex-row justify-around md:justify-end">
+          <el-button round style="width: 150px;height: 40px" @click="clear">清除</el-button>
+          <el-button round style="width: 150px;height: 40px" type="primary" @click="publish_message">发布</el-button>
+        </div>
+      </div>
+      </div>
       <div class="flex flex-row md:w-[70%] w-[85%] mt-[2vh] border-b-[1px] border-[#000000]">
         <div class="flex flex-row items-end">
           <span class="text-[4vh] font-bold font-['RGBZ']">comment</span>
@@ -223,23 +246,7 @@ export default {
         <div class="text-[3vh] font-['RGBZ']" v-if="!hasMore">没有更多留言惹</div>
         <div class="w-[70%]"><el-divider content-position="left">列车已到站</el-divider></div>
       </div>
-      <div class="my-[3vh] flex flex-col justify-center md:w-[70%] w-[85%]">
-        <div class="mb-[3vh] relative">
-          <p :class="{'text-[#FFFFFF]':style_mode,'bg-black':style_mode,'text-[1.6vh]':style_mode,'top-[-1.2vh]':style_mode,'left-[1.4vh]':style_mode,
-            'text-[#000000]':!style_mode,'bg-white':!style_mode,'text-[2vh]':!style_mode,'top-[1vh]':!style_mode,'left-[1vh]':!style_mode}
-            " class="absolute pointer-events-none px-[1vh] duration-700 z-50">
-            你是我一生只会遇见一次的惊喜...
-          </p>
-          <textarea id="pl" v-model="value"
-                    class="w-full h-[20vh] p-[2vh] border border-[#000000] min-h-[20vh] bg-[#FFFFFF] shadow-md"
-                    type="text" @blur="onBlur" @focus="onFocus"></textarea>
-        </div>
-        <div class="w-full flex flex-row justify-around">
-          <el-button round style="width: 200px;height: 40px" type="primary" @click="publish_message">发布</el-button>
-          <el-button round style="width: 200px;height: 40px" @click="clear">清除</el-button>
-        </div>
-        <div class="h-[50px] w-full my-[50px]"></div>
-      </div>
+      <div class="h-[50px] w-full my-[50px]"></div>
     </div>
   </div>
 </template>

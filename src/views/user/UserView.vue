@@ -1,15 +1,18 @@
 <script>
-import {ElMessageBox} from "element-plus";
+import {ElMessageBox, ElNotification} from "element-plus";
+import {get_user} from "@/src/utils/user_info";
+import {call_api} from "@/src/utils/cloud";
 
 export default {
   data() {
     return {
       dialogVisible: false,
-      date: null,
-      username: null,
-      motto: null,
+      name: null,
+      birthday: null,
+      personal_sign: null,
       fileList: null,
       avatar: [],
+      info:null,
       avatarUrl: [
         '/static/avatar/1.jpg',
         '/static/avatar/2.jpg',
@@ -53,11 +56,11 @@ export default {
     };
   },
   async mounted() {
+    this.info = await get_user()
   },
   methods: {
-    get_user() {
-      return get_user
-    },
+    get_user,
+
     handleClose(done) {
       ElMessageBox.confirm('确认关闭？（未提交的信息不会保存）', '提示', {
         confirmButtonText: '确定',
@@ -90,6 +93,43 @@ export default {
     choose(index) {
       this.clickFlag = index
     },
+    get_info(field){
+
+      if(!this.info?.[field] && field === "name"){
+        return "未登录"
+      }else{
+        this[field] = this.info?.[field]
+        return this.info?.[field]
+      }
+    },
+    async update_info() {
+      if (!this.name || !this.birthday || !this.personal_sign) {
+        ElNotification({
+          title: 'Info',
+          message: '请填写完整信息',
+          type: 'info',
+        })
+        return
+      }
+      let res = await call_api("user/info/update_basic_info", {
+        name: this.name,
+        birthday: this.birthday,
+        personal_sign: this.personal_sign
+      });
+      if(res.success === false){
+        ElNotification({
+          title: 'Error',
+          message: res,
+          type: 'error',
+        })
+        return
+      }
+      this.info.name = this.name;
+      this.info.birthday = this.birthday;
+      this.info.personal_sign = this.personal_sign;
+
+      this.dialogVisible = false
+    }
   },
 
 }
@@ -100,8 +140,8 @@ export default {
     <div class="bg-[url('/static/background/12.jpg')] bg-cover bg-center h-[40%] relative">
       <div class="absolute bottom-[-5vh] left-[10vw] flex flex-row items-end">
         <img alt="头像" class="h-[10vh] w-[10vh] rounded-full mr-[10px]" src="/static/favicon/favicon.png"/>
-        <p class="font-['SYST'] text-[24px] mr-[20px] leading-none pb-[5px]"></p>
-        <el-tag class="font-['SYST'] text-[18px] mr-[10px] leading-none pb-[5px]" type="primary">管理员</el-tag>
+        <p class="font-['SYST'] text-[24px] mr-[20px] leading-none pb-[5px]">{{ get_info("name") }}</p>
+        <el-tag class="font-['SYST'] text-[18px] mr-[10px] leading-none pb-[5px]" type="primary" >用户</el-tag>
         <p class="font-['SYST'] text-[14px] mr-[20px] leading-none pb-[5px]">生日：2006年3月1日</p>
         <p class="font-['SYST'] text-[14px] opacity-50 leading-none pb-[5px]">Hi！希望你开心～</p>
       </div>
@@ -142,21 +182,21 @@ export default {
         <div class="w-full flex flex-row items-center justify-between">
           <div class="w-[20%] my-[5px]">
             <span>用户名：</span>
-            <el-input v-model="username" class="w-full"/>
+            <el-input v-model="name" class="w-full"/>
           </div>
           <div class="w-[20%] my-[5px]">
             <span>生日：</span>
-            <el-date-picker v-model="date" size="default" style="width: 100%" type="date"/>
+            <el-date-picker v-model="birthday" value-format="YYYY年MM月DD日" size="default" style="width: 100%" type="date"/>
           </div>
           <div class="w-[50%] my-[5px]">
             <span>个性签名：</span>
-            <el-input v-model="motto" class="w-full"/>
+            <el-input v-model="personal_sign" class="w-full"/>
           </div>
         </div>
         <template #footer>
           <div class="dialog-footer">
             <el-button class="mx-[40px]" @click="dialogVisible = false">取消</el-button>
-            <el-button class="mx-[40px]" type="primary" @click="dialogVisible = false">确定</el-button>
+            <el-button class="mx-[40px]" type="primary" @click="update_info()">确定</el-button>
           </div>
         </template>
       </el-dialog>

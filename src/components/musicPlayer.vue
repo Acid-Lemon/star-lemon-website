@@ -25,68 +25,69 @@ export default {
         {
           name: 'The Chainsmokers',
           singer: 'Young',
-          src: 'https://mp-9c25a9c3-8b6e-4390-be64-8d3056531359.cdn.bspapp.com/musics/Young - The Chainsmokers.mp3',
-          cover: 'https://mp-9c25a9c3-8b6e-4390-be64-8d3056531359.cdn.bspapp.com/pictures/Young - The Chainsmokers.jpg'
+          src: '/static/music/Young - The Chainsmokers.mp3',
+          cover: '/static/cover/Young - The Chainsmokers.jpg'
         },
         {
           name: '去明天',
           singer: '周深',
-          src: 'https://mp-9c25a9c3-8b6e-4390-be64-8d3056531359.cdn.bspapp.com/musics/去明天 - 周深.mp3',
-          cover: 'https://mp-9c25a9c3-8b6e-4390-be64-8d3056531359.cdn.bspapp.com/pictures/去明天 - 周深.jpg'
+          src: '/static/music/去明天 - 周深.mp3',
+          cover: '/static/cover/去明天 - 周深.jpg',
+          lrc: '/static/lrc/去明天 - 周深.lrc'
         },
         {
           name: '第一次遇见花香的那刻',
           singer: '7paste',
-          src: 'https://mp-9c25a9c3-8b6e-4390-be64-8d3056531359.cdn.bspapp.com/musics/第一次遇见花香的那刻 - 7paste.mp3',
-          cover: 'https://mp-9c25a9c3-8b6e-4390-be64-8d3056531359.cdn.bspapp.com/pictures/第一次遇见花香的那刻 - 7paste.jpg'
+          src: '/static/music/第一次遇见花香的那刻 - 7paste.mp3',
+          cover: '/static/cover/第一次遇见花香的那刻 - 7paste.jpg'
         },
         {
           name: '你可以',
           singer: 'coco这个李文',
-          src: 'https://mp-9c25a9c3-8b6e-4390-be64-8d3056531359.cdn.bspapp.com/musics/你可以 - coco这个李文.mp3',
-          cover: 'https://mp-9c25a9c3-8b6e-4390-be64-8d3056531359.cdn.bspapp.com/pictures/你可以 - coco这个李文.jpg'
+          src: '/static/music/你可以 - coco这个李文.mp3',
+          cover: '/static/cover/你可以 - coco这个李文.jpg'
         },
         {
           name: 'A Thousand Years',
           singer: 'Jada Facer、Kyson Facer',
-          src: 'https://mp-9c25a9c3-8b6e-4390-be64-8d3056531359.cdn.bspapp.com/musics/A Thousand Years - Jada Facer、Kyson Facer.mp3',
-          cover: 'https://mp-9c25a9c3-8b6e-4390-be64-8d3056531359.cdn.bspapp.com/pictures/A Thousand Years - Jada Facer、Kyson Facer.jpg'
+          src: '/static/music/A Thousand Years - Jada Facer、Kyson Facer.mp3',
+          cover: '/static/cover/A Thousand Years - Jada Facer、Kyson Facer.jpg'
         },
         {
           name: '从没去过巴塞隆纳',
           singer: '告五人',
-          src: 'https://mp-9c25a9c3-8b6e-4390-be64-8d3056531359.cdn.bspapp.com/musics/从没去过巴塞隆纳 - 告五人.mp3',
-          cover: 'https://mp-9c25a9c3-8b6e-4390-be64-8d3056531359.cdn.bspapp.com/pictures/从没去过巴塞隆纳 - 告五人.jpg'
+          src: '/static/music/从没去过巴塞隆纳 - 告五人.mp3',
+          cover: '/static/cover/从没去过巴塞隆纳 - 告五人.jpg'
         },
         {
           name: '风，信箱，阳光与你',
           singer: 'RGR Y于新垚',
-          src: 'https://mp-9c25a9c3-8b6e-4390-be64-8d3056531359.cdn.bspapp.com/musics/风，信箱，阳光与你 - RGR Y于新垚.mp3',
-          cover: 'https://mp-9c25a9c3-8b6e-4390-be64-8d3056531359.cdn.bspapp.com/pictures/风，信箱，阳光与你 - RGR Y于新垚.jpg'
+          src: '/static/music/风，信箱，阳光与你 - RGR Y于新垚.mp3',
+          cover: '/static/cover/风，信箱，阳光与你 - RGR Y于新垚.jpg'
         },
         {
           name: '流萤之森',
           singer: 'Namibia',
-          src: 'https://mp-9c25a9c3-8b6e-4390-be64-8d3056531359.cdn.bspapp.com/musics/流萤之森 - Namibia.mp3',
-          cover: 'https://mp-9c25a9c3-8b6e-4390-be64-8d3056531359.cdn.bspapp.com/pictures/流萤之森 - Namibia.jpg'
+          src: '/static/music/流萤之森 - Namibia.mp3',
+          cover: '/static/cover/流萤之森 - Namibia.jpg'
         },
         {
           name: '烟雨小镇',
           singer: '陈阿晓',
-          src: 'https://mp-9c25a9c3-8b6e-4390-be64-8d3056531359.cdn.bspapp.com/musics/烟雨小镇 - 陈阿晓.mp3',
-          cover: 'https://mp-9c25a9c3-8b6e-4390-be64-8d3056531359.cdn.bspapp.com/pictures/烟雨小镇 - 陈阿晓.jpg'
+          src: '/static/music/烟雨小镇 - 陈阿晓.mp3',
+          cover: '/static/cover/烟雨小镇 - 陈阿晓.jpg'
         },
         {
           name: '有光',
           singer: '买辣椒也用券',
-          src: 'https://mp-9c25a9c3-8b6e-4390-be64-8d3056531359.cdn.bspapp.com/musics/有光 - 买辣椒也用券.mp3',
-          cover: 'https://mp-9c25a9c3-8b6e-4390-be64-8d3056531359.cdn.bspapp.com/pictures/有光 - 买辣椒也用券.jpg'
+          src: '/static/music/有光 - 买辣椒也用券.mp3',
+          cover: '/static/cover/有光 - 买辣椒也用券.jpg'
         },
         {
           name: '在日落前出发',
           singer: '江迟同学',
-          src: 'https://mp-9c25a9c3-8b6e-4390-be64-8d3056531359.cdn.bspapp.com/musics/在日落前出发 - 江迟同学.mp3',
-          cover: 'https://mp-9c25a9c3-8b6e-4390-be64-8d3056531359.cdn.bspapp.com/pictures/在日落前出发 - 江迟同学.jpg'
+          src: '/static/music/在日落前出发 - 江迟同学.mp3',
+          cover: '/static/cover/在日落前出发 - 江迟同学.jpg'
         }
       ]
     }

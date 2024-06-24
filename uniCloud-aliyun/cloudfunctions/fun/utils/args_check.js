@@ -26,6 +26,16 @@ class RuleHandler {
         }
     }
 
+    within(args, name, rule_val) {
+        if (!Array.isArray(rule_val)) {
+            throw TypeError(`rules[${name}]: args[${name}] is not an array`);
+        }
+
+        if (!rule_val.includes(args[name])) {
+            throw_handle_error(`args[${name}] invalid. not within the rule value`);
+        }
+    }
+
     length(args, name, rules) {
         if (!(rules instanceof Object)) {
             throw TypeError(`rules[${name}]: value of rule[length] is not an object`);

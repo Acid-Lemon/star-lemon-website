@@ -31,7 +31,7 @@ module.exports = class DBService_User extends Service {
     }
 
     async update_user(id, info) {
-        return await this.db.collection(tables.user).doc(user.id).update({
+        return await this.db.collection(tables.user).doc(id).update({
             ...info
         });
     }

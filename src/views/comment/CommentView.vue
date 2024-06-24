@@ -5,6 +5,7 @@ import {useInfiniteScroll} from "vue-hooks-plus";
 
 import {date_format} from "@/src/utils/time";
 import {get_user} from "@/src/utils/user_info";
+
 import axios from "axios";
 import {Message} from "@element-plus/icons-vue";
 
@@ -20,12 +21,14 @@ export default {
       sentences: null,
       loadingMore: false,
       hasMore: true,
-      username:"未登录"
+      username:"未登录",
+      info:""
     };
   },
   async mounted() {
     await this.get_sentences();
     await this.get_messages();
+    this.info = await get_user()
   },
   methods: {
     async get_sentences() {
@@ -201,8 +204,8 @@ export default {
       </p>
       <div class="md:w-[70%] w-[85%] mt-[30px] flex flex-row justify-evenly items-center bg-[url('/static/background/17.jpg')] bg-cover rounded-xl shadow-md">
         <div class="md:flex md:flex-col md:items-center md:justify-between h-[6vw] hidden self-start mt-[4vh]">
-        <el-avatar style="width: 4vw;height:4vw">未登录</el-avatar>
-        <div class="font-['SYST']">未登录</div>
+        <el-avatar style="width: 4vw;height:4vw">{{ info.name }}</el-avatar>
+        <div class="font-['SYST']">{{ info.name }}</div>
       </div>
       <div class="my-[3vh] flex flex-col justify-center md:w-[85%] w-[90%]">
         <div class="mb-[3vh] relative">

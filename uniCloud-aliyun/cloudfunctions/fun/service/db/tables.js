@@ -3,7 +3,8 @@
 let tables = {
     user: "user",
     sms_code: "sms_code",
-    message_board: "message_board"
+    message_board: "message_board",
+    cloud_storage: "cloud_storage"
 }
 
 module.exports = {

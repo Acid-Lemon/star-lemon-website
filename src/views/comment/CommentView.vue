@@ -1,7 +1,6 @@
 <script>
 import {call_api} from "@/src/utils/cloud";
 import {ElNotification} from "element-plus";
-import {useInfiniteScroll} from "vue-hooks-plus";
 
 import {date_format} from "@/src/utils/time";
 import {get_user} from "@/src/utils/user_info";
@@ -10,7 +9,7 @@ import axios from "axios";
 import {Message} from "@element-plus/icons-vue";
 
 export default {
-  components:{Message, useInfiniteScroll},
+  components:{Message},
   data() {
     return {
       value: "",

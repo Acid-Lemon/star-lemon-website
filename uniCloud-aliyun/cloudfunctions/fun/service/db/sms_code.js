@@ -9,9 +9,9 @@ const {
 const error = require("../../types/error");
 
 const { id_name_format } = require("../../utils/db/result_format");
-const obj_utils = require("../../utils/object");
+const obj_utils = require("../../utils/common/object");
 
-const config = require('uni-config-center')({ pluginId: "fun" }).config();
+const config = require("uni-config-center")({ pluginId: "fun" }).config();
 
 module.exports = class DBService_SmsCode extends Service {
     async find_code(phone_number) {

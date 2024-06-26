@@ -6,7 +6,7 @@ const jwt = require("jsonwebtoken");
 
 const bcrypt = require("bcryptjs");
 
-const config = require('uni-config-center')({ pluginId: "fun" }).config();
+const config = require("uni-config-center")({ pluginId: "fun" }).config();
 
 const error = require("../../types/error");
 

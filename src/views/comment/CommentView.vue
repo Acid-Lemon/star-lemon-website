@@ -180,7 +180,7 @@ export default {
 <template>
   <div class="w-full h-full">
     <div
-        class="bg-[url('/static/background/11.jpg')] bg-cover w-full md:h-[40%] flex flex-col items-center justify-center h-[30%]">
+        class="bg-[url('/static/background/11.jpg')] bg-cover w-full md:min-h-[40%] flex flex-col items-center justify-center h-[30%]">
       <p class="text-[#000000] font-['SYST'] text-[6vh] hover:text-[#44cef6] duration-700">
         留言板
       </p>

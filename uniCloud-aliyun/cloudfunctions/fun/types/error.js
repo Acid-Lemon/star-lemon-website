@@ -3,6 +3,7 @@ module.exports = {
         no_user: "err_no_user",
         no_sms_code: "err_no_sms_code",
         no_token: "err_no_token",
+        no_folder: "err_no_folder",
         invalid_password: "err_password",
         invalid_sms_code: "err_sms_code",
         invalid_phone_number: "err_phone_number",

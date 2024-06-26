@@ -27,12 +27,30 @@ class RuleHandler {
     }
 
     within(args, name, rule_val) {
-        if (!Array.isArray(rule_val)) {
+        if (!Array.isArray(args[name])) {
             throw TypeError(`rules[${name}]: args[${name}] is not an array`);
+        }
+
+        if (!Array.isArray(rule_val)) {
+            throw TypeError(`rules[${name}]: value of rule[within] is ${rule_val}, not an array`);
         }
 
         if (!rule_val.includes(args[name])) {
             throw_handle_error(`args[${name}] invalid. not within the rule value`);
+        }
+    }
+
+    start_with(args, name, rule_val) {
+        if (!(args[name] instanceof String)) {
+            throw TypeError(`rules[${name}]: args[${name}] is not a string, but a ${typeof args[name]}`);
+        }
+
+        if (!(rule_val instanceof String)) {
+            throw TypeError(`rules[${name}]: value of rule[start_with] is ${rule_val}, not a string`);
+        }
+        value
+        if (!args[name].startsWith(rule_val)) {
+            throw_handle_error(`args[${name}] invalid. not start with the rule`);
         }
     }
 

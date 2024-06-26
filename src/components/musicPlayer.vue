@@ -124,10 +124,6 @@ export default {
     this.innerAudioContext.onEnded(() => {
       this.switchMusic();
       this.play();
-      this.readLyrics(this.musicList[this.randomIndex].lrc);
-      setTimeout(()=>{
-        this.createLyricElements();
-      },1000)
 
     });
     this.innerAudioContext.onError((res) => {
@@ -143,17 +139,12 @@ export default {
   },
   watch: {},
   methods: {
-    play() {
+    async play() {
       this.innerAudioContext.play();
       this.deleteLyricElements();
-
-      setTimeout(() => {
-        this.readLyrics(this.musicList[this.randomIndex].lrc);
-        setTimeout(()=>{
-          this.createLyricElements();
-          console.log(document.getElementById('lyric').querySelectorAll('p'));
-        },1000)
-      }, 1000)
+      await this.readLyrics(this.musicList[this.randomIndex].lrc);
+      this.createLyricElements();
+      console.log(document.getElementById('lyric').querySelectorAll('p'));
     },
     pause() {
       this.innerAudioContext.pause();
@@ -223,30 +214,35 @@ export default {
       return truncatedText;
     },
     readLyrics(filePath) {
-      uni.request({
-        url: filePath,
-        success: (res) => {
-          if (res.statusCode === 200) {
-            const lines = res.data.split("\n")
-            for(let n = 0; n < lines?.length; n++){
-              const re = /\[(?<timeStr>.*?)](?<words>.*)/;
-              const match = re.exec(lines[n]);
-              if(match){
-                const lyric = match.groups;
-                const timeStr = lyric.timeStr;
-                const words = lyric.words;
-                const timeArr = timeStr.split(":");
-                const time = parseInt(timeArr[0]) * 60 + parseFloat(timeArr[1]);
-                this.lyricList.push({time, words});
+      return new Promise((resolve, reject) => {
+        uni.request({
+          url: filePath,
+          success: (res) => {
+            if (res.statusCode === 200) {
+              const lines = res.data.split("\n")
+              for(let n = 0; n < lines?.length; n++){
+                const re = /\[(?<timeStr>.*?)](?<words>.*)/;
+                const match = re.exec(lines[n]);
+                if(match){
+                  const lyric = match.groups;
+                  const timeStr = lyric.timeStr;
+                  const words = lyric.words;
+                  const timeArr = timeStr.split(":");
+                  const time = parseInt(timeArr[0]) * 60 + parseFloat(timeArr[1]);
+                  this.lyricList.push({time, words});
+                }
               }
+              resolve();
+            } else {
+              console.error('读取文件失败，状态码：', res.statusCode);
+              reject({statusCode: res.statusCode});
             }
-          } else {
-            console.error('读取文件失败，状态码：', res.statusCode);
+          },
+          fail: (err) => {
+            console.error('读取文件失败：', err);
+            reject(err);
           }
-        },
-        fail: (err) => {
-          console.error('读取文件失败：', err);
-        }
+        })
       });
     },
     createLyricElements() {
@@ -271,12 +267,15 @@ export default {
       });
     },
     findIndex(){
+      if(this.currentTime >= this.lyricList[this.lyricList.length - 1].time) {
+        return this.lyricList.length - 1;//没找到则显示最后一句歌词
+      }
       for(let i = 0; i < this.lyricList.length; i++){
         if(this.currentTime <= this.lyricList[i].time) {
           return i - 1;
         }
       }
-      return this.lyricList.length - 1;//没找到则显示最后一句歌词
+
     },
     setOffset(){
       const index = this.findIndex();

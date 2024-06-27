@@ -13,16 +13,16 @@ const {
 module.exports = class Controller_Album extends Controller {
     /*
          filename:      文件名  名字.拓展名
-         *path_prefix:  图片上传路径(/album后的路径)前缀
+         folder_path:   文件夹路径
          group_type:    图片上传分组类型, 都为创建人享有
          - share   公开共享人人可编辑
          - public  公开查看仅自己可编辑
+         - private 私有
     */
     async get_image_upload_options() {
         let {
             filename,
-            path_prefix,
-            group_type
+            folder_path
         } = validate(this.ctx.event.args, {
             filename: {
                 type: "string",
@@ -32,17 +32,41 @@ module.exports = class Controller_Album extends Controller {
                 type: "string",
                 regex: /^[a-zA-Z0-9_.\\/\-\u4e00-\u9fff]+$/,
                 start_with: cloud_storage_path_prefixes.album
-            },
-            group_type: {
-                type: "string",
-                within: ["share", "public", "private"]
             }
         });
 
         return await this.service.cloud_storage.get_image_upload_options({
             filename,
-            path_prefix,
-            group_type
+            folder_path
+        });
+    }
+
+    async create_folder() {
+        let {
+            exist_folder_path,
+            new_folder_path_suffix,
+            public_state
+        } = validate(this.ctx.event.args, {
+            exist_folder_path: {
+                undefined_able: true,
+                type: "string",
+                regex: /^[a-zA-Z0-9_.\\/\-\u4e00-\u9fff]+$/,
+                start_with: cloud_storage_path_prefixes.album
+            },
+            new_folder_path_suffix: {
+                type: "string",
+                regex: /^[a-zA-Z0-9_.\\/\-\u4e00-\u9fff]+$/
+            },
+            public_state: {
+                type: "string",
+                within: ["shared", "public", "private"]
+            }
+        });
+
+        return await this.service.cloud_storage.album.create_folder({
+            exist_folder_path,
+            new_folder_path_suffix,
+            public_state
         });
     }
 }

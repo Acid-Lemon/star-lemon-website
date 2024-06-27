@@ -24,12 +24,13 @@ function get_folder_depth(path) {
 }
 
 function merge_folder_path(path1, path2) {
-    path1 = path_slash_format(path1);
-    path2 = path_slash_format(path2);
+    path1 = path_slash_format(path1, "folder");
+    path2 = path_slash_format(path2, "folder");
+
     if (path1.endsWith("/")) {
-        return path1 + path2;
+        return path1 + (path2.startsWith("/") ? path2.slice(1) : path2);
     } else {
-        return path1 + "/" + path2;
+        return path1 + (path2.startsWith("/") ? "" : "/") + path2;
     }
 }
 
@@ -43,9 +44,15 @@ function separate_last_folder_name(folder_path) {
     };
 }
 
+function get_folder_names_by_path(path) {
+    path = path_slash_format(path, "folder");
+    return path.split('/').filter(item => item !== "");
+}
+
 module.exports = {
     path_slash_format,
     get_folder_depth,
     merge_folder_path,
-    separate_last_folder_name
+    separate_last_folder_name,
+    get_folder_names_by_path
 }

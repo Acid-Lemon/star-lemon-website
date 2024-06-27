@@ -180,8 +180,8 @@ export default {
 <template>
   <div class="w-full h-full">
     <div
-        class="bg-[url('/static/background/11.jpg')] bg-cover w-full md:min-h-[40%] flex flex-col items-center justify-center h-[30%]">
-      <p class="text-[#000000] font-['SYST'] text-[6vh] hover:text-[#44cef6] duration-700">
+        class="bg-[url('/static/background/11.jpg')] bg-cover w-full md:h-[40vh] flex flex-col items-center justify-center h-[30vh]">
+      <p class="text-[#000000] font-['FZSX'] text-[6vh] hover:text-[#44cef6] duration-700">
         留言板
       </p>
     </div>
@@ -237,7 +237,7 @@ export default {
               <el-avatar style="width:5.4vh;height:5.4vh" :src="message.user.avatar_filename">{{ message.user.name }}
               </el-avatar>
               <div class="flex flex-col ml-[1vh]">
-                <p class="text-[2vh] font-['SYST']">{{ message.user.name }}</p>
+                <p class="text-[2.2vh] font-['SYST']">{{ message.user.name }}</p>
                 <p class="text-[1.6vh] font-['SYST'] text-[#000000] opacity-80">{{ message.create_at_format_str }}</p>
               </div>
             </div>

@@ -15,6 +15,7 @@ module.exports = {
         token_expire: "err_token_expire",
         sms_code_expire: "err_sms_code_expire",
         sms_code_send_limit: "err_sms_code_send_limit",
+        err_folder_create: "err_folder_create",
         err_serve: "err_serve"
     }
 };

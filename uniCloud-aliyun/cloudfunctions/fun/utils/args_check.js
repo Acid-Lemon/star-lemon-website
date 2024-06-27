@@ -27,10 +27,6 @@ class RuleHandler {
     }
 
     within(args, name, rule_val) {
-        if (!Array.isArray(args[name])) {
-            throw TypeError(`rules[${name}]: args[${name}] is not an array`);
-        }
-
         if (!Array.isArray(rule_val)) {
             throw TypeError(`rules[${name}]: value of rule[within] is ${rule_val}, not an array`);
         }
@@ -183,17 +179,25 @@ function validate(args, rules) {
             throw TypeError(`config of ${name} is not an object`);
         }
 
-        if (rule.hasOwnProperty("undefined_able")) {
-            if (rule["undefined_able"] === true && args[name] === undefined) {
+        if (rule.hasOwnProperty("undefined_able") && args[name] === undefined) {
+            if (rule["undefined_able"] === true) {
                 continue;
+            }
+
+            if (rule["undefined_able"] === false) {
+                throw TypeError(`args[${name}] invalid. expect not undefined`);
             }
 
             delete rule["undefined_able"];
         }
 
-        if (rule.hasOwnProperty("null_able")) {
-            if (rule["null_able"] === true && args[name] === null) {
+        if (rule.hasOwnProperty("null_able") && args[name] === null) {
+            if (rule["null_able"] === true) {
                 continue;
+            }
+
+            if (rule["null_able"] === false) {
+                throw TypeError(`args[${name}] invalid. expect not null`);
             }
 
             delete rule["null_able"];

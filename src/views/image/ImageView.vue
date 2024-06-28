@@ -151,7 +151,7 @@ export default {
         </div>
         <el-scrollbar>
         <div v-if="filteredImages.length > 0"
-             class="grid gap-x-4 gap-y-[20px] grid-cols-4 auto-rows-auto">
+             class="grid grid-flow-row grid-cols-4 gap-[20px]">
           <div v-for="image in filteredImages"
                :key="image.id"
                class="shadow-md pb-[2px] flex flex-col justify-between">

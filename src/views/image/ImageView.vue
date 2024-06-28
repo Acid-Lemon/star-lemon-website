@@ -149,8 +149,9 @@ export default {
             <el-button @click="clear">重置</el-button>
           </div>
         </div>
+        <el-scrollbar>
         <div v-if="filteredImages.length > 0"
-             class="grid gap-x-4 gap-y-[20px] grid-cols-4 auto-rows-auto overflow-y-scroll">
+             class="grid gap-x-4 gap-y-[20px] grid-cols-4 auto-rows-auto">
           <div v-for="image in filteredImages"
                :key="image.id"
                class="shadow-md pb-[2px] flex flex-col justify-between">
@@ -167,7 +168,8 @@ export default {
         </div>
         <div v-else class="w-full h-full flex flex-row items-center justify-center"><span
             class="font-['RGBZ'] text-[40px]">没有找到符合筛选条件的图片</span></div>
-      </div>
+        </el-scrollbar>
+        </div>
     </div>
   </div>
 </template>

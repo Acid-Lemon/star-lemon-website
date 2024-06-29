@@ -179,25 +179,29 @@ function validate(args, rules) {
             throw TypeError(`config of ${name} is not an object`);
         }
 
-        if (rule.hasOwnProperty("undefined_able") && args[name] === undefined) {
-            if (rule["undefined_able"] === true) {
-                continue;
-            }
+        if (rule.hasOwnProperty("undefined_able")) {
+            if (args[name] === undefined) {
+                if (rule["undefined_able"] === true) {
+                    continue;
+                }
 
-            if (rule["undefined_able"] === false) {
-                throw TypeError(`args[${name}] invalid. expect not undefined`);
+                if (rule["undefined_able"] === false) {
+                    throw TypeError(`args[${name}] invalid. expect not undefined`);
+                }
             }
 
             delete rule["undefined_able"];
         }
 
-        if (rule.hasOwnProperty("null_able") && args[name] === null) {
-            if (rule["null_able"] === true) {
-                continue;
-            }
+        if (rule.hasOwnProperty("null_able")) {
+            if (args[name] === null) {
+                if (rule["null_able"] === true) {
+                    continue;
+                }
 
-            if (rule["null_able"] === false) {
-                throw TypeError(`args[${name}] invalid. expect not null`);
+                if (rule["null_able"] === false) {
+                    throw TypeError(`args[${name}] invalid. expect not null`);
+                }
             }
 
             delete rule["null_able"];

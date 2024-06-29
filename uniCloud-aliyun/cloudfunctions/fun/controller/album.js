@@ -10,6 +10,10 @@ const {
     cloud_storage_path_prefixes
 } = require("../service/cloud_storage/path_prefixes");
 
+const {
+    codes
+} = require("../types/error");
+
 module.exports = class Controller_Album extends Controller {
     async create_image() {
         let {
@@ -62,10 +66,22 @@ module.exports = class Controller_Album extends Controller {
                 regex: /^[a-zA-Z0-9_.\\/\-\u4e00-\u9fff]+$/
             },
             public_state: {
+                undefined_able: true,
                 type: "string",
                 within: ["shared", "public", "private"]
             }
         });
+
+        if (exist_folder_path === undefined) {
+            if (public_state === undefined) {
+                this.throw(codes.invalid_args, "public_state must be defined");
+            }
+        } else {
+            if (public_state !== undefined) {
+                this.throw(codes.invalid_args, "exist_folder_path is defined. public_state depends on the last folder. So must be undefined");
+            }
+        }
+
 
         let res = await this.service.cloud_storage.album.create_folder({
             exist_folder_path,

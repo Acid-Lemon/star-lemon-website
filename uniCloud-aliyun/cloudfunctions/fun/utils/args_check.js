@@ -11,8 +11,8 @@ class RuleHandler {
     }
 
     type(args, name, rule_type) {
-        if (!rule_type instanceof String) {
-            throw TypeError(`rules[${name}]: value of rule[type] is ${typeof rule_type}, not a string`);
+        if (typeof rule_type !== "string") {
+            throw TypeError(`rules[${name}]: value of rule[type] is a ${typeof rule_type}, not a string`);
         }
 
         if (typeof args[name] !== rule_type) {
@@ -28,7 +28,7 @@ class RuleHandler {
 
     within(args, name, rule_val) {
         if (!Array.isArray(rule_val)) {
-            throw TypeError(`rules[${name}]: args[${name}] is not an array`);
+            throw TypeError(`rules[${name}]: value of rule[within] is ${rule_val}, not an array`);
         }
 
         if (!rule_val.includes(args[name])) {
@@ -36,8 +36,22 @@ class RuleHandler {
         }
     }
 
+    start_with(args, name, rule_val) {
+        if (typeof args[name] !== "string") {
+            throw TypeError(`rules[${name}]: args[${name}] is not a string, but a ${typeof args[name]}`);
+        }
+
+        if (typeof rule_val !== "string") {
+            throw TypeError(`rules[${name}]: value of rule[start_with] is ${rule_val}, not a string`);
+        }
+
+        if (!args[name].startsWith(rule_val)) {
+            throw_handle_error(`args[${name}] invalid. not start with the rule`);
+        }
+    }
+
     length(args, name, rules) {
-        if (!(rules instanceof Object)) {
+        if (typeof rules !== "object") {
             throw TypeError(`rules[${name}]: value of rule[length] is not an object`);
         }
 
@@ -74,7 +88,7 @@ class RuleHandler {
     }
 
     math(args, name, rules) {
-        if (!(rules instanceof Object)) {
+        if (typeof rules !== "object") {
             throw TypeError(`rules[${name}]: value of rule[length] is not an object`);
         }
 
@@ -136,7 +150,7 @@ class RuleHandler {
     }
 
     customize(args, name, func) {
-        if (!(func instanceof Function)) {
+        if (typeof func !== "function") {
             throw TypeError(`rules[${name}]: value of rule[customize] is not a function`);
         }
 
@@ -156,7 +170,7 @@ function throw_handle_error(message) {
 
 
 function validate(args, rules) {
-    if (!args instanceof Object || !rules instanceof Object) {
+    if (typeof args !== "object" || typeof rules !== "object") {
         throw TypeError("obj or rules is not an object");
     }
 
@@ -165,17 +179,25 @@ function validate(args, rules) {
             throw TypeError(`config of ${name} is not an object`);
         }
 
-        if (rule.hasOwnProperty("undefined_able")) {
-            if (rule["undefined_able"] === true && args[name] === undefined) {
+        if (rule.hasOwnProperty("undefined_able") && args[name] === undefined) {
+            if (rule["undefined_able"] === true) {
                 continue;
+            }
+
+            if (rule["undefined_able"] === false) {
+                throw TypeError(`args[${name}] invalid. expect not undefined`);
             }
 
             delete rule["undefined_able"];
         }
 
-        if (rule.hasOwnProperty("null_able")) {
-            if (rule["null_able"] === true && args[name] === null) {
+        if (rule.hasOwnProperty("null_able") && args[name] === null) {
+            if (rule["null_able"] === true) {
                 continue;
+            }
+
+            if (rule["null_able"] === false) {
+                throw TypeError(`args[${name}] invalid. expect not null`);
             }
 
             delete rule["null_able"];
@@ -195,4 +217,4 @@ function validate(args, rules) {
 
 module.exports = {
     validate
-};
+}

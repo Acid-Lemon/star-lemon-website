@@ -6,6 +6,19 @@ function remove_start_string(str, start_str) {
     return str.substring(start_str.length);
 }
 
+function count_char(str, c) {
+    let cnt = 0;
+
+    for (let i of str) {
+        if (i === c) {
+            cnt++;
+        }
+    }
+
+    return cnt;
+}
+
 module.exports = {
+    count_char,
     remove_start_string
 }

@@ -10,56 +10,73 @@ export default {
         {
           imgUrl: "/static/background/1.jpg",
           id: 1,
+          album: "相册1",
           time: 1718640810456
         },
         {
           imgUrl: "/static/background/2.jpg",
           id: 2,
+          album: "相册1",
           time: 1718640810456
         },
         {
           imgUrl: "/static/background/3.jpg",
           id: 3,
+          album: "相册2",
           time: 1718640810456
         },
         {
           imgUrl: "/static/background/4.jpg",
           id: 4,
+          album: "相册2",
           time: 1638547200000
         },
         {
           imgUrl: "/static/background/5.jpg",
           id: 5,
+          album: "相册1",
           time: 1638547200000
         },
         {
           imgUrl: "/static/background/6.jpg",
           id: 6,
+          album: "相册3",
           time: 1638547200000
         },
         {
           imgUrl: "/static/background/7.jpg",
           id: 7,
+          album: "相册1",
           time: 1638547200000
         },
         {
           imgUrl: "/static/background/8.jpg",
           id: 8,
+          album: "相册3",
           time: 1638547200000
         },
         {
           imgUrl: "/static/background/9.jpg",
           id: 9,
+          album: "相册3",
           time: 1638547200000
         },
         {
           imgUrl: "/static/background/10.jpg",
           id: 10,
+          album: "相册1",
           time: 1718639386000
         }
       ],
       search_content: "",
       date_range: null,
+      photoAlbums: [
+        "全部",
+        "相册1",
+        "相册2",
+        "相册3",
+      ],
+      photoAlbum: "全部",
     };
   },
   mounted() {
@@ -69,6 +86,7 @@ export default {
     clear() {
       this.search_content = "";
       this.date_range = null;
+      this.photoAlbum = "全部"
     }
   },
   computed: {
@@ -79,8 +97,9 @@ export default {
       return this.images.filter(image => {
         const idMatch = image.id === searchContent || !searchContent;
         const dateMatch = !dateRange || new Date(image.time) >= dateRange[0] && new Date(image.time) <= dateRange[1];
+        const albumMatch = image.album === this.photoAlbum || this.photoAlbum === "全部";
 
-        return idMatch && dateMatch;
+        return idMatch && dateMatch && albumMatch;
       });
     }
   },
@@ -100,6 +119,21 @@ export default {
             </div>
           </div>
           <div class="flex flex-row items-center">
+            <div class="mx-[5px]">选择相册</div>
+          <el-select
+              v-model="photoAlbum"
+              placeholder="Select"
+              style="width: 240px"
+          >
+            <el-option
+                v-for="photoAlbum in photoAlbums"
+                :key="photoAlbum"
+                :label="photoAlbum"
+                :value="photoAlbum"
+            />
+          </el-select>
+            </div>
+          <div class="flex flex-row items-center">
             <div class="mx-[5px]">筛选日期</div>
             <div class="w-[300px] mx-[5px]">
               <el-date-picker v-model="date_range"
@@ -115,8 +149,9 @@ export default {
             <el-button @click="clear">重置</el-button>
           </div>
         </div>
+        <el-scrollbar>
         <div v-if="filteredImages.length > 0"
-             class="grid gap-x-4 gap-y-[20px] grid-cols-4 auto-rows-auto overflow-y-scroll">
+             class="grid grid-flow-row grid-cols-4 gap-[20px]">
           <div v-for="image in filteredImages"
                :key="image.id"
                class="shadow-md pb-[2px] flex flex-col justify-between">
@@ -133,7 +168,8 @@ export default {
         </div>
         <div v-else class="w-full h-full flex flex-row items-center justify-center"><span
             class="font-['RGBZ'] text-[40px]">没有找到符合筛选条件的图片</span></div>
-      </div>
+        </el-scrollbar>
+        </div>
     </div>
   </div>
 </template>

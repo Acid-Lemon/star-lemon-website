@@ -11,14 +11,6 @@ const {
 } = require("../service/cloud_storage/path_prefixes");
 
 module.exports = class Controller_Album extends Controller {
-    /*
-         filename:      文件名  名字.拓展名
-         folder_path:   文件夹路径
-         group_type:    图片上传分组类型, 都为创建人享有
-         - share   公开共享人人可编辑
-         - public  公开查看仅自己可编辑
-         - private 私有
-    */
     async create_image() {
         let {
             filename,

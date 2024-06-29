@@ -1,6 +1,6 @@
 <script>
 
-import MyEditor from "../../components/myEditor.vue";
+import MyEditor from "../../components/MyEditor.vue";
 
 export default {
   name: 'ArticleAdminView',
@@ -9,6 +9,13 @@ export default {
     return {
 
     }
+  },
+  methods: {
+    releaseArticle(){
+
+      console.log("发布文章")
+    }
+
   }
 }
 </script>
@@ -24,12 +31,13 @@ export default {
     <p>文章简介：</p>
     <el-Input style="width: auto;height: 30px"></el-Input>
       </div>
-    <el-button type="primary">发布</el-button>
+      <div class="flex flex-row">
+        <p>文章封面：</p>
+        <el-Input style="width: auto;height: 30px" placeholder="请输入一个图片链接"></el-Input>
+      </div>
+    <el-button type="primary" @click="releaseArticle()">发布</el-button>
     </div>
-
-    <div class="h-full w-full">
     <my-editor></my-editor>
-    </div>
   </div>
 </template>
 

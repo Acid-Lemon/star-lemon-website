@@ -8,6 +8,7 @@ import {
   VideoPause,
   VideoPlay
 } from "@element-plus/icons-vue";
+import {truncateText} from "@/src/utils/truncate_text";
 
 export default {
   name: 'MusicPlayer',
@@ -105,6 +106,7 @@ export default {
   },
   mounted() {
     this.innerAudioContext = uni.createInnerAudioContext();
+    this.innerAudioContext.volume = 0.1;
     this.switchMusic();
     this.innerAudioContext.onCanplay(() => {
       this.duration = this.innerAudioContext.duration;
@@ -139,6 +141,7 @@ export default {
   },
   watch: {},
   methods: {
+    truncateText,
     async play() {
       this.innerAudioContext.play();
       this.deleteLyricElements();
@@ -190,28 +193,6 @@ export default {
       }
       this.innerAudioContext.src = this.musicList[this.randomIndex].src;
       this.play();
-    },
-    truncateText(text, maxChineseLength) {
-      let currentLength = 0;
-      let truncatedText = '';
-
-      for (let char of text) {
-        // 检查字符是否为中文字符（通过字符的Unicode范围）
-        if (char.match(/[\u4e00-\u9fff]/)) {
-          currentLength += 2; // 中文字符长度加2
-        } else {
-          currentLength += 1; // 英文字符长度加1
-        }
-
-        if (currentLength <= maxChineseLength * 2) {
-          truncatedText += char;
-        } else {
-          truncatedText += '...';
-          break;
-        }
-      }
-
-      return truncatedText;
     },
     readLyrics(filePath) {
       return new Promise((resolve, reject) => {
@@ -303,8 +284,8 @@ export default {
               }}
               </div>
               <div class="ml-[1vh] text-[1.6vh] font-['SYST']">{{
-                truncateText(musicList[this.randomIndex].singer, 6)
-              }}
+                  truncateText(musicList[this.randomIndex].singer, 6)
+                }}
               </div>
             </div>
           </div>

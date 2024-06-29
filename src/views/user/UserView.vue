@@ -12,7 +12,7 @@ export default {
       personal_sign: null,
       fileList: null,
       avatar: [],
-      info:null,
+      info: null,
       avatarUrl: [
         '/static/avatar/1.jpg',
         '/static/avatar/2.jpg',
@@ -56,7 +56,7 @@ export default {
     };
   },
   async mounted() {
-    this.info = await get_user()
+    this.info = await get_user();
   },
   methods: {
     get_user,
@@ -69,37 +69,33 @@ export default {
       }).then(() => {
         done();
       })
-          .catch(() => {
-          });
+          .catch(() => {});
     },
     // 获取上传状态
     select(e) {
-      console.log('选择文件：', e)
+      console.log('选择文件：', e);
     },
     // 获取上传进度
     progress(e) {
-      console.log('上传进度：', e)
+      console.log('上传进度：', e);
     },
-
     // 上传成功
     success(e) {
-      console.log('上传成功')
+      console.log('上传成功');
     },
-
     // 上传失败
     fail(e) {
-      console.log('上传失败：', e)
+      console.log('上传失败：', e);
     },
     choose(index) {
-      this.clickFlag = index
+      this.clickFlag = index;
     },
-    get_info(field){
-
-      if(!this.info?.[field] && field === "name"){
-        return "未登录"
-      }else{
-        this[field] = this.info?.[field]
-        return this.info?.[field]
+    get_info(field) {
+      if (!this.info?.[field] && field === "name") {
+        return "未登录";
+      } else {
+        this[field] = this.info?.[field];
+        return this.info?.[field];
       }
     },
     async update_info() {
@@ -108,21 +104,21 @@ export default {
           title: 'Info',
           message: '请填写完整信息',
           type: 'info',
-        })
-        return
+        });
+        return;
       }
       let res = await call_api("user/info/update_basic_info", {
         name: this.name,
         birthday: this.birthday,
         personal_sign: this.personal_sign
       });
-      if(res.success === false){
+      if (res.success === false) {
         ElNotification({
           title: 'Error',
           message: res,
           type: 'error',
-        })
-        return
+        });
+        return;
       }
       this.info.name = this.name;
       this.info.birthday = this.birthday;
@@ -131,16 +127,15 @@ export default {
       localStorage.removeItem("user");
       await get_user();
 
-      this.dialogVisible = false
+      this.dialogVisible = false;
     }
   },
-
 }
 </script>
 
 <template>
-  <div class="h-full w-full bg-[#F8FAFD]">
-    <div class="bg-[url('/static/background/12.jpg')] bg-cover bg-center h-[40%] relative">
+  <div class="h-full w-full el-overlay-dialog">
+    <div class="bg-[url('/static/background/12.jpg')] bg-cover bg-center h-[40vh] relative">
       <div class="absolute bottom-[-5vh] left-[10vw] flex flex-row items-end">
         <img alt="头像" class="h-[10vh] w-[10vh] rounded-full mr-[10px]" src="/static/favicon/favicon.png"/>
         <p class="font-['SYST'] text-[24px] mr-[20px] leading-none pb-[5px]">{{ get_info("name") }}</p>
@@ -151,10 +146,10 @@ export default {
       <el-button class="absolute bottom-[-5vh] right-[10vw]" plain @click="dialogVisible = true">
         编辑信息
       </el-button>
-      <el-dialog v-model="dialogVisible" :before-close="handleClose" center
-                 class="flex flex-col items-center justify-center h-[500px]"
-                 title="编辑个人信息" width="60%">
-        <div class="w-full flex flex-row items-center justify-center">
+      <el-dialog v-model="dialogVisible" :before-close="handleClose"
+                 class="flex flex-col items-center justify-center el-overlay-dialog"
+                 title="编辑个人信息" style="padding: 50px;height: 540px;width:70%">
+        <div class="w-full h-[250px] flex flex-row items-center justify-center">
           <div class="w-[20%] my-[5px]">
             <span>头像：</span>
             <uni-file-picker v-model="avatar" :image-styles="avatarStyles" :limit="1" fileMediatype="image" mode="grid"
@@ -182,7 +177,7 @@ export default {
             </el-scrollbar>
           </div>
         </div>
-        <div class="w-full flex flex-row items-center justify-between">
+        <div class="w-full h-[100px] flex flex-row items-center justify-between">
           <div class="w-[20%] my-[5px]">
             <span>用户名：</span>
             <el-input v-model="name" class="w-full"/>
@@ -204,7 +199,13 @@ export default {
         </template>
       </el-dialog>
     </div>
+    <div class="w-full h-[60vh] flex flex-col items-center justify-center bg-[#F8FAFD]">
+    </div>
   </div>
 </template>
+
 <style scoped>
+.el-overlay-dialog{
+  overflow: hidden !important;
+}
 </style>

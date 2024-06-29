@@ -32,6 +32,17 @@ const router = createRouter({
             component: () => import("@/src/views/article/ArticleView.vue")
         },
         {
+            path: "/article/note",
+            name: "note",
+            meta: {
+                show: {
+                    navigation_bar: false,
+                    side_navigation_bar: false,
+                }
+            },
+            component: () => import("@/src/views/article/NoteView.vue")
+        },
+        {
             path: "/image",
             name: "image",
             meta: {

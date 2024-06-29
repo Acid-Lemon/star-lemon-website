@@ -111,6 +111,37 @@ module.exports = class Service_CloudStorage_Album extends Service {
         return new_folder_ids;
     }
 
+    async create_folder_if_absent(full_path, info) {
+        let transaction = await this.db.startTransaction();
+        try {
+            if (!(await this.service.db.album.check_folder_exist_by_path(full_path))) {
+                let {
+                    path_prefix,
+                    folder_name
+                } = separate_last_folder_name(full_path);
+
+                await transaction.collection(tables.album).add({
+                    type: "folder",
+                    path_prefix,
+                    name: folder_name,
+                    ...info,
+                    create_at: Date.now()
+                });
+            }
+
+            await transaction.commit();
+        } catch (err) {
+            console.error(err);
+            await transaction.rollback();
+
+            if (err.customize) {
+                throw err;
+            } else {
+                this.throw(codes.err_folder_create, "folder create error");
+            }
+        }
+    }
+
     async add_shared_image(image_info) {
         let time = Date.now();
 

@@ -10,6 +10,14 @@ const {
     cloud_storage_path_prefixes
 } = require("../service/cloud_storage/path_prefixes");
 
+const {
+    merge_folder_path
+} = require("../utils/common/path");
+
+const {
+    codes
+} = require("../types/error");
+
 module.exports = class Controller_Album extends Controller {
     async create_image() {
         let {
@@ -24,7 +32,9 @@ module.exports = class Controller_Album extends Controller {
             folder_path: {
                 type: "string",
                 regex: /^[a-zA-Z0-9_.\\/\-\u4e00-\u9fff]+$/,
-                start_with: cloud_storage_path_prefixes.album
+                start_within: [merge_folder_path(cloud_storage_path_prefixes.album, "public"),
+                    merge_folder_path(merge_folder_path(cloud_storage_path_prefixes.album, "public"), this.ctx.auth.user_id),
+                    merge_folder_path(merge_folder_path(cloud_storage_path_prefixes.album, "private"), this.ctx.auth.user_id)]
             }
         });
 
@@ -55,17 +65,31 @@ module.exports = class Controller_Album extends Controller {
                 undefined_able: true,
                 type: "string",
                 regex: /^[a-zA-Z0-9_.\\/\-\u4e00-\u9fff]+$/,
-                start_with: cloud_storage_path_prefixes.album
+                start_within: [merge_folder_path(cloud_storage_path_prefixes.album, "public"),
+                               merge_folder_path(merge_folder_path(cloud_storage_path_prefixes.album, "public"), this.ctx.auth.user_id),
+                               merge_folder_path(merge_folder_path(cloud_storage_path_prefixes.album, "private"), this.ctx.auth.user_id)]
             },
             new_folder_path_suffix: {
                 type: "string",
                 regex: /^[a-zA-Z0-9_.\\/\-\u4e00-\u9fff]+$/
             },
             public_state: {
+                undefined_able: true,
                 type: "string",
                 within: ["shared", "public", "private"]
             }
         });
+
+        if (exist_folder_path === undefined) {
+            if (public_state === undefined) {
+                this.throw(codes.invalid_args, "public_state must be defined");
+            }
+        } else {
+            if (public_state !== undefined) {
+                this.throw(codes.invalid_args, "exist_folder_path is defined. public_state depends on the last folder. So must be undefined");
+            }
+        }
+
 
         let res = await this.service.cloud_storage.album.create_folder({
             exist_folder_path,

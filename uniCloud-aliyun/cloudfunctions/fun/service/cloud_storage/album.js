@@ -70,20 +70,24 @@ module.exports = class Service_CloudStorage_Album extends Service {
             public_state
         } = info;
 
-        if (!["shared", "public", "private"].includes(public_state)) {
-            this.throw(codes.invalid_args, "public_state must be share or public or private");
-        }
-
         if (exist_folder_path === undefined) {
             exist_folder_path = merge_folder_path(cloud_storage_path_prefixes.album, public_state);
+
             if (public_state !== "shared") {
                 exist_folder_path = merge_folder_path(exist_folder_path, this.ctx.auth.user_id);
             }
         } else {
-            if (!(await this.service.db.album.check_folder_exist_by_path(exist_folder_path))) {
+            let exist_folder = await this.service.db.album.find_folder_by_path(exist_folder_path);
+            if (!exist_folder) {
                 this.throw(codes.no_folder, `no folder ${exist_folder_path} exist. create first`);
             }
+
+            public_state = exist_folder.public_state;
         }
+
+        console.info("exist_folder_path:", exist_folder_path ?? null);
+        console.info("new_folder_path_suffix:", new_folder_path_suffix);
+        console.info("public_state:", public_state);
 
         let new_folder_names = get_folder_names_by_path(new_folder_path_suffix);
 

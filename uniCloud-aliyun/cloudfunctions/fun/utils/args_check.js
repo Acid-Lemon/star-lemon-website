@@ -50,6 +50,28 @@ class RuleHandler {
         }
     }
 
+    start_within(args, name, rule_val) {
+        if (typeof args[name] === "string") {
+            throw TypeError(`args[${name}] invalid. args[${name}] is not a string`)
+        }
+
+        if (!Array.isArray(rule_val)) {
+            throw TypeError(`rules[${name}]: value of rule[within] is ${rule_val}, not an array`);
+        }
+
+        for (let rule of rule_val) {
+            if (typeof rule !== "string") {
+                throw TypeError(`rules[${name}]: value of rule[start_within] -- ${rule} is a ${typeof rule}, not a string`);
+            }
+
+            if (args[name].startsWith(rule)) {
+                return;
+            }
+        }
+
+        throw_handle_error(`args[${name}] invalid. not start with any allowed value`);
+    }
+
     length(args, name, rules) {
         if (typeof rules !== "object") {
             throw TypeError(`rules[${name}]: value of rule[length] is not an object`);
@@ -179,25 +201,29 @@ function validate(args, rules) {
             throw TypeError(`config of ${name} is not an object`);
         }
 
-        if (rule.hasOwnProperty("undefined_able") && args[name] === undefined) {
-            if (rule["undefined_able"] === true) {
-                continue;
-            }
+        if (rule.hasOwnProperty("undefined_able")) {
+            if (args[name] === undefined) {
+                if (rule["undefined_able"] === true) {
+                    continue;
+                }
 
-            if (rule["undefined_able"] === false) {
-                throw TypeError(`args[${name}] invalid. expect not undefined`);
+                if (rule["undefined_able"] === false) {
+                    throw TypeError(`args[${name}] invalid. expect not undefined`);
+                }
             }
 
             delete rule["undefined_able"];
         }
 
-        if (rule.hasOwnProperty("null_able") && args[name] === null) {
-            if (rule["null_able"] === true) {
-                continue;
-            }
+        if (rule.hasOwnProperty("null_able")) {
+            if (args[name] === null) {
+                if (rule["null_able"] === true) {
+                    continue;
+                }
 
-            if (rule["null_able"] === false) {
-                throw TypeError(`args[${name}] invalid. expect not null`);
+                if (rule["null_able"] === false) {
+                    throw TypeError(`args[${name}] invalid. expect not null`);
+                }
             }
 
             delete rule["null_able"];

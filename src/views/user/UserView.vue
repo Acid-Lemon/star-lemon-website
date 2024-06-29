@@ -2,8 +2,10 @@
 import {ElMessageBox, ElNotification} from "element-plus";
 import {get_user} from "@/src/utils/user_info";
 import {call_api} from "@/src/utils/cloud";
+import {Plus} from "@element-plus/icons-vue";
 
 export default {
+  components: {Plus},
   data() {
     return {
       dialogVisible: false,
@@ -12,6 +14,7 @@ export default {
       personal_sign: null,
       fileList: null,
       avatar: [],
+      background: [],
       info: null,
       avatarUrl: [
         '/static/avatar/1.jpg',
@@ -30,28 +33,6 @@ export default {
         '/static/avatar/14.jpg',
         '/static/avatar/15.jpg',
       ],
-      avatarName: '',
-      background: [],
-      avatarStyles: {
-        width: 128,
-        height: 128,
-        border: {
-          color: "#000000",
-          width: 2,
-          style: 'dashed',
-          radius: '2px'
-        }
-      },
-      backgroundStyles: {
-        width: 256,
-        height: 128,
-        border: {
-          color: "#000000",
-          width: 2,
-          style: 'dashed',
-          radius: '2px'
-        }
-      },
       clickFlag: -1,
     };
   },
@@ -69,7 +50,8 @@ export default {
       }).then(() => {
         done();
       })
-          .catch(() => {});
+          .catch(() => {
+          });
     },
     // 获取上传状态
     select(e) {
@@ -99,6 +81,7 @@ export default {
       }
     },
     async update_info() {
+
       if (!this.name || !this.birthday || !this.personal_sign) {
         ElNotification({
           title: 'Info',
@@ -128,8 +111,15 @@ export default {
       await get_user();
 
       this.dialogVisible = false;
-    }
-  },
+    },
+    // 选择文件
+    handleAvatarChange(file) {
+      this.avatar = URL.createObjectURL(file.raw);
+    },
+    handleBackgroundChange(file) {
+      this.background = URL.createObjectURL(file.raw);
+    },
+  }
 }
 </script>
 
@@ -148,23 +138,37 @@ export default {
       </el-button>
       <el-dialog v-model="dialogVisible" :before-close="handleClose"
                  class="flex flex-col items-center justify-center el-overlay-dialog"
-                 title="编辑个人信息" style="padding: 50px;height: 540px;width:70%">
-        <div class="w-full h-[250px] flex flex-row items-center justify-center">
-          <div class="w-[20%] my-[5px]">
+                 title="编辑个人信息" style="padding: 50px;height: 55vh;width:120vh">
+        <div class="w-full h-[25vh] flex flex-row items-center justify-center">
+          <div class="w-[20vh] my-[5px]">
             <span>头像：</span>
-            <uni-file-picker v-model="avatar" :image-styles="avatarStyles" :limit="1" fileMediatype="image" mode="grid"
-                             @fail="fail"
-                             @progress="progress"
-                             @select="select" @success="success"/>
+            <el-upload
+                style="width: 15vh;height: 15vh;border: 1px dashed var(--el-border-color);border-radius: 6px;cursor: pointer;position: relative;overflow: hidden;transition: var(--el-transition-duration-fast);"
+                :file-list = avatar
+                :on-change="handleAvatarChange"
+                action=""
+                list-type="picture"
+                :auto-upload = false
+            >
+              <img v-if="avatar.length !== 0" :src="avatar" style="width: 15vh;height: 15vh" alt="avatar"/>
+              <el-icon v-else style="width: 15vh;height: 15vh;font-size: 28px;color: #8c939d;text-align: center;"><Plus /></el-icon>
+            </el-upload>
           </div>
-          <div class="w-[30%] my-[5px]">
-            <span>个人背景：</span>
-            <uni-file-picker v-model="background" :image-styles="backgroundStyles" :limit="1" fileMediatype="image"
-                             mode="grid"
-                             @fail="fail"
-                             @progress="progress" @select="select" @success="success"/>
-          </div>
-          <div class="w-[50%] my-[5px]">
+          <div class="w-[35vh] my-[5px]">
+            <span @click="this.background">个人背景：</span>
+              <el-upload
+                  style="width: 30vh;height: 15vh;border: 1px dashed var(--el-border-color);border-radius: 6px;cursor: pointer;position: relative;overflow: hidden;transition: var(--el-transition-duration-fast);"
+                  :file-list = background
+                  :on-change="handleBackgroundChange"
+                  action=""
+                  list-type="picture"
+                  :auto-upload = false
+              >
+                <img v-if="background.length !== 0" :src="background" style="width: 30vh;height: 15vh" alt="background"/>
+                <el-icon v-else style="width: 30vh;height: 15vh;font-size: 28px;color: #8c939d;text-align: center;"><Plus /></el-icon>
+              </el-upload>
+            </div>
+          <div class="w-[50vh] my-[5px]">
             <el-scrollbar height="250px">
               <div class="grid gap-x-4 gap-y-[20px] grid-cols-4 auto-rows-auto w-full h-full">
                 <div v-for="(avatar,index) in avatarUrl" :key="avatar"
@@ -177,16 +181,16 @@ export default {
             </el-scrollbar>
           </div>
         </div>
-        <div class="w-full h-[100px] flex flex-row items-center justify-between">
-          <div class="w-[20%] my-[5px]">
+        <div class="w-full h-[10vh] flex flex-row items-center justify-between">
+          <div class="w-[15vh] my-[5px]">
             <span>用户名：</span>
             <el-input v-model="name" class="w-full"/>
           </div>
-          <div class="w-[20%] my-[5px]">
+          <div class="w-[15vh] my-[5px]">
             <span>生日：</span>
             <el-date-picker v-model="birthday" value-format="YYYY年MM月DD日" size="default" style="width: 100%" type="date"/>
           </div>
-          <div class="w-[50%] my-[5px]">
+          <div class="w-[60vh] my-[5px]">
             <span>个性签名：</span>
             <el-input v-model="personal_sign" class="w-full"/>
           </div>

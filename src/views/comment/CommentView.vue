@@ -400,6 +400,7 @@ export default {
       return li;
     },
     async createLabel() {
+      // 确保 DOM 更新完成
       await nextTick();
       this.$refs.messageRef.forEach((messageElement, index) => {
         // 移除现有标签，避免重复

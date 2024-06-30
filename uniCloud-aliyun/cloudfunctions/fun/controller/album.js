@@ -7,104 +7,80 @@ const {
 } = require("../utils/args_check");
 
 const {
-    cloud_storage_path_prefixes
-} = require("../service/cloud_storage/path_prefixes");
-
-const {
-    count_char
-} = require("../utils/common/string");
-
-const {
-    merge_folder_path
-} = require("../utils/common/path");
-
-const {
     codes
 } = require("../types/error");
 
 module.exports = class Controller_Album extends Controller {
     async create_image() {
         let {
-            filename,
-            folder_path
+            folder_id,
+            image_name
         } = validate(this.ctx.event.args, {
-            filename: {
-                type: "string",
-                regex: /^[\w._\-\u4e00-\u9fff]*?(?<![\/\\])\.(jpg|jpeg|png|gif|bmp|webp|tiff|svg)$/i
+            folder_id: {
+                type: "string"
             },
 
-            folder_path: {
+            image_name: {
                 type: "string",
-                regex: /^[a-zA-Z0-9_.\\/\-\u4e00-\u9fff]+$/,
-                start_within: [merge_folder_path(cloud_storage_path_prefixes.album, "public"),
-                    merge_folder_path(merge_folder_path(cloud_storage_path_prefixes.album, "public"), this.ctx.auth.user_id),
-                    merge_folder_path(merge_folder_path(cloud_storage_path_prefixes.album, "private"), this.ctx.auth.user_id)]
+                regex: /^[\w._\-\u4e00-\u9fff]*?(?<![\/\\])\.(jpg|jpeg|png|gif|bmp|webp|tiff|svg)$/i
             }
         });
 
-        let {
-            image_id,
-            image_path
-        } = await this.service.cloud_storage.album.create_image({
-            filename,
-            folder_path
+        let folder = await this.service.db.album.find_folder_by_id(folder_id);
+        if (!folder) {
+            this.throw(codes.no_folder, "folder_id invalid");
+        }
+
+        await this.service.cloud_storage.album.create_image({
+            folder_id,
+            image_name
         });
 
-        let new_folder_ids = await this.service.cloud_storage.album.get_image_upload_options(image_id, image_path);
+        let {exp_time, upload_file_options} = await this.service.cloud_storage.album.get_image_upload_options(image_name, folder.public_state);
 
         return {
             data: {
-                new_folder_ids
+                exp_time,
+                upload_file_options
             }
         };
     }
 
     async create_folder() {
         let {
-            exist_folder_path,
-            new_folder_path_suffix,
+            folder_name,
             public_state
         } = validate(this.ctx.event.args, {
-            exist_folder_path: {
-                undefined_able: true,
+            folder_name: {
                 type: "string",
-                regex: /^[a-zA-Z0-9_.\\/\-\u4e00-\u9fff]+$/,
-                start_within: [merge_folder_path(cloud_storage_path_prefixes.album, "shared"),
-                               merge_folder_path(merge_folder_path(cloud_storage_path_prefixes.album, "public"), this.ctx.auth.user_id),
-                               merge_folder_path(merge_folder_path(cloud_storage_path_prefixes.album, "private"), this.ctx.auth.user_id)]
-            },
-            new_folder_path_suffix: {
-                type: "string",
-                regex: /^[a-zA-Z0-9_.\\/\-\u4e00-\u9fff]+$/,
-                customize: (args, name) => {
-                    return count_char(args[name], '/') <= 5;
-                }
+                regex: /^[a-zA-Z0-9_.\-\u4e00-\u9fff]+$/
             },
             public_state: {
-                undefined_able: true,
                 type: "string",
                 within: ["shared", "public", "private"]
             }
         });
 
-        if (exist_folder_path === undefined) {
-            if (public_state === undefined) {
-                this.throw(codes.invalid_args, "public_state must be defined");
-            }
-        } else {
-            if (public_state !== undefined) {
-                this.throw(codes.invalid_args, "exist_folder_path is defined. public_state depends on the last folder. So must be undefined");
-            }
-        }
-
-        let res = await this.service.cloud_storage.album.create_folder({
-            exist_folder_path,
-            new_folder_path_suffix,
+        let folder_id = await this.service.cloud_storage.album.create_folder({
+            folder_name,
             public_state
         });
 
         return {
-            data: res
+            data: {
+                folder_id
+            }
         };
+    }
+
+    async get_folders() {
+        let {
+            public_state
+        } = validate(this.ctx.event.args, {
+            public_state: {
+                type: "string",
+                within: ["shared", "public", "private"]
+            }
+        });
     }
 }

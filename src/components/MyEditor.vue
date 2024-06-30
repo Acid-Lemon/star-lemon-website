@@ -1,10 +1,18 @@
 <script>
 
-import { onBeforeUnmount, ref, shallowRef, onMounted } from 'vue'
+import { onBeforeUnmount, ref, shallowRef } from 'vue'
 import { Editor, Toolbar } from '@wangeditor/editor-for-vue'
 
-export default {
+export default{
   components: { Editor, Toolbar },
+  emits: ['update:modelValue'],
+  watch:{
+    valueHtml:{
+      handler(newVal,oldVal){
+        this.$emit('update:modelValue',newVal)
+      }
+    }
+  },
   setup() {
     // 编辑器实例，必须用 shallowRef
     const editorRef = shallowRef()

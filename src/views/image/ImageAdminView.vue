@@ -40,7 +40,7 @@ export default {
       },
       photoAlbumName: "",
       photo: [],
-      folder_id: 0,
+      folder_id: "66816fcf466d41f585691d0e",
       uploadUrl: "",
       data:{},
       disabled: false,
@@ -63,11 +63,14 @@ export default {
           type: "error",
           message: `请求上传失败`
         });
-
+        console.log(res)
         return;
       }
       this.uploadUrl = res.data.upload_file_options.url;
-      this.data = res.data.upload_file_options.formData;
+      this.data = {
+        key: res.data.upload_file_options.formData.key,
+        token: res.data.upload_file_options.formData.token,
+      };
 
       this.$refs.upload.submit();
     },
@@ -77,6 +80,7 @@ export default {
         type: "success",
         message: `上传成功`
       });
+      this.disabled = false;
     },
     onError() {
       ElNotification({
@@ -172,7 +176,7 @@ export default {
         >
           <el-button type="primary" :disabled="disabled">选择图片</el-button>
         </el-upload>
-        <div class="mr-[20px]">已选择{{ photo.length }}张照片</div>
+        <div class="mr-[20px]" @click="console.log(this.photo)">已选择{{ photo.length }}张照片</div>
         <el-button @click="this.photo = []">清除</el-button>
         </div>
         <el-button type="primary" @click="upload" :disabled="disabled">上传</el-button>

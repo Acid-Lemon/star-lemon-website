@@ -3,9 +3,9 @@ export default {
   name: 'NoteView',
   data() {
     return{
-    article: {
-      title: '心中有梦，才能走得更远 - 如何正视高中生活？',
-      content: '高中三年，短暂但又美好。\n' +
+      article: {
+        title: '心中有梦，才能走得更远 - 如何正视高中生活？',
+        content: '高中三年，短暂但又美好。\n' +
           '\n' +
           '有些人可能对我这句话表示反对，觉得高中过得一点也不开心，累死了，每天都生活在忙碌之中，与试卷同行，与作业为伍，早出晚归。但是，当你高中毕业后，相信你一定会对这段时光感到留恋。想到当初一起结伴同行的同伴，一起努力奋斗的同学，一切都仿佛历历在目，却再也回不去了，大家将会很少再见面了。\n' +
           '\n' +
@@ -49,19 +49,26 @@ export default {
           '写此文的目的，主要是为了帮助大家正视高中生活。对生活有着对的态度，不断努力的前进，不要虚度光阴。暂时就聊这么多吧，还有什么不懂得可以直接问我，看到了就会回，希望能帮助到大家。\n' +
           '\n' +
           '全文完。',
-      date: '2022年06月25日星期六',
-      author: 'lemon',
-      views: '100',
-      comments: '50',
-      likes: '100'
-    },
+        date: '2022年06月25日星期六',
+        author: 'lemon',
+        views: '100',
+        comments: '50',
+        likes: '100'
+      },
+      scrollPercentage: 0,
     }
-  }
+  },
+  methods: {
+    handleScroll(distance) {
+      const scrollHeight =this.$refs["el-scrollbar"].wrapRef.scrollHeight - this.$refs["el-scrollbar"].wrapRef.offsetHeight;
+      this.scrollPercentage = Math.round((distance.scrollTop / scrollHeight) * 100);
+    },
+  },
 }
 </script>
 
 <template>
-  <el-scrollbar>
+  <el-scrollbar @scroll="handleScroll" ref="el-scrollbar">
   <div class="h-full w-full flex flex-col items-center justify-start">
     <div class="w-full min-h-[40vh] bg-[url('/static/background/18.jpg')] flex flex-col justify-center items-center bg-center bg-cover">
       <p class="text-[#FFFFFF] font-['FZSX'] text-[4vh] hover:text-[#44cef6] duration-700">
@@ -81,10 +88,25 @@ export default {
         <div class="text-[2vh] text-[#FFFFFF] font-['SYST'] opacity-50">{{ article.comments }}</div>
       </div>
     </div>
-    <div class="w-full bg-[#F8FAFD] flex flex-col items-center justify-start">
-      <div class="w-[70%] h-[200vh] bg-[#FFFFFF] shadow-md mt-[20px] text-[2vh] font-['SYST'] p-[40px]">
+    <div class="w-full flex flex-row items-start justify-center bg-[#F8FAFD]">
+      <div class="w-[15%] flex flex-col items-center justify-start"></div>
+      <div class="w-[70%] flex flex-col items-center justify-start">
+        <div class="w-full bg-[#FFFFFF] shadow-md mt-[20px] text-[2vh] font-['SYST'] p-[40px]">
         {{ article.content }}
-
+        </div>
+      </div>
+      <div class="w-[15%] flex flex-col items-start justify-start p-[40px] sticky top-[40px]">
+        <div class="h-[30px]">这是一个二级标题展示区域</div>
+        <div class="h-[30px]">二级标题1</div>
+        <div class="h-[30px]">二级标题2</div>
+        <div class="h-[30px]">二级标题3</div>
+        <el-divider />
+        <div class="flex flex-row items-center justify-start">
+        <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24">
+          <path fill="currentColor" d="M12 22q-2.05 0-3.875-.788t-3.187-2.15q-1.363-1.362-2.15-3.187T2 12q0-2.075.788-3.887t2.15-3.175Q6.3 3.575 8.124 2.788T12 2q.425 0 .713.288T13 3q0 .425-.288.713T12 4Q8.675 4 6.337 6.338T4 12q0 3.325 2.338 5.663T12 20q3.325 0 5.663-2.337T20 12q0-.425.288-.712T21 11q.425 0 .713.288T22 12q0 2.05-.788 3.875t-2.15 3.188q-1.362 1.362-3.175 2.15T12 22"></path>
+        </svg>
+        <div class="m-[3px]">{{ scrollPercentage }}%</div>
+        </div>
       </div>
     </div>
   </div>

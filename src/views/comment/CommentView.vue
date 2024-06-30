@@ -1,4 +1,5 @@
 <script>
+import { nextTick } from 'vue';
 import {call_api} from "@/src/utils/cloud";
 import {ElNotification} from "element-plus";
 
@@ -15,7 +16,7 @@ export default {
       value: "",
       message_list: [],
       buttonDisabled: false,
-      style_mode: false,
+      isFocus: false,
       pages: 0,
       sentences: null,
       loadingMore: false,
@@ -214,14 +215,28 @@ export default {
         {
           value:"**鼓掌**",
           path:"/static/emoji/鼓掌.png",
-        },
-      ]
+        }
+      ],
     };
   },
   async mounted() {
     await this.get_sentences();
     await this.get_messages();
     this.info = await get_user()
+  },
+  computed: {
+    style_mode: function() {
+      return !(this.value === '' && this.isFocus === false);
+    }
+  },
+  watch: {
+    message_list: {
+      handler() {
+        // 当 message_list 发生变化时，调用插入标签函数
+        this.createLabel();
+      },
+      deep: true
+    }
   },
   methods: {
     async get_sentences() {
@@ -240,16 +255,13 @@ export default {
       this.get_messages();
     },
     onFocus() {
-      this.style_mode = true;
+      this.isFocus = true;
     },
     onBlur() {
-      if (this.value === '') {
-        this.style_mode = false;
-      }
+      this.isFocus = false;
     },
     clear() {
       this.value = "";
-      this.style_mode = false;
     },
 
     async messages_format(messages) {
@@ -365,8 +377,60 @@ export default {
         message: "发送成功"
       });
       this.buttonDisabled = false;
-      this.style_mode = false;
     },
+    divide(text) {
+      let li = [];
+      let emoji_re = /\*\*(.*?)\*\*/;
+
+      while (text.length) {
+        let match_res = emoji_re.exec(text);
+        if (match_res === null) {
+          li.push({type: "text", words: text});
+          break;
+        }
+        let match_full_text = match_res[0];
+        let match_text = match_res[1];
+        if (match_res.index > 0) {
+          li.push({type: "text", words: text.substring(0, match_res.index)});
+        }
+        text = text.slice(match_res.index + match_full_text.length);
+        li.push({type: "emoji", words: match_text});
+      }
+
+      return li;
+    },
+    async createLabel() {
+      // 确保 DOM 更新完成
+      await nextTick();
+      this.$refs.messageRef.forEach((messageElement, index) => {
+        // 移除现有标签，避免重复
+        const existingTags = messageElement.querySelectorAll('.additional-tag');
+        existingTags.forEach(tag => tag.remove());
+
+        // 创建新的标签
+        let split_content = this.divide(this.message_list[index].content);
+        let frag = document.createDocumentFragment();
+        for(let i = 0; i < split_content.length; i++) {
+          if (split_content[i].type === "text") {
+            const span = document.createElement('span');
+            span.className = 'additional-tag';
+            span.style.fontSize = "2vh";
+            span.style.fontFamily = "SYST";
+            span.innerText = split_content[i].words;
+            frag.appendChild(span);
+          }
+          if (split_content[i].type === "emoji") {
+            const img = document.createElement('img');
+            img.src = "/static/emoji/" + split_content[i].words + ".png";
+            img.className = 'additional-tag';
+            img.style.width = "3vh";
+            img.style.height = "3vh";
+            frag.appendChild(img);
+          }
+        }
+        messageElement.appendChild(frag);
+      })
+    }
   }
 }
 </script>
@@ -408,7 +472,7 @@ export default {
             " class="absolute pointer-events-none px-[1vh] duration-700 z-50 bg-black">
             你是我一生只会遇见一次的惊喜...
           </p>
-          <textarea id="pl" v-model="value"
+          <textarea id="pl" v-model.lazy="value" maxlength="100"
                     class="w-full h-[20vh] p-[2vh] border border-[#000000] min-h-[20vh] bg-[#FFFFFF] shadow-md bg-opacity-50"
                     type="text" @blur="onBlur" @focus="onFocus"></textarea>
         </div>
@@ -445,11 +509,11 @@ export default {
               <el-avatar style="width:5.4vh;height:5.4vh" :src="message.user.avatar_filename">{{ message.user.name }}
               </el-avatar>
               <div class="flex flex-col ml-[1vh]">
-                <p class="text-[2.2vh] font-['SYST']">{{ message.user.name }}</p>
-                <p class="text-[1.6vh] font-['SYST'] text-[#000000] opacity-80">{{ message.create_at_format_str }}</p>
+                <div class="text-[2.2vh] font-['SYST']">{{ message.user.name }}</div>
+                <div class="text-[1.6vh] font-['SYST'] text-[#000000] opacity-80">{{ message.create_at_format_str }}</div>
               </div>
             </div>
-            <p class="m-[1vh] text-[2vh] font-['SYST']">{{ message.content }}</p>
+            <div class="p-[1vh] flex flex-row items-center" ref="messageRef"></div>
           </div>
         </div>
         <div class="text-[3vh] font-['RGBZ']" v-if="loadingMore">正在加载中</div>

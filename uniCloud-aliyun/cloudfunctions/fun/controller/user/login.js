@@ -30,11 +30,6 @@ module.exports = class Controller_User_Login extends Controller {
 			}
 		});
 
-		let exist_user = await this.service.db.user.find_user_by_name(username);
-		if (exist_user) {
-			this.throw(error.codes.exist_username, "username already exists");
-		}
-
 		let user = await this.service.user.login.create_user({
 			name: username,
 			password

@@ -39,19 +39,12 @@ export default {
         label: '私密相册'
       },
       photoAlbumName: "",
+      imageList: [],
       photo: [],
       uploadUrl: "",
       data:{},
       disabled: false,
-      index:0,
-    }
-  },
-  watch:{
-    index: {
-      handler() {
-        this.uploadImage();
-      },
-      deep: true
+      index: 0,
     }
   },
   async mounted() {
@@ -70,57 +63,63 @@ export default {
     this.photoAlbum = res.data.folders_info[0];
   },
   methods: {
-    async upload() {
+    upload() {
       this.disabled = true;
-      await this.uploadImage();
+      this.photo = this.imageList;
+      this.uploadImage();
     },
-    async uploadImage() {
-      if(this.index >= this.photo.length){
+    async uploadImage(){
+      if (this.index >= this.photo.length) {
         this.photo = [];
+        this.imageList = [];
         this.index = 0;
         this.disabled = false;
         return;
       }
-        let res = await call_api("album/create_image", {
-          folder_id: this.photoAlbum.id,
-          image_name: this.photo[this.index]?.name
+
+      this.imageList = [];
+      this.imageList.push(this.photo[this.index]);
+      console.log(`第${this.index + 1}次请求`);
+      let res = await call_api("album/create_image", {
+        folder_id: this.photoAlbum.id,
+        image_name: this.imageList[0].name
+      });
+
+      if (!res.success) {
+        ElNotification({
+          title: 'Error',
+          type: "error",
+          message: `第${this.index + 1}张请求上传失败`
         });
+        console.log(res);
 
-        if (!res.success) {
-          ElNotification({
-            title: 'Error',
-            type: "error",
-            message: `第${this.index + 1}张请求上传失败`
-          });
-          console.log(res)
-          this.index ++;
+        this.index ++;
+        await this.uploadImage();
 
-          return;
-        }
+        return;
+      }
 
-        this.uploadUrl = res.data.upload_file_options.url;
-        this.data = {
-          key: res.data.upload_file_options.formData.key,
-          token: res.data.upload_file_options.formData.token,
-        };
+      this.uploadUrl = res.data.upload_file_options.url;
+      this.data = res.data.upload_file_options.formData;
 
-        this.$refs.upload.submit();
+      this.$refs.upload.submit();
     },
-    onSuccess() {
+    async onSuccess() {
       ElNotification({
         title: 'Success',
         type: "success",
         message: `第${this.index + 1}张上传成功`
       });
-      this.index ++
+      this.index ++;
+      await this.uploadImage();
     },
-    onError() {
+    async onError() {
       ElNotification({
         title: 'Error',
         type: "error",
         message: `第${this.index + 1}张上传失败`
       });
-      this.index ++
+      await this.uploadImage();
     },
     async createNewPhotoAlbum(){
       let res = await call_api("album/create_folder", {
@@ -193,23 +192,22 @@ export default {
         </div>
         <div class="flex flex-row items-center">
         <el-upload
-            v-model:file-list="photo"
-            class="upload-demo"
-            :action="uploadUrl"
+            v-model:file-list="imageList"
             ref="upload"
             :multiple = true
             :auto-upload = false
             :show-file-list = false
             style="margin-right: 20px"
+            :action = "uploadUrl"
+            :data = "data"
             :on-success="onSuccess"
             :on-error="onError"
-            :data="data"
 
         >
           <el-button type="primary" :disabled="disabled">选择图片</el-button>
         </el-upload>
-        <div class="mr-[20px]" @click="console.log(this.photo)">已选择{{ photo.length }}张照片</div>
-        <el-button @click="this.photo = []">清除</el-button>
+        <div class="mr-[20px]">已选择{{ imageList.length }}张照片</div>
+        <el-button @click="this.imageList = []" :disabled="disabled">清除</el-button>
         </div>
         <el-button type="primary" @click="upload" :disabled="disabled">上传</el-button>
       </div>

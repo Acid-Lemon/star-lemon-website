@@ -38,6 +38,9 @@ module.exports = class DBService_MessageBoard extends Service {
                     { user_id: this.ctx.auth?.user_id ?? ""}
                 ])
             ]))
+            .sort({
+                create_at: -1
+            })
             .limit(limit_num)
             .lookup({
                 from: tables.user,

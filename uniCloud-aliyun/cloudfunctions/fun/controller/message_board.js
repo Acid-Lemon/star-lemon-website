@@ -32,7 +32,8 @@ module.exports = class Controller_MessageBoard extends Controller {
                 type: "number",
                 math: {
                     max: Date.now()
-                }},
+                }
+            },
             message_number: {
                 type: "number",
                 math: {

@@ -40,54 +40,86 @@ export default {
       },
       photoAlbumName: "",
       photo: [],
-      folder_id: "66816fcf466d41f585691d0e",
       uploadUrl: "",
       data:{},
       disabled: false,
+      index:0,
     }
   },
-  mounted() {
-
+  watch:{
+    index: {
+      handler(newVal, oldVal) {
+        this.uploadImage(newVal);
+      },
+      deep: true
+    }
+  },
+  async mounted() {
+    let res = await call_api("album/get_folders", {
+      public_state: "private"
+    });
+    if (!res.success) {
+      ElNotification({
+        title: 'Error',
+        type: "error",
+        message: `请求相册列表失败`
+      });
+      return;
+    }
+    this.photoAlbums = res.data.folders_info;
+    this.photoAlbum = res.data.folders_info[0];
   },
   methods: {
     async upload() {
       this.disabled = true;
-      let res = await call_api("album/create_image", {
-        folder_id: this.folder_id,
-        image_name: this.photo[0].name
-      });
-
-      if (!res.success) {
-        ElNotification({
-          title: 'Error',
-          type: "error",
-          message: `请求上传失败`
-        });
-        console.log(res)
+      await this.uploadImage();
+    },
+    async uploadImage(i) {
+      if(this.index >= this.photo.length){
+        this.photo = [];
+        this.index = 0;
+        this.disabled = false;
         return;
       }
-      this.uploadUrl = res.data.upload_file_options.url;
-      this.data = {
-        key: res.data.upload_file_options.formData.key,
-        token: res.data.upload_file_options.formData.token,
-      };
+        let res = await call_api("album/create_image", {
+          folder_id: this.photoAlbum.id,
+          image_name: this.photo[i]?.name
+        });
 
-      this.$refs.upload.submit();
+        if (!res.success) {
+          ElNotification({
+            title: 'Error',
+            type: "error",
+            message: `第${this.index + 1}张请求上传失败`
+          });
+          this.index ++;
+
+          return;
+        }
+
+        this.uploadUrl = res.data.upload_file_options.url;
+        this.data = {
+          key: res.data.upload_file_options.formData.key,
+          token: res.data.upload_file_options.formData.token,
+        };
+
+        this.$refs.upload.submit();
     },
     onSuccess() {
       ElNotification({
         title: 'Success',
         type: "success",
-        message: `上传成功`
+        message: `第${this.index + 1}张上传成功`
       });
-      this.disabled = false;
+      this.index ++
     },
     onError() {
       ElNotification({
         title: 'Error',
         type: "error",
-        message: `上传失败`
+        message: `第${this.index + 1}张上传失败`
       });
+      this.index ++
     },
     async createNewPhotoAlbum(){
       let res = await call_api("album/create_folder", {
@@ -104,11 +136,11 @@ export default {
 
         return;
       }
-      this.folder_id = res.folder_id;
 
       this.photoAlbums.push({
         value: this.photoAlbumsType.value,
-        label: this.photoAlbumName,
+        name: this.photoAlbumName,
+        id: res.data.folder_id
       });
       this.photoAlbumName = "";
       this.photoAlbum = this.photoAlbums[this.photoAlbums.length - 1];
@@ -136,7 +168,7 @@ export default {
           <el-option
               v-for="photoAlbum in photoAlbums"
               :key="photoAlbum"
-              :label="photoAlbum.label"
+              :label="photoAlbum.name"
               :value="photoAlbum"
               :disabled="disabled"
           />

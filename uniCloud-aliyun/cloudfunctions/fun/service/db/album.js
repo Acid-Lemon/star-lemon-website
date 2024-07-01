@@ -82,11 +82,11 @@ module.exports = class Service_CloudStorage_Album extends Service {
         let transaction = await this.db.startTransaction();
         try {
             if (await this.service.db.album.check_image_exist(folder_id, image_name)) {
-                this.throw(codes.exist_file, "image already exist");
+                this.throw(codes.exist_image, "image already exist");
             }
 
             let image_id = (await transaction.collection(tables.album).add({
-                type: "file",
+                type: "image",
                 folder_id,
                 name: image_name,
                 create_at: Date.now()
@@ -102,7 +102,7 @@ module.exports = class Service_CloudStorage_Album extends Service {
             if (err.customize) {
                 throw err;
             } else {
-                this.throw(codes.err_file_create, "file create error");
+                this.throw(codes.err_image_create, "image create error");
             }
         }
     }
@@ -132,12 +132,13 @@ module.exports = class Service_CloudStorage_Album extends Service {
         return id_name_format((await this.db.collection(tables.album).where({
             type: "folder",
             public_state: "shared"
-        }).field({
-            id: true,
-            name: true,
-            create_at: true
-        }).orderBy("create_at", "desc")
-          .get()).data);
+        })  .field({
+              id: true,
+              name: true,
+              create_at: true
+            })
+            .orderBy("create_at", "desc")
+            .get()).data);
     }
 
     async find_public_folders() {
@@ -217,6 +218,21 @@ module.exports = class Service_CloudStorage_Album extends Service {
             .data;
     }
 
+    async find_images(folder_id, image_number, start_time=0) {
+        return id_name_format((await this.db.collection(tables.album).where({
+            type: "image",
+            folder_id,
+            create_at: this.db.command.gt(start_time)
+        })  .limit(image_number)
+            .field({
+              id: true,
+              name: true,
+              create_at: true
+            })
+            .orderBy("create_at", "desc")
+            .get()).data);
+    }
+
     async check_shared_folder_exist(name) {
         return Boolean((await this.db.collection(tables.album).where({
             type: "folder",
@@ -236,7 +252,7 @@ module.exports = class Service_CloudStorage_Album extends Service {
 
     async check_image_exist(folder_id, image_name) {
         return Boolean((await this.db.collection(tables.album).where({
-            type: "file",
+            type: "image",
             folder_id,
             name: image_name
         }).count()).total);

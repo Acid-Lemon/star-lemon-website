@@ -7,14 +7,14 @@ export default {
   components: {MyEditor},
   data() {
     return {
+      value: '',
 
     }
   },
   methods: {
     releaseArticle(){
-
-      console.log("发布文章")
-    }
+      console.log(this.value)
+    },
 
   }
 }
@@ -37,7 +37,7 @@ export default {
       </div>
     <el-button type="primary" @click="releaseArticle()">发布</el-button>
     </div>
-    <my-editor></my-editor>
+    <my-editor @update:model-value="(value) => this.value = value"></my-editor>
   </div>
 </template>
 

@@ -48,8 +48,8 @@ export default {
   },
   watch:{
     index: {
-      handler(newVal, oldVal) {
-        this.uploadImage(newVal);
+      handler() {
+        this.uploadImage();
       },
       deep: true
     }
@@ -74,7 +74,7 @@ export default {
       this.disabled = true;
       await this.uploadImage();
     },
-    async uploadImage(i) {
+    async uploadImage() {
       if(this.index >= this.photo.length){
         this.photo = [];
         this.index = 0;
@@ -83,7 +83,7 @@ export default {
       }
         let res = await call_api("album/create_image", {
           folder_id: this.photoAlbum.id,
-          image_name: this.photo[i]?.name
+          image_name: this.photo[this.index]?.name
         });
 
         if (!res.success) {
@@ -92,6 +92,7 @@ export default {
             type: "error",
             message: `第${this.index + 1}张请求上传失败`
           });
+          console.log(res)
           this.index ++;
 
           return;
@@ -138,7 +139,6 @@ export default {
       }
 
       this.photoAlbums.push({
-        value: this.photoAlbumsType.value,
         name: this.photoAlbumName,
         id: res.data.folder_id
       });

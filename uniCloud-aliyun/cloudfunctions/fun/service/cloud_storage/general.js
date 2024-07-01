@@ -12,14 +12,25 @@ module.exports = class Service_CloudStorage_General extends Service {
             bucketName: config["UNICLOUD_EXT_STORAGE_BUCKET_NAME"],
             bucketSecret: config["UNICLOUD_EXT_STORAGE_BUCKET_SECRET"]
         });
-
     }
 
     get_upload_file_options(manager, file_info) {
         return manager.getUploadFileOptions({
-            cloudPath: file_info.cloud_path,
+            cloudPath: file_info.cloud_path.slice(1),
             allowUpdate: file_info.allow_update
         });
     }
+
+    async change_file_public_state(manager, file_path, new_state) {
+        let res = await extStorageManager.updateFileStatus({
+            fileID: `qiniu://${file_path.slice(1)}`,
+            isPrivate: new_state === "private"
+        });
+
+        if (res.code !== 0) {
+            throw res;
+        }
+    }
 }
+
 

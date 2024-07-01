@@ -31,6 +31,8 @@ module.exports = class Controller_Album extends Controller {
             this.throw(codes.no_folder, "folder_id invalid");
         }
 
+        await this.service.db.album.check_folder_edit_access(folder);
+
         await this.service.cloud_storage.album.create_image({
             folder_id,
             image_name
@@ -88,6 +90,42 @@ module.exports = class Controller_Album extends Controller {
         return {
             data: {
                 folders_info
+            }
+        };
+    }
+
+    async get_images() {
+        let {
+            folder_id,
+            start_time,
+            image_number
+        } = validate(this.ctx.event.args, {
+            folder_id: {
+                type: "string"
+            },
+            start_time: {
+                undefined_able: true,
+                null_able: true,
+                type: "number",
+                math: {
+                    max: Date.now()
+                }
+            },
+            image_number: {
+                type: "number",
+                math: {
+                    min: 1,
+                    max: 20
+                }
+            }
+        });
+
+        await this.service.cloud_storage.album.check_folder_visit_access(folder_id);
+
+        let images_info = await this.service.cloud_storage.album.get_images(folder_id, image_number, start_time);
+        return {
+            data: {
+                images_info
             }
         };
     }

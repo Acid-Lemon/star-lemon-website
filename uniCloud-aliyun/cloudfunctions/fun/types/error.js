@@ -16,9 +16,9 @@ module.exports = {
         token_expire: "err_token_expire",
         sms_code_expire: "err_sms_code_expire",
         sms_code_send_limit: "err_sms_code_send_limit",
-        err_file_create: "err_file_create",
+        err_image_create: "err_image_create",
         err_folder_create: "err_folder_create",
-        exist_file: "err_file_exist",
+        exist_image: "err_image_exist",
         err_folder_exist: "err_folder_exist",
         permission_denied: "err_permission_denied",
         err_serve: "err_serve"

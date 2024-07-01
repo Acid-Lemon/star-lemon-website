@@ -48,19 +48,28 @@ export default {
     }
   },
   async mounted() {
-    let res = await call_api("album/get_folders", {
-      public_state: "private"
-    });
-    if (!res.success) {
-      ElNotification({
-        title: 'Error',
-        type: "error",
-        message: `请求相册列表失败`
+    for(let i = 0; i < this.photoAlbumsTypes.length; i++){
+      let res = await call_api("album/get_folders", {
+        public_state: this.photoAlbumsTypes[i].value
       });
-      return;
+      if (!res.success) {
+        ElNotification({
+          title: 'Error',
+          type: "error",
+          message: `请求相册列表失败`
+        });
+        console.log(res);
+        return;
+      }
+      for(let j = 0; j < res.data.folders_info.length; j++){
+        let album = {
+          ...res.data.folders_info[j],
+          value: this.photoAlbumsTypes[i].value
+        }
+        this.photoAlbums.push(album);
+      }
     }
-    this.photoAlbums = res.data.folders_info;
-    this.photoAlbum = res.data.folders_info[0];
+    this.photoAlbum = this.photoAlbums[0];
   },
   methods: {
     upload() {
@@ -140,7 +149,8 @@ export default {
 
       this.photoAlbums.push({
         name: this.photoAlbumName,
-        id: res.data.folder_id
+        id: res.data.folder_id,
+        value: this.photoAlbumsType.value,
       });
       this.photoAlbumName = "";
       this.photoAlbum = this.photoAlbums[this.photoAlbums.length - 1];
@@ -151,6 +161,13 @@ export default {
         message: "创建成功"
       });
     },
+    album_format(photoAlbum) {
+      for (let i = 0; i < this.photoAlbumsTypes.length; i++) {
+        if (photoAlbum.value === this.photoAlbumsTypes[i].value) {
+          return `${photoAlbum.name}[${this.photoAlbumsTypes[i].label}]`
+        }
+      }
+    }
   }
 }
 </script>
@@ -168,7 +185,7 @@ export default {
           <el-option
               v-for="photoAlbum in photoAlbums"
               :key="photoAlbum"
-              :label="photoAlbum.name"
+              :label= "album_format(photoAlbum)"
               :value="photoAlbum"
               :disabled="disabled"
           />

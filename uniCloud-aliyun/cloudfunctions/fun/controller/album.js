@@ -31,14 +31,14 @@ module.exports = class Controller_Album extends Controller {
             this.throw(codes.no_folder, "folder_id invalid");
         }
 
-        await this.service.db.album.check_folder_edit_access(folder);
+        await this.service.cloud_storage.album.check_folder_edit_access(folder);
 
         await this.service.cloud_storage.album.create_image({
             folder_id,
             image_name
         });
 
-        let {exp_time, upload_file_options} = await this.service.cloud_storage.album.get_image_upload_options(image_name, folder.public_state);
+        let {exp_time, upload_file_options} = await this.service.cloud_storage.album.get_image_upload_options(image_name, folder.name, folder.public_state);
 
         return {
             data: {

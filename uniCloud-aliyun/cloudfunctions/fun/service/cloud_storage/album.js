@@ -19,7 +19,7 @@ module.exports = class Service_CloudStorage_Album extends Service {
         return await this.service.db.album.add_image(folder_id, image_name);
     }
 
-    async get_image_upload_options(image_name, public_state) {
+    async get_image_upload_options(image_name, folder_name, public_state) {
         let base_path;
         if (public_state === "shared") {
             base_path = merge_folder_path(cloud_storage_path_prefixes.album, "shared");
@@ -27,7 +27,7 @@ module.exports = class Service_CloudStorage_Album extends Service {
             base_path = merge_folder_path(merge_folder_path(cloud_storage_path_prefixes.album, public_state), this.ctx.auth.user_id);
         }
 
-        let image_path = base_path + image_name;
+        let image_path = merge_folder_path(base_path, folder_name) + image_name;
         console.info("image_path:", image_path);
 
         let storage_manager = this.service.cloud_storage.general.get_manager();

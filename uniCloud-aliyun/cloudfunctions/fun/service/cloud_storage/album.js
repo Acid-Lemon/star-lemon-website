@@ -10,6 +10,8 @@ const {
     cloud_storage_path_prefixes
 } = require("./path_prefixes");
 
+const {codes} = require("../../types/error");
+
 module.exports = class Service_CloudStorage_Album extends Service {
     async create_image(info) {
         let {image_name, folder_id} = info;
@@ -66,6 +68,22 @@ module.exports = class Service_CloudStorage_Album extends Service {
                 return await this.service.db.album.find_private_folders(this.ctx.auth.user_id);
             default:
                 throw TypeError("get_folders: public_state is invalid");
+        }
+    }
+
+    async get_images(folder_id, image_number, start_time) {
+        return start_time ? await this.service.db.album.find_images(folder_id, image_number, start_time) :
+                            await this.service.db.album.find_images(folder_id, image_number);
+    }
+
+    async check_folder_visit_access(folder_id) {
+        let folder = await this.service.db.album.find_folder_by_id(folder_id);
+        if (!folder) {
+            this.throw(codes.no_folder, "folder_id invalid");
+        }
+
+        if (folder.public_state === "private" && folder.owner_id !== this.ctx.auth.user_id) {
+            this.throw(codes.permission_denied, "the private folder isn't yours");
         }
     }
 }

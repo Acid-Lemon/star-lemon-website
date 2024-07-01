@@ -91,4 +91,40 @@ module.exports = class Controller_Album extends Controller {
             }
         };
     }
+
+    async get_images() {
+        let {
+            folder_id,
+            start_time,
+            image_number
+        } = validate(this.ctx.event.args, {
+            folder_id: {
+                type: "string"
+            },
+            start_time: {
+                undefined_able: true,
+                null_able: true,
+                type: "number",
+                math: {
+                    max: Date.now()
+                }
+            },
+            image_number: {
+                type: "number",
+                math: {
+                    min: 1,
+                    max: 20
+                }
+            }
+        });
+
+        await this.service.cloud_storage.album.check_folder_visit_access(folder_id);
+
+        let images_info = await this.service.cloud_storage.album.get_images(folder_id, image_number, start_time);
+        return {
+            data: {
+                images_info
+            }
+        };
+    }
 }

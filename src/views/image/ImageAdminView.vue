@@ -119,6 +119,7 @@ export default {
         type: "error",
         message: `第${this.index + 1}张上传失败`
       });
+      this.index ++;
       await this.uploadImage();
     },
     async createNewPhotoAlbum(){

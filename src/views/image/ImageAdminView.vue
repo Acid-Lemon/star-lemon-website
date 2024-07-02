@@ -88,7 +88,7 @@ export default {
 
       this.imageList = [];
       this.imageList.push(this.photo[this.index]);
-      console.log(`第${this.index + 1}次请求`);
+
       let res = await call_api("album/create_image", {
         folder_id: this.photoAlbum.id,
         image_name: this.imageList[0].name
@@ -176,21 +176,6 @@ export default {
   <div class="w-full h-full bg-[#F8FAFD] flex flex-col content-center items-center">
     <div class="w-[95%] my-[20px]">
       <div class="flex flex-row items-center justify-around">
-        <div class="flex flex-row items-center">
-        <el-select
-            v-model="photoAlbum"
-            placeholder="未选择"
-            style="width: 240px"
-        >
-          <el-option
-              v-for="photoAlbum in photoAlbums"
-              :key="photoAlbum"
-              :label= "album_format(photoAlbum)"
-              :value="photoAlbum"
-              :disabled="disabled"
-          />
-        </el-select>
-        </div>
           <div class="flex flex-row items-center">
           <el-select
               v-model="photoAlbumsType"
@@ -209,6 +194,19 @@ export default {
           <el-button type="primary" @click="createNewPhotoAlbum()" :disabled="disabled">新建相册</el-button>
         </div>
         <div class="flex flex-row items-center">
+          <el-select
+              v-model="photoAlbum"
+              placeholder="未选择"
+              style="width: 240px;margin-right: 20px"
+          >
+            <el-option
+                v-for="photoAlbum in photoAlbums"
+                :key="photoAlbum"
+                :label= "album_format(photoAlbum)"
+                :value="photoAlbum"
+                :disabled="disabled"
+            />
+          </el-select>
         <el-upload
             v-model:file-list="imageList"
             ref="upload"

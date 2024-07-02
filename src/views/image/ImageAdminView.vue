@@ -40,7 +40,7 @@ export default {
       },
       photoAlbumName: "",
       imageList: [],
-      photo: [],
+      photoList: [],
       uploadUrl: "",
       data:{},
       disabled: false,
@@ -48,38 +48,32 @@ export default {
     }
   },
   async mounted() {
-    for(let i = 0; i < this.photoAlbumsTypes.length; i++){
-      let res = await call_api("album/get_folders", {
-        public_state: this.photoAlbumsTypes[i].value
+    let res = call_api("album/get_images",{
+      folder_id: this.$route.params.id,
+      start_time: 1577808000000,
+      image_number: 20
+    })
+    if(!res.success){
+      ElNotification({
+        title: 'Error',
+        type: "error",
+        message: `获取图片失败`
       });
-      if (!res.success) {
-        ElNotification({
-          title: 'Error',
-          type: "error",
-          message: `请求相册列表失败`
-        });
-        console.log(res);
-        return;
-      }
-      for(let j = 0; j < res.data.folders_info.length; j++){
-        let album = {
-          ...res.data.folders_info[j],
-          value: this.photoAlbumsTypes[i].value
-        }
-        this.photoAlbums.push(album);
-      }
+      console.log(res);
+
+      return
     }
-    this.photoAlbum = this.photoAlbums[0];
+    console.log(res);
   },
   methods: {
     upload() {
       this.disabled = true;
-      this.photo = this.imageList;
+      this.photoList = this.imageList;
       this.uploadImage();
     },
     async uploadImage(){
-      if (this.index >= this.photo.length) {
-        this.photo = [];
+      if (this.index >= this.photoList.length) {
+        this.photoList = [];
         this.imageList = [];
         this.index = 0;
         this.disabled = false;
@@ -87,7 +81,7 @@ export default {
       }
 
       this.imageList = [];
-      this.imageList.push(this.photo[this.index]);
+      this.imageList.push(this.photoList[this.index]);
 
       let res = await call_api("album/create_image", {
         folder_id: this.photoAlbum.id,
@@ -131,43 +125,6 @@ export default {
       this.index ++;
       await this.uploadImage();
     },
-    async createNewPhotoAlbum(){
-      let res = await call_api("album/create_folder", {
-        folder_name: this.photoAlbumName,
-        public_state: this.photoAlbumsType.value
-      });
-
-      if(!res.success){
-        ElNotification({
-          title: 'Error',
-          type: "error",
-          message: res
-        });
-
-        return;
-      }
-
-      this.photoAlbums.push({
-        name: this.photoAlbumName,
-        id: res.data.folder_id,
-        value: this.photoAlbumsType.value,
-      });
-      this.photoAlbumName = "";
-      this.photoAlbum = this.photoAlbums[this.photoAlbums.length - 1];
-
-      ElNotification({
-        title: 'Success',
-        type: "success",
-        message: "创建成功"
-      });
-    },
-    album_format(photoAlbum) {
-      for (let i = 0; i < this.photoAlbumsTypes.length; i++) {
-        if (photoAlbum.value === this.photoAlbumsTypes[i].value) {
-          return `${photoAlbum.name}[${this.photoAlbumsTypes[i].label}]`
-        }
-      }
-    }
   }
 }
 </script>
@@ -175,56 +132,24 @@ export default {
 <template>
   <div class="w-full h-full bg-[#F8FAFD] flex flex-col content-center items-center">
     <div class="w-[95%] my-[20px]">
-      <div class="flex flex-row items-center justify-around">
-          <div class="flex flex-row items-center">
-          <el-select
-              v-model="photoAlbumsType"
-              placeholder="Select"
-              style="width: 120px;margin-right: 20px"
-          >
-            <el-option
-                v-for="photoAlbumsType in photoAlbumsTypes"
-                :key="photoAlbumsType"
-                :label="photoAlbumsType.label"
-                :value="photoAlbumsType"
-                :disabled="disabled"
-            />
-          </el-select>
-        <el-input v-model="photoAlbumName" style="width: 240px;margin-right: 20px" placeholder="相册名"></el-input>
-          <el-button type="primary" @click="createNewPhotoAlbum()" :disabled="disabled">新建相册</el-button>
-        </div>
-        <div class="flex flex-row items-center">
-          <el-select
-              v-model="photoAlbum"
-              placeholder="未选择"
-              style="width: 240px;margin-right: 20px"
-          >
-            <el-option
-                v-for="photoAlbum in photoAlbums"
-                :key="photoAlbum"
-                :label= "album_format(photoAlbum)"
-                :value="photoAlbum"
-                :disabled="disabled"
-            />
-          </el-select>
+      <div class="h-[5vh]"></div>
+      <div class="flex flex-row items-center justify-center">
         <el-upload
-            v-model:file-list="imageList"
-            ref="upload"
-            :multiple = true
-            :auto-upload = false
-            :show-file-list = false
-            style="margin-right: 20px"
-            :action = "uploadUrl"
-            :data = "data"
-            :on-success="onSuccess"
-            :on-error="onError"
-
+              v-model:file-list="imageList"
+              ref="upload"
+              :multiple = true
+              :auto-upload = false
+              :show-file-list = false
+              style="margin-right: 20px"
+              :action = "uploadUrl"
+              :data = "data"
+              :on-success="onSuccess"
+              :on-error="onError"
         >
           <el-button type="primary" :disabled="disabled">选择图片</el-button>
         </el-upload>
         <div class="mr-[20px]">已选择{{ imageList.length }}张照片</div>
-        <el-button @click="this.imageList = []" :disabled="disabled">清除</el-button>
-        </div>
+        <el-button @click="this.imageList = []" :disabled="disabled" style="margin-right: 100px">清除</el-button>
         <el-button type="primary" @click="upload" :disabled="disabled">上传</el-button>
       </div>
     </div>

@@ -454,7 +454,7 @@ export default {
           <p class="text-[2.4vh] m-[2vh] font-['FZSX']">
             {{ sentences?.hitokoto }}
           </p>
-          <p class="text-[1.9vh] m-[2vh] font-['FZSX']">——{{ sentences?.from }}</p>
+          <p class="text-[1.9vh] m-[2vh] font-['FZSX']">——{{ sentences?.from_who }}</p>
         </div>
       </div>
       <p class="mx-[2vh] font-serif text-[2.4vh]">

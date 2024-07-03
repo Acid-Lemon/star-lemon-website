@@ -52,7 +52,7 @@ export default {
       }
       this.photoAlbums = res.data.folders_info;
     },
-  },
+  }
 };
 </script>
 

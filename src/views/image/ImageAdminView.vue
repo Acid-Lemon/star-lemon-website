@@ -13,11 +13,6 @@ export default {
   components: {ElAutoResizer,UploadFilled},
   data() {
     return {
-      tableData: [
-        {id: '1', dateTime: 10000000, photoAlbum: "相册3", uploadUsername: "lemon", uploadTime: 10000000, downloadLink: "https://xxxxx/xxx/"},
-        {id: '2', dateTime: 10000000, photoAlbum: "相册2", uploadUsername: "lemon", uploadTime: 10000000, downloadLink: "https://xxxxx/xxx/"},
-        {id: '3', dateTime: 10000000, photoAlbum: "相册1", uploadUsername: "star", uploadTime: 10000000, downloadLink: "https://xxxxx/xxx/"},
-      ],
       photoAlbums: [],
       photoAlbum: null,
       photoAlbumsTypes: [
@@ -43,12 +38,13 @@ export default {
       photoList: [],
       uploadUrl: "",
       data:{},
+      images: [],
       disabled: false,
       index: 0,
     }
   },
   async mounted() {
-    let res = call_api("album/get_images",{
+    let res = await call_api("album/get_images", {
       folder_id: this.$route.params.id,
       start_time: 1577808000000,
       image_number: 20
@@ -63,10 +59,11 @@ export default {
 
       return
     }
-    console.log(res);
+    this.images = res.data.images_info;
   },
   methods: {
     upload() {
+      console.log("开始");
       this.disabled = true;
       this.photoList = this.imageList;
       this.uploadImage();
@@ -84,7 +81,7 @@ export default {
       this.imageList.push(this.photoList[this.index]);
 
       let res = await call_api("album/create_image", {
-        folder_id: this.photoAlbum.id,
+        folder_id: this.$route.params.id,
         image_name: this.imageList[0].name
       });
 
@@ -125,6 +122,9 @@ export default {
       this.index ++;
       await this.uploadImage();
     },
+    handleDelete(index, row){
+      console.log(index, row)
+    }
   }
 }
 </script>
@@ -132,7 +132,7 @@ export default {
 <template>
   <div class="w-full h-full bg-[#F8FAFD] flex flex-col content-center items-center">
     <div class="w-[95%] my-[20px]">
-      <div class="h-[5vh]"></div>
+      <div class="h-[3vh]"></div>
       <div class="flex flex-row items-center justify-center">
         <el-upload
               v-model:file-list="imageList"
@@ -154,13 +154,21 @@ export default {
       </div>
     </div>
     <div class="w-[95%] my-[20px]">
-      <el-table :data="tableData" border style="width: 100%">
-        <el-table-column label="图片id" prop="id" width="100"/>
-        <el-table-column label="拍摄时间" prop="dateTime" width="200"/>
-        <el-table-column label="相册" prop="photoAlbum" width="100"/>
-        <el-table-column label="上传者" prop="uploadUsername" width="200"/>
-        <el-table-column label="上传时间" prop="uploadTime" width="200"/>
-        <el-table-column label="下载链接" prop="downloadLink"/>
+      <el-table :data="images" border style="width: 100%">
+        <el-table-column label="图片名称" prop="name" width="100"/>
+        <el-table-column label="图片id" prop="id" width="250"/>
+        <el-table-column label="下载链接" prop="temp_url"/>
+        <el-table-column label="操作" width="200">
+          <template #default="scope">
+            <el-button
+                size="small"
+                type="danger"
+                @click="handleDelete(scope.$index, scope.row)"
+            >
+              删除
+            </el-button>
+          </template>
+        </el-table-column>
       </el-table>
     </div>
   </div>

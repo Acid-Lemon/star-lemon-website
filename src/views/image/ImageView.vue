@@ -17,7 +17,7 @@ export default {
       const dateRange = this.date_range;
 
       return this.images.filter(image => {
-        const idMatch = image.id === searchContent || !searchContent;
+        const idMatch = image.name === searchContent || !searchContent;
         const dateMatch = !dateRange || new Date(image.time) >= dateRange[0] && new Date(image.time) <= dateRange[1];
 
         return idMatch && dateMatch;
@@ -30,6 +30,7 @@ export default {
       start_time: 1577808000000,
       image_number: 20
     })
+    console.log(res);
     if(!res.success){
       ElNotification({
         title: 'Error',
@@ -41,13 +42,15 @@ export default {
       return
     }
     this.images = res.data.images_info;
-    console.log(this.images)
-
   },
   methods:{
     clear() {
       this.search_content = "";
       this.date_range = null;
+    },
+    getRaw(){
+
+      console.log(this.image);
     }
   }
 }
@@ -56,11 +59,11 @@ export default {
 <template>
   <div class="h-full w-full flex flex-col justify-center items-center bg-[#F8FAFD]">
 
-    <div class="h-[5vh] mb-[20px] flex flex-row items-center justify-around">
+    <div class="h-[5vh] w-full mb-[20px] flex flex-row items-center justify-around">
       <div class="flex flex-row items-center">
         <div class="mx-[5px]">搜索图片</div>
         <div class="w-[240px] mx-[5px]">
-          <el-input v-model="search_content" placeholder="请输入图片id"/>
+          <el-input v-model="search_content" placeholder="请输入图片名称"/>
         </div>
       </div>
       <div class="flex flex-row items-center">
@@ -86,15 +89,13 @@ export default {
             <div v-for="image in filteredImages"
                  :key="image.id"
                  class="shadow-md pb-[2px] flex flex-col justify-between">
-              <router-link :to="'/album/' + image.id">
-                <div>
-                  <el-image src="" class="w-full h-[20vh]" fit="cover"/>
+                <div @click="console.log(image)">
+                  <el-image :src="image.temp_url" class="w-full h-[20vh]" fit="cover"/>
                 </div>
                 <div>
-                  <div class="px-[10px] py-[2px]">相册名：{{ image.name }}</div>
+                  <div class="px-[10px] py-[2px]">图片：{{ image.name }}</div>
                   <div class="px-[10px] py-[2px]">id：{{ image.id }}</div>
                 </div>
-              </router-link>
             </div>
           </div>
           <div v-else class="w-full h-[85vh] flex flex-row items-center justify-center">

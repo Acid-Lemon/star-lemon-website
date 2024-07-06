@@ -106,7 +106,7 @@ export default {
   },
   mounted() {
     this.innerAudioContext = uni.createInnerAudioContext();
-    this.innerAudioContext.volume = 0.1;
+    this.innerAudioContext.volume = 0.5;
     this.switchMusic();
     this.innerAudioContext.onCanplay(() => {
       this.duration = this.innerAudioContext.duration;
@@ -147,7 +147,6 @@ export default {
       this.deleteLyricElements();
       await this.readLyrics(this.musicList[this.randomIndex].lrc);
       this.createLyricElements();
-      console.log(document.getElementById('lyric').querySelectorAll('p'));
     },
     pause() {
       this.innerAudioContext.pause();
@@ -167,6 +166,7 @@ export default {
       if (this.value - this.currentTime > 5 || this.value - this.currentTime < -5) {
         this.innerAudioContext.seek(this.value)
       }
+      return 0;
     },
     toggleDisplay() {
       this.displayState = !this.displayState;

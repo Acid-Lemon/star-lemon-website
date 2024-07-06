@@ -10,6 +10,8 @@ const {
     cloud_storage_path_prefixes
 } = require("./path_prefixes");
 
+const config = require("uni-config-center")({ pluginId: "fun" }).config();
+
 const {codes} = require("../../types/error");
 
 module.exports = class Service_CloudStorage_Album extends Service {
@@ -71,17 +73,30 @@ module.exports = class Service_CloudStorage_Album extends Service {
         }
     }
 
-    async get_images(folder_id, image_number, start_time) {
-        return start_time ? await this.service.db.album.find_images(folder_id, image_number, start_time) :
-                            await this.service.db.album.find_images(folder_id, image_number);
+    async get_images(folder, image_number, start_time) {
+        let images_info = start_time ? await this.service.db.album.find_images(folder.id, image_number, start_time) :
+                                            await this.service.db.album.find_images(folder.id, image_number);
+
+        let manager = this.service.cloud_storage.general.get_manager();
+        return images_info.map((image_info) => {
+            let file_path;
+            if (folder.public_state === "shared") {
+                file_path = merge_folder_path(merge_folder_path(cloud_storage_path_prefixes.album, "shared"), folder.name) + image_info.name;
+            } else {
+                file_path = merge_folder_path(merge_folder_path(merge_folder_path(cloud_storage_path_prefixes.album, folder.public_state), this.ctx.auth.user_id), folder.name) + image_info.name;
+            }
+
+            image_info["temp_url"] = this.service.cloud_storage.general.get_private_files_temp_urls(
+                manager,
+                [file_path],
+                config["ALBUM_PHOTO_URLS_EXPIRES"]
+            )[0];
+
+            return image_info;
+        });
     }
 
-    async check_folder_visit_access(folder_id) {
-        let folder = await this.service.db.album.find_folder_by_id(folder_id);
-        if (!folder) {
-            this.throw(codes.no_folder, "folder_id invalid");
-        }
-
+    async check_folder_visit_access(folder) {
         if (folder.public_state === "private" && folder.owner_id !== this.ctx.auth.user_id) {
             this.throw(codes.permission_denied, "the private folder isn't yours");
         }

@@ -120,9 +120,15 @@ module.exports = class Controller_Album extends Controller {
             }
         });
 
-        await this.service.cloud_storage.album.check_folder_visit_access(folder_id);
+        let folder = await this.service.db.album.find_folder_by_id(folder_id);
+        if (!folder) {
+            this.throw(codes.no_folder, "folder_id invalid");
+        }
 
-        let images_info = await this.service.cloud_storage.album.get_images(folder_id, image_number, start_time);
+        await this.service.cloud_storage.album.check_folder_visit_access(folder);
+
+        let images_info = await this.service.cloud_storage.album.get_images(folder, image_number, start_time);
+
         return {
             data: {
                 images_info

@@ -79,13 +79,20 @@ module.exports = class Service_CloudStorage_Album extends Service {
 
         let manager = this.service.cloud_storage.general.get_manager();
         return images_info.map((image_info) => {
+            let file_path;
+            if (folder.public_state === "shared") {
+                file_path = merge_folder_path(merge_folder_path(cloud_storage_path_prefixes.album, "shared"), folder.name) + image_info.name;
+            } else {
+                file_path = merge_folder_path(merge_folder_path(merge_folder_path(cloud_storage_path_prefixes.album, folder.public_state), this.ctx.auth.user_id), folder.name) + image_info.name;
+            }
+
             image_info["temp_url"] = this.service.cloud_storage.general.get_private_files_temp_urls(
                 manager,
-                [merge_folder_path(cloud_storage_path_prefixes.album, folder.name) + image_info.name],
+                [file_path],
                 config["ALBUM_PHOTO_URLS_EXPIRES"]
             )[0];
 
-            return images_info;
+            return image_info;
         });
     }
 

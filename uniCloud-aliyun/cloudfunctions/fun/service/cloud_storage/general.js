@@ -31,6 +31,21 @@ module.exports = class Service_CloudStorage_General extends Service {
             throw res;
         }
     }
+
+    get_private_files_temp_urls(manager, file_paths, expires=3600) {
+        file_paths = file_paths.map((file_path) => {
+            return file_path.slice(1);
+        });
+
+        let file_list = manager.getTempFileURL({
+            fileList: file_paths,
+            expiresIn: expires
+        }).fileList;
+
+        return file_list.map((temp_url_info) => {
+            return temp_url_info.tempFileURL;
+        });
+    }
 }
 
 

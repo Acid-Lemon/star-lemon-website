@@ -39,117 +39,91 @@ export default {
         label: '私密相册'
       },
       photoAlbumName: "",
-      photo: [],
+      imageList: [],
+      photoList: [],
       uploadUrl: "",
       data:{},
       disabled: false,
-      index:0,
-    }
-  },
-  watch:{
-    index: {
-      handler() {
-        this.uploadImage();
-      },
-      deep: true
+      index: 0,
     }
   },
   async mounted() {
-    let res = await call_api("album/get_folders", {
-      public_state: "private"
-    });
-    if (!res.success) {
+    let res = call_api("album/get_images",{
+      folder_id: this.$route.params.id,
+      start_time: 1577808000000,
+      image_number: 20
+    })
+    if(!res.success){
       ElNotification({
         title: 'Error',
         type: "error",
-        message: `请求相册列表失败`
+        message: `获取图片失败`
       });
-      return;
+      console.log(res);
+
+      return
     }
-    this.photoAlbums = res.data.folders_info;
-    this.photoAlbum = res.data.folders_info[0];
+    console.log(res);
   },
   methods: {
-    async upload() {
+    upload() {
       this.disabled = true;
-      await this.uploadImage();
+      this.photoList = this.imageList;
+      this.uploadImage();
     },
-    async uploadImage() {
-      if(this.index >= this.photo.length){
-        this.photo = [];
+    async uploadImage(){
+      if (this.index >= this.photoList.length) {
+        this.photoList = [];
+        this.imageList = [];
         this.index = 0;
         this.disabled = false;
         return;
       }
-        let res = await call_api("album/create_image", {
-          folder_id: this.photoAlbum.id,
-          image_name: this.photo[this.index]?.name
+
+      this.imageList = [];
+      this.imageList.push(this.photoList[this.index]);
+
+      let res = await call_api("album/create_image", {
+        folder_id: this.photoAlbum.id,
+        image_name: this.imageList[0].name
+      });
+
+      if (!res.success) {
+        ElNotification({
+          title: 'Error',
+          type: "error",
+          message: `第${this.index + 1}张请求上传失败`
         });
+        console.log(res);
 
-        if (!res.success) {
-          ElNotification({
-            title: 'Error',
-            type: "error",
-            message: `第${this.index + 1}张请求上传失败`
-          });
-          console.log(res)
-          this.index ++;
+        this.index ++;
+        await this.uploadImage();
 
-          return;
-        }
+        return;
+      }
 
-        this.uploadUrl = res.data.upload_file_options.url;
-        this.data = {
-          key: res.data.upload_file_options.formData.key,
-          token: res.data.upload_file_options.formData.token,
-        };
+      this.uploadUrl = res.data.upload_file_options.url;
+      this.data = res.data.upload_file_options.formData;
 
-        this.$refs.upload.submit();
+      this.$refs.upload.submit();
     },
-    onSuccess() {
+    async onSuccess() {
       ElNotification({
         title: 'Success',
         type: "success",
         message: `第${this.index + 1}张上传成功`
       });
-      this.index ++
+      this.index ++;
+      await this.uploadImage();
     },
-    onError() {
+    async onError() {
       ElNotification({
         title: 'Error',
         type: "error",
         message: `第${this.index + 1}张上传失败`
       });
-      this.index ++
-    },
-    async createNewPhotoAlbum(){
-      let res = await call_api("album/create_folder", {
-        folder_name: this.photoAlbumName,
-        public_state: this.photoAlbumsType.value
-      });
-
-      if(!res.success){
-        ElNotification({
-          title: 'Error',
-          type: "error",
-          message: res
-        });
-
-        return;
-      }
-
-      this.photoAlbums.push({
-        name: this.photoAlbumName,
-        id: res.data.folder_id
-      });
-      this.photoAlbumName = "";
-      this.photoAlbum = this.photoAlbums[this.photoAlbums.length - 1];
-
-      ElNotification({
-        title: 'Success',
-        type: "success",
-        message: "创建成功"
-      });
+      this.index ++;
+      await this.uploadImage();
     },
   }
 }
@@ -158,59 +132,24 @@ export default {
 <template>
   <div class="w-full h-full bg-[#F8FAFD] flex flex-col content-center items-center">
     <div class="w-[95%] my-[20px]">
-      <div class="flex flex-row items-center justify-around">
-        <div class="flex flex-row items-center">
-        <el-select
-            v-model="photoAlbum"
-            placeholder="未选择"
-            style="width: 240px"
-        >
-          <el-option
-              v-for="photoAlbum in photoAlbums"
-              :key="photoAlbum"
-              :label="photoAlbum.name"
-              :value="photoAlbum"
-              :disabled="disabled"
-          />
-        </el-select>
-        </div>
-          <div class="flex flex-row items-center">
-          <el-select
-              v-model="photoAlbumsType"
-              placeholder="Select"
-              style="width: 120px;margin-right: 20px"
-          >
-            <el-option
-                v-for="photoAlbumsType in photoAlbumsTypes"
-                :key="photoAlbumsType"
-                :label="photoAlbumsType.label"
-                :value="photoAlbumsType"
-                :disabled="disabled"
-            />
-          </el-select>
-        <el-input v-model="photoAlbumName" style="width: 240px;margin-right: 20px" placeholder="相册名"></el-input>
-          <el-button type="primary" @click="createNewPhotoAlbum()" :disabled="disabled">新建相册</el-button>
-        </div>
-        <div class="flex flex-row items-center">
+      <div class="h-[5vh]"></div>
+      <div class="flex flex-row items-center justify-center">
         <el-upload
-            v-model:file-list="photo"
-            class="upload-demo"
-            :action="uploadUrl"
-            ref="upload"
-            :multiple = true
-            :auto-upload = false
-            :show-file-list = false
-            style="margin-right: 20px"
-            :on-success="onSuccess"
-            :on-error="onError"
-            :data="data"
-
+              v-model:file-list="imageList"
+              ref="upload"
+              :multiple = true
+              :auto-upload = false
+              :show-file-list = false
+              style="margin-right: 20px"
+              :action = "uploadUrl"
+              :data = "data"
+              :on-success="onSuccess"
+              :on-error="onError"
         >
           <el-button type="primary" :disabled="disabled">选择图片</el-button>
         </el-upload>
-        <div class="mr-[20px]" @click="console.log(this.photo)">已选择{{ photo.length }}张照片</div>
-        <el-button @click="this.photo = []">清除</el-button>
-        </div>
+        <div class="mr-[20px]">已选择{{ imageList.length }}张照片</div>
+        <el-button @click="this.imageList = []" :disabled="disabled" style="margin-right: 100px">清除</el-button>
         <el-button type="primary" @click="upload" :disabled="disabled">上传</el-button>
       </div>
     </div>

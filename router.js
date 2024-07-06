@@ -43,14 +43,25 @@ const router = createRouter({
             component: () => import("@/src/views/article/NoteView.vue")
         },
         {
-            path: "/image",
-            name: "image",
+            path: "/album",
+            name: "album",
             meta: {
                 navigation_bar: {
                     name: "相册",
                     svg: "/static/svg/相册.svg"
                 },
                 show: {
+                    side_navigation_bar: false,
+                }
+            },
+            component: () => import("@/src/views/album/AlbumView.vue")
+        },
+        {
+            path: "/album/:id",
+            name: "image",
+            meta: {
+                show: {
+                    navigation_bar: false,
                     side_navigation_bar: false,
                 }
             },
@@ -128,8 +139,8 @@ const router = createRouter({
             component: () => import("@/src/views/article/ArticleAdminView.vue")
         },
         {
-            path: "/admin/image",
-            name: "image-admin",
+            path: "/admin/album",
+            name: "album-admin",
             meta: {
                 side_navigation_bar: {
                     name: "相册",
@@ -137,6 +148,17 @@ const router = createRouter({
                 },
                 show: {
                     navigation_bar: false,
+                },
+            },
+            component: () => import("@/src/views/album/AlbumAdminView.vue")
+        },
+        {
+            path: "/admin/album/:id",
+            name: "image-admin",
+            meta: {
+                show: {
+                    navigation_bar: false,
+                    side_navigation_bar: false,
                 },
             },
             component: () => import("@/src/views/image/ImageAdminView.vue")

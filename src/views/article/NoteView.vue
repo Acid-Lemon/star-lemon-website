@@ -91,7 +91,7 @@ export default {
     <div class="w-full flex flex-row items-start justify-center bg-[#F8FAFD]">
       <div class="w-[15%] flex flex-col items-center justify-start"></div>
       <div class="w-[70%] flex flex-col items-center justify-start">
-        <div class="w-full bg-[#FFFFFF] shadow-md mt-[20px] text-[2vh] font-['SYST'] p-[40px]">
+        <div class="w-full bg-[#FFFFFF] shadow-md mt-[20px] text-[2vh] font-['SYST'] p-[40px] whitespace-pre-line">
         {{ article.content }}
         </div>
       </div>

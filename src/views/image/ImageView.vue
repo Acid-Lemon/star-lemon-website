@@ -13,14 +13,15 @@ export default {
   },
   computed: {
     filteredImages() {
-      const searchContent = Number(this.search_content);
+      const searchContent = this.search_content;
+      const re = new RegExp(searchContent, 'i');
       const dateRange = this.date_range;
 
       return this.images.filter(image => {
-        const idMatch = image.name === searchContent || !searchContent;
+        const nameMatch = re.test(image.name) || !searchContent;
         const dateMatch = !dateRange || new Date(image.time) >= dateRange[0] && new Date(image.time) <= dateRange[1];
 
-        return idMatch && dateMatch;
+        return nameMatch && dateMatch;
       });
     }
   },
@@ -42,6 +43,17 @@ export default {
       return
     }
     this.images = res.data.images_info;
+    for(let i = 0; i < this.images.length; i++) {
+      uni.request({
+        url: this.images[i].temp_url,
+        responseType: 'arraybuffer',
+        success: (res) => {
+          console.log(res.data);
+          this.text = 'request success';
+        }
+      });
+
+    }
   },
   methods:{
     clear() {

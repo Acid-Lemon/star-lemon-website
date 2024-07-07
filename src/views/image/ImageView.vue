@@ -48,10 +48,6 @@ export default {
       this.search_content = "";
       this.date_range = null;
     },
-    getRaw(){
-
-      console.log(this.image);
-    }
   }
 }
 </script>

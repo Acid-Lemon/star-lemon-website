@@ -41,6 +41,7 @@ export default {
       let res = await call_api("album/get_folders", {
         public_state: this.activeName
       });
+
       if (!res.success) {
         ElNotification({
           title: 'Error',

@@ -148,17 +148,17 @@ export default {
         >
           <el-button type="primary" :disabled="disabled">选择图片</el-button>
         </el-upload>
-        <div class="mr-[20px]">已选择{{ imageList.length }}张照片</div>
+        <div class="mr-[20px]" @click="console.log(this.imageList)">已选择{{ imageList.length }}张照片</div>
         <el-button @click="this.imageList = []" :disabled="disabled" style="margin-right: 100px">清除</el-button>
         <el-button type="primary" @click="upload" :disabled="disabled">上传</el-button>
       </div>
     </div>
     <div class="w-[95%] my-[20px]">
       <el-table :data="images" border style="width: 100%">
-        <el-table-column label="图片名称" prop="name" width="100"/>
+        <el-table-column label="图片名称" prop="name" width="150"/>
         <el-table-column label="图片id" prop="id" width="250"/>
         <el-table-column label="下载链接" prop="temp_url"/>
-        <el-table-column label="操作" width="200">
+        <el-table-column label="操作" width="100">
           <template #default="scope">
             <el-button
                 size="small"

@@ -123,7 +123,7 @@ export default {
       await this.uploadImage();
     },
     handleDelete(index, row){
-      console.log(index, row)
+      console.log("删除")
     }
   }
 }

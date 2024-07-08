@@ -15,10 +15,12 @@ const config = require("uni-config-center")({ pluginId: "fun" }).config();
 const {codes} = require("../../types/error");
 
 module.exports = class Service_CloudStorage_Album extends Service {
-    async create_image(info) {
-        let {image_name, folder_id} = info;
-
-        return await this.service.db.album.add_image(folder_id, image_name);
+    async create_image(image_name, folder) {
+        if (folder.public_state === "shared") {
+            return await this.service.db.album.add_shared_image(folder.id, image_name, this.auth.ctx.user_id);
+        } else {
+            return await this.service.db.album.add_personal_image(folder.id, image_name);
+        }
     }
 
     async get_image_upload_options(image_name, folder_name, public_state) {
@@ -54,7 +56,7 @@ module.exports = class Service_CloudStorage_Album extends Service {
         } = info;
 
         if (public_state === "shared") {
-            return await this.service.db.album.add_shared_folder(folder_name);
+            return await this.service.db.album.add_shared_folder(folder_name, this.ctx.auth.user_id);
         } else {
             return await this.service.db.album.add_personal_folder(folder_name, this.ctx.auth.user_id, public_state);
         }
@@ -73,9 +75,15 @@ module.exports = class Service_CloudStorage_Album extends Service {
         }
     }
 
-    async get_images(folder, image_number, start_time) {
-        let images_info = start_time ? await this.service.db.album.find_images(folder.id, image_number, start_time) :
-                                            await this.service.db.album.find_images(folder.id, image_number);
+    async get_images(folder, image_number, start_time=undefined) {
+        let images_info;
+        if (folder.public_state === "shared") {
+            images_info = start_time ? await this.service.db.album.find_shared_images(folder.id, image_number, start_time) :
+                                      await this.service.db.album.find_shared_images(folder.id, image_number);
+        } else {
+            images_info = start_time ? await this.service.db.album.find_personal_images(folder.id, image_number, start_time) :
+                                      await this.service.db.album.find_personal_images(folder.id, image_number);
+        }
 
         let manager = this.service.cloud_storage.general.get_manager();
         return images_info.map((image_info) => {

@@ -33,10 +33,7 @@ module.exports = class Controller_Album extends Controller {
 
         await this.service.cloud_storage.album.check_folder_edit_access(folder);
 
-        await this.service.cloud_storage.album.create_image({
-            folder_id,
-            image_name
-        });
+        await this.service.cloud_storage.album.create_image(image_name, folder);
 
         let {exp_time, upload_file_options} = await this.service.cloud_storage.album.get_image_upload_options(image_name, folder.name, folder.public_state);
 

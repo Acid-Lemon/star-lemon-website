@@ -15,7 +15,7 @@ const {
 } = require("../../types/error");
 
 module.exports = class Service_CloudStorage_Album extends Service {
-    async add_shared_folder(folder_name) {
+    async add_shared_folder(folder_name, creator_id) {
         let transaction = await this.db.startTransaction();
         try {
             if (await this.service.db.album.check_shared_folder_exist(folder_name)) {
@@ -25,6 +25,7 @@ module.exports = class Service_CloudStorage_Album extends Service {
             let res = await transaction.collection(tables.album).add({
                 type: "folder",
                 name: folder_name,
+                creator_id,
                 public_state: "shared",
                 create_at: Date.now()
             });
@@ -78,7 +79,37 @@ module.exports = class Service_CloudStorage_Album extends Service {
         return new_folder_ids;
     }
 
-    async add_image(folder_id, image_name) {
+    async add_shared_image(folder_id, image_name, user_id) {
+        let transaction = await this.db.startTransaction();
+        try {
+            if (await this.service.db.album.check_image_exist(folder_id, image_name)) {
+                this.throw(codes.exist_image, "image already exist");
+            }
+
+            let image_id = (await transaction.collection(tables.album).add({
+                type: "image",
+                folder_id,
+                name: image_name,
+                creator_id: user_id,
+                create_at: Date.now()
+            })).id;
+
+            await transaction.commit();
+
+            return image_id;
+        } catch (err) {
+            console.error(err);
+            await transaction.rollback();
+
+            if (err.customize) {
+                throw err;
+            } else {
+                this.throw(codes.err_image_create, "image create error");
+            }
+        }
+    }
+
+    async add_personal_image(folder_id, image_name) {
         let transaction = await this.db.startTransaction();
         try {
             if (await this.service.db.album.check_image_exist(folder_id, image_name)) {
@@ -129,16 +160,41 @@ module.exports = class Service_CloudStorage_Album extends Service {
     }
 
     async find_shared_folders() {
-        return id_name_format((await this.db.collection(tables.album).where({
-            type: "folder",
-            public_state: "shared"
-        })  .field({
-              id: true,
-              name: true,
-              create_at: true
+        return (await this.db.collection(tables.album).aggregate()
+            .match({
+                type: "folder",
+                public_state: "shared"
             })
-            .orderBy("create_at", "desc")
-            .get()).data);
+            .sort({
+                create_at: -1
+            })
+            .lookup({
+                from: tables.user,
+                let: {
+                    creator_id: "$creator_id"
+                },
+                pipeline: this.db.command.aggregate.pipeline()
+                    .match(this.db.command.expr(this.db.command.
+                        eq(["$_id", "$$creator_id"])
+                    ))
+                    .project({
+                        id: "$_id",
+                        _id: false,
+                        name: true,
+                        avatar: true
+                    })
+                    .done(),
+                as: "creator"
+            })
+            .project({
+                id: "$_id",
+                _id: false,
+                name: true,
+                creator: this.db.command.aggregate.arrayElemAt(["$creator", 0]),
+                create_at: true
+            })
+            .end())
+            .data;
     }
 
     async find_public_folders() {
@@ -218,7 +274,23 @@ module.exports = class Service_CloudStorage_Album extends Service {
             .data;
     }
 
-    async find_images(folder_id, image_number, start_time=0) {
+    async find_shared_images(folder_id, image_number, start_time=0) {
+        return id_name_format((await this.db.collection(tables.album).where({
+            type: "image",
+            folder_id,
+            create_at: this.db.command.gt(start_time)
+        })  .limit(image_number)
+            .field({
+                id: true,
+                name: true,
+                creator_id: true,
+                create_at: true
+            })
+            .orderBy("create_at", "desc")
+            .get()).data);
+    }
+
+    async find_personal_images(folder_id, image_number, start_time=0) {
         return id_name_format((await this.db.collection(tables.album).where({
             type: "image",
             folder_id,

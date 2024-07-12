@@ -17,12 +17,12 @@ module.exports = () => {
 					break;
 				}
 			}
-			
+
 			if (public_vis) {
 				await next();
 				return;
 			}
-			
+
 			ctx.throw(error.codes.no_token, "no token for the api");
 		}
 
@@ -30,7 +30,7 @@ module.exports = () => {
 		try {
 			auth_info = jwt.verify(token.replace("Bearer ", ""), config["JWT_SECRET"]);
 		} catch (err) {
-			console.log("auth error:", err);
+			console.error("auth error:", err);
 			if (err instanceof jwt.TokenExpiredError) {
 				ctx.throw(error.codes.token_expire, "token expired. login again");
 			}
@@ -38,7 +38,7 @@ module.exports = () => {
 			ctx.throw(error.codes.invalid_token, "invalid token");
 		}
 
-		console.log("auth_info:", auth_info);
+		console.info("auth_info:", auth_info);
 
 		ctx.auth = auth_info;
 		await next();

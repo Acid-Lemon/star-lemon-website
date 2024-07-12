@@ -1,8 +1,10 @@
 {
 	"name": "fun",
 	"dependencies": {
+		"@vercel/kv": "^2.0.0",
 		"bcryptjs": "^2.4.3",
 		"jsonwebtoken": "^9.0.2",
+		"node-fetch": "^3.3.2",
 		"uni-cloud-router": "file:../../../uni_modules/uni-cloud-router/uniCloud/cloudfunctions/common/uni-cloud-router",
 		"uni-config-center": "file:../../../uni_modules/uni-config-center/uniCloud/cloudfunctions/common/uni-config-center"
 	},

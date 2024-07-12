@@ -7,6 +7,11 @@ const {
 } = require("./tables");
 
 const {
+    redis,
+    redis_fields
+} = require("../../utils/db/redis");
+
+const {
     codes
 } = require("../../types/error");
 
@@ -14,7 +19,19 @@ const { id_name_format } = require("../../utils/db/result_format");
 
 module.exports = class DBService_User extends Service {
     async find_user_by_id(id) {
-        return id_name_format((await this.db.collection(tables.user).doc(id).get()).data[0]);
+        let redis_val = await redis.hgetall(redis_fields.user_info.key_prefix + id);
+        if (redis_val) {
+            return redis_val;
+        }
+
+        let db_val = id_name_format((await this.db.collection(tables.user).doc(id).get()).data[0]);
+        if (db_val) {
+            let redis_key = redis_fields.user_info.key_prefix + id;
+            await redis.hset(redis_key, db_val);
+            await redis.expire(redis_key, redis_fields.user_info.ex);
+        }
+
+        return db_val;
     }
 
     async find_user_by_name(name) {
@@ -59,6 +76,7 @@ module.exports = class DBService_User extends Service {
     }
 
     async update_user(id, info) {
+        await redis.del(redis_fields.user_info.key_prefix + id);
         return await this.db.collection(tables.user).doc(id).update({
             ...info
         });

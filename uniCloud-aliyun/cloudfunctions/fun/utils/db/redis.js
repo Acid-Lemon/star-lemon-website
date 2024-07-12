@@ -13,10 +13,10 @@ const kv = createClient({
 });
 
 const fields = {
-    user_info: {key_prefix: "user:info:", ex: 3600 * 24}
+    user_info: {key_prefix: "user:info:", ex: 60 * 60}
 };
 
 module.exports = {
-    kv,
-    fields
+    redis: kv,
+    redis_fields: fields
 }

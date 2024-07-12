@@ -1,4 +1,4 @@
-const {kv, fields : kv_fields} = require("../utils/db/redis");
+const {redis, redis_fields} = require("../utils/db/redis");
 const db = uniCloud.database();
 const { tables } = require("../service/db/tables");
 
@@ -15,8 +15,8 @@ module.exports = () => {
 }
 
 async function find_user(user_id) {
-    let user_redis_key = kv_fields.user_info.key_prefix + user_id;
-    let redis_val = await kv.hgetall(user_redis_key);
+    let user_redis_key = redis_fields.user_info.key_prefix + user_id;
+    let redis_val = await redis.hgetall(user_redis_key);
 
     if (redis_val) {
         return redis_val;
@@ -24,7 +24,7 @@ async function find_user(user_id) {
 
     let db_val = (await db.collection(tables.user).doc(user_id).get()).data[0];
 
-    await kv.hset(user_redis_key, db_val);
+    await redis.hset(user_redis_key, db_val);
 
     return db_val;
 }

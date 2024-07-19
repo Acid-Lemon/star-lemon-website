@@ -4,8 +4,5 @@
 	}],
 	"globalStyle": {
 		"navigationStyle": "custom"
-	},
-	"h5": {
-		"favicon": "/static/favicon/favicon.png"
 	}
 }

@@ -73,7 +73,13 @@ export default {
                    class="shadow-md pb-[2px] flex flex-col justify-between">
                 <router-link :to="'/album/' + photoAlbum.id">
                 <div>
-                  <el-image src="" class="w-full h-[20vh]" fit="cover"/>
+                  <el-image src=""  class="w-full h-[20vh]" fit="cover">
+                    <template #error>
+                      <div class="image-slot">
+                        <el-icon style="width:100%; height:20vh"><Picture style="width: 50px;height:50px"/></el-icon>
+                      </div>
+                    </template>
+                  </el-image>
                 </div>
                 <div>
                   <div class="px-[10px] py-[2px]">相册名：{{ photoAlbum.name }}</div>
@@ -129,7 +135,13 @@ export default {
                    class="shadow-md pb-[2px] flex flex-col">
                 <router-link :to="'/album/' + photoAlbum.id">
                 <div>
-                  <el-image src="" class="w-full h-[20vh]" fit="cover"/>
+                  <el-image src=""  class="w-full h-[20vh]" fit="cover">
+                    <template #error>
+                      <div class="image-slot">
+                        <el-icon style="width:100%; height:20vh"><Picture style="width: 50px;height:50px"/></el-icon>
+                      </div>
+                    </template>
+                  </el-image>
                 </div>
                 <div>
                   <div class="px-[10px] py-[2px]">相册名：{{ photoAlbum.name }}</div>

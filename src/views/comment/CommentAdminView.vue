@@ -8,6 +8,9 @@
       return {
         message_list: [],
         pages: 0,
+        currentPage: 1,
+        info: null,
+        activeName: "all",
       }
     },
 
@@ -17,10 +20,11 @@
     methods: {
       async get_messages() {
         this.pages += 1;
+        console.log(this.pages);
 
         let start_time = 1577808000000;
         if (this.pages !== 1) {
-          start_time = this.message_list[this.message_list.length - 1].create_at;
+          start_time = this.message_list[this.pages - 2][this.message_list[this.pages - 2].length - 1].create_at;
         }
 
         let res = await call_api("message_board/get_messages", {
@@ -46,7 +50,7 @@
           return;
         }
 
-        this.message_list = this.message_list.concat(await this.messages_format(res.data.messages));
+        this.message_list = this.message_list.concat([await this.messages_format(res.data.messages)]);
       },
       async messages_format(messages) {
         if (!messages) {
@@ -66,6 +70,20 @@
       },
       handleDelete() {
         console.log("删除")
+      },
+      handleClick() {
+
+      },
+      async nextClick() {
+      },
+      async change() {
+        if(this.pages + 1 === this.currentPage) {
+          await this.get_messages()
+        }
+
+      },
+      pageCount() {
+        return this.message_list[this.pages - 1]?.length < 20 ? this.pages : this.pages + 1
       }
     },
   }
@@ -73,13 +91,10 @@
 
 <template>
   <div class="w-full h-full bg-[#F8FAFD] flex flex-col content-center items-center">
-    <div class="w-[95%] my-[20px]">
-      <div class="flex flex-row items-center justify-around">
-
-      </div>
-    </div>
-    <div class="w-[95%] my-[20px]">
-      <el-table :data="message_list" border :row-style="(row) => {return row.row.public_state ? '--el-table-tr-bg-color: var(--el-color-success-light-9)' : '--el-table-tr-bg-color: var(--el-color-warning-light-9)'}" style="width: 100%">
+    <el-tabs v-model="activeName" class="w-[95%]" @tab-click="handleClick">
+      <el-tab-pane label="全部" name="all">
+    <div class="w-full">
+      <el-table :data="message_list[currentPage - 1]" border max-height="80vh" :row-style="(row) => {return row.row.public_state ? '--el-table-tr-bg-color: var(--el-color-success-light-9)' : '--el-table-tr-bg-color: var(--el-color-warning-light-9)'}" style="width: 100%">
         <el-table-column type="index" width="50" />
         <el-table-column label="留言id" prop="id" width="250"/>
         <el-table-column label="内容" prop="content"/>
@@ -94,7 +109,7 @@
                 type="primary"
                 @click="handleShow(scope.$index, scope.row)"
             >
-              {{ message_list[scope.$index].public_state ? "隐藏" : "显示" }}
+              {{ message_list[currentPage - 1][scope.$index].public_state ? "隐藏" : "显示" }}
             </el-button>
             <el-button
                 size="small"
@@ -106,7 +121,10 @@
           </template>
         </el-table-column>
       </el-table>
+      <el-pagination layout="prev, pager, next" v-model:current-page="currentPage" :page-count="pageCount()" @change="change()" @next-click="nextClick()" />
     </div>
+    </el-tab-pane>
+    </el-tabs>
   </div>
 </template>
 

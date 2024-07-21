@@ -1,6 +1,7 @@
 <script>
 import {ElMessageBox} from "element-plus";
-import {useWebConfigStore} from "../../stores/webConfig";
+import {useWebConfigStore} from "@/src/stores/webConfig";
+import {get_user} from "@/src/utils/user_info";
 
 export default {
   components: {
@@ -10,26 +11,44 @@ export default {
     return {
       webName: useWebConfigStore()?.webName,
       newWebName: useWebConfigStore()?.webName,
-      webIcon: "https://mp-9c25a9c3-8b6e-4390-be64-8d3056531359.cdn.bspapp.com/cloudstorage/icon/image.jpg",
-      newWebIcon: "https://mp-9c25a9c3-8b6e-4390-be64-8d3056531359.cdn.bspapp.com/cloudstorage/icon/image.jpg",
-      username: "lemon",
       webNameDialog: false,
-      webIconDialog: false,
       timeState: "",
+      info: "",
     };
   },
-  mounted() {
-    let time = new Date().getHours()
+  async mounted() {
+    this.info = await get_user();
   },
   methods: {
     handleClose(done) {
-      ElMessageBox.confirm('你确定取消更改吗?（已输入的内容不会被保存）')
-          .then(() => {
-            done()
-          })
-          .catch(() => {
-            // catch error
-          })
+      ElMessageBox.confirm('你确定取消更改吗?（已输入的内容不会被保存）').then(() => {
+        done()
+      }).catch(() => {
+        // catch error
+      })
+    },
+    getTimeGreetings() {
+      const now = new Date();
+      const hours = now.getHours();
+
+      if(5 <= hours && hours < 8) {
+        return "早上好呀，早起的鸟儿有虫吃！";
+      }
+      if(8 <= hours && hours < 12) {
+        return "上午好呀，又是活力满满的一天~";
+      }
+      if(12 <= hours && hours < 14) {
+        return "中午好呀，有没有吃午饭呢？";
+      }
+      if(14 <= hours && hours < 18) {
+        return "下午好呀，努力工作的小伙伴~";
+      }
+      if(18 <= hours && hours <= 23) {
+        return "晚上好呀，记得早点睡哦~";
+      }
+      if(0 <= hours && hours < 5) {
+        return "凌晨好呀，熬夜不好哦";
+      }
     }
   }
 };
@@ -44,11 +63,16 @@ export default {
         </div>
       </template>
       <div @click="webNameDialog = true">网站名称：{{ webName }}</div>
-      <div style="width:100%;white-space:nowrap;text-overflow:ellipsis;overflow:hidden" @click="webIconDialog = true">
-        网站图标：{{ webIcon }}
-      </div>
-      <template #footer>{{ username }}上午好！</template>
+      <template #footer>{{ info.name }}，{{ getTimeGreetings() }}</template>
     </el-card>
+    <el-row>
+      <el-col :span="6">
+        <el-statistic title="Daily active users" :value="268500" />
+      </el-col>
+      <el-col>
+        <el-statistic title="Daily active users" :value="268500" />
+      </el-col>
+    </el-row>
     <el-dialog
         v-model="webNameDialog"
         :before-close="handleClose"
@@ -63,25 +87,6 @@ export default {
           </el-button>
           <el-button type="primary"
                      @click="webNameDialog = false; webName = newWebName">
-            确定
-          </el-button>
-        </div>
-      </template>
-    </el-dialog>
-    <el-dialog
-        v-model="webIconDialog"
-        :before-close="handleClose"
-        title="修改信息"
-        width="500"
-    >
-      <el-input v-model="newWebIcon" class="w-[240px]" placeholder="请输入新的网站图标链接"/>
-      <template #footer>
-        <div class="dialog-footer">
-          <el-button
-              @click="webIconDialog = false; newWebIcon = webIcon">取消
-          </el-button>
-          <el-button type="primary"
-                     @click="webIconDialog = false; webIcon = newWebIcon">
             确定
           </el-button>
         </div>

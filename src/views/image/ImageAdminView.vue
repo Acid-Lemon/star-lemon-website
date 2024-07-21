@@ -59,6 +59,8 @@ export default {
 
       return
     }
+
+    console.log(res);
     this.images = res.data.images_info;
   },
   methods: {

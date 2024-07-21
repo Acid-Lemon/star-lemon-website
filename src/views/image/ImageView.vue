@@ -43,17 +43,6 @@ export default {
       return
     }
     this.images = res.data.images_info;
-    for(let i = 0; i < this.images.length; i++) {
-      uni.request({
-        url: this.images[i].temp_url,
-        responseType: 'arraybuffer',
-        success: (res) => {
-          console.log(res.data);
-          this.text = 'request success';
-        }
-      });
-
-    }
   },
   methods:{
     clear() {

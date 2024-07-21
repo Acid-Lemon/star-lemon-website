@@ -29,17 +29,52 @@ module.exports = class DBService_MessageBoard extends Service {
         });
     }
 
-    async get_messages(limit_num, from_time = 0) {
+    async get_personal_and_public_messages(limit_num, time_range={}) {
+        let {
+            from_time,
+            to_time
+        } = time_range;
+
+        let time_sort_direction = 1;
+        if (from_time > to_time) {
+            time_sort_direction = -1;
+            [from_time, to_time] = [to_time, from_time];
+        }
+
+        let create_at_match_obj;
+        if (from_time) {
+            if (to_time) {
+                create_at_match_obj = {
+                    create_at: this.db.command.and([
+                        this.db.command.gte(from_time),
+                        this.db.command.lte(to_time)
+                    ])
+                };
+            } else {
+                create_at_match_obj = {
+                    create_at: this.db.command.gte(from_time)
+                };
+            }
+        } else if (to_time) {
+            create_at_match_obj = {
+                create_at: this.db.command.lte(to_time)
+            };
+        } else {
+            create_at_match_obj = {
+                create_at: true
+            };
+        }
+
         return (await this.db.collection(tables.message_board).aggregate()
             .match(this.db.command.and([
-                { create_at: this.db.command.gt(from_time) },
+                { ...create_at_match_obj },
                 this.db.command.or([
                     { public_state: true },
                     { user_id: this.ctx.auth?.user_id ?? ""}
                 ])
             ]))
             .sort({
-                create_at: -1
+                create_at: time_sort_direction
             })
             .limit(limit_num)
             .lookup({

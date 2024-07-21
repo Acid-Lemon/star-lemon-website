@@ -24,15 +24,15 @@ module.exports = class Controller_MessageBoard extends Controller {
         };
     }
 
-    async get_messages() {
-        let { start_time, message_number } = validate(this.ctx.event.args, {
-            start_time: {
+    async get_personal_and_public_messages() {
+        let {
+            time_range = {},
+            message_number
+        } = validate(this.ctx.event.args, {
+            time_range: {
                 undefined_able: true,
                 null_able: true,
-                type: "number",
-                math: {
-                    max: Date.now()
-                }
+                type: "object"
             },
             message_number: {
                 type: "number",
@@ -43,7 +43,33 @@ module.exports = class Controller_MessageBoard extends Controller {
             }
         });
 
-        let messages = await this.service.message_board.get_messages(message_number, start_time);
+        if (time_range) {
+            let now_time = Date.now();
+            validate(time_range, {
+                from_time: {
+                    undefined_able: true,
+                    null_able: true,
+
+                    type: "number",
+                    math: {
+                        min: 0,
+                        max: now_time
+                    }
+                },
+                to_time: {
+                    undefined_able: true,
+                    null_able: true,
+
+                    type: "number",
+                    math: {
+                        min: 0,
+                        max: now_time
+                    }
+                }
+            });
+        }
+
+        let messages = await this.service.message_board.get_personal_and_public_messages(message_number, time_range);
         return {
             data: {
                 messages

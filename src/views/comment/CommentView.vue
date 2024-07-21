@@ -277,13 +277,16 @@ export default {
     async get_messages() {
       this.pages += 1;
       this.loadingMore = true;
-      let start_time = 1577808000000;
+      let start_time = new Date().getTime();
       if (this.pages !== 1) {
         start_time = this.message_list[this.message_list.length - 1].create_at;
       }
 
-      let res = await call_api("message_board/get_messages", {
-        start_time,
+      let res = await call_api("message_board/get_personal_and_public_messages", {
+        time_range: {
+          from_time: start_time,
+          to_time: 0
+        },
         message_number: 20
       });
 

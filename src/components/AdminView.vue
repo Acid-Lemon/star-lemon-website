@@ -8,7 +8,7 @@ export default {
 </script>
 
 <template>
-  <div class="flex flex-row items-center pl-[10px] w-full h-[50px] shadow-md">
+  <div class="flex flex-row items-center pl-[10px] w-full h-[5vh] shadow-md">
     <router-link to="/admin">
   <span
       class="text-[#000000] text-[20px] font-['SYST'] duration-700 hover:text-[#44cef6]">

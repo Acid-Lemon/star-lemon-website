@@ -171,7 +171,7 @@ export default {
     <div class="w-full bg-[#F8FAFD] flex flex-col items-center justify-start">
       <div class="w-[70%] h-[200vh] bg-[#FFFFFF] shadow-md mt-[20px]">
         <div v-for="article in articles">
-          <router-link to="/article/note">
+          <router-link to="/article/write">
             <div class="w-full h-[200px] px-[20px] pt-[20px] border-b border-[#000000]">
               <div class="text-[2.6vh] font-['SYST']">{{ article.title }}</div>
               <div class="flex flex-row items-center mb-[5px]">

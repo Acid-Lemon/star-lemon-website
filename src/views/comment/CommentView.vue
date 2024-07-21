@@ -251,9 +251,6 @@ export default {
         this.sentences = JSON.parse(window.sessionStorage.getItem("sentences"));
       }
     },
-    loadMore() {
-      this.get_messages();
-    },
     onFocus() {
       this.isFocus = true;
     },
@@ -469,7 +466,7 @@ export default {
         <div class="mb-[3vh] relative">
           <p :class="{'text-[#FFFFFF]':style_mode,'bg-opacity-100':style_mode,'text-[1.6vh]':style_mode,'top-[-1.2vh]':style_mode,'left-[1.4vh]':style_mode,
             'text-[#000000]':!style_mode,'bg-opacity-0':!style_mode,'text-[2vh]':!style_mode,'top-[1vh]':!style_mode,'left-[1vh]':!style_mode}
-            " class="absolute pointer-events-none px-[1vh] duration-700 z-50 bg-black">
+            " class="absolute pointer-events-none px-[1vh] duration-700 z-50 bg-black font-['FZSX']">
             你是我一生只会遇见一次的惊喜...
           </p>
           <textarea id="pl" v-model.lazy="value" maxlength="100"

@@ -90,7 +90,7 @@
 </script>
 
 <template>
-  <div class="w-full h-full bg-[#F8FAFD] flex flex-col content-center items-center">
+  <div class="w-full h-[95vh] bg-[#F8FAFD] flex flex-col content-center items-center">
     <el-tabs v-model="activeName" class="w-[95%]" @tab-click="handleClick">
       <el-tab-pane label="全部" name="all">
     <div class="w-full">
@@ -109,7 +109,7 @@
                 type="primary"
                 @click="handleShow(scope.$index, scope.row)"
             >
-              {{ message_list[currentPage - 1][scope.$index].public_state ? "隐藏" : "显示" }}
+              {{ message_list[currentPage - 1][scope.$index].public_state ? "私有" : "公开" }}
             </el-button>
             <el-button
                 size="small"

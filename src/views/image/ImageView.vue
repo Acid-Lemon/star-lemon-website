@@ -9,6 +9,8 @@ export default {
       image: null,
       search_content: "",
       date_range: null,
+      hasMore: true,
+      pages: 0,
     }
   },
   computed: {
@@ -26,29 +28,44 @@ export default {
     }
   },
   async mounted() {
-    let res = await call_api("album/get_images",{
-      folder_id: this.$route.params.id,
-      start_time: 1577808000000,
-      image_number: 20
-    })
-    console.log(res);
-    if(!res.success){
-      ElNotification({
-        title: 'Error',
-        type: "error",
-        message: `获取图片失败`
-      });
-      console.log(res);
-
-      return
-    }
-    this.images = res.data.images_info;
+    await this.get_image();
   },
   methods:{
+    async get_image() {
+      this.pages += 1;
+      let start_time = 1577808000000;
+      if (this.pages !== 1) {
+        start_time = this.images[this.images.length - 1].create_at;
+      }
+      console.log(start_time);
+      let res = await call_api("album/get_images",{
+        folder_id: this.$route.params.id,
+        start_time: start_time,
+        image_number: 20
+      })
+      console.log(res);
+      if(!res.success){
+        ElNotification({
+          title: 'Error',
+          type: "error",
+          message: `获取图片失败`
+        });
+        this.pages -= 1;
+        console.log(res);
+
+        return
+      }
+      this.hasMore = res.data.images_info.length === 20;
+      console.log(`第${this.pages}页数据已加载`);
+      this.images = this.images.concat(res.data.images_info);
+    },
     clear() {
       this.search_content = "";
       this.date_range = null;
     },
+    showDialog() {
+
+    }
   }
 }
 </script>
@@ -81,13 +98,14 @@ export default {
     </div>
       <div class="h-[85vh] w-[90vw]">
         <el-scrollbar>
-          <div v-if="filteredImages.length > 0"
-               class="grid grid-flow-row grid-cols-4 gap-[20px]">
+          <div v-if="filteredImages.length > 0" v-infinite-scroll="get_image" :infinite-scroll-disabled=!hasMore infinite-scroll-delay=1000
+               class="grid grid-cols-4 gap-[20px]">
             <div v-for="image in filteredImages"
                  :key="image.id"
+                 @click="showDialog"
                  class="shadow-md pb-[2px] flex flex-col justify-between">
                 <div @click="console.log(image)">
-                  <el-image :src="image.temp_url" class="w-full h-[20vh]" fit="cover"/>
+                  <el-image :src="image.temp_url" class="w-full h-auto" fit="cover"/>
                 </div>
                 <div>
                   <div class="px-[10px] py-[2px]">图片：{{ image.name }}</div>

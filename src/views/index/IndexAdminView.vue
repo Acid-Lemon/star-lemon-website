@@ -55,7 +55,7 @@ export default {
 </script>
 
 <template>
-  <div class="w-full h-full bg-[#F8FAFD]">
+  <div class="w-full h-[95vh] bg-[#F8FAFD]">
     <el-card class="w-[480px] ml-[20px] mt-[20px]">
       <template #header>
         <div class="card-header">

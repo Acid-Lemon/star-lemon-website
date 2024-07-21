@@ -32,7 +32,7 @@ const router = createRouter({
             component: () => import("@/src/views/article/ArticleView.vue")
         },
         {
-            path: "/article/note",
+            path: "/article/write",
             name: "note",
             meta: {
                 show: {
@@ -40,7 +40,7 @@ const router = createRouter({
                     side_navigation_bar: false,
                 }
             },
-            component: () => import("@/src/views/article/NoteView.vue")
+            component: () => import("@/src/views/write/WriteView.vue")
         },
         {
             path: "/album",

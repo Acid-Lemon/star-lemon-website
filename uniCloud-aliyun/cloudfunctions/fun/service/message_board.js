@@ -12,8 +12,9 @@ module.exports = class Service_MessageBoard extends Service {
         }
     }
 
-    async get_messages(message_number, start_time) {
-       return start_time ? await this.service.db.message_board.get_messages(message_number, start_time) :
-                           await this.service.db.message_board.get_messages(message_number);
+    async get_personal_and_public_messages(message_number, time_range={}) {
+        return time_range && time_range !== {} ?
+            await this.service.db.message_board.get_personal_and_public_messages(message_number, time_range) :
+            await this.service.db.message_board.get_personal_and_public_messages(message_number);
     }
 }

@@ -236,7 +236,9 @@ function validate(args, rules) {
 
     let checked_obj = {};
     for (let [name] of Object.entries(rules)) {
-        checked_obj[name] = args[name];
+        if (args.hasOwnProperty("name")) {
+            checked_obj[name] = args[name];
+        }
     }
     return checked_obj;
 }

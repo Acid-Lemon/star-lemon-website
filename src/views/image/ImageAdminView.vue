@@ -33,6 +33,11 @@ export default {
         value: 'private',
         label: '私密相册'
       },
+      devices: [
+        { value: 'Redmi K60 Ultra', label: '红米 K60 至尊版' },
+        { value: 'Redmi K60', label: '红米 K60' },
+      ],
+      device: { value: 'Redmi K60 Ultra', label: '红米 K60 至尊版' },
       photoAlbumName: "",
       imageList: [],
       photoList: [],
@@ -59,6 +64,8 @@ export default {
 
       return
     }
+
+    console.log(res);
     this.images = res.data.images_info;
   },
   methods: {
@@ -130,27 +137,65 @@ export default {
 </script>
 
 <template>
-  <div class="w-full h-full bg-[#F8FAFD] flex flex-col content-center items-center">
+  <div class="w-full h-[95vh] bg-[#F8FAFD] flex flex-col content-center items-center">
     <div class="w-[95%] my-[20px]">
       <div class="h-[3vh]"></div>
-      <div class="flex flex-row items-center justify-center">
-        <el-upload
-              v-model:file-list="imageList"
-              ref="upload"
-              :multiple = true
-              :auto-upload = false
-              :show-file-list = false
-              style="margin-right: 20px"
-              :action = "uploadUrl"
-              :data = "data"
-              :on-success="onSuccess"
-              :on-error="onError"
-        >
-          <el-button type="primary" :disabled="disabled">选择图片</el-button>
-        </el-upload>
-        <div class="mr-[20px]" @click="console.log(this.imageList)">已选择{{ imageList.length }}张照片</div>
-        <el-button @click="this.imageList = []" :disabled="disabled" style="margin-right: 100px">清除</el-button>
-        <el-button type="primary" @click="upload" :disabled="disabled">上传</el-button>
+      <div class="bg-[url('/static/background/17.jpg')] bg-cover rounded-md h-[30vh] flex flex-col items-start justify-between p-[20px]">
+        <div class="w-full flex flex-row justify-between items-center">
+          <div class="flex flex-row justify-center items-center">
+            <div>图片名称：</div>
+            <el-input style="width: 10vw; height: 30px"></el-input>
+          </div>
+          <div class="flex flex-row justify-center items-center">
+            <div>拍摄地点：</div>
+            <el-input style="width: 10vw; height: 30px"></el-input>
+          </div>
+          <div class="flex flex-row justify-center items-center">
+            <div>拍摄设备：</div>
+            <el-select
+                v-model="device"
+                style="width: 10vw; height: 30px"
+            >
+              <el-option
+                  v-for="device in devices"
+                  :key="device.value"
+                  :label="device.label"
+                  :value="device.value"
+              />
+            </el-select>
+          </div>
+          <div class="flex flex-row justify-center items-center">
+            <div>描述：</div>
+            <el-input style="width: 30vw; height: 30px"></el-input>
+          </div>
+        </div>
+        <div class="w-full flex flex-row justify-between items-center">
+          <div class="flex flex-row justify-center items-center">
+            <div>描述：</div>
+            <el-input style="width: 30vw; height: 30px"></el-input>
+          </div>
+        </div>
+        <div class="w-full flex flex-row justify-between items-center">
+          <div class="flex flex-row justify-center items-center">
+            <el-upload
+                v-model:file-list="imageList"
+                ref="upload"
+                :multiple = true
+                :auto-upload = false
+                :show-file-list = false
+                style="margin-right: 20px"
+                :action = "uploadUrl"
+                :data = "data"
+                :on-success="onSuccess"
+                :on-error="onError"
+            >
+              <el-button type="primary" :disabled="disabled">选择图片</el-button>
+            </el-upload>
+            <div class="mr-[20px]" @click="console.log(this.imageList)">已选择{{ imageList.length }}张照片</div>
+            <el-button @click="this.imageList = []" :disabled="disabled" style="margin-right: 100px">清除</el-button>
+          </div>
+          <el-button type="primary" @click="upload" :disabled="disabled">上传</el-button>
+        </div>
       </div>
     </div>
     <div class="w-[95%] my-[20px]">

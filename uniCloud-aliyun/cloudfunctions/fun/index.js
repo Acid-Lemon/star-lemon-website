@@ -4,6 +4,7 @@ const router = new Router(require("./config"));
 const error = require("./types/error");
 
 exports.main = async (event, context) => {
+	// noinspection JSCheckFunctionSignatures - ide在uni-cloud-router压缩的情况下无法正确识别参数
 	let res = await router.serve(event, context);
 	console.info(res);
 
@@ -12,7 +13,7 @@ exports.main = async (event, context) => {
 			res = {
 				success: false,
 				code: res.code,
-				message: "error"
+				message: "unknown error"
 			};
 		} else {
 			delete res.customize;

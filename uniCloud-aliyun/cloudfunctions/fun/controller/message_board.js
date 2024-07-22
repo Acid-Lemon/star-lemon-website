@@ -3,7 +3,8 @@ const {
 } = require("uni-cloud-router");
 
 const {
-    validate
+    validate,
+    validate_time_range
 } = require("../utils/args_check");
 
 module.exports = class Controller_MessageBoard extends Controller {
@@ -27,49 +28,38 @@ module.exports = class Controller_MessageBoard extends Controller {
     async get_personal_and_public_messages() {
         let {
             time_range = {},
-            message_number
+            message_number,
+            skip_number = 0
         } = validate(this.ctx.event.args, {
             time_range: {
                 undefined_able: true,
                 null_able: true,
                 type: "object"
             },
+
             message_number: {
                 type: "number",
                 math: {
                     max: 20,
                     min: 1
                 }
+            },
+
+            skip_number: {
+                undefined_able: true,
+                null_able: true,
+                type: "number",
+
+                math: {
+                    min: 0,
+                    max: 200
+                }
             }
         });
 
-        if (time_range) {
-            let now_time = Date.now();
-            validate(time_range, {
-                from_time: {
-                    undefined_able: true,
-                    null_able: true,
+        validate_time_range(time_range);
 
-                    type: "number",
-                    math: {
-                        min: 0,
-                        max: now_time
-                    }
-                },
-                to_time: {
-                    undefined_able: true,
-                    null_able: true,
-
-                    type: "number",
-                    math: {
-                        min: 0,
-                        max: now_time
-                    }
-                }
-            });
-        }
-
-        let messages = await this.service.message_board.get_personal_and_public_messages(message_number, time_range);
+        let messages = await this.service.message_board.get_personal_and_public_messages(message_number, time_range, skip_number);
         return {
             data: {
                 messages

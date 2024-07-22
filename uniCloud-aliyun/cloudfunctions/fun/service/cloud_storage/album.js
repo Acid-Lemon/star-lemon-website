@@ -75,14 +75,12 @@ module.exports = class Service_CloudStorage_Album extends Service {
         }
     }
 
-    async get_images(folder, image_number, start_time=undefined) {
+    async get_images(folder, image_number, time_range={}, skip_number=0) {
         let images_info;
         if (folder.public_state === "shared") {
-            images_info = start_time ? await this.service.db.album.find_shared_images(folder.id, image_number, start_time) :
-                                      await this.service.db.album.find_shared_images(folder.id, image_number);
+            images_info = await this.service.db.album.find_shared_images(folder.id, image_number, time_range, skip_number);
         } else {
-            images_info = start_time ? await this.service.db.album.find_personal_images(folder.id, image_number, start_time) :
-                                      await this.service.db.album.find_personal_images(folder.id, image_number);
+            images_info = await this.service.db.album.find_personal_images(folder.id, image_number, time_range, skip_number);
         }
 
         let manager = this.service.cloud_storage.general.get_manager();

@@ -46,29 +46,46 @@ export default {
       images: [],
       disabled: false,
       index: 0,
+      pages: 0,
+      currentPage: 1,
     }
   },
   async mounted() {
-    let res = await call_api("album/get_images", {
-      folder_id: this.$route.params.id,
-      start_time: 1577808000000,
-      image_number: 20
-    })
-    if(!res.success){
-      ElNotification({
-        title: 'Error',
-        type: "error",
-        message: `获取图片失败`
-      });
-      console.log(res);
-
-      return
-    }
-
-    console.log(res);
-    this.images = res.data.images_info;
+    await this.get_images();
   },
   methods: {
+    async get_images() {
+      this.pages += 1;
+      console.log("开始加载第${this.pages}页数据");
+      let start_time = new Date().getTime();
+      let skip_number = 0;
+      if (this.pages !== 1) {
+        start_time = this.images[this.pages - 2][this.images[this.pages - 2].length - 1].create_at;
+        skip_number = this.skip_number();
+      }
+      let res = await call_api("album/get_images", {
+        folder_id: this.$route.params.id,
+        time_range: {
+          from_time: start_time,
+          to_time: 0
+        },
+        image_number: 20,
+        skip_number
+      })
+      if(!res.success){
+        ElNotification({
+          title: 'Error',
+          type: "error",
+          message: `获取图片失败`
+        });
+        this.pages -= 1;
+        console.log(res);
+
+        return
+      }
+
+      this.images = this.images.concat([res.data.images_info]);
+    },
     upload() {
       console.log("开始");
       this.disabled = true;
@@ -131,16 +148,31 @@ export default {
     },
     handleDelete(index, row){
       console.log("删除")
-    }
+    },
+    async change() {
+      if(this.pages + 1 === this.currentPage) {
+        await this.get_images()
+      }
+
+    },
+    pageCount() {
+      return this.images[this.pages - 1]?.length === 20 ? this.pages + 1 : this.pages
+    },
+    skip_number() {
+      let index = 1;
+      while(this.images[this.pages - 2][this.images[this.pages - 2].length - index].create_at === this.images[this.pages - 2][this.images[this.pages - 2].length - index - 1].create_at) {
+        index += 1;
+      }
+      return index;
+    },
   }
 }
 </script>
 
 <template>
-  <div class="w-full h-[95vh] bg-[#F8FAFD] flex flex-col content-center items-center">
-    <div class="w-[95%] my-[20px]">
-      <div class="h-[3vh]"></div>
-      <div class="bg-[url('/static/background/17.jpg')] bg-cover rounded-md h-[30vh] flex flex-col items-start justify-between p-[20px]">
+  <div class="w-full h-full bg-[#F8FAFD] flex flex-col content-center items-center">
+    <div class="w-[95%] my-[2vh]">
+      <div class="bg-[url('/static/background/17.jpg')] bg-cover rounded-md h-[20vh] flex flex-col items-start justify-between p-[20px]">
         <div class="w-full flex flex-row justify-between items-center">
           <div class="flex flex-row justify-center items-center">
             <div>图片名称：</div>
@@ -198,8 +230,8 @@ export default {
         </div>
       </div>
     </div>
-    <div class="w-[95%] my-[20px]">
-      <el-table :data="images" border style="width: 100%">
+    <div class="w-[95%] my-[2vh]">
+      <el-table :data="images[currentPage - 1]" border max-height="66vh" style="width: 100%">
         <el-table-column label="图片名称" prop="name" width="150"/>
         <el-table-column label="图片id" prop="id" width="250"/>
         <el-table-column label="下载链接" prop="temp_url"/>
@@ -215,6 +247,7 @@ export default {
           </template>
         </el-table-column>
       </el-table>
+      <el-pagination layout="prev, pager, next" v-model:current-page="currentPage" :page-count="pageCount()" @change="change()" />
     </div>
   </div>
 </template>

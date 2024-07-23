@@ -103,11 +103,11 @@ export default {
           <path fill="currentColor" d="M12 20a8 8 0 0 0 8-8a8 8 0 0 0-8-8a8 8 0 0 0-8 8a8 8 0 0 0 8 8m0-18a10 10 0 0 1 10 10a10 10 0 0 1-10 10C6.47 22 2 17.5 2 12A10 10 0 0 1 12 2m.5 5v5.25l4.5 2.67l-.75 1.23L11 13V7h1.5Z"></path>
         </svg>
         <div class="text-[2vh] text-[#FFFFFF] font-['SYST'] mr-[20px] opacity-50">{{ article.date }}</div>
-        <img class="opacity-50 w-[2vh] h-[2vh] mr-[3px]" src="/svg/views.svg" alt="浏览"/>
+        <img class="opacity-50 w-[2vh] h-[2vh] mr-[3px]" src="/static/svg/views.svg" alt="浏览"/>
         <div class="text-[2vh] text-[#FFFFFF] font-['SYST'] mr-[20px] opacity-50">{{ article.views }}</div>
-        <img class="opacity-50 w-[2vh] h-[2vh] mr-[3px]" src="/svg/likes.svg" alt="喜欢"/>
+        <img class="opacity-50 w-[2vh] h-[2vh] mr-[3px]" src="/static/svg/likes.svg" alt="喜欢"/>
         <div class="text-[2vh] text-[#FFFFFF] font-['SYST'] mr-[20px] opacity-50">{{ article.likes }}</div>
-        <img class="opacity-50 w-[2vh] h-[2vh] mr-[3px]" src="/svg/comments.svg" alt="评论"/>
+        <img class="opacity-50 w-[2vh] h-[2vh] mr-[3px]" src="/static/svg/comments.svg" alt="评论"/>
         <div class="text-[2vh] text-[#FFFFFF] font-['SYST'] opacity-50">{{ article.comments }}</div>
       </div>
     </div>

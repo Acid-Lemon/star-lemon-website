@@ -163,15 +163,10 @@ export default {
 <template>
   <el-scrollbar>
     <div class="h-[95vh] w-full flex flex-col items-center justify-start">
-      <div class="w-full min-h-[40vh] bg-[url('/static/background/13.jpg')] flex flex-row justify-center items-center bg-center bg-cover">
-        <p class="text-[#FFFFFF] font-['FZSX'] text-[6vh] hover:text-[#44cef6] duration-700">
-          一件小事
-        </p>
-      </div>
       <div class="w-full bg-[#F8FAFD] flex flex-col items-center justify-start">
         <div class="w-[70%] h-[200vh] bg-[#FFFFFF] shadow-md mt-[20px]">
           <div v-for="article in articles">
-            <router-link to="/write/note">
+            <router-link to="/admin/article/write/">
               <div class="w-full h-[200px] px-[20px] pt-[20px] border-b border-[#000000]">
                 <div class="text-[2.6vh] font-['SYST']">{{ article.title }}</div>
                 <div class="flex flex-row items-center mb-[5px]">

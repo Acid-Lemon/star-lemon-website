@@ -21,10 +21,11 @@
       async get_messages() {
         this.pages += 1;
         console.log(this.pages);
-
         let start_time = new Date().getTime();
+        let skip_number = 0;
         if (this.pages !== 1) {
           start_time = this.message_list[this.pages - 2][this.message_list[this.pages - 2].length - 1].create_at;
+          skip_number = this.skip_number()
         }
 
         let res = await call_api("message_board/get_personal_and_public_messages", {
@@ -32,7 +33,8 @@
             from_time: start_time,
             to_time: 0
           },
-          message_number: 20
+          message_number: 20,
+          skip_number
         });
 
         if (!res.success) {
@@ -77,8 +79,6 @@
       handleClick() {
 
       },
-      async nextClick() {
-      },
       async change() {
         if(this.pages + 1 === this.currentPage) {
           await this.get_messages()
@@ -86,8 +86,15 @@
 
       },
       pageCount() {
-        return this.message_list[this.pages - 1]?.length < 20 ? this.pages : this.pages + 1
-      }
+        return this.message_list[this.pages - 1]?.length === 20 ? this.pages + 1 : this.pages
+      },
+      skip_number() {
+        let index = 1;
+        while(this.message_list[this.pages - 2][this.message_list[this.pages - 2].length - index].create_at === this.message_list[this.pages - 2][this.message_list[this.pages - 2].length - index - 1].create_at) {
+          index += 1;
+        }
+        return index;
+      },
     },
   }
 </script>
@@ -124,7 +131,7 @@
           </template>
         </el-table-column>
       </el-table>
-      <el-pagination layout="prev, pager, next" v-model:current-page="currentPage" :page-count="pageCount()" @change="change()" @next-click="nextClick()" />
+      <el-pagination layout="prev, pager, next" v-model:current-page="currentPage" :page-count="pageCount()" @change="change()" />
     </div>
     </el-tab-pane>
     </el-tabs>

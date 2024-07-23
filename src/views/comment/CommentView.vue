@@ -21,8 +21,8 @@ export default {
       sentences: null,
       loadingMore: false,
       hasMore: true,
-      username:"未登录",
-      info:"",
+      username: "未登录",
+      info: "",
       emoji:[
         {
           value:"**doge**",
@@ -225,8 +225,11 @@ export default {
     this.info = await get_user()
   },
   computed: {
-    style_mode: function() {
+    style_mode() {
       return !(this.value === '' && this.isFocus === false);
+    },
+    state() {
+      return !this.hasMore || this.loadingMore
     }
   },
   watch: {
@@ -275,11 +278,13 @@ export default {
       }));
     },
     async get_messages() {
-      this.pages += 1;
       this.loadingMore = true;
+      this.pages += 1;
       let start_time = new Date().getTime();
+      let skip_number = 0;
       if (this.pages !== 1) {
         start_time = this.message_list[this.message_list.length - 1].create_at;
+        skip_number = this.skip_number();
       }
 
       let res = await call_api("message_board/get_personal_and_public_messages", {
@@ -287,7 +292,8 @@ export default {
           from_time: start_time,
           to_time: 0
         },
-        message_number: 20
+        message_number: 20,
+        skip_number
       });
 
       if (!res.success) {
@@ -309,12 +315,11 @@ export default {
         return;
       }
 
+      this.message_list = this.message_list.concat(await this.messages_format(res.data.messages));
+
       this.loadingMore = false;
       this.hasMore = res.data.messages.length === 20;
-
-      this.message_list = this.message_list.concat(await this.messages_format(res.data.messages));
     },
-
     check_message(message) {
       if (message.length === 0) {
         ElNotification({
@@ -430,7 +435,14 @@ export default {
         }
         messageElement.appendChild(frag);
       })
-    }
+    },
+    skip_number() {
+      let index = 1;
+      while(this.message_list[this.message_list.length - index].create_at === this.message_list[this.message_list.length - index - 1].create_at) {
+        index += 1;
+      }
+      return index;
+    },
   }
 }
 </script>
@@ -501,7 +513,7 @@ export default {
           <span class="text-[2vh] mb-[1vh] mx-[2vh] font-['FZSX']">{{ message_list.length }}条评论</span>
         </div>
       </div>
-      <div v-infinite-scroll="get_messages" :infinite-scroll-disabled=!hasMore infinite-scroll-delay=1000 class="h-full w-full flex flex-col items-center">
+      <div v-infinite-scroll="get_messages" :infinite-scroll-disabled="state" infinite-scroll-delay=1000 infinite-scroll-distance=100 class="h-full w-full flex flex-col items-center">
         <div v-for="message in message_list" :key="message.id"
              class="my-[1em] flex flex-col items-center w-full">
           <div class="border border-[#000000] md:w-[70%] w-[85%] shadow-md bg-[#FFFFFF]">

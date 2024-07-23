@@ -10,6 +10,7 @@ export default {
       search_content: "",
       date_range: null,
       hasMore: true,
+      loadingMore: false,
       pages: 0,
     }
   },
@@ -25,23 +26,34 @@ export default {
 
         return nameMatch && dateMatch;
       });
+    },
+    state() {
+      return !this.hasMore || this.loadingMore
     }
   },
   async mounted() {
-    await this.get_image();
+    await this.get_images();
   },
   methods:{
-    async get_image() {
+    async get_images() {
+      this.loadingMore = true;
       this.pages += 1;
-      let start_time = 1577808000000;
+      console.log(`开始加载第${this.pages}页数据`);
+      let start_time = new Date().getTime();
+      let skip_number = 0;
       if (this.pages !== 1) {
         start_time = this.images[this.images.length - 1].create_at;
+        skip_number = this.skip_number();
       }
       console.log(start_time);
       let res = await call_api("album/get_images",{
         folder_id: this.$route.params.id,
-        start_time: start_time,
-        image_number: 20
+        time_range: {
+          from_time: start_time,
+          to_time: 0
+        },
+        image_number: 20,
+        skip_number
       })
       console.log(res);
       if(!res.success){
@@ -51,21 +63,31 @@ export default {
           message: `获取图片失败`
         });
         this.pages -= 1;
+        this.loadingMore = false;
         console.log(res);
 
         return
       }
-      this.hasMore = res.data.images_info.length === 20;
       console.log(`第${this.pages}页数据已加载`);
       this.images = this.images.concat(res.data.images_info);
+
+      this.hasMore = res.data.images_info.length === 20;
+      this.loadingMore = false;
     },
     clear() {
       this.search_content = "";
       this.date_range = null;
     },
+    skip_number() {
+      let index = 1;
+      while(this.images[this.images.length - index].create_at === this.images[this.images.length - index - 1].create_at) {
+        index += 1;
+      }
+      return index;
+    },
     showDialog() {
 
-    }
+    },
   }
 }
 </script>
@@ -98,7 +120,7 @@ export default {
     </div>
       <div class="h-[85vh] w-[90vw]">
         <el-scrollbar>
-          <div v-if="filteredImages.length > 0" v-infinite-scroll="get_image" :infinite-scroll-disabled=!hasMore infinite-scroll-delay=1000
+          <div v-if="filteredImages.length > 0" v-infinite-scroll="get_images" :infinite-scroll-disabled="state" infinite-scroll-delay=1000 infinite-scroll-distance=100
                class="grid grid-cols-4 gap-[20px]">
             <div v-for="image in filteredImages"
                  :key="image.id"
@@ -114,7 +136,13 @@ export default {
             </div>
           </div>
           <div v-else class="w-full h-[85vh] flex flex-row items-center justify-center">
-            <span class="font-['RGBZ'] text-[40px]">当前相册没有图片</span>
+            <div class="font-['RGBZ'] text-[40px]">当前相册没有图片</div>
+          </div>
+          <div v-if="loadingMore" class="w-full h-[20vh] flex flex-row items-center justify-center">
+            <div class="text-[3vh] font-['RGBZ']">正在加载中</div>
+          </div>
+          <div v-if="!hasMore" class="w-full h-[20vh] flex flex-row items-center justify-center">
+            <div class="text-[3vh] font-['RGBZ']">没有更多图片惹</div>
           </div>
         </el-scrollbar>
       </div>

@@ -243,6 +243,35 @@ function validate(args, rules) {
     return checked_obj;
 }
 
+function validate_time_range(time_range) {
+    if (time_range) {
+        let now_time = Date.now();
+        validate(time_range, {
+            from_time: {
+                undefined_able: true,
+                null_able: true,
+
+                type: "number",
+                math: {
+                    min: 0,
+                    max: now_time
+                }
+            },
+            to_time: {
+                undefined_able: true,
+                null_able: true,
+
+                type: "number",
+                math: {
+                    min: 0,
+                    max: now_time
+                }
+            }
+        });
+    }
+}
+
 module.exports = {
-    validate
+    validate,
+    validate_time_range
 }

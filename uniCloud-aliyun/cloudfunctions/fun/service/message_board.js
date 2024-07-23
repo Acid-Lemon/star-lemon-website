@@ -12,9 +12,8 @@ module.exports = class Service_MessageBoard extends Service {
         }
     }
 
-    async get_personal_and_public_messages(message_number, time_range={}) {
-        return time_range && time_range !== {} ?
-            await this.service.db.message_board.get_personal_and_public_messages(message_number, time_range) :
-            await this.service.db.message_board.get_personal_and_public_messages(message_number);
+    async get_personal_and_public_messages(message_number, time_range={}, skip_numbers = 0) {
+        time_range = time_range ?? {};
+        return await this.service.db.message_board.get_personal_and_public_messages(message_number, time_range, skip_numbers)
     }
 }

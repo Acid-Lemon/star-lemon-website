@@ -6,6 +6,10 @@ const {
     tables
 } = require("./tables");
 
+const {
+    convert_time_range
+} = require("../../utils/db/compose_select_command");
+
 module.exports = class DBService_MessageBoard extends Service {
     async create_message(content, user_id, public_state) {
         let now_time = Date.now();
@@ -29,41 +33,11 @@ module.exports = class DBService_MessageBoard extends Service {
         });
     }
 
-    async get_personal_and_public_messages(limit_num, time_range={}) {
+    async get_personal_and_public_messages(limit_num, time_range={}, skip_number=0) {
         let {
-            from_time,
-            to_time
-        } = time_range;
-
-        let time_sort_direction = 1;
-        if (from_time > to_time) {
-            time_sort_direction = -1;
-            [from_time, to_time] = [to_time, from_time];
-        }
-
-        let create_at_match_obj;
-        if (from_time) {
-            if (to_time) {
-                create_at_match_obj = {
-                    create_at: this.db.command.and([
-                        this.db.command.gte(from_time),
-                        this.db.command.lte(to_time)
-                    ])
-                };
-            } else {
-                create_at_match_obj = {
-                    create_at: this.db.command.gte(from_time)
-                };
-            }
-        } else if (to_time) {
-            create_at_match_obj = {
-                create_at: this.db.command.lte(to_time)
-            };
-        } else {
-            create_at_match_obj = {
-                create_at: true
-            };
-        }
+            create_at_match_obj,
+            time_sort_direction
+        } = convert_time_range(time_range);
 
         return (await this.db.collection(tables.message_board).aggregate()
             .match(this.db.command.and([
@@ -76,6 +50,7 @@ module.exports = class DBService_MessageBoard extends Service {
             .sort({
                 create_at: time_sort_direction
             })
+            .skip(skip_number)
             .limit(limit_num)
             .lookup({
                 from: tables.user,

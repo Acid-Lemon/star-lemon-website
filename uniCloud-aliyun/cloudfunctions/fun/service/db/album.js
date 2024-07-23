@@ -7,6 +7,10 @@ const {
 } = require("./tables");
 
 const {
+    convert_time_range
+} = require("../../utils/db/compose_select_command");
+
+const {
     id_name_format
 } = require("../../utils/db/result_format");
 
@@ -274,34 +278,40 @@ module.exports = class Service_CloudStorage_Album extends Service {
             .data;
     }
 
-    async find_shared_images(folder_id, image_number, start_time=0) {
+    async find_shared_images(folder_id, image_number, time_range={}, skip_number=0) {
+        let { time_sort_direction, create_at_match_obj } = convert_time_range(time_range);
+
         return id_name_format((await this.db.collection(tables.album).where({
             type: "image",
             folder_id,
-            create_at: this.db.command.gt(start_time)
-        })  .limit(image_number)
+            ...create_at_match_obj
+        })  .skip(skip_number)
+            .limit(image_number)
             .field({
                 id: true,
                 name: true,
                 creator_id: true,
                 create_at: true
             })
-            .orderBy("create_at", "desc")
+            .orderBy("create_at", time_sort_direction === 1 ? "asc" : "desc")
             .get()).data);
     }
 
-    async find_personal_images(folder_id, image_number, start_time=0) {
+    async find_personal_images(folder_id, image_number, time_range={}, skip_number=0) {
+        let { time_sort_direction, create_at_match_obj } = convert_time_range(time_range);
+
         return id_name_format((await this.db.collection(tables.album).where({
             type: "image",
             folder_id,
-            create_at: this.db.command.gt(start_time)
-        })  .limit(image_number)
+            ...create_at_match_obj
+        })  .skip(skip_number)
+            .limit(image_number)
             .field({
               id: true,
               name: true,
               create_at: true
             })
-            .orderBy("create_at", "desc")
+            .orderBy("create_at", time_sort_direction === 1 ? "asc" : "desc")
             .get()).data);
     }
 

@@ -3,7 +3,8 @@ const {
 } = require("uni-cloud-router");
 
 const {
-    validate
+    validate,
+    validate_time_range
 } = require("../utils/args_check");
 
 const {
@@ -94,28 +95,41 @@ module.exports = class Controller_Album extends Controller {
     async get_images() {
         let {
             folder_id,
-            start_time,
-            image_number
+            time_range,
+            image_number,
+            skip_number = 0
         } = validate(this.ctx.event.args, {
             folder_id: {
                 type: "string"
             },
-            start_time: {
+
+            time_range: {
                 undefined_able: true,
                 null_able: true,
-                type: "number",
-                math: {
-                    max: Date.now()
-                }
+                type: "object"
             },
+
             image_number: {
                 type: "number",
                 math: {
                     min: 1,
                     max: 20
                 }
+            },
+
+            skip_number: {
+                undefined_able: true,
+                null_able: true,
+                type: "number",
+
+                math: {
+                    min: 0,
+                    max: 200
+                }
             }
         });
+
+        validate_time_range(time_range);
 
         let folder = await this.service.db.album.find_folder_by_id(folder_id);
         if (!folder) {
@@ -124,7 +138,7 @@ module.exports = class Controller_Album extends Controller {
 
         await this.service.cloud_storage.album.check_folder_visit_access(folder);
 
-        let images_info = await this.service.cloud_storage.album.get_images(folder, image_number, start_time);
+        let images_info = await this.service.cloud_storage.album.get_images(folder, image_number, time_range, skip_number);
 
         return {
             data: {

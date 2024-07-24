@@ -64,9 +64,13 @@ export default {
         this.updatePages();
       }
     },
+    // 光标移入导航标签时触发
     onMouseEnter(page) {
       this.hoveredPage = page;
+      // 清除光标移出导航标签回调函数
+      clearTimeout(this.hoveredTimeout);
     },
+    // 光标移出导航标签时触发
     onMouseLeave() {
       this.hoveredTimeout = setTimeout(() => {
         if (!this.isHoveredSecondary) {
@@ -74,10 +78,14 @@ export default {
         }
       }, 300); // 延迟300ms
     },
+    // 鼠标移入二级菜单时触发
     onSecondaryMouseEnter() {
+      // 清除光标移出导航标签回调函数
       clearTimeout(this.hoveredTimeout);
+      // 光标在二级菜单上时
       this.isHoveredSecondary = true;
     },
+    // 鼠标移出二级菜单时触发
     onSecondaryMouseLeave() {
       this.isHoveredSecondary = false;
       this.hoveredTimeout = setTimeout(() => {
@@ -105,14 +113,12 @@ export default {
 </script>
 
 <template>
-  <div
-      class="fixed top-[2.5%] left-[2.5%] w-[95%] md:h-[50px] h-[50px] hover:bg-white hover:bg-opacity-50 duration-700 rounded-md flex flex-row justify-between items-center p-[3vh] z-[1000]">
+  <div class="fixed top-[2.5%] left-[2.5%] w-[95%] md:h-[50px] h-[50px] hover:bg-white hover:bg-opacity-50 duration-700 rounded-md flex flex-row justify-between items-center p-[3vh] z-[1000]">
     <router-link to="/">
       <span class="md:text-[26px] text-[20px] font-['ZKXW'] hover:text-[#44cef6] duration-700">star和lemon的小站</span>
     </router-link>
     <div class="flex flex-row justify-center items-center">
-      <div v-for="page in filteredPages" class="m-[1vh] flex flex-col items-center" @mouseenter="onMouseEnter(page)"
-           @mouseleave="onMouseLeave">
+      <div v-for="page in filteredPages" class="m-[1vh] flex flex-col items-center" @mouseenter="onMouseEnter(page)" @mouseleave="onMouseLeave">
         <router-link :to="page.link" class="flex flex-row items-center relative">
           <img
               class="w-[3vh] m-[0.5vh]"
@@ -121,9 +127,11 @@ export default {
           />
           <span class="md:block hidden hover:text-[#44cef6] m-[0.5vh] font-['SYST'] duration-700">{{ page.name }}</span>
         </router-link>
-        <div v-show="page.name === '个人' && hoveredPage === page" class="absolute flex flex-col items-center justify-center bottom-[-5vh] w-[10vh] h-[4vh] bg-[#FFFFFF] bg-opacity-50 rounded shadow-md duration-700" @mouseenter="onSecondaryMouseEnter"
-             @mouseleave="onSecondaryMouseLeave" @click="loginOut">
+        <div v-show="page.name === '个人' && hoveredPage === page" class="absolute flex flex-col items-center justify-center bottom-[-5vh] w-[10vh] h-[4vh] bg-[#FFFFFF] bg-opacity-50 rounded shadow-md duration-700" @mouseenter="onSecondaryMouseEnter" @mouseleave="onSecondaryMouseLeave" @click="loginOut">
           取消登录
+        </div>
+        <div v-show="page.name === '文章' && hoveredPage === page" class="absolute flex flex-col items-center justify-center bottom-[-5vh] w-[10vh] h-[4vh] bg-[#FFFFFF] bg-opacity-50 rounded shadow-md duration-700" @mouseenter="onSecondaryMouseEnter" @mouseleave="onSecondaryMouseLeave">
+          一件小事
         </div>
       </div>
     </div>

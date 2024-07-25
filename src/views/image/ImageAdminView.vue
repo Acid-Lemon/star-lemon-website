@@ -35,9 +35,10 @@ export default {
       },
       devices: [
         { value: 'Redmi K60 Ultra', label: '红米 K60 至尊版' },
-        { value: 'Redmi K60', label: '红米 K60' },
+        { value: 'EOS 500D', label: '佳能 500D' },
+        { value: 'CCD', label: 'CCD' },
       ],
-      device: { value: 'Redmi K60 Ultra', label: '红米 K60 至尊版' },
+      device: { value: 'EOS 500D', label: '佳能 500D' },
       photoAlbumName: "",
       imageList: [],
       photoList: [],
@@ -48,6 +49,7 @@ export default {
       index: 0,
       pages: 0,
       currentPage: 1,
+      date: null
     }
   },
   async mounted() {
@@ -165,14 +167,25 @@ export default {
       }
       return index;
     },
+    onBack() {
+      this.$router.back()
+    },
   }
 }
 </script>
 
 <template>
   <div class="w-full h-full bg-[#F8FAFD] flex flex-col content-center items-center">
-    <div class="w-[95%] my-[2vh]">
-      <div class="bg-[url('/static/background/17.jpg')] bg-cover rounded-md h-[20vh] flex flex-col items-start justify-between p-[20px]">
+    <div class="fixed top-0 left-0 w-full h-[6vh] p-[10px] z-[1000] flex flex-row items-center">
+      <div @click="onBack" class="flex flex-row items-center text-[#000000] font-['RGBZ']">
+        <el-icon style="width: 25px; height: 25px"><arrow-left style="width: 25px; height: 25px" /></el-icon>
+        返回
+      </div>
+      <div class="w-[1px] h-[80%] border border-[#000000] mx-[10px]"></div>
+      <div class="text-[2vh] text-[#000000] font-['RGBZ']">图片管理</div>
+    </div>
+    <div class="w-full h-[5vh]"></div>
+      <div class="bg-[url('/static/background/17.jpg')] bg-cover rounded-md w-[95vw] h-[15vh] flex flex-col items-start justify-between p-[20px]">
         <div class="w-full flex flex-row justify-between items-center">
           <div class="flex flex-row justify-center items-center">
             <div>图片名称：</div>
@@ -197,14 +210,11 @@ export default {
             </el-select>
           </div>
           <div class="flex flex-row justify-center items-center">
-            <div>描述：</div>
-            <el-input style="width: 30vw; height: 30px"></el-input>
-          </div>
-        </div>
-        <div class="w-full flex flex-row justify-between items-center">
-          <div class="flex flex-row justify-center items-center">
-            <div>描述：</div>
-            <el-input style="width: 30vw; height: 30px"></el-input>
+            <div>拍摄时间：</div>
+              <el-date-picker v-model="date"
+                              style="width: 10vw; height: 30px"
+                              type="date"
+              />
           </div>
         </div>
         <div class="w-full flex flex-row justify-between items-center">
@@ -229,9 +239,8 @@ export default {
           <el-button type="primary" @click="upload" :disabled="disabled">上传</el-button>
         </div>
       </div>
-    </div>
     <div class="w-[95%] my-[2vh]">
-      <el-table :data="images[currentPage - 1]" border max-height="66vh" style="width: 100%">
+      <el-table :data="images[currentPage - 1]" border max-height="70vh" style="width: 100%">
         <el-table-column label="图片名称" prop="name" width="150"/>
         <el-table-column label="图片id" prop="id" width="250"/>
         <el-table-column label="下载链接" prop="temp_url"/>

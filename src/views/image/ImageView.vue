@@ -1,8 +1,10 @@
 <script>
 import {call_api} from "../../utils/cloud";
 import {ElNotification} from "element-plus";
+import {ArrowLeft} from "@element-plus/icons-vue";
 
 export default {
+  components: {ArrowLeft},
   data(){
     return{
       images: [],
@@ -85,6 +87,9 @@ export default {
       }
       return index;
     },
+    onBack() {
+      this.$router.back()
+    },
     showDialog() {
 
     },
@@ -93,32 +98,42 @@ export default {
 </script>
 
 <template>
-  <div class="h-full w-full flex flex-col justify-center items-center bg-[#F8FAFD]">
-
-    <div class="h-[5vh] w-full mb-[20px] flex flex-row items-center justify-around">
-      <div class="flex flex-row items-center">
-        <div class="mx-[5px]">搜索图片</div>
-        <div class="w-[240px] mx-[5px]">
-          <el-input v-model="search_content" placeholder="请输入图片名称"/>
-        </div>
+  <div class="h-full w-full flex flex-col justify-start items-center bg-[#F8FAFD]">
+    <div class="fixed top-0 left-0 w-full h-[6vh] p-[10px] z-[1000] flex flex-row items-center">
+      <div @click="onBack" class="flex flex-row items-center text-[#000000] font-['RGBZ']">
+        <el-icon style="width: 25px; height: 25px"><arrow-left style="width: 25px; height: 25px" /></el-icon>
+        返回
       </div>
-      <div class="flex flex-row items-center">
-        <div class="mx-[5px]">筛选日期</div>
-        <div class="w-[300px] mx-[5px]">
-          <el-date-picker v-model="date_range"
+      <div class="w-[1px] h-[80%] border border-[#000000] mx-[10px]"></div>
+      <div class="text-[2vh] text-[#000000] font-['RGBZ']">图片</div>
+    </div>
+    <div class="w-full h-[5vh]"></div>
+    <div class="bg-[url('/static/background/17.jpg')] bg-cover rounded-md h-[6vh] w-[95vw] flex flex-col items-center justify-center p-[20px]">
+      <div class="h-[5vh] w-full flex flex-row items-center justify-between">
+        <div class="flex flex-row items-center">
+          <div class="mx-[5px]">搜索图片</div>
+          <div class="w-[240px] mx-[5px]">
+            <el-input v-model="search_content" placeholder="请输入图片名称"/>
+          </div>
+        </div>
+        <div class="flex flex-row items-center">
+          <div class="mx-[5px]">筛选日期</div>
+          <div class="w-[300px] mx-[5px]">
+            <el-date-picker v-model="date_range"
                           end-placeholder="结束日期"
                           range-separator="到"
                           start-placeholder="开始日期"
                           style="width: 100%"
                           type="daterange"
-          />
+            />
+          </div>
+        </div>
+        <div class="flex flex-row items-center">
+          <el-button @click="clear">重置</el-button>
         </div>
       </div>
-      <div class="flex flex-row items-center">
-        <el-button @click="clear">重置</el-button>
-      </div>
     </div>
-      <div class="h-[85vh] w-[90vw]">
+      <div class="h-[82vh] w-[95vw] my-[2vh]">
         <el-scrollbar>
           <div v-if="filteredImages.length > 0" v-infinite-scroll="get_images" :infinite-scroll-disabled="state" infinite-scroll-delay=1000 infinite-scroll-distance=100
                class="grid grid-cols-4 gap-[20px]">
@@ -146,8 +161,6 @@ export default {
           </div>
         </el-scrollbar>
       </div>
-
-
   </div>
 </template>
 

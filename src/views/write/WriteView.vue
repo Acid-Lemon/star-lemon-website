@@ -1,9 +1,9 @@
 <script>
-import {CaretTop} from "@element-plus/icons-vue";
+import {ArrowLeft, CaretTop} from "@element-plus/icons-vue";
 
 export default {
   name: 'NoteView',
-  components: {CaretTop},
+  components: {CaretTop, ArrowLeft},
   data() {
     return{
       article: {
@@ -91,12 +91,23 @@ export default {
     },
     backTop() {
       this.$refs["el-scrollbar"].wrapRef.scrollTop = 0;
+    },
+    onBack() {
+      this.$router.back()
     }
   },
 }
 </script>
 
 <template>
+  <div class="fixed top-0 left-0 w-full h-[6vh] p-[10px] z-[1000] flex flex-row items-center">
+    <div @click="onBack" class="flex flex-row items-center text-[#FFFFFF] font-['RGBZ']">
+      <el-icon style="width: 25px; height: 25px"><arrow-left style="width: 25px; height: 25px" /></el-icon>
+      返回
+    </div>
+    <div class="w-[1px] h-[80%] border border-[#FFFFFF] mx-[10px]"></div>
+    <div class="text-[2vh] text-[#FFFFFF] font-['RGBZ']">文章</div>
+  </div>
   <el-scrollbar @scroll="handleScroll" ref="el-scrollbar">
   <div class="h-full w-full flex flex-col items-center justify-start">
     <div class="w-full min-h-[40vh] bg-[url('/static/background/23.jpg')] flex flex-col justify-center items-center bg-center bg-cover">
@@ -127,16 +138,16 @@ export default {
       <div class="w-[15%] flex flex-col items-start justify-start">
         <el-affix :offset="5">
           <div class="p-[20px]">
-            <div class="text-[1.8vh] my-[5px]">这是一个二级标题展示区域</div>
-            <div class="text-[1.5vh] my-[5px]">二级标题1</div>
-            <div class="text-[1.5vh] my-[5px]">二级标题2</div>
-            <div class="text-[1.5vh] my-[5px]">二级标题3</div>
+            <div class="text-[1.8vh] my-[5px] font-['FZSX']">这是一个二级标题展示区域</div>
+            <div class="text-[1.5vh] my-[5px] font-['FZSX']">二级标题1</div>
+            <div class="text-[1.5vh] my-[5px] font-['FZSX']">二级标题2</div>
+            <div class="text-[1.5vh] my-[5px] font-['FZSX']">二级标题3</div>
             <el-divider />
             <div class="flex flex-row items-center justify-start">
               <svg xmlns="http://www.w3.org/2000/svg" width="1.5vh" height="1.5vh" viewBox="0 0 24 24">
                 <path fill="currentColor" d="M12 22q-2.05 0-3.875-.788t-3.187-2.15q-1.363-1.362-2.15-3.187T2 12q0-2.075.788-3.887t2.15-3.175Q6.3 3.575 8.124 2.788T12 2q.425 0 .713.288T13 3q0 .425-.288.713T12 4Q8.675 4 6.337 6.338T4 12q0 3.325 2.338 5.663T12 20q3.325 0 5.663-2.337T20 12q0-.425.288-.712T21 11q.425 0 .713.288T22 12q0 2.05-.788 3.875t-2.15 3.188q-1.362 1.362-3.175 2.15T12 22"></path>
               </svg>
-              <div class="m-[3px] text-[1.5vh]">{{ scrollPercentage }}%</div>
+              <div class="m-[3px] text-[1.5vh] font-['SYST']">{{ scrollPercentage }}%</div>
             </div>
           </div>
         </el-affix>

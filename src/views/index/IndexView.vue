@@ -25,19 +25,13 @@ export default {
       <div class="flex flex-row mt-[20px]">
         <div class="flex flex-col">
           <div class="w-[500px] height-[280px] ml-[20px]">
-            <el-carousel height="280px" trigger="click">
+            <el-carousel height="280px" trigger="click" :motion-blur=true>
               <el-carousel-item v-for="picture in pictureUrl" :key="picture">
                 <el-image :src="picture" fit="cover"/>
               </el-carousel-item>
             </el-carousel>
           </div>
           <div class="w-[500px] ml-[20px] mt-[20px]">
-            <el-card>
-              <template #header>
-              </template>
-              <template #footer>
-              </template>
-            </el-card>
           </div>
         </div>
         <div></div>

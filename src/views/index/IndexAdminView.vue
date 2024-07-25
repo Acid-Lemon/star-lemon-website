@@ -65,12 +65,12 @@ export default {
       <div @click="webNameDialog = true">网站名称：{{ webName }}</div>
       <template #footer>{{ info.name }}，{{ getTimeGreetings() }}</template>
     </el-card>
-    <el-row>
+    <el-row class="ml-[20px] mt-[20px]">
       <el-col :span="6">
-        <el-statistic title="Daily active users" :value="268500" />
+        <el-statistic title="浏览量" :value="268500" />
       </el-col>
       <el-col>
-        <el-statistic title="Daily active users" :value="268500" />
+        <el-statistic title="评论" :value="268500" />
       </el-col>
     </el-row>
     <el-dialog

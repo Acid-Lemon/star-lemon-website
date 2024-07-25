@@ -485,7 +485,7 @@ export default {
             你是我一生只会遇见一次的惊喜...
           </p>
           <textarea id="pl" v-model.lazy="value" maxlength="100"
-                    class="w-full h-[20vh] p-[2vh] border border-[#000000] min-h-[20vh] bg-[#FFFFFF] shadow-md bg-opacity-50"
+                    class="w-full h-[20vh] p-[2vh] border border-[#000000] min-h-[20vh] bg-[#FFFFFF] shadow-md bg-opacity-50 font-['FZSX']"
                     type="text" @blur="onBlur" @focus="onFocus"></textarea>
         </div>
         <div class="w-full flex flex-row justify-around md:justify-end">

@@ -241,6 +241,7 @@ export default {
       </div>
     <div class="w-[95%] my-[2vh]">
       <el-table :data="images[currentPage - 1]" border max-height="70vh" style="width: 100%">
+        <el-table-column type="index" width="50"/>
         <el-table-column label="图片名称" prop="name" width="150"/>
         <el-table-column label="图片id" prop="id" width="250"/>
         <el-table-column label="下载链接" prop="temp_url"/>

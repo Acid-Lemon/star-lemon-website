@@ -192,6 +192,13 @@ export default {
             <el-input style="width: 10vw; height: 30px"></el-input>
           </div>
           <div class="flex flex-row justify-center items-center">
+            <div>拍摄时间：</div>
+            <el-date-picker v-model="date"
+                            style="width: 10vw; height: 30px"
+                            type="date"
+            />
+          </div>
+          <div class="flex flex-row justify-center items-center">
             <div>拍摄地点：</div>
             <el-input style="width: 10vw; height: 30px"></el-input>
           </div>
@@ -208,13 +215,6 @@ export default {
                   :value="device.value"
               />
             </el-select>
-          </div>
-          <div class="flex flex-row justify-center items-center">
-            <div>拍摄时间：</div>
-              <el-date-picker v-model="date"
-                              style="width: 10vw; height: 30px"
-                              type="date"
-              />
           </div>
         </div>
         <div class="w-full flex flex-row justify-between items-center">

@@ -1,6 +1,9 @@
 <script>
+import {CaretTop} from "@element-plus/icons-vue";
+
 export default {
   name: 'NoteView',
+  components: {CaretTop},
   data() {
     return{
       article: {
@@ -86,6 +89,9 @@ export default {
       const scrollHeight =this.$refs["el-scrollbar"].wrapRef.scrollHeight - this.$refs["el-scrollbar"].wrapRef.offsetHeight;
       this.scrollPercentage = Math.round((distance.scrollTop / scrollHeight) * 100);
     },
+    backTop() {
+      this.$refs["el-scrollbar"].wrapRef.scrollTop = 0;
+    }
   },
 }
 </script>
@@ -118,22 +124,29 @@ export default {
         {{ article.content }}
         </div>
       </div>
-      <div class="w-[15%] flex flex-col items-start justify-start p-[40px] sticky top-[40px]">
-        <div class="h-[30px]">这是一个二级标题展示区域</div>
-        <div class="h-[30px]">二级标题1</div>
-        <div class="h-[30px]">二级标题2</div>
-        <div class="h-[30px]">二级标题3</div>
-        <el-divider />
-        <div class="flex flex-row items-center justify-start">
-        <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24">
-          <path fill="currentColor" d="M12 22q-2.05 0-3.875-.788t-3.187-2.15q-1.363-1.362-2.15-3.187T2 12q0-2.075.788-3.887t2.15-3.175Q6.3 3.575 8.124 2.788T12 2q.425 0 .713.288T13 3q0 .425-.288.713T12 4Q8.675 4 6.337 6.338T4 12q0 3.325 2.338 5.663T12 20q3.325 0 5.663-2.337T20 12q0-.425.288-.712T21 11q.425 0 .713.288T22 12q0 2.05-.788 3.875t-2.15 3.188q-1.362 1.362-3.175 2.15T12 22"></path>
-        </svg>
-        <div class="m-[3px]">{{ scrollPercentage }}%</div>
-        </div>
+      <div class="w-[15%] flex flex-col items-start justify-start">
+        <el-affix :offset="5">
+          <div class="p-[20px]">
+            <div class="text-[1.8vh] my-[5px]">这是一个二级标题展示区域</div>
+            <div class="text-[1.5vh] my-[5px]">二级标题1</div>
+            <div class="text-[1.5vh] my-[5px]">二级标题2</div>
+            <div class="text-[1.5vh] my-[5px]">二级标题3</div>
+            <el-divider />
+            <div class="flex flex-row items-center justify-start">
+              <svg xmlns="http://www.w3.org/2000/svg" width="1.5vh" height="1.5vh" viewBox="0 0 24 24">
+                <path fill="currentColor" d="M12 22q-2.05 0-3.875-.788t-3.187-2.15q-1.363-1.362-2.15-3.187T2 12q0-2.075.788-3.887t2.15-3.175Q6.3 3.575 8.124 2.788T12 2q.425 0 .713.288T13 3q0 .425-.288.713T12 4Q8.675 4 6.337 6.338T4 12q0 3.325 2.338 5.663T12 20q3.325 0 5.663-2.337T20 12q0-.425.288-.712T21 11q.425 0 .713.288T22 12q0 2.05-.788 3.875t-2.15 3.188q-1.362 1.362-3.175 2.15T12 22"></path>
+              </svg>
+              <div class="m-[3px] text-[1.5vh]">{{ scrollPercentage }}%</div>
+            </div>
+          </div>
+        </el-affix>
       </div>
     </div>
   </div>
   </el-scrollbar>
+  <div v-if="scrollPercentage > 20" @click="backTop" class="fixed bottom-[40px] right-[40px] w-[40px] h-[40px] border-[2px] border-[#000000] rounded-full flex flex-row justify-center items-center">
+    <el-icon style="width: 20px; height: 20px"><CaretTop style="width: 20px; height: 20px" /></el-icon>
+  </div>
 </template>
 
 <style scoped>

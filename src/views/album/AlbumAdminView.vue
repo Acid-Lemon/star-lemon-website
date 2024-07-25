@@ -29,15 +29,16 @@ export default {
 
       ],
       photoAlbum: "",
+      hasPhotoAlbums: true,
       activeName: "shared",
       disabled: false,
     };
   },
   async mounted() {
-    await this.handleClick()
+    await this.get_folders()
   },
   methods: {
-    async handleClick() {
+    async get_folders() {
       this.photoAlbums = [];
 
       let res = await call_api("album/get_folders", {
@@ -54,6 +55,8 @@ export default {
         return;
       }
       this.photoAlbums = res.data.folders_info;
+
+      this.hasPhotoAlbums = this.photoAlbums.length !== 0;
     },
     async createNewPhotoAlbum(){
       let res = await call_api("album/create_folder", {
@@ -92,7 +95,7 @@ export default {
 <template>
   <div class="w-full h-full flex flex-col items-center overflow-y-hidden bg-[#F8FAFD]">
     <div class="h-[95vh] w-[90vw]">
-      <el-tabs v-model="activeName" class="demo-tabs" @tab-change="handleClick">
+      <el-tabs v-model="activeName" class="demo-tabs" @tab-change="get_folders">
         <el-tab-pane label="共享相册" name="shared">
           <div class="h-[95vh]">
             <div class="flex flex-row items-center mb-[20px]">
@@ -100,7 +103,7 @@ export default {
               <el-button type="primary" @click="createNewPhotoAlbum()" :disabled="disabled">新建相册</el-button>
             </div>
             <el-scrollbar>
-              <div v-if="photoAlbums.length > 0"
+              <div v-if="hasPhotoAlbums"
                    class="grid grid-flow-row grid-cols-4 gap-[20px]">
                 <div v-for="photoAlbum in photoAlbums"
                      :key="photoAlbum.id"
@@ -135,7 +138,7 @@ export default {
               <el-button type="primary" @click="createNewPhotoAlbum()" :disabled="disabled">新建相册</el-button>
             </div>
             <el-scrollbar>
-              <div v-if="photoAlbums.length > 0"
+              <div v-if="hasPhotoAlbums"
                    class="grid grid-flow-row grid-cols-4 gap-[20px]">
                 <div v-for="photoAlbum in photoAlbums"
                      :key="photoAlbum.id"
@@ -170,7 +173,7 @@ export default {
               <el-button type="primary" @click="createNewPhotoAlbum()" :disabled="disabled">新建相册</el-button>
             </div>
             <el-scrollbar>
-              <div v-if="photoAlbums.length > 0"
+              <div v-if="hasPhotoAlbums"
                    class="grid grid-flow-row grid-cols-4 gap-[20px]">
                 <div v-for="photoAlbum in photoAlbums"
                      :key="photoAlbum.id"

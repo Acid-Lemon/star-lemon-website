@@ -69,7 +69,7 @@ export default {
       <div class="w-[15%] h-full flex flex-col justify-center items-center">
         <img alt="头像"
              class="w-[15vh] h-[15vh] rounded-full hover:rotate-[360deg] duration-700 border border-[#dedede]"
-             src="/static/avatar/1.jpg"/>
+             src="/static/developer/1.jpg"/>
         <div class="text-[20px] font-['SYST']">{{ star.name }}</div>
         <div class="flex flex-row content-center items-center">
           <div v-for="i in star.contact" class="mx-[2vh] flex flex-row content-center items-center">
@@ -96,7 +96,7 @@ export default {
       <div class="w-[15%] h-full flex flex-col justify-center items-center">
         <img alt="头像"
              class="w-[15vh] h-[15vh] rounded-full hover:rotate-[360deg] duration-700 border border-[#dedede]"
-             src="/static/avatar/2.jpg"/>
+             src="/static/developer/2.jpg"/>
         <div class="text-[20px] font-['SYST']">{{ lemon.name }}</div>
         <div class="flex flex-row content-center items-center">
           <div v-for="i in lemon.contact" class="mx-[2vh] flex flex-row content-center items-center">

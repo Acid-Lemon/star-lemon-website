@@ -30,7 +30,7 @@ export default {
     },
     isLogin() {
       const userInfoStore = useUserInfoStore();
-      return !!userInfoStore;
+      return !!userInfoStore.userInfo;
     },
   },
   methods: {
@@ -84,8 +84,8 @@ export default {
       localStorage.removeItem("token");
       localStorage.removeItem("user");
       // 更新用户状态
-      const userInfoState = useUserInfoStore();
-      userInfoState.userInfo = {};
+      const userInfoStore = useUserInfoStore();
+      userInfoStore.userInfo = null;
       // 更新导航栏
       this.updatePages();
       // 如果目前在个人页，则跳转到登录页

@@ -231,7 +231,7 @@ export default {
     },
     isLogin() {
       const userInfoStore = useUserInfoStore();
-      return !!userInfoStore.userInfo;
+      return userInfoStore.userInfo !== null;
     },
     userInfo() {
       const userInfoStore = useUserInfoStore();

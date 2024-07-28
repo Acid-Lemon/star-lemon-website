@@ -9,7 +9,8 @@ function store_token(token) {
 
 function store_user(user) {
 	uni.setStorageSync("user", user);
-	useUserInfoStore().userInfo = user;
+	const userInfoStore = useUserInfoStore();
+	userInfoStore.userInfo = user;
 }
 
 async function load_user() {

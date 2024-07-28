@@ -3,7 +3,7 @@ import {get_user} from "@/src/utils/user_info";
 
 export const useUserInfoStore = defineStore('userInfoState', {
     state: () => ({
-        userInfo: {}
+        userInfo: null
     }),
     actions: {
         init() {

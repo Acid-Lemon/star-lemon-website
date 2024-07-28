@@ -1,8 +1,12 @@
 <script>
 import {ElMessageBox, ElNotification} from "element-plus";
-import {get_user} from "@/src/utils/user_info";
+import {load_user} from "../../utils/user_info";
 import {call_api} from "@/src/utils/cloud";
 import {Plus} from "@element-plus/icons-vue";
+
+
+import {useUserInfoStore} from "../../stores/userInfo";
+
 
 export default {
   components: {Plus},
@@ -12,36 +16,46 @@ export default {
       name: null,
       birthday: null,
       personal_sign: null,
-      fileList: null,
       avatar: [],
       background: [],
-      info: null,
-      avatarUrl: [
-        '/static/avatar/1.jpg',
-        '/static/avatar/2.jpg',
-        '/static/avatar/3.jpg',
-        '/static/avatar/4.jpg',
-        '/static/avatar/5.jpg',
-        '/static/avatar/6.jpg',
-        '/static/avatar/7.jpg',
-        '/static/avatar/8.jpg',
-        '/static/avatar/9.jpg',
-        '/static/avatar/10.jpg',
-        '/static/avatar/11.jpg',
-        '/static/avatar/12.jpg',
-        '/static/avatar/13.jpg',
-        '/static/avatar/14.jpg',
-        '/static/avatar/15.jpg',
+      avatarList: [
+        "/static/avatar/1.jpg",
+        "/static/avatar/2.jpg",
+        "/static/avatar/3.jpg",
+        "/static/avatar/4.jpg",
+        "/static/avatar/5.jpg",
+        "/static/avatar/6.jpg",
+        "/static/avatar/7.jpg",
+        "/static/avatar/8.jpg",
+        "/static/avatar/9.jpg",
+        "/static/avatar/10.jpg",
+        "/static/avatar/11.jpg",
+        "/static/avatar/12.jpg",
+        "/static/avatar/13.jpg",
+        "/static/avatar/14.jpg",
+        "/static/avatar/15.jpg",
+        "/static/avatar/16.jpg",
+        "/static/avatar/17.jpg",
+        "/static/avatar/18.jpg",
+        "/static/avatar/19.jpg",
+        "/static/avatar/20.jpg",
       ],
       clickFlag: -1,
+      isDisabled: false,
     };
   },
-  async mounted() {
-    this.info = await get_user();
+  mounted() {
+    this.name = this.userInfo.name;
+    this.birthday = this.userInfo.birthday;
+    this.personal_sign = this.userInfo.personal_sign;
+  },
+  computed: {
+    userInfo() {
+      const userInfoStore = useUserInfoStore();
+      return userInfoStore.userInfo;
+    }
   },
   methods: {
-    get_user,
-
     handleClose(done) {
       ElMessageBox.confirm('确认关闭？（未提交的信息不会保存）', '提示', {
         confirmButtonText: '确定',
@@ -70,7 +84,15 @@ export default {
       console.log('上传失败：', e);
     },
     choose(index) {
-      this.clickFlag = index;
+      if(this.clickFlag !== index) {
+        this.isDisabled = true;
+        this.avatar = [];
+        this.clickFlag = index;
+      } else {
+        this.isDisabled = false;
+        this.clickFlag = -1;
+      }
+
     },
     get_info(field) {
       if (!this.info?.[field] && field === "name") {
@@ -103,12 +125,9 @@ export default {
         });
         return;
       }
-      this.info.name = this.name;
-      this.info.birthday = this.birthday;
-      this.info.personal_sign = this.personal_sign;
 
       localStorage.removeItem("user");
-      await get_user();
+      await load_user();
 
       this.dialogVisible = false;
     },
@@ -128,17 +147,21 @@ export default {
     <div class="bg-[url('/static/background/12.jpg')] bg-cover bg-center h-[40vh] relative">
       <div class="absolute bottom-[-5vh] left-[10vw] flex flex-row items-end">
         <img alt="头像" class="h-[10vh] w-[10vh] rounded-full mr-[10px]" src="/static/favicon/favicon.png"/>
-        <p class="font-['SYST'] text-[24px] mr-[20px] leading-none pb-[5px]">{{ get_info("name") }}</p>
+        <p class="font-['SYST'] text-[24px] mr-[20px] leading-none pb-[5px]">{{ userInfo?.name ? userInfo.name : "未登录" }}</p>
         <el-tag class="font-['SYST'] text-[18px] mr-[10px] leading-none pb-[5px]" type="primary" >用户</el-tag>
-        <p class="font-['SYST'] text-[14px] mr-[20px] leading-none pb-[5px]">生日：{{ get_info("birthday") }}</p>
-        <p class="font-['SYST'] text-[14px] opacity-50 leading-none pb-[5px]">{{ get_info("personal_sign") }}</p>
+        <p v-if="userInfo.hasOwnProperty('birthday')" class="font-['SYST'] text-[14px] mr-[20px] leading-none pb-[5px]">生日：{{ userInfo?.birthday }}</p>
+        <p class="font-['SYST'] text-[14px] opacity-50 leading-none pb-[5px]">{{ userInfo?.personal_sign }}</p>
       </div>
       <el-button class="absolute bottom-[-5vh] right-[10vw]" plain @click="dialogVisible = true">
         编辑信息
       </el-button>
-      <el-dialog v-model="dialogVisible" :before-close="handleClose"
+      <el-dialog v-model="dialogVisible" :before-close="handleClose" align-center
                  class="flex flex-col items-center justify-center el-overlay-dialog"
-                 title="编辑个人信息" style="padding: 50px;height: 55vh;width:120vh">
+                 style="padding: 50px;height: 56vh;width:120vh">
+        <template #header>
+          <div class="text-[2vh]">编辑个人信息</div>
+        </template>
+        <template #default>
         <div class="w-full h-[25vh] flex flex-row items-center justify-center">
           <div class="w-[20vh] my-[5px]">
             <span>头像：</span>
@@ -149,6 +172,7 @@ export default {
                 action=""
                 list-type="picture"
                 :auto-upload = false
+                :disabled="isDisabled"
             >
               <img v-if="avatar.length !== 0" :src="avatar" style="width: 15vh;height: 15vh" alt="avatar"/>
               <el-icon v-else style="width: 15vh;height: 15vh;font-size: 28px;color: #8c939d;text-align: center;"><Plus /></el-icon>
@@ -171,7 +195,7 @@ export default {
           <div class="w-[50vh] my-[5px]">
             <el-scrollbar height="250px">
               <div class="grid gap-x-4 gap-y-[20px] grid-cols-4 auto-rows-auto w-full h-full">
-                <div v-for="(avatar,index) in avatarUrl" :key="avatar"
+                <div v-for="(avatar,index) in avatarList" :key="avatar"
                      :class="{'border-[2px]':clickFlag === index,'border-[#08d9d6]':clickFlag === index}"
                      class="w-full shadow-md"
                      @click="choose(index)">
@@ -195,8 +219,9 @@ export default {
             <el-input v-model="personal_sign" class="w-full"/>
           </div>
         </div>
+        </template>
         <template #footer>
-          <div class="dialog-footer">
+          <div class="flex flex-row justify-end items-end">
             <el-button class="mx-[40px]" @click="dialogVisible = false">取消</el-button>
             <el-button class="mx-[40px]" type="primary" @click="update_info()">确定</el-button>
           </div>

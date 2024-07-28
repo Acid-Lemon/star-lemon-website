@@ -7,6 +7,8 @@ import musicPlayer from '@/src/components/musicPlayer.vue'
 
 import el_locale_zh_cn from 'element-plus/es/locale/lang/zh-cn'
 
+import {useUserInfoStore} from "./stores/userInfo";
+
 export default {
   data() {
     return {
@@ -18,6 +20,8 @@ export default {
     this.$watch("$route", (to, _from) => {
       this.show = to?.meta?.show;
     });
+
+    useUserInfoStore().init();
   },
   methods: {},
   components: {

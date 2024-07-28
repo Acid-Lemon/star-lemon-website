@@ -1,13 +1,14 @@
 <script>
-import { nextTick } from 'vue';
+import {nextTick} from 'vue';
 import {call_api} from "@/src/utils/cloud";
 import {ElNotification} from "element-plus";
 
 import {date_format} from "@/src/utils/time";
-import {get_user} from "@/src/utils/user_info";
 
 import axios from "axios";
 import {Message} from "@element-plus/icons-vue";
+
+import {useUserInfoStore} from "../../stores/userInfo";
 
 export default {
   components:{Message},
@@ -21,8 +22,6 @@ export default {
       sentences: null,
       loadingMore: false,
       hasMore: true,
-      username: "未登录",
-      info: "",
       emoji:[
         {
           value:"**doge**",
@@ -222,7 +221,6 @@ export default {
   async mounted() {
     await this.get_sentences();
     await this.get_messages();
-    this.info = await get_user()
   },
   computed: {
     style_mode() {
@@ -230,7 +228,15 @@ export default {
     },
     state() {
       return !this.hasMore || this.loadingMore
-    }
+    },
+    isLogin() {
+      const userInfoStore = useUserInfoStore();
+      return !!userInfoStore.userInfo;
+    },
+    userInfo() {
+      const userInfoStore = useUserInfoStore();
+      return userInfoStore.userInfo;
+    },
   },
   watch: {
     message_list: {
@@ -243,7 +249,7 @@ export default {
   },
   methods: {
     async get_sentences() {
-      if (window.sessionStorage.getItem("sentences") === null) {
+      if (!window.sessionStorage.getItem("sentences")) {
         axios.get(
             'https://v1.hitokoto.cn?c=j&encode=json'
         ).then((res) => {
@@ -297,25 +303,18 @@ export default {
       });
 
       if (!res.success) {
-        if (res.code === "err_no_token") {
-          ElNotification({
-            title: 'Error',
-            message: '请检查您的登陆状态',
-            type: 'error',
-          })
-        } else {
-          ElNotification({
-            title: 'Error',
-            message: '获取留言失败',
-            type: 'error',
-          });
-        }
+        ElNotification({
+          title: 'Error',
+          message: '获取留言失败',
+          type: 'error',
+        });
         this.pages -= 1;
         this.loadingMore = false;
         return;
       }
 
       this.message_list = this.message_list.concat(await this.messages_format(res.data.messages));
+      console.log(this.message_list);
 
       this.loadingMore = false;
       this.hasMore = res.data.messages.length === 20;
@@ -336,6 +335,17 @@ export default {
       this.buttonDisabled = true;
 
       let message = this.value;
+
+      if (!this.isLogin) {
+        ElNotification({
+          title: 'Error',
+          type: "error",
+          message: "请先进行登录",
+        });
+        this.buttonDisabled = false;
+        return;
+      }
+
       if (!this.check_message(message)) {
         this.buttonDisabled = false;
         return;
@@ -361,20 +371,18 @@ export default {
       }
 
       let new_message = {
-          id: res.data.id,
-		  content: message,
-		  create_at: res.data.create_at,
-		  public_state: res.data.public_state
+        id: res.data.id,
+		    content: message,
+		    create_at: res.data.create_at,
+		    public_state: res.data.public_state
       };
-      let user = get_user();
       new_message.user = {
-        id: user.id,
-        name: user.name,
-        avatar: user.avatar
+        id: this.userInfo.id,
+        name: this.userInfo.name,
+        avatar: this.userInfo.avatar
       };
 
-      let new_message_format = (await this.messages_format([new_message]))[0];
-      this.message_list.push(new_message_format);
+      this.message_list.unshift(await this.messages_format([new_message]));
 
       ElNotification({
         title: 'Success',
@@ -466,7 +474,7 @@ export default {
           <p class="text-[2.4vh] m-[2vh] font-['FZSX']">
             {{ sentences?.hitokoto }}
           </p>
-          <p class="text-[1.9vh] m-[2vh] font-['FZSX']">——{{ sentences?.from_who }}</p>
+          <p class="text-[1.9vh] m-[2vh] font-['FZSX']">——『{{ sentences?.from }}』{{ sentences?.from_who === null ? '未知' : sentences?.from_who }}</p>
         </div>
       </div>
       <p class="mx-[2vh] font-serif text-[2.4vh]">
@@ -474,8 +482,8 @@ export default {
       </p>
       <div class="md:w-[70%] w-[85%] mt-[30px] flex flex-row justify-evenly items-center bg-[url('/static/background/17.jpg')] bg-cover rounded-xl shadow-md relative">
         <div class="md:flex md:flex-col md:items-center md:justify-between h-[6vw] hidden self-start mt-[4vh]">
-        <el-avatar style="width: 4vw;height:4vw">{{ info.name }}</el-avatar>
-        <div class="font-['SYST']">{{ info.name }}</div>
+          <el-avatar style="width: 4vw;height:4vw">{{ userInfo?.name === undefined ? '未登录' : userInfo?.name }}</el-avatar>
+          <div class="font-['SYST']">{{ userInfo?.name === undefined ? '未登录' : userInfo?.name }}</div>
       </div>
       <div class="my-[3vh] flex flex-col justify-center md:w-[85%] w-[90%]">
         <div class="mb-[3vh] relative">
@@ -485,7 +493,7 @@ export default {
             你是我一生只会遇见一次的惊喜...
           </p>
           <textarea id="pl" v-model.lazy="value" maxlength="100"
-                    class="w-full h-[20vh] p-[2vh] border border-[#000000] min-h-[20vh] bg-[#FFFFFF] shadow-md bg-opacity-50 font-['FZSX']"
+                    class="w-full h-[20vh] p-[2vh] border border-[#000000] min-h-[20vh] bg-[#FFFFFF] shadow-md bg-opacity-50 font-['SYST']"
                     type="text" @blur="onBlur" @focus="onFocus"></textarea>
         </div>
         <div class="w-full flex flex-row justify-around md:justify-end">

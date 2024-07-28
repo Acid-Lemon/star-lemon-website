@@ -1,6 +1,6 @@
 <script>
 import {call_api} from "../../utils/cloud.js";
-import { useLoginStateStore } from '../../stores/loginState';
+import {load_user} from "../../utils/user_info";
 
 import {ElLoading, ElNotification} from "element-plus";
 
@@ -163,8 +163,7 @@ export default {
         message: "登录成功",
       })
 
-      const loginStateStore = useLoginStateStore();
-      loginStateStore.changeLoginState();
+      await load_user();
 
       // 登录成功后跳转回原页面
       this.$router.back();

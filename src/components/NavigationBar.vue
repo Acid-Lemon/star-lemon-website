@@ -1,16 +1,10 @@
 <script>
-import { useLoginStateStore } from '../stores/loginState'
+import {useUserInfoStore} from "../stores/userInfo";
 
 export default {
   name: "NavigationBar",
   beforeMount() {
     this.updatePages();
-  },
-  mounted() {
-    window.addEventListener('storage', this.onStorageChange);
-  },
-  beforeDestroy() {
-    window.removeEventListener('storage', this.onStorageChange);
   },
   data() {
     return {
@@ -20,35 +14,33 @@ export default {
       isHoveredSecondary: false,
     };
   },
+  mounted() {
+  },
   computed: {
+    // 过滤掉登录和用户信息页面
+    // 如果用户已经登录，则过滤掉登录页面
+    // 如果用户未登录，则过滤掉用户信息页面 & 管理页面
     filteredPages() {
       return this.pages.filter(page => {
-        const loginMatch = !(page.name === "登录" && localStorage.getItem("token"));
-        const userMatch = !(page.name === "个人" && !localStorage.getItem("token"));
-        return loginMatch && userMatch;
+        const loginMatch = !(page.name === "登录" && this.isLogin);
+        const userMatch = !(page.name === "个人" && !this.isLogin);
+        const adminMatch = !(page.name === "管理" && !this.isLogin);
+        return loginMatch && userMatch && adminMatch;
       });
-    },loginState() {
-      const loginStateStore = useLoginStateStore();
-      return loginStateStore.loginState;
     },
-    currentRoute() {
-      return this.$route.path;
-    }
+    isLogin() {
+      const userInfoStore = useUserInfoStore();
+      return !!userInfoStore;
+    },
   },
   methods: {
+    // 更新导航栏
     updatePages() {
       let routes = this.$router.options.routes;
       let select_pages = [];
       routes.map(e => {
         if (!e?.meta?.navigation_bar) {
           return;
-        }
-
-        if (e.login !== undefined) {
-          let is_login = !!localStorage.getItem("token")?.length;
-          if (is_login !== e.login) {
-            return;
-          }
         }
 
         select_pages.push({
@@ -58,11 +50,6 @@ export default {
       });
 
       this.pages = select_pages;
-    },
-    onStorageChange(event) {
-      if (event.key === 'token') {
-        this.updatePages();
-      }
     },
     // 光标移入导航标签时触发
     onMouseEnter(page) {
@@ -93,27 +80,25 @@ export default {
       }, 300); // 延迟300ms
     },
     loginOut(){
+      // 清除本地存储
       localStorage.removeItem("token");
       localStorage.removeItem("user");
+      // 更新用户状态
+      const userInfoState = useUserInfoStore();
+      userInfoState.userInfo = {};
+      // 更新导航栏
       this.updatePages();
+      // 如果目前在个人页，则跳转到登录页
       if(this.$route.path === "/user"){
         this.$router.push("/login");
       }
     }
   },
-  watch: {
-    token() {
-      this.updatePages();
-    },
-    loginState() {
-      this.updatePages();
-    }
-  }
 };
 </script>
 
 <template>
-  <div class="fixed top-[2.5%] left-[2.5%] w-[95%] md:h-[50px] h-[50px] hover:bg-white hover:bg-opacity-50 duration-700 rounded-md flex flex-row justify-between items-center p-[3vh] z-[1000]">
+  <div class="fixed top-[1.5vw] left-[1.5vw] w-[97vw] h-[50px] hover:bg-white hover:bg-opacity-50 duration-700 rounded-md flex flex-row justify-between items-center p-[3vh] z-[1000]">
     <router-link to="/">
       <span class="md:text-[26px] text-[20px] font-['ZKXW'] hover:text-[#44cef6] duration-700">star和lemon的小站</span>
     </router-link>

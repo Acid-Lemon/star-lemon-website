@@ -54,9 +54,9 @@ export default {
 
 <template>
   <div class="fixed bottom-[8px] left-[10px] z-50 flex md:flex-row flex-col">
-      <div class="text-[#222222] md:text-[15px] text-[12px] mr-[10px] font-['SYST']">Copyright © 2023-{{ new Date().getFullYear() }} star和lemon的小站 All Rights Reserved.</div>
-      <a href="https://beian.miit.gov.cn/" class="text-[#dd5a00] md:text-[15px] text-[12px] font-['SYST']" target="_blank">皖ICP备2024036960号-1</a>
-      <div class="text-[#222222] md:text-[15px] text-[12px] ml-[10px] font-['SYST']">网站在各种灾难中运行了:{{time_str}}</div>
+      <div class="text-[#222222] md:text-[15px] text-[12px] md:mr-[10px] mr-0 font-['SYST']">Copyright © 2023-{{ new Date().getFullYear() }} star和lemon的小站 All Rights Reserved.</div>
+      <a href="https://beian.miit.gov.cn/" class="text-[#dd5a00] md:text-[15px] text-[12px] md:mr-[10px] mr-0  font-['SYST']" target="_blank">皖ICP备2024036960号-1</a>
+      <div class="text-[#222222] md:text-[15px] text-[12px] font-['SYST']">网站在各种灾难中运行了:{{time_str}}</div>
   </div>
 </template>
 

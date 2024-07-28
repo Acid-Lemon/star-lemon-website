@@ -98,19 +98,21 @@ export default {
 </script>
 
 <template>
-  <div class="fixed top-[1.5vw] left-[1.5vw] w-[97vw] h-[50px] hover:bg-white hover:bg-opacity-50 duration-700 rounded-md flex flex-row justify-between items-center p-[3vh] z-[1000]">
-    <router-link to="/">
-      <span class="md:text-[26px] text-[20px] font-['ZKXW'] hover:text-[#44cef6] duration-700">star和lemon的小站</span>
-    </router-link>
+  <div class="fixed top-[1.5vw] left-[1.5vw] w-[97vw] md:h-[50px] h-[80px] hover:bg-white hover:bg-opacity-50 duration-700 rounded-md flex md:flex-row flex-col md:justify-between items-center justify-center md:p-[3vh] z-[1000]">
+    <div class="flex flex-row justify-center items-center">
+      <router-link to="/">
+        <div class="md:text-[26px] text-[20px] md:m-[0.5vh] mt-[0.5vh] font-['ZKXW'] hover:text-[#44cef6] duration-700">star和lemon的小站</div>
+      </router-link>
+    </div>
     <div class="flex flex-row justify-center items-center">
       <div v-for="page in filteredPages" class="m-[1vh] flex flex-col items-center" @mouseenter="onMouseEnter(page)" @mouseleave="onMouseLeave">
         <router-link :to="page.link" class="flex flex-row items-center relative">
           <img
-              class="w-[3vh] m-[0.5vh]"
+              class="w-[3vh] md:m-[0.5vh] mb-[0.5vh]"
               :src="page.svg"
               :alt="page.name"
           />
-          <span class="md:block hidden hover:text-[#44cef6] m-[0.5vh] font-['SYST'] duration-700">{{ page.name }}</span>
+          <span class="md:block hidden hover:text-[#44cef6] md:m-[0.5vh] mb-[0.5vh]  font-['SYST'] duration-700">{{ page.name }}</span>
         </router-link>
         <div v-show="page.name === '个人' && hoveredPage === page" class="absolute flex flex-col items-center justify-center bottom-[-5vh] w-[10vh] h-[4vh] bg-[#FFFFFF] bg-opacity-50 rounded shadow-md duration-700" @mouseenter="onSecondaryMouseEnter" @mouseleave="onSecondaryMouseLeave" @click="loginOut">
           取消登录

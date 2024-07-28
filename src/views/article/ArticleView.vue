@@ -163,34 +163,41 @@ export default {
 <template>
   <el-scrollbar>
   <div class="h-full w-full flex flex-col items-center justify-start">
-    <div class="w-full min-h-[40vh] bg-[url('/static/background/13.jpg')] flex flex-row justify-center items-center bg-center bg-cover">
+    <div class="w-full md:min-h-[40vh] min-h-[30vh] bg-[url('/static/background/13.jpg')] flex flex-row justify-center items-center bg-center bg-cover">
       <p class="text-[#FFFFFF] font-['FZSX'] text-[6vh] hover:text-[#44cef6] duration-700">
       一件小事
       </p>
     </div>
     <div class="w-full bg-[#F8FAFD] flex flex-col items-center justify-start">
-      <div class="w-[70%] h-[200vh] bg-[#FFFFFF] shadow-md mt-[20px]">
+      <div class="md:w-[70vw] w-[90vw] h-auto bg-[#FFFFFF] shadow-md mt-[20px]">
         <div v-for="article in articles">
           <router-link to="/article/write">
-            <div class="w-full h-[200px] px-[20px] pt-[20px] border-b border-[#000000]">
+            <div class="w-full h-auto px-[20px] py-[20px] border-b border-[#000000]">
               <div class="text-[2.6vh] font-['SYST']">{{ article.title }}</div>
-              <div class="flex flex-row items-center mb-[5px]">
-                <div class="text-[1.5vh] font-['SYST'] mr-[20px]">{{ article.author }}</div>
-                <svg class="opacity-50 w-[1.5vh] h-[1.5vh] mr-[3px]" viewBox="0 0 24 24">
-                  <path fill="currentColor" d="M12 20a8 8 0 0 0 8-8a8 8 0 0 0-8-8a8 8 0 0 0-8 8a8 8 0 0 0 8 8m0-18a10 10 0 0 1 10 10a10 10 0 0 1-10 10C6.47 22 2 17.5 2 12A10 10 0 0 1 12 2m.5 5v5.25l4.5 2.67l-.75 1.23L11 13V7h1.5Z"></path>
-                </svg>
-                <div class="text-[1.5vh] font-['SYST'] mr-[20px] opacity-50">{{ article.date }}</div>
-                <img class="opacity-50 w-[1.5vh] h-[1.5vh] mr-[3px]" src="/static/svg/views.svg"  alt="浏览"/>
-                <div class="text-[1.5vh] font-['SYST'] mr-[20px] opacity-50">{{ article.views }}</div>
-                <img class="opacity-50 w-[1.5vh] h-[1.5vh] mr-[3px]" src="/static/svg/likes.svg"  alt="喜欢"/>
-                <div class="text-[1.5vh] font-['SYST'] mr-[20px] opacity-50">{{ article.likes }}</div>
-                <img class="opacity-50 w-[1.5vh] h-[1.5vh] mr-[3px]" src="/static/svg/comments.svg"  alt="评论"/>
-                <div class="text-[1.5vh] font-['SYST'] opacity-50">{{ article.comments }}</div>
+              <div class="flex md:flex-row flex-col md:items-center md:justify-start items-start justify-center mb-[5px]">
+                <div class="flex flex-row items-center">
+                  <div class="text-[1.5vh] font-['SYST'] mr-[20px]">{{ article.author }}</div>
+                  <svg class="opacity-50 w-[1.5vh] h-[1.5vh] mr-[3px]" viewBox="0 0 24 24">
+                    <path fill="currentColor" d="M12 20a8 8 0 0 0 8-8a8 8 0 0 0-8-8a8 8 0 0 0-8 8a8 8 0 0 0 8 8m0-18a10 10 0 0 1 10 10a10 10 0 0 1-10 10C6.47 22 2 17.5 2 12A10 10 0 0 1 12 2m.5 5v5.25l4.5 2.67l-.75 1.23L11 13V7h1.5Z"></path>
+                  </svg>
+                  <div class="text-[1.5vh] font-['SYST'] mr-[20px] opacity-50">{{ article.date }}</div>
+                </div>
+                <div class="flex flex-row items-center">
+                  <img class="opacity-50 w-[1.5vh] h-[1.5vh] mr-[3px]" src="/static/svg/views.svg"  alt="浏览"/>
+                  <div class="text-[1.5vh] font-['SYST'] mr-[20px] opacity-50">{{ article.views }}</div>
+                  <img class="opacity-50 w-[1.5vh] h-[1.5vh] mr-[3px]" src="/static/svg/likes.svg"  alt="喜欢"/>
+                  <div class="text-[1.5vh] font-['SYST'] mr-[20px] opacity-50">{{ article.likes }}</div>
+                  <img class="opacity-50 w-[1.5vh] h-[1.5vh] mr-[3px]" src="/static/svg/comments.svg"  alt="评论"/>
+                  <div class="text-[1.5vh] font-['SYST'] opacity-50">{{ article.comments }}</div>
+                </div>
               </div>
               <div class="text-[1.5vh] font-['SYST']">{{ truncateText(article.content,300) }}</div>
             </div>
           </router-link>
         </div>
+      </div>
+      <div class="md:w-[70vw] w-[90vw] h-[100px] flex flex-row items-center justify-center">
+        <div class="text-[3vh] font-['RGBZ']">没有更多文章惹</div>
       </div>
     </div>
   </div>

@@ -70,10 +70,10 @@ export default {
           <div class="h-[85vh]">
           <el-scrollbar>
             <div v-if="hasPhotoAlbums"
-                 class="grid grid-flow-row grid-cols-4 gap-[20px]">
+                 class="md:columns-5 columns-2 column-gap-[20px]">
               <div v-for="photoAlbum in photoAlbums"
                    :key="photoAlbum.id"
-                   class="shadow-md pb-[2px] flex flex-col justify-between">
+                   class="shadow-md break-inside-avoid mb-[20px]">
                 <router-link :to="'/album/' + photoAlbum.id">
                 <div>
                   <el-image src=""  class="w-full h-[20vh]" fit="cover">
@@ -85,8 +85,8 @@ export default {
                   </el-image>
                 </div>
                 <div>
-                  <div class="px-[10px] py-[2px]">相册名：{{ photoAlbum.name }}</div>
-                  <div class="px-[10px] py-[2px]">id：{{ photoAlbum.id }}</div>
+                  <div class="text-[14px] px-[10px] py-[2px] whitespace-normal break-all">相册名：{{ photoAlbum.name }}</div>
+                  <div class="text-[14px] px-[10px] py-[2px] whitespace-normal break-all">id：{{ photoAlbum.id }}</div>
                 </div>
                   </router-link>
               </div>
@@ -101,10 +101,10 @@ export default {
           <div class="h-[85vh]">
           <el-scrollbar>
             <div v-if="hasPhotoAlbums"
-                 class="grid grid-flow-row grid-cols-4 gap-[20px]">
+                 class="md:columns-5 columns-2 column-gap-[20px]">
               <div v-for="photoAlbum in photoAlbums"
                    :key="photoAlbum.id"
-                   class="shadow-md pb-[2px] flex flex-col justify-between">
+                   class="shadow-md break-inside-avoid mb-[20px]">
                 <router-link :to="'/album/' + photoAlbum.id">
                   <div>
                     <el-image src=""  class="w-full h-[20vh]" fit="cover">
@@ -116,8 +116,8 @@ export default {
                     </el-image>
                   </div>
                   <div>
-                    <div class="px-[10px] py-[2px]">相册名：{{ photoAlbum.name }}</div>
-                    <div class="px-[10px] py-[2px]">id：{{ photoAlbum.id }}</div>
+                    <div class="text-[14px] px-[10px] py-[2px] whitespace-normal break-all">相册名：{{ photoAlbum.name }}</div>
+                    <div class="text-[14px] px-[10px] py-[2px] whitespace-normal break-all">id：{{ photoAlbum.id }}</div>
                   </div>
                 </router-link>
               </div>
@@ -132,10 +132,10 @@ export default {
           <div class="h-[85vh]">
           <el-scrollbar>
             <div v-if="hasPhotoAlbums"
-                 class="grid grid-flow-row grid-cols-4 gap-[20px]">
+                 class="md:columns-5 columns-2 column-gap-[20px]">
               <div v-for="photoAlbum in photoAlbums"
                    :key="photoAlbum.id"
-                   class="shadow-md pb-[2px] flex flex-col">
+                   class="shadow-md break-inside-avoid mb-[20px]">
                 <router-link :to="'/album/' + photoAlbum.id">
                 <div>
                   <el-image src=""  class="w-full h-[20vh]" fit="cover">
@@ -147,8 +147,8 @@ export default {
                   </el-image>
                 </div>
                 <div>
-                  <div class="px-[10px] py-[2px]">相册名：{{ photoAlbum.name }}</div>
-                  <div class="px-[10px] py-[2px]">id：{{ photoAlbum.id }}</div>
+                  <div class="text-[14px] px-[10px] py-[2px] whitespace-normal break-all">相册名：{{ photoAlbum.name }}</div>
+                  <div class="text-[14px] px-[10px] py-[2px] whitespace-normal break-all">id：{{ photoAlbum.id }}</div>
                 </div>
                 </router-link>
               </div>

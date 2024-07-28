@@ -107,9 +107,8 @@ export default {
       <div class="w-[1px] h-[80%] border border-[#000000] mx-[10px]"></div>
       <div class="text-[2vh] text-[#000000] font-['RGBZ']">图片</div>
     </div>
-    <div class="w-full h-[5vh]"></div>
-    <div class="bg-[url('/static/background/17.jpg')] bg-cover rounded-md h-[6vh] w-[95vw] flex flex-col items-center justify-center p-[20px]">
-      <div class="h-[5vh] w-full flex flex-row items-center justify-between">
+    <div class="bg-[url('/static/background/17.jpg')] bg-cover rounded-md md:h-[6vh] h-[14vh] w-[95vw] flex flex-col mt-[5vh] md:p-[20px] p-[10px]">
+      <div class="md:h-[5vh] h-[13vh] w-full flex md:flex-row flex-col md:items-center items-start justify-between">
         <div class="flex flex-row items-center">
           <div class="mx-[5px]">搜索图片</div>
           <div class="w-[240px] mx-[5px]">
@@ -118,7 +117,7 @@ export default {
         </div>
         <div class="flex flex-row items-center">
           <div class="mx-[5px]">筛选日期</div>
-          <div class="w-[300px] mx-[5px]">
+          <div class="w-[280px] mx-[5px]">
             <el-date-picker v-model="date_range"
                           end-placeholder="结束日期"
                           range-separator="到"

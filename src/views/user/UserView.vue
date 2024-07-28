@@ -76,7 +76,6 @@ export default {
         this.isDisabled = false;
         this.clickFlag = -1;
       }
-
     },
     get_info(field) {
       if (!this.info?.[field] && field === "name") {
@@ -133,7 +132,7 @@ export default {
         <img alt="头像" class="h-[10vh] w-[10vh] rounded-full mr-[10px]" src="/static/favicon/favicon.png"/>
         <p class="font-['SYST'] text-[24px] mr-[20px] leading-none pb-[5px]">{{ userInfo?.name ? userInfo.name : "未登录" }}</p>
         <el-tag class="font-['SYST'] text-[18px] mr-[10px] leading-none pb-[5px]" type="primary" >用户</el-tag>
-        <p class="font-['SYST'] text-[14px] mr-[20px] leading-none pb-[5px]">生日：{{ userInfo?.birthday }}</p>
+        <p v-if="userInfo?.birthday" class="font-['SYST'] text-[14px] mr-[20px] leading-none pb-[5px]">生日：{{ userInfo?.birthday }}</p>
         <p class="font-['SYST'] text-[14px] opacity-50 leading-none pb-[5px]">{{ userInfo?.personal_sign }}</p>
       </div>
       <el-button class="absolute bottom-[-5vh] right-[10vw]" plain @click="dialogVisible = true">

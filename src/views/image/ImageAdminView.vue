@@ -1,16 +1,11 @@
 <script>
 import {ElAutoResizer, ElNotification} from 'element-plus';
-import { UploadFilled } from '@element-plus/icons-vue'
+import { UploadFilled, ArrowLeft } from '@element-plus/icons-vue'
 import {call_api} from "@/src/utils/cloud";
 
 export default {
   name: "ImageAdminView",
-  computed: {
-    UploadFilled() {
-      return UploadFilled
-    },
-  },
-  components: {ElAutoResizer,UploadFilled},
+  components: {ElAutoResizer,UploadFilled, ArrowLeft},
   data() {
     return {
       photoAlbums: [],

@@ -136,7 +136,7 @@ export default {
       <div class="h-[82vh] w-[95vw] my-[2vh]">
         <el-scrollbar>
           <div v-if="filteredImages.length > 0" v-infinite-scroll="get_images" :infinite-scroll-disabled="state" infinite-scroll-delay=1000 infinite-scroll-distance=100
-               class="columns-5 column-gap-[20px]">
+               class="md:columns-5 columns-2 column-gap-[20px]">
             <div v-for="image in filteredImages"
                  :key="image.id"
                  @click="showDialog"
@@ -145,8 +145,8 @@ export default {
                   <el-image :src="image.temp_url" class="w-full h-auto" fit="cover"/>
                 </div>
                 <div>
-                  <div class="px-[10px] py-[2px]">图片：{{ image.name }}</div>
-                  <div class="px-[10px] py-[2px]">id：{{ image.id }}</div>
+                  <div class="text-[14px] px-[10px] py-[2px] whitespace-normal break-all">图片：{{ image.name }}</div>
+                  <div class="text-[14px] px-[10px] py-[2px] whitespace-normal break-all">id：{{ image.id }}</div>
                 </div>
             </div>
           </div>

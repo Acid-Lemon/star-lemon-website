@@ -136,11 +136,11 @@ export default {
       <div class="h-[82vh] w-[95vw] my-[2vh]">
         <el-scrollbar>
           <div v-if="filteredImages.length > 0" v-infinite-scroll="get_images" :infinite-scroll-disabled="state" infinite-scroll-delay=1000 infinite-scroll-distance=100
-               class="grid grid-cols-4 gap-[20px]">
+               class="columns-5 column-gap-[20px]">
             <div v-for="image in filteredImages"
                  :key="image.id"
                  @click="showDialog"
-                 class="shadow-md pb-[2px] flex flex-col justify-between">
+                 class="shadow-md break-inside-avoid mb-[20px]">
                 <div @click="console.log(image)">
                   <el-image :src="image.temp_url" class="w-full h-auto" fit="cover"/>
                 </div>

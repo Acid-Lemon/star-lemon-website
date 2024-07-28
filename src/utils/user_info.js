@@ -1,6 +1,7 @@
 import {
 	call_api
 } from "@/src/utils/cloud";
+import {useUserInfoStore} from "../stores/userInfo";
 
 function store_token(token) {
 	uni.setStorageSync("token", token);
@@ -8,6 +9,7 @@ function store_token(token) {
 
 function store_user(user) {
 	uni.setStorageSync("user", user);
+	useUserInfoStore().userInfo = user;
 }
 
 async function load_user() {

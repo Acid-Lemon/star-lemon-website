@@ -33,7 +33,7 @@ const router = createRouter({
         },
         {
             path: "/article/write",
-            name: "note",
+            name: "write",
             meta: {
                 show: {
                     navigation_bar: false,
@@ -111,9 +111,27 @@ const router = createRouter({
             component: () => import("@/src/views/user/LoginView.vue")
         },
         {
+            path: "/user",
+            name: "user",
+            meta: {
+                navigation_bar: {
+                    name: "个人",
+                    svg: "/static/svg/登录.svg"
+                },
+                show: {
+                    side_navigation_bar: false,
+                }
+            },
+            component: () => import("@/src/views/user/UserView.vue")
+        },
+        {
             path: "/admin",
             name: "admin",
             meta: {
+                navigation_bar: {
+                    name: "管理",
+                    svg: "/static/svg/管理.svg"
+                },
                 side_navigation_bar: {
                     name: "首页",
                     svg: "/static/svg/首页.svg"
@@ -137,6 +155,17 @@ const router = createRouter({
                 }
             },
             component: () => import("@/src/views/article/ArticleAdminView.vue")
+        },
+        {
+            path: "/admin/article/write",
+            name: "write-admin",
+            meta: {
+                show: {
+                    navigation_bar: false,
+                    side_navigation_bar: false,
+                }
+            },
+            component: () => import("@/src/views/write/WriteAdminView.vue")
         },
         {
             path: "/admin/album",
@@ -176,20 +205,6 @@ const router = createRouter({
                 }
             },
             component: () => import("@/src/views/comment/CommentAdminView.vue")
-        },
-        {
-            path: "/user",
-            name: "user",
-            meta: {
-                navigation_bar: {
-                    name: "个人",
-                    svg: "/static/svg/登录.svg"
-                },
-                show: {
-                    side_navigation_bar: false,
-                }
-            },
-            component: () => import("@/src/views/user/UserView.vue")
         },
         {
             path: "/404",

@@ -10,13 +10,6 @@ export default {
         return;
       }
 
-      if (e.login !== undefined) {
-        let is_login = !!localStorage.getItem("token")?.length;
-        if (is_login !== e.login) {
-          return;
-        }
-      }
-
       select_pages.push({
         ...e.meta.side_navigation_bar,
         link: e.path
@@ -24,7 +17,6 @@ export default {
     });
 
     this.pages = select_pages;
-    console.log(this.pages);
   },
   data() {
     return {

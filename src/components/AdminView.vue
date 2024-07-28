@@ -8,12 +8,21 @@ export default {
 </script>
 
 <template>
-  <div class="flex flex-row items-center pl-[10px] w-full h-[5vh] shadow-md">
+  <div class="flex flex-row items-center justify-between pl-[10px] w-full h-[5vh] shadow-md px-[10px]">
     <router-link to="/admin">
-  <span
-      class="text-[#000000] text-[20px] font-['SYST'] duration-700 hover:text-[#44cef6]">
-    {{ useWebConfigStore().webName }}：后台管理系统
-  </span>
+      <div class="text-[#000000] text-[20px] font-['SYST'] duration-700 hover:text-[#44cef6]">
+        {{ useWebConfigStore().webName }}：后台管理系统
+      </div>
+    </router-link>
+    <router-link to="/">
+      <div class="flex flex-row items-center">
+        <img
+            class="w-[3vh] m-[0.5vh]"
+            src="/static/svg/首页.svg"
+            alt="首页"
+        />
+        <div class="md:block hidden hover:text-[#44cef6] m-[0.5vh] font-['SYST'] duration-700">用户</div>
+      </div>
     </router-link>
   </div>
 </template>

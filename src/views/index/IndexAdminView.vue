@@ -43,7 +43,10 @@ export default {
       if(14 <= hours && hours < 18) {
         return "下午好呀，努力工作的小伙伴~";
       }
-      if(18 <= hours && hours <= 23) {
+      if(18 <= hours && hours < 19) {
+        return "傍晚好呀，别忘了喝杯茶~";
+      }
+      if(19 <= hours && hours <= 23) {
         return "晚上好呀，记得早点睡哦~";
       }
       if(0 <= hours && hours < 5) {

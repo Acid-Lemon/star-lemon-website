@@ -163,7 +163,11 @@ export default {
       return index;
     },
     onBack() {
-      this.$router.back()
+      if(window.history.length > 1) {
+        this.$router.back()
+      } else {
+        this.$router.push('/admin/album');
+      }
     },
   }
 }

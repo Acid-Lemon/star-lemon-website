@@ -93,7 +93,11 @@ export default {
       this.$refs["el-scrollbar"].wrapRef.scrollTop = 0;
     },
     onBack() {
-      this.$router.back()
+      if(window.history.length > 1) {
+        this.$router.back()
+      } else {
+        this.$router.push('/article');
+      }
     }
   },
 }

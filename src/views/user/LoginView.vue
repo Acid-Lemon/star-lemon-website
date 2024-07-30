@@ -8,9 +8,7 @@ export default {
   data() {
     return {
       state: {
-        text: "登录",
-        id: "login",
-        value: true,// 登录和注册，登陆状态是true，注册状态是false
+        isLogin: true,// 登录和注册，登陆状态是true，注册状态是false
         mode: true,// 用户名登录和手机号登录，用户名登录是true，手机号登录是false
       },
       username: "",
@@ -28,22 +26,16 @@ export default {
   },
   methods: {
     register_mode() {
-      this.state.value = false;
-      this.state.text = "注册";
-      this.state.id = "register";
+      this.state.isLogin = false;
       this.phone_number_tip="如若没有可不填";
     },
     username_mode() {
-      this.state.value = true;
+      this.state.isLogin = true;
       this.state.mode = true;
-      this.state.text = "登录";
-      this.state.id = "login";
     },
     phone_number_mode() {
-      this.state.value = true;
+      this.state.isLogin = true;
       this.state.mode = false;
-      this.state.text = "登录";
-      this.state.id = "login";
       this.phone_number_tip="";
 
     },
@@ -82,7 +74,7 @@ export default {
 
       let res = await call_api("user/login/send_code", {
         phone_number: this.phone_number,
-        mode: this.state.text
+        mode: this.state.isLogin === true ? "login" : "register"
       });
 
       if (res.success) {
@@ -101,13 +93,13 @@ export default {
       this.codeState = false;
     },
     async login() {
-      if (this.state.value === false) {
+      if (this.state.isLogin === false) {
         if (!this.check()) {
           return;
         }
       }
 
-      if (this.phone_number && !this.code) {
+      if (!this.state.mode && !this.code) {
         ElNotification({
           title: 'Warning',
           type: "warning",
@@ -117,20 +109,15 @@ export default {
         return;
       }
 
-      if (this.state.value === false) {
-        // noinspection RedundantConditionalExpressionJS
-        this.state.mode = this.phone_number ? false : true;
-      }
-
       let loading = ElLoading.service();
       let res;
       if (this.state.mode === true) {
-        res = await call_api(`user/login/${this.state.value === true ? "login" : "register"}_by_user`, {
+        res = await call_api(`user/login/${this.state.isLogin === true ? "login" : "register"}_by_user`, {
           username: this.username,
           password: this.password
         });
       } else {
-        res = await call_api(`user/login/${this.state.value === true ? "login" : "register"}_by_sms`, {
+        res = await call_api(`user/login/${this.state.isLogin === true ? "login" : "register"}_by_sms`, {
           username: this.username,
           password: this.password,
           phone_number: this.phone_number,
@@ -152,21 +139,36 @@ export default {
           this.username = "";
           this.password = "";
           this.confirm_password = "";
+          this.phone_number = "";
+          this.code = "";
         }
 
         return;
       }
 
-      ElNotification({
-        title: 'Success',
-        type: "success",
-        message: "登录成功",
-      })
+      if(this.state.isLogin) {
+        ElNotification({
+          title: 'Success',
+          type: "success",
+          message: "登录成功",
+        })
 
-      await load_user();
+        await load_user();
 
-      // 登录成功后跳转回原页面
-      this.$router.back();
+        // 登录成功后跳转回原页面
+        this.$router.back();
+      }
+
+
+      if (!this.state.isLogin) {
+        ElNotification({
+          title: 'Success',
+          type: "success",
+          message: "注册成功",
+        })
+
+        this.state.isLogin = true
+      }
     }
   }
 }
@@ -183,21 +185,21 @@ export default {
     </div>
     <div class="bg-[#FFFFFF]/80 md:w-[360px] w-[95vw] h-[85vh] shadow-sm rounded-lg p-[3vh] mt-[12vh] mb-[3vh]">
       <div class="w-full h-full">
-        <span class="text-[4vh] font-['SYST']">{{ state.text }}</span>
+        <span class="text-[4vh] font-['SYST']">{{ state.isLogin === true ? "登录" : "注册" }}</span>
         <div class="my-[2vh] flex flex-col justify-between align-top w-full">
           <!--    注册或用户名密码登录        -->
-          <div v-if="!state.value || (state.mode && state.value)" class="flex flex-col">
+          <div v-if="!state.isLogin || (state.mode && state.isLogin)" class="flex flex-col">
             <span class="my-[0.5vh] text-[2vh] font-['FZSX']">用户名：</span>
             <el-input v-model="username" :placeholder="username_tip"
                       style="width: 100%;height:4vh;"/>
           </div>
           <!--    手机号登录注册或用户名注册        -->
-          <div v-if="!state.mode || !state.value" class="flex flex-col">
+          <div v-if="!state.mode || !state.isLogin" class="flex flex-col">
             <span class="my-[0.5vh] text-[2vh] font-['FZSX']">手机号码：</span>
             <el-input v-model="phone_number" :placeholder="phone_number_tip" style="width: 100%;height:4vh"/>
           </div>
           <!--    手机号登录注册或用户名注册        -->
-          <div v-if="!state.mode || !state.value" class="flex flex-col">
+          <div v-if="!state.mode || !state.isLogin" class="flex flex-col">
             <span class="my-[0.5vh] text-[2vh] font-['FZSX']">验证码：</span>
             <div class="flex flex-row justify-between">
               <el-input v-model="code" :placeholder="code_tip" style="width: 50%;height:4vh"/>
@@ -205,20 +207,20 @@ export default {
             </div>
           </div>
           <!--     注册或用户名密码登录       -->
-          <div v-if="!state.value || (state.mode && state.value)" class="flex flex-col">
+          <div v-if="!state.isLogin || (state.mode && state.isLogin)" class="flex flex-col">
             <span class="my-1 text-[2vh] font-['FZSX']">密码：</span>
             <el-input v-model="password" :placeholder="password_tip" style="width: 100%;height:4vh" type="password"/>
           </div>
           <!--      注册      -->
-          <div v-if="!state.value" class="flex flex-col">
+          <div v-if="!state.isLogin" class="flex flex-col">
             <span class="my-1 text-[2vh] font-['FZSX']">确认密码：</span>
             <el-input v-model="confirm_password" :placeholder="confirm_password_tip" style="width: 100%;height:4vh"
                       type="password"/>
           </div>
         </div>
-        <el-button round style="width: 100%;height: 4vh" type="primary" @click="login">{{ state.text }}</el-button>
+        <el-button round style="width: 100%;height: 4vh" type="primary" @click="login">{{ state.isLogin === true ? "登录" : "注册" }}</el-button>
         <!--    用户名密码登录      -->
-        <div v-if="state.value && state.mode" class="flex flex-row justify-between">
+        <div v-if="state.isLogin && state.mode" class="flex flex-row justify-between">
           <div class="my-2" @click="register_mode">
             <span class="text-[#40A2E3] text-[1.8vh] font-['FZSX']">注册</span>
           </div>
@@ -226,7 +228,7 @@ export default {
             <span class="text-[#40A2E3] text-[1.8vh] font-['FZSX']">手机号登录</span>
           </div>
         </div>
-        <div v-if="!state.value" class="flex flex-row justify-between">
+        <div v-if="!state.isLogin" class="flex flex-row justify-between">
           <div class="my-2" @click="username_mode">
             <span class="text-[#40A2E3] text-[1.8vh] font-['FZSX']">用户名登录</span>
           </div>
@@ -234,7 +236,7 @@ export default {
             <span class="text-[#40A2E3] text-[1.8vh] font-['FZSX']">手机号登录</span>
           </div>
         </div>
-        <div v-if="state.value && !state.mode" class="flex flex-row justify-between">
+        <div v-if="state.isLogin && !state.mode" class="flex flex-row justify-between">
           <div class="my-2" @click="register_mode">
             <span class="text-[#40A2E3] text-[1.8vh] font-['FZSX']">注册</span>
           </div>

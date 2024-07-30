@@ -57,7 +57,7 @@ const router = createRouter({
             component: () => import("@/src/views/album/AlbumView.vue")
         },
         {
-            path: "/album/:id",
+            path: "/album/:album_name",
             name: "image",
             meta: {
                 show: {
@@ -182,7 +182,7 @@ const router = createRouter({
             component: () => import("@/src/views/album/AlbumAdminView.vue")
         },
         {
-            path: "/admin/album/:id",
+            path: "/admin/album/:album_name",
             name: "image-admin",
             meta: {
                 show: {

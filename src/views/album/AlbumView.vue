@@ -74,7 +74,7 @@ export default {
               <div v-for="photoAlbum in photoAlbums"
                    :key="photoAlbum.id"
                    class="shadow-md break-inside-avoid mb-[20px]">
-                <router-link :to="'/album/' + photoAlbum.id">
+                <router-link :to="'/album/' + photoAlbum.name + '?album_id=' + photoAlbum.id">
                 <div>
                   <el-image src=""  class="w-full h-[20vh]" fit="cover">
                     <template #error>
@@ -105,7 +105,7 @@ export default {
               <div v-for="photoAlbum in photoAlbums"
                    :key="photoAlbum.id"
                    class="shadow-md break-inside-avoid mb-[20px]">
-                <router-link :to="'/album/' + photoAlbum.id">
+                <router-link :to="'/album/' + photoAlbum.name + '?album_id=' + photoAlbum.id">
                   <div>
                     <el-image src=""  class="w-full h-[20vh]" fit="cover">
                       <template #error>
@@ -136,7 +136,7 @@ export default {
               <div v-for="photoAlbum in photoAlbums"
                    :key="photoAlbum.id"
                    class="shadow-md break-inside-avoid mb-[20px]">
-                <router-link :to="'/album/' + photoAlbum.id">
+                <router-link :to="'/album/' + photoAlbum.name + '?album_id=' + photoAlbum.id">
                 <div>
                   <el-image src=""  class="w-full h-[20vh]" fit="cover">
                     <template #error>

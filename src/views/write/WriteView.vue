@@ -98,7 +98,7 @@ export default {
       } else {
         this.$router.push('/article');
       }
-    }
+    },
   },
 }
 </script>

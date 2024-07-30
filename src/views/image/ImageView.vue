@@ -49,7 +49,7 @@ export default {
       }
       console.log(start_time);
       let res = await call_api("album/get_images",{
-        folder_id: this.$route.params.id,
+        folder_id: this.$route.query.album_id,
         time_range: {
           from_time: start_time,
           to_time: 0
@@ -57,8 +57,11 @@ export default {
         image_number: 20,
         skip_number
       })
-      console.log(res);
-      if(!res.success){
+      if(!res.success) {
+        if(res.code === "err_no_folder") {
+          this.$router.push('/404');
+          return
+        }
         ElNotification({
           title: 'Error',
           type: "error",
@@ -109,10 +112,10 @@ export default {
         返回
       </div>
       <div class="w-[1px] h-[80%] border border-[#000000] mx-[10px]"></div>
-      <div class="text-[2vh] text-[#000000] font-['RGBZ']">图片</div>
+      <div class="text-[2vh] text-[#000000] font-['RGBZ']">{{ this.$route.params.album_name }}</div>
     </div>
-    <div class="bg-[url('/static/background/17.jpg')] bg-cover rounded-md md:h-[6vh] h-[14vh] w-[95vw] flex flex-col mt-[5vh] md:p-[20px] p-[10px]">
-      <div class="md:h-[5vh] h-[13vh] w-full flex md:flex-row flex-col md:items-center items-start justify-between">
+    <div class="bg-[url('/static/background/17.jpg')] bg-cover rounded-md md:h-[6vh] h-[14vh] w-[95vw] flex flex-col justify-center mt-[5vh] md:p-[20px] p-[10px]">
+      <div class="md:h-[5vh] h-[13vh] w-full flex md:flex-row flex-col md:items-center justify-between">
         <div class="flex flex-row items-center">
           <div class="mx-[5px]">搜索图片</div>
           <div class="w-[240px] mx-[5px]">

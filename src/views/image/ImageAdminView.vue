@@ -53,7 +53,7 @@ export default {
   methods: {
     async get_images() {
       this.pages += 1;
-      console.log("开始加载第${this.pages}页数据");
+      console.log(`开始加载第${this.pages}页数据`);
       let start_time = new Date().getTime();
       let skip_number = 0;
       if (this.pages !== 1) {
@@ -61,7 +61,7 @@ export default {
         skip_number = this.skip_number();
       }
       let res = await call_api("album/get_images", {
-        folder_id: this.$route.params.id,
+        folder_id: this.$route.query.album_id,
         time_range: {
           from_time: start_time,
           to_time: 0
@@ -107,6 +107,10 @@ export default {
       });
 
       if (!res.success) {
+        if(res.code === "err_no_folder") {
+          this.$router.push('/404');
+          return
+        }
         ElNotification({
           title: 'Error',
           type: "error",
@@ -181,7 +185,7 @@ export default {
         返回
       </div>
       <div class="w-[1px] h-[80%] border border-[#000000] mx-[10px]"></div>
-      <div class="text-[2vh] text-[#000000] font-['RGBZ']">图片管理</div>
+      <div class="text-[2vh] text-[#000000] font-['RGBZ']">{{ this.$route.params.album_name }}</div>
     </div>
     <div class="w-full h-[5vh]"></div>
       <div class="bg-[url('/static/background/17.jpg')] bg-cover rounded-md w-[95vw] h-[15vh] flex flex-col items-start justify-between p-[20px]">

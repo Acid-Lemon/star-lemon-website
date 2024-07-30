@@ -19,6 +19,7 @@
     "@wangeditor/editor-for-vue": "^5.1.12",
     "axios": "^1.6.8",
     "element-plus": "^2.7.2",
+    "masonry-layout": "^4.2.2",
     "pinia": "^2.1.7",
     "vue-router": "^4.3.0"
   },

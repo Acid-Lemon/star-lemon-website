@@ -102,7 +102,7 @@ export default {
       this.imageList.push(this.photoList[this.index]);
 
       let res = await call_api("album/create_image", {
-        folder_id: this.$route.params.id,
+        folder_id: this.$route.query.album_id,
         image_name: this.imageList[0].name
       });
 

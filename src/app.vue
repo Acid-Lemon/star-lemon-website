@@ -38,7 +38,7 @@ export default {
   <ElConfigProvider :locale="el_locale">
     <NavigationBar v-if="show?.hasOwnProperty('navigation_bar') ? show.navigation_bar: true"></NavigationBar>
     <div class="flex flex-col w-full h-full">
-      <AdminView v-if="show?.hasOwnProperty('side_navigation_bar') ? show.admin_view: true"></AdminView>
+      <AdminView v-if="show?.hasOwnProperty('side_navigation_bar') ? show.side_navigation_bar: true"></AdminView>
       <div class="flex flex-row w-full h-full">
         <SideNavigationBar
             v-if="show?.hasOwnProperty('side_navigation_bar') ? show.side_navigation_bar: true"></SideNavigationBar>

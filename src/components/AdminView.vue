@@ -17,7 +17,7 @@ export default {
     <router-link to="/">
       <div class="flex flex-row items-center">
         <img
-            class="w-[3vh] m-[0.5vh] invert"
+            class="w-[3vh] m-[0.5vh] invert contrast-200"
             src="/static/svg/首页.svg"
             alt="首页"
         />

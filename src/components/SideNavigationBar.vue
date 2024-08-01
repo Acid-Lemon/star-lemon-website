@@ -27,7 +27,7 @@ export default {
 </script>
 
 <template>
-  <div class="w-[150px] py-[10px] shadow-md">
+  <div class="bg-blue-100 shadow-md w-[150px] py-[10px]">
     <div class="w-full flex flex-col items-center">
       <div v-for="page in pages" class="m-[1vh]">
         <router-link :to="page.link" class="flex flex-row items-center relative">

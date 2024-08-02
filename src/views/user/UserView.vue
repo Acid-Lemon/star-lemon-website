@@ -101,13 +101,6 @@ export default {
 
       this.dialog_visible = false;
     },
-    // 选择文件
-    handleAvatarChange(file) {
-      this.avatar = URL.createObjectURL(file.raw);
-    },
-    handleBackgroundChange(file) {
-      this.background = URL.createObjectURL(file.raw);
-    },
   }
 }
 </script>
@@ -138,7 +131,6 @@ export default {
             <el-upload
                 style="width: 15vh;height: 15vh;border: 1px dashed var(--el-border-color);border-radius: 6px;cursor: pointer;position: relative;overflow: hidden;transition: var(--el-transition-duration-fast);"
                 :file-list = avatar
-                :on-change="handleAvatarChange"
                 action=""
                 list-type="picture"
                 :auto-upload = false
@@ -153,7 +145,6 @@ export default {
               <el-upload
                   style="width: 30vh;height: 15vh;border: 1px dashed var(--el-border-color);border-radius: 6px;cursor: pointer;position: relative;overflow: hidden;transition: var(--el-transition-duration-fast);"
                   :file-list = background
-                  :on-change="handleBackgroundChange"
                   action=""
                   list-type="picture"
                   :auto-upload = false

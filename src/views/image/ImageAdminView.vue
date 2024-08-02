@@ -70,6 +70,10 @@ export default {
         skip_number
       })
       if(!res.success){
+        if(res.code === "err_no_folder") {
+          this.$router.push('/404');
+          return
+        }
         ElNotification({
           title: 'Error',
           type: "error",
@@ -107,10 +111,6 @@ export default {
       });
 
       if (!res.success) {
-        if(res.code === "err_no_folder") {
-          this.$router.push('/404');
-          return
-        }
         ElNotification({
           title: 'Error',
           type: "error",

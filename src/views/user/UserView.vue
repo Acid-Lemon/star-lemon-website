@@ -101,6 +101,9 @@ export default {
 
       this.dialog_visible = false;
     },
+    change() {
+      console.log(this.background)
+    }
   }
 }
 </script>
@@ -130,13 +133,13 @@ export default {
             <span>头像：</span>
             <el-upload
                 style="width: 15vh;height: 15vh;border: 1px dashed var(--el-border-color);border-radius: 6px;cursor: pointer;position: relative;overflow: hidden;transition: var(--el-transition-duration-fast);"
-                :file-list = avatar
+                v-model:file-list = avatar
                 action=""
                 list-type="picture"
                 :auto-upload = false
                 :disabled="is_disabled"
             >
-              <img v-if="avatar.length !== 0" :src="avatar" style="width: 15vh;height: 15vh" alt="avatar"/>
+              <img v-if="avatar.length !== 0" :src="avatar[0].url" style="width: 15vh;height: 15vh" alt="avatar"/>
               <el-icon v-else style="width: 15vh;height: 15vh;font-size: 28px;color: #8c939d;text-align: center;"><Plus /></el-icon>
             </el-upload>
           </div>
@@ -144,12 +147,12 @@ export default {
             <span @click="this.background">个人背景：</span>
               <el-upload
                   style="width: 30vh;height: 15vh;border: 1px dashed var(--el-border-color);border-radius: 6px;cursor: pointer;position: relative;overflow: hidden;transition: var(--el-transition-duration-fast);"
-                  :file-list = background
+                  v-model:file-list = background
                   action=""
                   list-type="picture"
                   :auto-upload = false
               >
-                <img v-if="background.length !== 0" :src="background" style="width: 30vh;height: 15vh" alt="background"/>
+                <img v-if="background.length !== 0" :src="background[0].url" style="width: 30vh;height: 15vh" alt="background"/>
                 <el-icon v-else style="width: 30vh;height: 15vh;font-size: 28px;color: #8c939d;text-align: center;"><Plus /></el-icon>
               </el-upload>
             </div>

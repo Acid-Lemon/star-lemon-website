@@ -16,7 +16,7 @@ export default {
     return {
       value: "",
       message_list: [],
-      button_disabled: false,
+      is_disabled: false,
       is_focus: false,
       pages: 0,
       sentences: null,
@@ -332,7 +332,7 @@ export default {
       return true;
     },
     async publish_message() {
-      this.button_disabled = true;
+      this.is_disabled = true;
 
       let message = this.value;
 
@@ -342,12 +342,12 @@ export default {
           type: "error",
           message: "请先进行登录",
         });
-        this.button_disabled = false;
+        this.is_disabled = false;
         return;
       }
 
       if (!this.check_message(message)) {
-        this.button_disabled = false;
+        this.is_disabled = false;
         return;
       }
 
@@ -357,7 +357,7 @@ export default {
 
       if (res.api_call_success) {
         this.value = "";
-        this.button_disabled = false;
+        this.is_disabled = false;
       }
 
       if (!res.success) {
@@ -389,7 +389,7 @@ export default {
         type: "success",
         message: "发送成功"
       });
-      this.button_disabled = false;
+      this.is_disabled = false;
     },
     divide(text) {
       let li = [];

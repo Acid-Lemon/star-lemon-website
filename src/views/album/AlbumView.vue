@@ -28,7 +28,7 @@ export default {
 
       ],
       photo_album: "",
-      hasphoto_albums: true,
+      has_photo_albums: true,
       active_name: "shared",
     };
   },
@@ -55,7 +55,7 @@ export default {
       }
       this.photo_albums = res.data.folders_info;
 
-      this.hasphoto_albums = this.photo_albums.length !== 0;
+      this.has_photo_albums = this.photo_albums.length !== 0;
     },
   }
 };
@@ -69,7 +69,7 @@ export default {
         <el-tab-pane label="共享相册" name="shared">
           <div class="h-[85vh]">
           <el-scrollbar>
-            <div v-if="hasphoto_albums"
+            <div v-if="has_photo_albums"
                  class="md:columns-5 columns-2 column-gap-[20px]">
               <div v-for="photo_album in photo_albums"
                    :key="photo_album.id"
@@ -100,7 +100,7 @@ export default {
         <el-tab-pane label="公共相册" name="public">
           <div class="h-[85vh]">
           <el-scrollbar>
-            <div v-if="hasphoto_albums"
+            <div v-if="has_photo_albums"
                  class="md:columns-5 columns-2 column-gap-[20px]">
               <div v-for="photo_album in photo_albums"
                    :key="photo_album.id"
@@ -131,7 +131,7 @@ export default {
         <el-tab-pane label="私密相册" name="private">
           <div class="h-[85vh]">
           <el-scrollbar>
-            <div v-if="hasphoto_albums"
+            <div v-if="has_photo_albums"
                  class="md:columns-5 columns-2 column-gap-[20px]">
               <div v-for="photo_album in photo_albums"
                    :key="photo_album.id"

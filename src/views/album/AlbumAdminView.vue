@@ -29,7 +29,7 @@ export default {
 
       ],
       photo_album: "",
-      hasphoto_albums: true,
+      has_photo_albums: true,
       active_name: "shared",
       disabled: false,
     };
@@ -56,7 +56,7 @@ export default {
       }
       this.photo_albums = res.data.folders_info;
 
-      this.hasphoto_albums = this.photo_albums.length !== 0;
+      this.has_photo_albums = this.photo_albums.length !== 0;
     },
     async createNewphoto_album(){
       let res = await call_api("album/create_folder", {
@@ -103,7 +103,7 @@ export default {
               <el-button type="primary" @click="createNewphoto_album()" :disabled="disabled">新建相册</el-button>
             </div>
             <el-scrollbar>
-              <div v-if="hasphoto_albums"
+              <div v-if="has_photo_albums"
                    class="md:columns-5 columns-2 column-gap-[20px]">
                 <div v-for="photo_album in photo_albums"
                      :key="photo_album.id"
@@ -138,7 +138,7 @@ export default {
               <el-button type="primary" @click="createNewphoto_album()" :disabled="disabled">新建相册</el-button>
             </div>
             <el-scrollbar>
-              <div v-if="hasphoto_albums"
+              <div v-if="has_photo_albums"
                    class="md:columns-5 columns-2 column-gap-[20px]">
                 <div v-for="photo_album in photo_albums"
                      :key="photo_album.id"
@@ -173,7 +173,7 @@ export default {
               <el-button type="primary" @click="createNewphoto_album()" :disabled="disabled">新建相册</el-button>
             </div>
             <el-scrollbar>
-              <div v-if="hasphoto_albums"
+              <div v-if="has_photo_albums"
                    class="md:columns-5 columns-2 column-gap-[20px]">
                 <div v-for="photo_album in photo_albums"
                      :key="photo_album.id"

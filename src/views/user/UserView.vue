@@ -139,7 +139,7 @@ export default {
                 :auto-upload = false
                 :disabled="is_disabled"
             >
-              <img v-if="avatar.length !== 0" :src="avatar[0].url" style="width: 15vh;height: 15vh" alt="avatar"/>
+              <el-image v-if="avatar.length !== 0" :src="avatar[0].url" class="w-[15vh] h-[15vh]" alt="avatar"/>
               <el-icon v-else style="width: 15vh;height: 15vh;font-size: 28px;color: #8c939d;text-align: center;"><Plus /></el-icon>
             </el-upload>
           </div>
@@ -152,7 +152,7 @@ export default {
                   list-type="picture"
                   :auto-upload = false
               >
-                <img v-if="background.length !== 0" :src="background[0].url" style="width: 30vh;height: 15vh" alt="background"/>
+                <el-image v-if="background.length !== 0" :src="background[0].url" class="w-[30vh] h-[15vh]" alt="background"/>
                 <el-icon v-else style="width: 30vh;height: 15vh;font-size: 28px;color: #8c939d;text-align: center;"><Plus /></el-icon>
               </el-upload>
             </div>

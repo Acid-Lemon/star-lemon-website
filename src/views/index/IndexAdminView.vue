@@ -9,10 +9,10 @@ export default {
   },
   data() {
     return {
-      webName: useWebConfigStore()?.webName,
-      newWebName: useWebConfigStore()?.webName,
-      webNameDialog: false,
-      timeState: "",
+      web_name: useWebConfigStore()?.web_name,
+      new_web_name: useWebConfigStore()?.web_name,
+      web_name_dialog: false,
+      time_state: "",
       info: "",
     };
   },
@@ -65,7 +65,7 @@ export default {
           <span>网站信息</span>
         </div>
       </template>
-      <div @click="webNameDialog = true">网站名称：{{ webName }}</div>
+      <div @click="web_name_dialog = true">网站名称：{{ web_name }}</div>
       <template #footer>{{ info.name }}，{{ getTimeGreetings() }}</template>
     </el-card>
     <el-row class="ml-[20px] mt-[20px]">
@@ -77,19 +77,19 @@ export default {
       </el-col>
     </el-row>
     <el-dialog
-        v-model="webNameDialog"
+        v-model="web_name_dialog"
         :before-close="handleClose"
         title="修改信息"
         width="500"
     >
-      <el-input v-model="newWebName" class="w-[240px]" placeholder="请输入新的网站名称"/>
+      <el-input v-model="new_web_name" class="w-[240px]" placeholder="请输入新的网站名称"/>
       <template #footer>
         <div class="dialog-footer">
           <el-button
-              @click="webNameDialog = false; newWebName = webName">取消
+              @click="web_name_dialog = false; new_web_name = web_name">取消
           </el-button>
           <el-button type="primary"
-                     @click="webNameDialog = false; webName = newWebName">
+                     @click="web_name_dialog = false; web_name = new_web_name">
             确定
           </el-button>
         </div>

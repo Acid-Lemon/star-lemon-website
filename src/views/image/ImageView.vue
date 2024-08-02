@@ -11,8 +11,8 @@ export default {
       image: null,
       search_content: "",
       date_range: null,
-      hasMore: true,
-      loadingMore: false,
+      has_more: true,
+      loading_more: false,
       pages: 0,
     }
   },
@@ -30,7 +30,7 @@ export default {
       });
     },
     state() {
-      return !this.hasMore || this.loadingMore
+      return !this.has_more || this.loading_more
     }
   },
   async mounted() {
@@ -38,7 +38,7 @@ export default {
   },
   methods:{
     async get_images() {
-      this.loadingMore = true;
+      this.loading_more = true;
       this.pages += 1;
       console.log(`开始加载第${this.pages}页数据`);
       let start_time = new Date().getTime();
@@ -68,7 +68,7 @@ export default {
           message: `获取图片失败`
         });
         this.pages -= 1;
-        this.loadingMore = false;
+        this.loading_more = false;
         console.log(res);
 
         return
@@ -76,8 +76,8 @@ export default {
       console.log(`第${this.pages}页数据已加载`);
       this.images = this.images.concat(res.data.images_info);
 
-      this.hasMore = res.data.images_info.length === 20;
-      this.loadingMore = false;
+      this.has_more = res.data.images_info.length === 20;
+      this.loading_more = false;
     },
     clear() {
       this.search_content = "";
@@ -159,10 +159,10 @@ export default {
           <div v-else class="w-full h-[85vh] flex flex-row items-center justify-center">
             <div class="font-['RGBZ'] text-[40px]">当前相册没有图片</div>
           </div>
-          <div v-if="loadingMore" class="w-full h-[20vh] flex flex-row items-center justify-center">
+          <div v-if="loading_more" class="w-full h-[20vh] flex flex-row items-center justify-center">
             <div class="text-[3vh] font-['RGBZ']">正在加载中</div>
           </div>
-          <div v-if="!hasMore" class="w-full h-[20vh] flex flex-row items-center justify-center">
+          <div v-if="!has_more" class="w-full h-[20vh] flex flex-row items-center justify-center">
             <div class="text-[3vh] font-['RGBZ']">没有更多图片惹</div>
           </div>
         </el-scrollbar>

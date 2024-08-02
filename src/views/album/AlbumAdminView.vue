@@ -10,7 +10,7 @@ export default {
     return {
       images: [
       ],
-      photoAlbumsTypes: [
+      photo_albums_types: [
         {
           value: 'shared',
           label: '共享相册'
@@ -24,13 +24,13 @@ export default {
           label: '私密相册'
         },
       ],
-      photoAlbumName: "",
-      photoAlbums: [
+      photo_album_name: "",
+      photo_albums: [
 
       ],
-      photoAlbum: "",
-      hasPhotoAlbums: true,
-      activeName: "shared",
+      photo_album: "",
+      hasphoto_albums: true,
+      active_name: "shared",
       disabled: false,
     };
   },
@@ -39,10 +39,10 @@ export default {
   },
   methods: {
     async get_folders() {
-      this.photoAlbums = [];
+      this.photo_albums = [];
 
       let res = await call_api("album/get_folders", {
-        public_state: this.activeName
+        public_state: this.active_name
       });
       if (!res.success) {
         ElNotification({
@@ -54,14 +54,14 @@ export default {
 
         return;
       }
-      this.photoAlbums = res.data.folders_info;
+      this.photo_albums = res.data.folders_info;
 
-      this.hasPhotoAlbums = this.photoAlbums.length !== 0;
+      this.hasphoto_albums = this.photo_albums.length !== 0;
     },
-    async createNewPhotoAlbum(){
+    async createNewphoto_album(){
       let res = await call_api("album/create_folder", {
-        folder_name: this.photoAlbumName,
-        public_state: this.activeName
+        folder_name: this.photo_album_name,
+        public_state: this.active_name
       });
 
       if(!res.success){
@@ -74,13 +74,13 @@ export default {
         return;
       }
 
-      this.photoAlbums.push({
-        name: this.photoAlbumName,
+      this.photo_albums.push({
+        name: this.photo_album_name,
         id: res.data.folder_id,
-        value: this.activeName,
+        value: this.active_name,
       });
-      this.photoAlbumName = "";
-      this.photoAlbum = this.photoAlbums[this.photoAlbums.length - 1];
+      this.photo_album_name = "";
+      this.photo_album = this.photo_albums[this.photo_albums.length - 1];
 
       ElNotification({
         title: 'Success',
@@ -95,20 +95,20 @@ export default {
 <template>
   <div class="w-full h-full flex flex-col items-center overflow-y-hidden bg-[#F8FAFD]">
     <div class="h-[95vh] w-[90vw]">
-      <el-tabs v-model="activeName" class="demo-tabs" @tab-change="get_folders">
+      <el-tabs v-model="active_name" class="demo-tabs" @tab-change="get_folders">
         <el-tab-pane label="共享相册" name="shared">
           <div class="h-[95vh]">
             <div class="flex flex-row items-center mb-[20px]">
-              <el-input v-model="photoAlbumName" style="width: 240px;margin-right: 20px" placeholder="相册名"></el-input>
-              <el-button type="primary" @click="createNewPhotoAlbum()" :disabled="disabled">新建相册</el-button>
+              <el-input v-model="photo_album_name" style="width: 240px;margin-right: 20px" placeholder="相册名"></el-input>
+              <el-button type="primary" @click="createNewphoto_album()" :disabled="disabled">新建相册</el-button>
             </div>
             <el-scrollbar>
-              <div v-if="hasPhotoAlbums"
+              <div v-if="hasphoto_albums"
                    class="md:columns-5 columns-2 column-gap-[20px]">
-                <div v-for="photoAlbum in photoAlbums"
-                     :key="photoAlbum.id"
+                <div v-for="photo_album in photo_albums"
+                     :key="photo_album.id"
                      class="shadow-md break-inside-avoid mb-[20px]">
-                  <router-link :to="'/admin/album/' + photoAlbum.name + '?album_id=' + photoAlbum.id">
+                  <router-link :to="'/admin/album/' + photo_album.name + '?album_id=' + photo_album.id">
                     <div>
                       <el-image src=""  class="w-full h-[20vh]" fit="cover">
                         <template #error>
@@ -119,8 +119,8 @@ export default {
                       </el-image>
                     </div>
                     <div>
-                      <div class="text-[14px] px-[10px] py-[2px] whitespace-normal break-all">相册名：{{ photoAlbum.name }}</div>
-                      <div class="text-[14px] px-[10px] py-[2px] whitespace-normal break-all">id：{{ photoAlbum.id }}</div>
+                      <div class="text-[14px] px-[10px] py-[2px] whitespace-normal break-all">相册名：{{ photo_album.name }}</div>
+                      <div class="text-[14px] px-[10px] py-[2px] whitespace-normal break-all">id：{{ photo_album.id }}</div>
                     </div>
                   </router-link>
                 </div>
@@ -134,16 +134,16 @@ export default {
         <el-tab-pane label="公共相册" name="public">
           <div class="h-[95vh]">
             <div class="flex flex-row items-center mb-[20px]">
-              <el-input v-model="photoAlbumName" style="width: 240px;margin-right: 20px" placeholder="相册名"></el-input>
-              <el-button type="primary" @click="createNewPhotoAlbum()" :disabled="disabled">新建相册</el-button>
+              <el-input v-model="photo_album_name" style="width: 240px;margin-right: 20px" placeholder="相册名"></el-input>
+              <el-button type="primary" @click="createNewphoto_album()" :disabled="disabled">新建相册</el-button>
             </div>
             <el-scrollbar>
-              <div v-if="hasPhotoAlbums"
+              <div v-if="hasphoto_albums"
                    class="md:columns-5 columns-2 column-gap-[20px]">
-                <div v-for="photoAlbum in photoAlbums"
-                     :key="photoAlbum.id"
+                <div v-for="photo_album in photo_albums"
+                     :key="photo_album.id"
                      class="shadow-md break-inside-avoid mb-[20px]">
-                  <router-link :to="'/admin/album/' + photoAlbum.name + '?album_id=' + photoAlbum.id">
+                  <router-link :to="'/admin/album/' + photo_album.name + '?album_id=' + photo_album.id">
                     <div>
                       <el-image src=""  class="w-full h-[20vh]" fit="cover">
                         <template #error>
@@ -154,8 +154,8 @@ export default {
                       </el-image>
                     </div>
                     <div>
-                      <div class="text-[14px] px-[10px] py-[2px] whitespace-normal break-all">相册名：{{ photoAlbum.name }}</div>
-                      <div class="text-[14px] px-[10px] py-[2px] whitespace-normal break-all">id：{{ photoAlbum.id }}</div>
+                      <div class="text-[14px] px-[10px] py-[2px] whitespace-normal break-all">相册名：{{ photo_album.name }}</div>
+                      <div class="text-[14px] px-[10px] py-[2px] whitespace-normal break-all">id：{{ photo_album.id }}</div>
                     </div>
                   </router-link>
                 </div>
@@ -169,16 +169,16 @@ export default {
         <el-tab-pane label="私密相册" name="private">
           <div class="h-[95vh]">
             <div class="flex flex-row items-center mb-[20px]">
-              <el-input v-model="photoAlbumName" style="width: 240px;margin-right: 20px" placeholder="相册名"></el-input>
-              <el-button type="primary" @click="createNewPhotoAlbum()" :disabled="disabled">新建相册</el-button>
+              <el-input v-model="photo_album_name" style="width: 240px;margin-right: 20px" placeholder="相册名"></el-input>
+              <el-button type="primary" @click="createNewphoto_album()" :disabled="disabled">新建相册</el-button>
             </div>
             <el-scrollbar>
-              <div v-if="hasPhotoAlbums"
+              <div v-if="hasphoto_albums"
                    class="md:columns-5 columns-2 column-gap-[20px]">
-                <div v-for="photoAlbum in photoAlbums"
-                     :key="photoAlbum.id"
+                <div v-for="photo_album in photo_albums"
+                     :key="photo_album.id"
                      class="shadow-md break-inside-avoid mb-[20px]">
-                  <router-link :to="'/admin/album/' + photoAlbum.name + '?album_id=' + photoAlbum.id">
+                  <router-link :to="'/admin/album/' + photo_album.name + '?album_id=' + photo_album.id">
                     <div>
                       <el-image src=""  class="w-full h-[20vh]" fit="cover">
                         <template #error>
@@ -189,8 +189,8 @@ export default {
                       </el-image>
                     </div>
                     <div>
-                      <div class="text-[14px] px-[10px] py-[2px] whitespace-normal break-all">相册名：{{ photoAlbum.name }}</div>
-                      <div class="text-[14px] px-[10px] py-[2px] whitespace-normal break-all">id：{{ photoAlbum.id }}</div>
+                      <div class="text-[14px] px-[10px] py-[2px] whitespace-normal break-all">相册名：{{ photo_album.name }}</div>
+                      <div class="text-[14px] px-[10px] py-[2px] whitespace-normal break-all">id：{{ photo_album.id }}</div>
                     </div>
                   </router-link>
                 </div>

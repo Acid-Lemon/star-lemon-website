@@ -12,42 +12,23 @@ export default {
   components: {Plus},
   data() {
     return {
-      dialogVisible: false,
+      dialog_visible: false,
       name: null,
       birthday: null,
       personal_sign: null,
       avatar: [],
       background: [],
-      avatarList: [
-        "/static/avatar/1.jpg",
-        "/static/avatar/2.jpg",
-        "/static/avatar/3.jpg",
-        "/static/avatar/4.jpg",
-        "/static/avatar/5.jpg",
-        "/static/avatar/6.jpg",
-        "/static/avatar/7.jpg",
-        "/static/avatar/8.jpg",
-        "/static/avatar/9.jpg",
-        "/static/avatar/10.jpg",
-        "/static/avatar/11.jpg",
-        "/static/avatar/12.jpg",
-        "/static/avatar/13.jpg",
-        "/static/avatar/14.jpg",
-        "/static/avatar/15.jpg",
-        "/static/avatar/16.jpg",
-        "/static/avatar/17.jpg",
-        "/static/avatar/18.jpg",
-        "/static/avatar/19.jpg",
-        "/static/avatar/20.jpg",
-      ],
-      clickFlag: -1,
-      isDisabled: false,
+      avatar_list: [],
+      avatars_nums: 99,
+      click_flag: -1,
+      is_disabled: false,
     };
   },
   mounted() {
     this.name = this.userInfo.name;
     this.birthday = this.userInfo.birthday;
     this.personal_sign = this.userInfo.personal_sign;
+    this.loadAvatars();
   },
   computed: {
     userInfo() {
@@ -56,6 +37,12 @@ export default {
     }
   },
   methods: {
+    loadAvatars() {
+      while (this.avatars_nums > 0) {
+        this.avatar_list.push(`/static/avatar/${this.avatars_nums}.jpg`);
+        this.avatars_nums--;
+      }
+    },
     handleClose(done) {
       ElMessageBox.confirm('确认关闭？（未提交的信息不会保存）', '提示', {
         confirmButtonText: '确定',
@@ -68,13 +55,13 @@ export default {
           });
     },
     choose(index) {
-      if(this.clickFlag !== index) {
-        this.isDisabled = true;
+      if(this.click_flag !== index) {
+        this.is_disabled = true;
         this.avatar = [];
-        this.clickFlag = index;
+        this.click_flag = index;
       } else {
-        this.isDisabled = false;
-        this.clickFlag = -1;
+        this.is_disabled = false;
+        this.click_flag = -1;
       }
     },
     get_info(field) {
@@ -112,7 +99,7 @@ export default {
       localStorage.removeItem("user");
       await load_user();
 
-      this.dialogVisible = false;
+      this.dialog_visible = false;
     },
     // 选择文件
     handleAvatarChange(file) {
@@ -135,10 +122,10 @@ export default {
         <p v-if="userInfo?.birthday" class="font-['SYST'] text-[14px] mr-[20px] leading-none pb-[5px]">生日：{{ userInfo?.birthday }}</p>
         <p class="font-['SYST'] text-[14px] opacity-50 leading-none pb-[5px]">{{ userInfo?.personal_sign }}</p>
       </div>
-      <el-button class="absolute bottom-[-5vh] right-[10vw]" plain @click="dialogVisible = true">
+      <el-button class="absolute bottom-[-5vh] right-[10vw]" plain @click="dialog_visible = true">
         编辑信息
       </el-button>
-      <el-dialog v-model="dialogVisible" :before-close="handleClose" align-center
+      <el-dialog v-model="dialog_visible" :before-close="handleClose" align-center
                  class="flex flex-col items-center justify-center el-overlay-dialog"
                  style="padding: 50px;height: 56vh;width:120vh">
         <template #header>
@@ -155,7 +142,7 @@ export default {
                 action=""
                 list-type="picture"
                 :auto-upload = false
-                :disabled="isDisabled"
+                :disabled="is_disabled"
             >
               <img v-if="avatar.length !== 0" :src="avatar" style="width: 15vh;height: 15vh" alt="avatar"/>
               <el-icon v-else style="width: 15vh;height: 15vh;font-size: 28px;color: #8c939d;text-align: center;"><Plus /></el-icon>
@@ -178,8 +165,8 @@ export default {
           <div class="w-[50vh] my-[5px]">
             <el-scrollbar height="250px">
               <div class="grid gap-x-4 gap-y-[20px] grid-cols-4 auto-rows-auto w-full h-full">
-                <div v-for="(avatar,index) in avatarList" :key="avatar"
-                     :class="{'border-[2px]':clickFlag === index,'border-[#08d9d6]':clickFlag === index}"
+                <div v-for="(avatar,index) in avatar_list" :key="avatar"
+                     :class="{'border-[2px]':click_flag === index,'border-[#08d9d6]':click_flag === index}"
                      class="w-full shadow-md"
                      @click="choose(index)">
                   <el-image :src="avatar" class="w-full h-full" fit="cover"/>
@@ -205,7 +192,7 @@ export default {
         </template>
         <template #footer>
           <div class="flex flex-row justify-end items-end">
-            <el-button class="mx-[40px]" @click="dialogVisible = false">取消</el-button>
+            <el-button class="mx-[40px]" @click="dialog_visible = false">取消</el-button>
             <el-button class="mx-[40px]" type="primary" @click="update_info()">确定</el-button>
           </div>
         </template>

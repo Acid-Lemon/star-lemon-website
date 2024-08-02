@@ -9,9 +9,9 @@ export default {
   data() {
     return {
       pages: [],
-      hoveredPage: null,
-      hoveredTimeout: null,
-      isHoveredSecondary: false,
+      hovered_page: null,
+      hovered_timeout: null,
+      is_hovered_secondary: false,
     };
   },
   mounted() {
@@ -22,13 +22,13 @@ export default {
     // 如果用户未登录，则过滤掉用户信息页面 & 管理页面
     filteredPages() {
       return this.pages.filter(page => {
-        const loginMatch = !(page.name === "登录" && this.isLogin);
-        const userMatch = !(page.name === "个人" && !this.isLogin);
-        const adminMatch = !(page.name === "管理" && !this.isLogin);
+        const loginMatch = !(page.name === "登录" && this.is_login);
+        const userMatch = !(page.name === "个人" && !this.is_login);
+        const adminMatch = !(page.name === "管理" && !this.is_login);
         return loginMatch && userMatch && adminMatch;
       });
     },
-    isLogin() {
+    is_login() {
       const userInfoStore = useUserInfoStore();
       return !!userInfoStore.userInfo;
     },
@@ -53,30 +53,30 @@ export default {
     },
     // 光标移入导航标签时触发
     onMouseEnter(page) {
-      this.hoveredPage = page;
+      this.hovered_page = page;
       // 清除光标移出导航标签回调函数
-      clearTimeout(this.hoveredTimeout);
+      clearTimeout(this.hovered_timeout);
     },
     // 光标移出导航标签时触发
     onMouseLeave() {
-      this.hoveredTimeout = setTimeout(() => {
-        if (!this.isHoveredSecondary) {
-          this.hoveredPage = null;
+      this.hovered_timeout = setTimeout(() => {
+        if (!this.is_hovered_secondary) {
+          this.hovered_page = null;
         }
       }, 300); // 延迟300ms
     },
     // 鼠标移入二级菜单时触发
     onSecondaryMouseEnter() {
       // 清除光标移出导航标签回调函数
-      clearTimeout(this.hoveredTimeout);
+      clearTimeout(this.hovered_timeout);
       // 光标在二级菜单上时
-      this.isHoveredSecondary = true;
+      this.is_hovered_secondary = true;
     },
     // 鼠标移出二级菜单时触发
     onSecondaryMouseLeave() {
-      this.isHoveredSecondary = false;
-      this.hoveredTimeout = setTimeout(() => {
-        this.hoveredPage = null;
+      this.is_hovered_secondary = false;
+      this.hovered_timeout = setTimeout(() => {
+        this.hovered_page = null;
       }, 300); // 延迟300ms
     },
     loginOut(){
@@ -114,10 +114,10 @@ export default {
           />
           <span class="md:block hidden hover:text-[#44cef6] md:m-[0.5vh] mb-[0.5vh]  font-['SYST'] duration-700">{{ page.name }}</span>
         </router-link>
-        <div v-show="page.name === '个人' && hoveredPage === page" class="absolute flex flex-col items-center justify-center bottom-[-5vh] w-[10vh] h-[4vh] bg-[#FFFFFF] bg-opacity-50 rounded shadow-md duration-700" @mouseenter="onSecondaryMouseEnter" @mouseleave="onSecondaryMouseLeave" @click="loginOut">
+        <div v-show="page.name === '个人' && hovered_page === page" class="absolute flex flex-col items-center justify-center bottom-[-5vh] w-[10vh] h-[4vh] bg-[#FFFFFF] bg-opacity-50 rounded shadow-md duration-700" @mouseenter="onSecondaryMouseEnter" @mouseleave="onSecondaryMouseLeave" @click="loginOut">
           取消登录
         </div>
-        <div v-show="page.name === '文章' && hoveredPage === page" class="absolute flex flex-col items-center justify-center bottom-[-5vh] w-[10vh] h-[4vh] bg-[#FFFFFF] bg-opacity-50 rounded shadow-md duration-700" @mouseenter="onSecondaryMouseEnter" @mouseleave="onSecondaryMouseLeave">
+        <div v-show="page.name === '文章' && hovered_page === page" class="absolute flex flex-col items-center justify-center bottom-[-5vh] w-[10vh] h-[4vh] bg-[#FFFFFF] bg-opacity-50 rounded shadow-md duration-700" @mouseenter="onSecondaryMouseEnter" @mouseleave="onSecondaryMouseLeave">
           一件小事
         </div>
       </div>

@@ -11,7 +11,7 @@ export default {
   <div class="bg-blue-500 flex flex-row items-center justify-between pl-[10px] w-full h-[5vh] shadow-md px-[10px]">
     <router-link to="/admin">
       <div class="text-[#FFFFFF] text-[20px] font-['SYST'] duration-700 hover:text-[#44cef6]">
-        {{ useWebConfigStore().webName }}：后台管理系统
+        {{ useWebConfigStore().web_name }}：后台管理系统
       </div>
     </router-link>
     <router-link to="/">

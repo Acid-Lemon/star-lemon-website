@@ -3,7 +3,7 @@
 export default {
   data() {
     return {
-      pictureUrl: [
+      picture_url: [
         "/static/picture/1.jpg",
         "/static/picture/2.jpg"
       ],
@@ -25,7 +25,7 @@ export default {
         <div class="flex flex-col">
           <div class="md:w-[500px] w-[90vw] md:h-[280px] h-[50vw] md:ml-[20px] ml-[5vw]">
             <el-carousel trigger="click" motion-blur>
-              <el-carousel-item v-for="picture in pictureUrl" :key="picture">
+              <el-carousel-item v-for="picture in picture_url" :key="picture">
                 <el-image :src="picture" fit="cover"/>
               </el-carousel-item>
             </el-carousel>

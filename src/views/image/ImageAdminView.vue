@@ -8,9 +8,9 @@ export default {
   components: {ElAutoResizer,UploadFilled, ArrowLeft},
   data() {
     return {
-      photoAlbums: [],
-      photoAlbum: null,
-      photoAlbumsTypes: [
+      photo_albums: [],
+      photo_album: null,
+      photo_albums_types: [
         {
           value: 'shared',
           label: '共享相册'
@@ -24,7 +24,7 @@ export default {
           label: '私密相册'
         },
       ],
-      photoAlbumsType: {
+      photo_albums_type: {
         value: 'private',
         label: '私密相册'
       },
@@ -34,16 +34,16 @@ export default {
         { value: 'CCD', label: 'CCD' },
       ],
       device: { value: 'EOS 500D', label: '佳能 500D' },
-      photoAlbumName: "",
-      imageList: [],
-      photoList: [],
-      uploadUrl: "",
+      photo_album_name: "",
+      image_list: [],
+      photo_list: [],
+      upload_url: "",
       data:{},
       images: [],
       disabled: false,
       index: 0,
       pages: 0,
-      currentPage: 1,
+      current_page: 1,
       date: null
     }
   },
@@ -86,24 +86,24 @@ export default {
     upload() {
       console.log("开始");
       this.disabled = true;
-      this.photoList = this.imageList;
+      this.photo_list = this.image_list;
       this.uploadImage();
     },
     async uploadImage(){
-      if (this.index >= this.photoList.length) {
-        this.photoList = [];
-        this.imageList = [];
+      if (this.index >= this.photo_list.length) {
+        this.photo_list = [];
+        this.image_list = [];
         this.index = 0;
         this.disabled = false;
         return;
       }
 
-      this.imageList = [];
-      this.imageList.push(this.photoList[this.index]);
+      this.image_list = [];
+      this.image_list.push(this.photo_list[this.index]);
 
       let res = await call_api("album/create_image", {
         folder_id: this.$route.query.album_id,
-        image_name: this.imageList[0].name
+        image_name: this.image_list[0].name
       });
 
       if (!res.success) {
@@ -124,7 +124,7 @@ export default {
         return;
       }
 
-      this.uploadUrl = res.data.upload_file_options.url;
+      this.upload_url = res.data.upload_file_options.url;
       this.data = res.data.upload_file_options.formData;
 
       this.$refs.upload.submit();
@@ -151,7 +151,7 @@ export default {
       console.log("删除")
     },
     async change() {
-      if(this.pages + 1 === this.currentPage) {
+      if(this.pages + 1 === this.current_page) {
         await this.get_images()
       }
 
@@ -223,27 +223,27 @@ export default {
         <div class="w-full flex flex-row justify-between items-center">
           <div class="flex flex-row justify-center items-center">
             <el-upload
-                v-model:file-list="imageList"
+                v-model:file-list="image_list"
                 ref="upload"
                 :multiple = true
                 :auto-upload = false
                 :show-file-list = false
                 style="margin-right: 20px"
-                :action = "uploadUrl"
+                :action = "upload_url"
                 :data = "data"
                 :on-success="onSuccess"
                 :on-error="onError"
             >
               <el-button type="primary" :disabled="disabled">选择图片</el-button>
             </el-upload>
-            <div class="mr-[20px]" @click="console.log(this.imageList)">已选择{{ imageList.length }}张照片</div>
-            <el-button @click="this.imageList = []" :disabled="disabled" style="margin-right: 100px">清除</el-button>
+            <div class="mr-[20px]" @click="console.log(this.image_list)">已选择{{ image_list.length }}张照片</div>
+            <el-button @click="this.image_list = []" :disabled="disabled" style="margin-right: 100px">清除</el-button>
           </div>
           <el-button type="primary" @click="upload" :disabled="disabled">上传</el-button>
         </div>
       </div>
     <div class="w-[95%] my-[2vh]">
-      <el-table :data="images[currentPage - 1]" border max-height="70vh" style="width: 100%">
+      <el-table :data="images[current_page - 1]" border max-height="70vh" style="width: 100%">
         <el-table-column type="index" width="50"/>
         <el-table-column label="图片名称" prop="name" width="150"/>
         <el-table-column label="图片id" prop="id" width="250"/>
@@ -260,7 +260,7 @@ export default {
           </template>
         </el-table-column>
       </el-table>
-      <el-pagination layout="prev, pager, next" v-model:current-page="currentPage" :page-count="pageCount()" @change="change()" />
+      <el-pagination layout="prev, pager, next" v-model:current-page="current_page" :page-count="pageCount()" @change="change()" />
     </div>
   </div>
 </template>

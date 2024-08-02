@@ -16,12 +16,12 @@ export default {
     return {
       value: "",
       message_list: [],
-      buttonDisabled: false,
-      isFocus: false,
+      button_disabled: false,
+      is_focus: false,
       pages: 0,
       sentences: null,
-      loadingMore: false,
-      hasMore: true,
+      loading_more: false,
+      has_more: true,
       emoji:[
         {
           value:"**doge**",
@@ -224,12 +224,12 @@ export default {
   },
   computed: {
     style_mode() {
-      return !(this.value === '' && this.isFocus === false);
+      return !(this.value === '' && this.is_focus === false);
     },
     state() {
-      return !this.hasMore || this.loadingMore
+      return !this.has_more || this.loading_more
     },
-    isLogin() {
+    is_login() {
       const userInfoStore = useUserInfoStore();
       return userInfoStore.userInfo !== null;
     },
@@ -261,10 +261,10 @@ export default {
       }
     },
     onFocus() {
-      this.isFocus = true;
+      this.is_focus = true;
     },
     onBlur() {
-      this.isFocus = false;
+      this.is_focus = false;
     },
     clear() {
       this.value = "";
@@ -284,7 +284,7 @@ export default {
       }));
     },
     async get_messages() {
-      this.loadingMore = true;
+      this.loading_more = true;
       this.pages += 1;
       let start_time = new Date().getTime();
       let skip_number = 0;
@@ -309,15 +309,15 @@ export default {
           type: 'error',
         });
         this.pages -= 1;
-        this.loadingMore = false;
+        this.loading_more = false;
         return;
       }
 
       this.message_list = this.message_list.concat(await this.messages_format(res.data.messages));
       console.log(this.message_list);
 
-      this.loadingMore = false;
-      this.hasMore = res.data.messages.length === 20;
+      this.loading_more = false;
+      this.has_more = res.data.messages.length === 20;
     },
     check_message(message) {
       if (message.length === 0) {
@@ -332,22 +332,22 @@ export default {
       return true;
     },
     async publish_message() {
-      this.buttonDisabled = true;
+      this.button_disabled = true;
 
       let message = this.value;
 
-      if (!this.isLogin) {
+      if (!this.is_login) {
         ElNotification({
           title: 'Error',
           type: "error",
           message: "请先进行登录",
         });
-        this.buttonDisabled = false;
+        this.button_disabled = false;
         return;
       }
 
       if (!this.check_message(message)) {
-        this.buttonDisabled = false;
+        this.button_disabled = false;
         return;
       }
 
@@ -357,7 +357,7 @@ export default {
 
       if (res.api_call_success) {
         this.value = "";
-        this.buttonDisabled = false;
+        this.button_disabled = false;
       }
 
       if (!res.success) {
@@ -389,7 +389,7 @@ export default {
         type: "success",
         message: "发送成功"
       });
-      this.buttonDisabled = false;
+      this.button_disabled = false;
     },
     divide(text) {
       let li = [];
@@ -536,8 +536,8 @@ export default {
             <div class="p-[1vh] flex flex-row items-center" ref="messageRef"></div>
           </div>
         </div>
-        <div class="text-[3vh] font-['RGBZ']" v-if="loadingMore">正在加载中</div>
-        <div class="text-[3vh] font-['RGBZ']" v-if="!hasMore">没有更多留言惹</div>
+        <div class="text-[3vh] font-['RGBZ']" v-if="loading_more">正在加载中</div>
+        <div class="text-[3vh] font-['RGBZ']" v-if="!has_more">没有更多留言惹</div>
         <div class="w-[70%]"><el-divider content-position="left">列车已到站</el-divider></div>
       </div>
       <div class="h-[50px] w-full my-[50px]"></div>

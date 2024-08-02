@@ -8,9 +8,9 @@
       return {
         message_list: [],
         pages: 0,
-        currentPage: 1,
+        current_page: 1,
         info: null,
-        activeName: "all",
+        active_name: "all",
       }
     },
 
@@ -80,7 +80,7 @@
 
       },
       async change() {
-        if(this.pages + 1 === this.currentPage) {
+        if(this.pages + 1 === this.current_page) {
           await this.get_messages()
         }
 
@@ -101,10 +101,10 @@
 
 <template>
   <div class="w-full h-[95vh] bg-[#F8FAFD] flex flex-col content-center items-center">
-    <el-tabs v-model="activeName" class="w-[95%]" @tab-click="handleClick">
+    <el-tabs v-model="active_name" class="w-[95%]" @tab-click="handleClick">
       <el-tab-pane label="全部" name="all">
     <div class="w-full">
-      <el-table :data="message_list[currentPage - 1]" border max-height="80vh" :row-style="(row) => {return row.row.public_state ? '--el-table-tr-bg-color: var(--el-color-success-light-9)' : '--el-table-tr-bg-color: var(--el-color-warning-light-9)'}" style="width: 100%">
+      <el-table :data="message_list[current_page - 1]" border max-height="80vh" :row-style="(row) => {return row.row.public_state ? '--el-table-tr-bg-color: var(--el-color-success-light-9)' : '--el-table-tr-bg-color: var(--el-color-warning-light-9)'}" style="width: 100%">
         <el-table-column type="index" width="50" />
         <el-table-column label="留言id" prop="id" width="250"/>
         <el-table-column label="内容" prop="content"/>
@@ -119,7 +119,7 @@
                 type="primary"
                 @click="handleShow(scope.$index, scope.row)"
             >
-              {{ message_list[currentPage - 1][scope.$index].public_state ? "私有" : "公开" }}
+              {{ message_list[current_page - 1][scope.$index].public_state ? "私有" : "公开" }}
             </el-button>
             <el-button
                 size="small"
@@ -131,7 +131,7 @@
           </template>
         </el-table-column>
       </el-table>
-      <el-pagination layout="prev, pager, next" v-model:current-page="currentPage" :page-count="pageCount()" @change="change()" />
+      <el-pagination layout="prev, pager, next" v-model:current-page="current_page" :page-count="pageCount()" @change="change()" />
     </div>
     </el-tab-pane>
     </el-tabs>

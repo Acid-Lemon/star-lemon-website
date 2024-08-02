@@ -16,14 +16,14 @@ export default {
   data() {
     return {
       value: 0,
-      innerAudioContext: null,
-      playState: 'pause',
+      inner_audio_context: null,
+      play_state: 'pause',
       duration: 0,
-      currentTime: 0,
-      randomIndex: 0,
-      lyricList: [],
-      displayState: false,
-      musicList: [
+      current_time: 0,
+      random_index: 0,
+      lyric_list: [],
+      display_state: false,
+      music_list: [
         {
           name: 'Young',
           singer: 'The Chainsmokers',
@@ -105,30 +105,30 @@ export default {
     }
   },
   mounted() {
-    this.innerAudioContext = uni.createInnerAudioContext();
-    this.innerAudioContext.volume = 0.5;
+    this.inner_audio_context = uni.createInnerAudioContext();
+    this.inner_audio_context.volume = 0.5;
     this.switchMusic();
-    this.innerAudioContext.onCanplay(() => {
-      this.duration = this.innerAudioContext.duration;
+    this.inner_audio_context.onCanplay(() => {
+      this.duration = this.inner_audio_context.duration;
 
     })
-    this.innerAudioContext.onPlay(() => {
-      this.playState = 'play';
-      this.innerAudioContext.onTimeUpdate(() => {
-        this.currentTime = this.innerAudioContext.currentTime;
-        this.value = this.currentTime;
+    this.inner_audio_context.onPlay(() => {
+      this.play_state = 'play';
+      this.inner_audio_context.onTimeUpdate(() => {
+        this.current_time = this.inner_audio_context.current_time;
+        this.value = this.current_time;
         this.setOffset()
       });
     });
-    this.innerAudioContext.onPause(() => {
-      this.playState = 'pause'
+    this.inner_audio_context.onPause(() => {
+      this.play_state = 'pause'
     });
-    this.innerAudioContext.onEnded(() => {
+    this.inner_audio_context.onEnded(() => {
       this.switchMusic();
       this.play();
 
     });
-    this.innerAudioContext.onError((res) => {
+    this.inner_audio_context.onError((res) => {
       console.log(res.errMsg);
       console.log(res.errCode);
     });
@@ -143,13 +143,13 @@ export default {
   methods: {
     truncateText,
     async play() {
-      this.innerAudioContext.play();
+      this.inner_audio_context.play();
       this.deleteLyricElements();
-      await this.readLyrics(this.musicList[this.randomIndex].lrc);
+      await this.readLyrics(this.music_list[this.random_index].lrc);
       this.createLyricElements();
     },
     pause() {
-      this.innerAudioContext.pause();
+      this.inner_audio_context.pause();
     },
     musicTime(duration) {
       let f = Math.floor(duration / 60)
@@ -163,35 +163,35 @@ export default {
       return `${f}:${m}`
     },
     change() {
-      if (this.value - this.currentTime > 5 || this.value - this.currentTime < -5) {
-        this.innerAudioContext.seek(this.value)
+      if (this.value - this.current_time > 5 || this.value - this.current_time < -5) {
+        this.inner_audio_context.seek(this.value)
       }
       return 0;
     },
     toggleDisplay() {
-      this.displayState = !this.displayState;
+      this.display_state = !this.display_state;
     },
     switchMusic() {
-      this.randomIndex = Math.floor(Math.random() * this.musicList.length);
-      this.innerAudioContext.src = this.musicList[this.randomIndex].src;
+      this.random_index = Math.floor(Math.random() * this.music_list.length);
+      this.inner_audio_context.src = this.music_list[this.random_index].src;
     },
     upMusic() {
-      if (this.randomIndex === 0) {
-        this.randomIndex = this.musicList.length - 1;
+      if (this.random_index === 0) {
+        this.random_index = this.music_list.length - 1;
       } else {
-        this.randomIndex--;
+        this.random_index--;
       }
-      this.innerAudioContext.src = this.musicList[this.randomIndex].src;
+      this.inner_audio_context.src = this.music_list[this.random_index].src;
       this.play();
 
     },
     downMusic() {
-      if (this.randomIndex === this.musicList.length - 1) {
-        this.randomIndex = 0;
+      if (this.random_index === this.music_list.length - 1) {
+        this.random_index = 0;
       } else {
-        this.randomIndex++;
+        this.random_index++;
       }
-      this.innerAudioContext.src = this.musicList[this.randomIndex].src;
+      this.inner_audio_context.src = this.music_list[this.random_index].src;
       this.play();
     },
     readLyrics(filePath) {
@@ -210,7 +210,7 @@ export default {
                   const words = lyric.words;
                   const timeArr = timeStr.split(":");
                   const time = parseInt(timeArr[0]) * 60 + parseFloat(timeArr[1]);
-                  this.lyricList.push({time, words});
+                  this.lyric_list.push({time, words});
                 }
               }
               resolve();
@@ -228,9 +228,9 @@ export default {
     },
     createLyricElements() {
       let frag = document.createDocumentFragment();
-      for(let i = 0; i < this.lyricList.length; i++){
+      for(let i = 0; i < this.lyric_list.length; i++){
         const p = document.createElement('p');
-        p.textContent = this.lyricList[i].words;
+        p.textContent = this.lyric_list[i].words;
         p.style.color = '#FFFFFF';
         p.style.lineHeight ="6vh";
         p.style.fontSize = '3vh';
@@ -242,17 +242,17 @@ export default {
       lyric.appendChild(frag);
     },
     deleteLyricElements() {
-      this.lyricList = [];
+      this.lyric_list = [];
       document.getElementById('lyric').querySelectorAll('p').forEach((p) => {
         p.remove();
       });
     },
     findIndex(){
-      if(this.currentTime >= this.lyricList[this.lyricList.length - 1].time) {
-        return this.lyricList.length - 1;//没找到则显示最后一句歌词
+      if(this.current_time >= this.lyric_list[this.lyric_list.length - 1].time) {
+        return this.lyric_list.length - 1;//没找到则显示最后一句歌词
       }
-      for(let i = 0; i < this.lyricList.length; i++){
-        if(this.currentTime <= this.lyricList[i].time) {
+      for(let i = 0; i < this.lyric_list.length; i++){
+        if(this.current_time <= this.lyric_list[i].time) {
           return i - 1;
         }
       }
@@ -269,22 +269,22 @@ export default {
 </script>
 
 <template>
-    <div :class="{'left-0':displayState,'left-[-42vh]':!displayState}"
+    <div :class="{'left-0':display_state,'left-[-42vh]':!display_state}"
        class=" transition-all duration-500 fixed bottom-[40px] left-0 w-[44vh] h-[12vh] bg-white z-[1000] flex flex-row items-center justify-between shadow-md">
       <div class="ml-[2vh]">
         <div class="w-[38vh] flex flex-row justify-between items-center">
           <div class="flex flex-row">
             <div class="mt-[1vh]">
-              <el-avatar :src="musicList[this.randomIndex].cover"
+              <el-avatar :src="music_list[this.random_index].cover"
                        style="width: 5.6vh;height:5.6vh"></el-avatar>
             </div>
             <div class="flex flex-col">
               <div class="ml-[1vh] mt-[1vh] text-[2.2vh] font-['SYST']">{{
-                truncateText(musicList[this.randomIndex].name, 6)
+                truncateText(music_list[this.random_index].name, 6)
               }}
               </div>
               <div class="ml-[1vh] text-[1.6vh] font-['SYST']">{{
-                  truncateText(musicList[this.randomIndex].singer, 6)
+                  truncateText(music_list[this.random_index].singer, 6)
                 }}
               </div>
             </div>
@@ -293,11 +293,11 @@ export default {
             <el-icon style="width: 3vh;height:3vh;margin-left: 5px;margin-right: 5px" @click="upMusic">
               <ArrowLeftBold style="width: 3vh;height:3vh"/>
             </el-icon>
-            <el-icon v-if="playState === 'pause'" style="width: 3vh;height:3vh;margin-left: 5px;margin-right: 5px"
+            <el-icon v-if="play_state === 'pause'" style="width: 3vh;height:3vh;margin-left: 5px;margin-right: 5px"
                    @click="play">
               <VideoPlay style="width: 3vh;height:3vh"/>
             </el-icon>
-            <el-icon v-if="playState === 'play'" style="width: 3vh;height:3vh;margin-left: 5px;margin-right: 5px"
+            <el-icon v-if="play_state === 'play'" style="width: 3vh;height:3vh;margin-left: 5px;margin-right: 5px"
                    @click="pause">
               <VideoPause style="width: 3vh;height:3vh"/>
             </el-icon>
@@ -307,7 +307,7 @@ export default {
           </div>
         </div>
         <div class="w-[38vh] flex flex-row">
-          <div class="font-['SYST']">{{ musicTime(this.currentTime) }}</div>
+          <div class="font-['SYST']">{{ musicTime(this.current_time) }}</div>
           <el-slider v-model="value" :change="change()" :max="duration" :show-tooltip="false" size="small"
                    style="margin-left: 15px;margin-right: 15px;width: 30vh"/>
           <div class="font-['SYST']">{{ musicTime(this.duration) }}</div>
@@ -315,10 +315,10 @@ export default {
       </div>
       <div class="w-[2vh] h-[12vh] border-l border-[#000000] flex flex-col justify-center items-center"
          @click="toggleDisplay">
-        <el-icon v-if="displayState">
+        <el-icon v-if="display_state">
           <CaretLeft/>
         </el-icon>
-        <el-icon v-if="!displayState">
+        <el-icon v-if="!display_state">
           <CaretRight/>
         </el-icon>
       </div>

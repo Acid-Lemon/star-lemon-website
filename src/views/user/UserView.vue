@@ -134,6 +134,7 @@ export default {
             <el-upload
                 style="width: 15vh;height: 15vh;border: 1px dashed var(--el-border-color);border-radius: 6px;cursor: pointer;position: relative;overflow: hidden;transition: var(--el-transition-duration-fast);"
                 v-model:file-list = avatar
+                :show-file-list = false
                 action=""
                 list-type="picture"
                 :auto-upload = false
@@ -148,6 +149,7 @@ export default {
               <el-upload
                   style="width: 30vh;height: 15vh;border: 1px dashed var(--el-border-color);border-radius: 6px;cursor: pointer;position: relative;overflow: hidden;transition: var(--el-transition-duration-fast);"
                   v-model:file-list = background
+                  :show-file-list = false
                   action=""
                   list-type="picture"
                   :auto-upload = false

@@ -166,7 +166,7 @@ export default {
             <el-scrollbar height="250px">
               <div class="grid gap-x-4 gap-y-[20px] grid-cols-4 auto-rows-auto w-full h-full">
                 <div v-for="(avatar,index) in avatar_list" :key="avatar"
-                     :class="{'border-[2px]':click_flag === index,'border-[#08d9d6]':click_flag === index}"
+                     :class="{'border-[2px] border-[#08d9d6]':click_flag === index}"
                      class="w-full shadow-md"
                      @click="choose(index)">
                   <el-image :src="avatar" class="w-full h-full" fit="cover"/>

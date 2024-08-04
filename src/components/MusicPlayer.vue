@@ -19,8 +19,6 @@ export default {
       value: 0,
       inner_audio_context: null,
       play_state: 'pause',
-      duration: 0,
-      current_time: 0,
       random_index: 0,
       lyric_list: [],
       display_state: false,
@@ -50,24 +48,19 @@ export default {
     this.inner_audio_context = uni.createInnerAudioContext();
     this.inner_audio_context.volume = 0.5;
     await this.switchMusic();
-    this.inner_audio_context.onCanplay(() => {
-      this.duration = this.inner_audio_context.duration;
-
-    })
     this.inner_audio_context.onPlay(() => {
       this.play_state = 'play';
       this.inner_audio_context.onTimeUpdate(() => {
-        this.current_time = this.inner_audio_context.currentTime;
-        this.value = this.current_time;
+        this.value = this.inner_audio_context.currentTime;
         this.setOffset()
       });
     });
     this.inner_audio_context.onPause(() => {
       this.play_state = 'pause'
     });
-    this.inner_audio_context.onEnded(() => {
-      this.switchMusic();
-      this.play();
+    this.inner_audio_context.onEnded(async () => {
+      await this.switchMusic();
+      await this.play();
 
     });
   },
@@ -108,18 +101,21 @@ export default {
       this.inner_audio_context.pause();
     },
     musicTime(duration) {
+      if(!duration) {
+        return '00:00'
+      }
       let f = Math.floor(duration / 60)
       if (f.toString().length === 1) {
         f = '0' + f;
       }
-      let m = Math.round(duration % 60)
+      let m = Math.floor(duration % 60)
       if (m.toString().length === 1) {
         m = '0' + m;
       }
       return `${f}:${m}`
     },
     change() {
-      if (this.value - this.current_time > 5 || this.value - this.current_time < -5) {
+      if (this.value - this.inner_audio_context.currentTime > 2 || this.value - this.inner_audio_context.currentTime < -2) {
         this.inner_audio_context.seek(this.value)
       }
       return 0;
@@ -193,11 +189,11 @@ export default {
       });
     },
     findIndex(){
-      if(this.current_time >= this.lyric_list[this.lyric_list.length - 1].time) {
+      if(this.inner_audio_context.currentTime >= this.lyric_list[this.lyric_list.length - 1].time) {
         return this.lyric_list.length - 1;//没找到则显示最后一句歌词
       }
       for(let i = 0; i < this.lyric_list.length; i++){
-        if(this.current_time <= this.lyric_list[i].time) {
+        if(this.inner_audio_context.currentTime <= this.lyric_list[i].time) {
           return i - 1;
         }
       }
@@ -251,10 +247,10 @@ export default {
           </div>
         </div>
         <div class="w-[38vh] flex flex-row">
-          <div class="font-['SYST']">{{ musicTime(this.current_time) }}</div>
-          <el-slider v-model="value" :change="change()" :max="duration" :show-tooltip="false" size="small"
+          <div class="font-['SYST']">{{ musicTime(this.inner_audio_context.currentTime) }}</div>
+          <el-slider v-model="value" :change="change()" :max="this.inner_audio_context.duration" :show-tooltip="false" size="small"
                    style="margin-left: 15px;margin-right: 15px;width: 30vh"/>
-          <div class="font-['SYST']">{{ musicTime(this.duration) }}</div>
+          <div class="font-['SYST']">{{ musicTime(this.inner_audio_context.duration) }}</div>
         </div>
       </div>
       <div class="w-[2vh] h-[12vh] border-l border-[#000000] flex flex-col justify-center items-center"

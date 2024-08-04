@@ -1,6 +1,6 @@
-function truncateText(text, maxChineseLength) {
+function truncate_text(text, max_chinese_length) {
     let currentLength = 0;
-    let truncatedText = '';
+    let current_text = '';
 
     for (let char of text) {
         // 检查字符是否为中文字符（通过字符的Unicode范围）
@@ -10,17 +10,17 @@ function truncateText(text, maxChineseLength) {
             currentLength += 1; // 英文字符长度加1
         }
 
-        if (currentLength <= maxChineseLength * 2) {
-            truncatedText += char;
+        if (currentLength <= max_chinese_length * 2) {
+            current_text += char;
         } else {
-            truncatedText += '...';
+            current_text += '...';
             break;
         }
     }
 
-    return truncatedText;
+    return current_text;
 }
 
 export {
-    truncateText
+    truncate_text
 }

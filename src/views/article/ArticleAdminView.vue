@@ -1,8 +1,8 @@
 <script>
-import {truncateText} from "@/src/utils/truncate_text";
+import {truncate_text} from "@/src/utils/truncate_text";
 export default {
   name: 'ArticleView',
-  methods: {truncateText},
+  methods: {truncate_text},
   components: {
 
   },
@@ -186,7 +186,7 @@ export default {
                     <div class="text-[1.5vh] font-['SYST'] opacity-50">{{ article.comments }}</div>
                   </div>
                 </div>
-                <div class="text-[1.5vh] font-['SYST']">{{ truncateText(article.content,300) }}</div>
+                <div class="text-[1.5vh] font-['SYST']">{{ truncate_text(article.content,300) }}</div>
               </div>
             </router-link>
           </div>

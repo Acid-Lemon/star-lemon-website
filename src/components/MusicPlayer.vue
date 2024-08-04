@@ -8,7 +8,8 @@ import {
   VideoPause,
   VideoPlay
 } from "@element-plus/icons-vue";
-import {truncateText} from "@/src/utils/truncate_text";
+import axios from "axios";
+import {truncate_text} from "../utils/truncate_text";
 
 export default {
   name: 'MusicPlayer',
@@ -24,90 +25,31 @@ export default {
       lyric_list: [],
       display_state: false,
       music_list: [
-        {
-          name: 'Young',
-          singer: 'The Chainsmokers',
-          src: '/static/music/Young - The Chainsmokers.mp3',
-          cover: '/static/cover/Young - The Chainsmokers.jpg',
-          lrc: '/static/lrc/Young - The Chainsmokers.lrc'
-        },
-        {
-          name: '去明天',
-          singer: '周深',
-          src: '/static/music/去明天 - 周深.mp3',
-          cover: '/static/cover/去明天 - 周深.jpg',
-          lrc: '/static/lrc/去明天 - 周深.lrc'
-        },
-        {
-          name: '第一次遇见花香的那刻',
-          singer: '7paste',
-          src: '/static/music/第一次遇见花香的那刻 - 7paste.mp3',
-          cover: '/static/cover/第一次遇见花香的那刻 - 7paste.jpg',
-          lrc: '/static/lrc/第一次遇见花香的那刻 - 7paste.lrc'
-        },
-        {
-          name: '你可以',
-          singer: 'coco这个李文',
-          src: '/static/music/你可以 - coco这个李文.mp3',
-          cover: '/static/cover/你可以 - coco这个李文.jpg',
-          lrc: '/static/lrc/你可以 - coco这个李文.lrc'
-        },
-        {
-          name: 'A Thousand Years',
-          singer: 'Jada Facer、Kyson Facer',
-          src: '/static/music/A Thousand Years - Jada Facer、Kyson Facer.mp3',
-          cover: '/static/cover/A Thousand Years - Jada Facer、Kyson Facer.jpg',
-          lrc: '/static/lrc/A Thousand Years - Jada Facer、Kyson Facer.lrc'
-        },
-        {
-          name: '从没去过巴塞隆纳',
-          singer: '告五人',
-          src: '/static/music/从没去过巴塞隆纳 - 告五人.mp3',
-          cover: '/static/cover/从没去过巴塞隆纳 - 告五人.jpg',
-          lrc: '/static/lrc/从没去过巴塞隆纳 - 告五人.lrc'
-        },
-        {
-          name: '风，信箱，阳光与你',
-          singer: 'RGR Y于新垚',
-          src: '/static/music/风，信箱，阳光与你 - RGR Y于新垚.mp3',
-          cover: '/static/cover/风，信箱，阳光与你 - RGR Y于新垚.jpg',
-          lrc: '/static/lrc/风，信箱，阳光与你 - RGR Y于新垚.lrc'
-        },
-        {
-          name: '流萤之森',
-          singer: 'Namibia',
-          src: '/static/music/流萤之森 - Namibia.mp3',
-          cover: '/static/cover/流萤之森 - Namibia.jpg',
-          lrc: '/static/lrc/流萤之森 - Namibia.lrc'
-        },
-        {
-          name: '烟雨小镇',
-          singer: '陈阿晓',
-          src: '/static/music/烟雨小镇 - 陈阿晓.mp3',
-          cover: '/static/cover/烟雨小镇 - 陈阿晓.jpg',
-          lrc: '/static/lrc/烟雨小镇 - 陈阿晓.lrc'
-        },
-        {
-          name: '有光',
-          singer: '买辣椒也用券',
-          src: '/static/music/有光 - 买辣椒也用券.mp3',
-          cover: '/static/cover/有光 - 买辣椒也用券.jpg',
-          lrc: '/static/lrc/有光 - 买辣椒也用券.lrc'
-        },
-        {
-          name: '在日落前出发',
-          singer: '江迟同学',
-          src: '/static/music/在日落前出发 - 江迟同学.mp3',
-          cover: '/static/cover/在日落前出发 - 江迟同学.jpg',
-          lrc: '/static/lrc/在日落前出发 - 江迟同学.lrc'
-        }
-      ]
+        'Young - The Chainsmokers',
+        '去明天 - 周深',
+        '第一次遇见花香的那刻 - 7paste',
+        '你可以 - coco这个李文',
+        'A Thousand Years - Jada Facer、Kyson Facer',
+        '从没去过巴塞隆纳 - 告五人',
+        '风，信箱，阳光与你 - RGR Y于新垚',
+        '流萤之森 - Namibia',
+        '烟雨小镇 - 陈阿晓',
+        '有光 - 买辣椒也用券',
+        '在日落前出发 - 江迟同学'
+      ],
+      music_info: {
+        cover: '',
+        name: '',
+        singer: '',
+        src: '',
+        lyric: ''
+      }
     }
   },
-  mounted() {
+  async mounted() {
     this.inner_audio_context = uni.createInnerAudioContext();
     this.inner_audio_context.volume = 0.5;
-    this.switchMusic();
+    await this.switchMusic();
     this.inner_audio_context.onCanplay(() => {
       this.duration = this.inner_audio_context.duration;
 
@@ -115,7 +57,7 @@ export default {
     this.inner_audio_context.onPlay(() => {
       this.play_state = 'play';
       this.inner_audio_context.onTimeUpdate(() => {
-        this.current_time = this.inner_audio_context.current_time;
+        this.current_time = this.inner_audio_context.currentTime;
         this.value = this.current_time;
         this.setOffset()
       });
@@ -128,10 +70,6 @@ export default {
       this.play();
 
     });
-    this.inner_audio_context.onError((res) => {
-      console.log(res.errMsg);
-      console.log(res.errCode);
-    });
   },
   onUnload() {
   },
@@ -141,11 +79,29 @@ export default {
   },
   watch: {},
   methods: {
-    truncateText,
+    truncate_text,
+    async get_music(n) {
+        await axios.get(
+          `https://www.hhlqilongzhu.cn/api/dg_qqmusic.php?gm=${this.music_list[n]}&n=1`
+        ).then((res) => {
+            this.music_info.cover = res.data.split('\n')[0].slice(5, -1);
+            this.music_info.name = res.data.split('\n')[1].slice(3);
+            this.music_info.singer = res.data.split('\n')[2].slice(3);
+            this.music_info.src = res.data.split('\n')[4].slice(5)
+        })
+    },
+    async get_lyric(n) {
+      await axios.get(
+          `https://www.hhlqilongzhu.cn/api/dg_geci.php?msg=${this.music_list[n]}&n=1&type=2`
+      ).then((res) => {
+        this.music_info.lyric = res.data;
+      });
+    },
     async play() {
       this.inner_audio_context.play();
       this.deleteLyricElements();
-      await this.readLyrics(this.music_list[this.random_index].lrc);
+      await this.get_lyric(this.random_index);
+      this.readLyrics(this.music_info.lyric);
       this.createLyricElements();
     },
     pause() {
@@ -171,60 +127,49 @@ export default {
     toggleDisplay() {
       this.display_state = !this.display_state;
     },
-    switchMusic() {
+    async switchMusic() {
       this.random_index = Math.floor(Math.random() * this.music_list.length);
-      this.inner_audio_context.src = this.music_list[this.random_index].src;
+      await this.get_music(this.random_index);
+      this.inner_audio_context.src = this.music_info.src;
     },
-    upMusic() {
+    async upMusic() {
       if (this.random_index === 0) {
         this.random_index = this.music_list.length - 1;
       } else {
         this.random_index--;
       }
-      this.inner_audio_context.src = this.music_list[this.random_index].src;
-      this.play();
+      await this.get_music(this.random_index);
+      this.inner_audio_context.src = this.music_info.src;
+      await this.play();
 
     },
-    downMusic() {
+    async downMusic() {
       if (this.random_index === this.music_list.length - 1) {
         this.random_index = 0;
       } else {
         this.random_index++;
       }
-      this.inner_audio_context.src = this.music_list[this.random_index].src;
-      this.play();
+      await this.get_music(this.random_index);
+      this.inner_audio_context.src = this.music_info.src;
+      await this.play();
     },
-    readLyrics(filePath) {
-      return new Promise((resolve, reject) => {
-        uni.request({
-          url: filePath,
-          success: (res) => {
-            if (res.statusCode === 200) {
-              const lines = res.data.split("\n")
-              for(let n = 0; n < lines?.length; n++){
-                const re = /\[(?<timeStr>.*?)](?<words>.*)/;
-                const match = re.exec(lines[n]);
-                if(match){
-                  const lyric = match.groups;
-                  const timeStr = lyric.timeStr;
-                  const words = lyric.words;
-                  const timeArr = timeStr.split(":");
-                  const time = parseInt(timeArr[0]) * 60 + parseFloat(timeArr[1]);
-                  this.lyric_list.push({time, words});
-                }
-              }
-              resolve();
-            } else {
-              console.error('读取文件失败，状态码：', res.statusCode);
-              reject({statusCode: res.statusCode});
-            }
-          },
-          fail: (err) => {
-            console.error('读取文件失败：', err);
-            reject(err);
-          }
-        })
-      });
+    readLyrics(lyric) {
+      const lines = lyric.split("\n")
+      for(let n = 0; n < lines?.length; n++) {
+        if(lines[n].slice(-1) === ']') continue;
+
+
+        const re = /\[(?<timeStr>.*?)](?<words>.*)/;
+        const match = re.exec(lines[n]);
+        if (match) {
+          const lyric = match.groups;
+          const timeStr = lyric.timeStr;
+          const words = lyric.words;
+          const timeArr = timeStr.split(":");
+          const time = parseInt(timeArr[0]) * 60 + parseFloat(timeArr[1]);
+          this.lyric_list.push({time, words});
+        }
+      }
     },
     createLyricElements() {
       let frag = document.createDocumentFragment();
@@ -256,7 +201,6 @@ export default {
           return i - 1;
         }
       }
-
     },
     setOffset(){
       const index = this.findIndex();
@@ -275,16 +219,16 @@ export default {
         <div class="w-[38vh] flex flex-row justify-between items-center">
           <div class="flex flex-row">
             <div class="mt-[1vh]">
-              <el-avatar :src="music_list[this.random_index].cover"
+              <el-avatar :src="music_info.cover"
                        style="width: 5.6vh;height:5.6vh"></el-avatar>
             </div>
             <div class="flex flex-col">
               <div class="ml-[1vh] mt-[1vh] text-[2.2vh] font-['SYST']">{{
-                truncateText(music_list[this.random_index].name, 6)
-              }}
+                  truncate_text(music_info.name, 6)
+                }}
               </div>
               <div class="ml-[1vh] text-[1.6vh] font-['SYST']">{{
-                  truncateText(music_list[this.random_index].singer, 6)
+                  truncate_text(music_info.singer, 6)
                 }}
               </div>
             </div>

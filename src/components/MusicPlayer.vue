@@ -74,6 +74,7 @@ export default {
   methods: {
     truncate_text,
     async get_music(n) {
+      // 获取音乐信息    API源于：龙珠API https://www.hhlqilongzhu.cn
         await axios.get(
           `https://www.hhlqilongzhu.cn/api/dg_qqmusic.php?gm=${this.music_list[n]}&n=1`
         ).then((res) => {
@@ -84,6 +85,7 @@ export default {
         })
     },
     async get_lyric(n) {
+      // 获取音乐歌词    API源于：龙珠API https://www.hhlqilongzhu.cn
       await axios.get(
           `https://www.hhlqilongzhu.cn/api/dg_geci.php?msg=${this.music_list[n]}&n=1&type=2`
       ).then((res) => {

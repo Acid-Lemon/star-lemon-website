@@ -58,7 +58,7 @@ export default {
 
       this.has_photo_albums = this.photo_albums.length !== 0;
     },
-    async createNewphoto_album(){
+    async create_new_photo_album(){
       let res = await call_api("album/create_folder", {
         folder_name: this.photo_album_name,
         public_state: this.active_name
@@ -100,7 +100,7 @@ export default {
           <div class="h-[95vh]">
             <div class="flex flex-row items-center mb-[20px]">
               <el-input v-model="photo_album_name" style="width: 240px;margin-right: 20px" placeholder="相册名"></el-input>
-              <el-button type="primary" @click="createNewphoto_album()" :disabled="disabled">新建相册</el-button>
+              <el-button type="primary" @click="create_new_photo_album()" :disabled="disabled">新建相册</el-button>
             </div>
             <el-scrollbar>
               <div v-if="has_photo_albums"
@@ -135,7 +135,7 @@ export default {
           <div class="h-[95vh]">
             <div class="flex flex-row items-center mb-[20px]">
               <el-input v-model="photo_album_name" style="width: 240px;margin-right: 20px" placeholder="相册名"></el-input>
-              <el-button type="primary" @click="createNewphoto_album()" :disabled="disabled">新建相册</el-button>
+              <el-button type="primary" @click="create_new_photo_album()" :disabled="disabled">新建相册</el-button>
             </div>
             <el-scrollbar>
               <div v-if="has_photo_albums"
@@ -170,7 +170,7 @@ export default {
           <div class="h-[95vh]">
             <div class="flex flex-row items-center mb-[20px]">
               <el-input v-model="photo_album_name" style="width: 240px;margin-right: 20px" placeholder="相册名"></el-input>
-              <el-button type="primary" @click="createNewphoto_album()" :disabled="disabled">新建相册</el-button>
+              <el-button type="primary" @click="create_new_photo_album()" :disabled="disabled">新建相册</el-button>
             </div>
             <el-scrollbar>
               <div v-if="has_photo_albums"

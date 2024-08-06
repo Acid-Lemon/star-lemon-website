@@ -1,5 +1,5 @@
 <script>
-import {useUserInfoStore} from "../stores/userInfo";
+import {use_user_info_store} from "../stores/userInfo";
 
 export default {
   name: "NavigationBar",
@@ -29,8 +29,8 @@ export default {
       });
     },
     is_login() {
-      const userInfoStore = useUserInfoStore();
-      return !!userInfoStore.userInfo;
+      const user_info_store = use_user_info_store();
+      return !!user_info_store.user_info;
     },
   },
   methods: {
@@ -84,8 +84,8 @@ export default {
       localStorage.removeItem("token");
       localStorage.removeItem("user");
       // 更新用户状态
-      const userInfoStore = useUserInfoStore();
-      userInfoStore.userInfo = null;
+      const user_infoStore = useUserInfoStore();
+      user_infoStore.user_info = null;
       // 更新导航栏
       this.updatePages();
       // 如果目前在个人页，则跳转到登录页

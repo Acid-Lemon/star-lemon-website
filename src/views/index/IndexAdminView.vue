@@ -20,7 +20,7 @@ export default {
     this.info = await get_user();
   },
   methods: {
-    handleClose(done) {
+    handle_close(done) {
       ElMessageBox.confirm('你确定取消更改吗?（已输入的内容不会被保存）').then(() => {
         done()
       }).catch(() => {
@@ -78,7 +78,7 @@ export default {
     </el-row>
     <el-dialog
         v-model="web_name_dialog"
-        :before-close="handleClose"
+        :before-close="handle_close"
         title="修改信息"
         width="500"
     >

@@ -33,6 +33,9 @@ export default {
       return !this.has_more || this.loading_more
     }
   },
+  watch: {
+
+  },
   async mounted() {
     await this.get_images();
   },
@@ -151,8 +154,8 @@ export default {
                   <el-image :src="image.temp_url" class="w-full h-auto" fit="cover"/>
                 </div>
                 <div>
-                  <div class="text-[14px] px-[10px] py-[2px] whitespace-normal break-all">图片：{{ image.name }}</div>
-                  <div class="text-[14px] px-[10px] py-[2px] whitespace-normal break-all">id：{{ image.id }}</div>
+                  <div id="image_name" class="px-[10px] py-[2px] text-[14px] whitespace-normal break-all">图片名：{{ image.name }}</div>
+                  <div id="image_id" class=" px-[10px] py-[2px] text-[14px] whitespace-normal break-all">图片id：{{ image.id }}</div>
                 </div>
             </div>
           </div>

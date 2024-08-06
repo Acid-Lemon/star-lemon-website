@@ -3,7 +3,6 @@ import NavigationBar from '@/src/components/NavigationBar.vue'
 import SideNavigationBar from '@/src/components/SideNavigationBar.vue'
 import AdminView from "@/src/components/AdminView.vue";
 import Copyright from '@/src/components/Copyright.vue'
-import musicPlayer from '@/src/components/musicPlayer.vue'
 
 import el_locale_zh_cn from 'element-plus/es/locale/lang/zh-cn'
 
@@ -28,8 +27,7 @@ export default {
     NavigationBar,
     SideNavigationBar,
     AdminView,
-    Copyright,
-    musicPlayer
+    Copyright
   }
 }
 </script>
@@ -46,7 +44,6 @@ export default {
       </div>
     </div>
     <Copyright v-if="show?.hasOwnProperty('copyright') ? show.copyright: true"></Copyright>
-    <music-player></music-player>
   </ElConfigProvider>
 </template>
 

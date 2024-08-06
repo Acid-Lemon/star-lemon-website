@@ -85,14 +85,14 @@ export default {
     }
   },
   methods: {
-    handleScroll(distance) {
+    handle_scroll(distance) {
       const scrollHeight =this.$refs["el-scrollbar"].wrapRef.scrollHeight - this.$refs["el-scrollbar"].wrapRef.offsetHeight;
       this.scrollPercentage = Math.round((distance.scrollTop / scrollHeight) * 100);
     },
-    backTop() {
+    back_top() {
       this.$refs["el-scrollbar"].wrapRef.scrollTop = 0;
     },
-    onBack() {
+    on_back() {
       if(window.history.length > 1) {
         this.$router.back()
       } else {
@@ -105,14 +105,14 @@ export default {
 
 <template>
   <div class="fixed top-0 left-0 w-full h-[6vh] p-[10px] z-[1000] flex flex-row items-center">
-    <div @click="onBack" class="flex flex-row items-center text-[#FFFFFF] font-['RGBZ']">
+    <div @click="on_back" class="flex flex-row items-center text-[#FFFFFF] font-['RGBZ']">
       <el-icon style="width: 25px; height: 25px"><arrow-left style="width: 25px; height: 25px" /></el-icon>
       返回
     </div>
     <div class="w-[1px] h-[80%] border border-[#FFFFFF] mx-[10px]"></div>
     <div class="text-[2vh] text-[#FFFFFF] font-['RGBZ']">文章</div>
   </div>
-  <el-scrollbar @scroll="handleScroll" ref="el-scrollbar">
+  <el-scrollbar @scroll="handle_scroll" ref="el-scrollbar">
   <div class="h-full w-full flex flex-col items-center justify-start">
     <div class="w-full min-h-[40vh] bg-[url('/static/background/23.jpg')] flex flex-col justify-center items-center bg-center bg-cover">
       <p class="text-[#FFFFFF] font-['FZSX'] text-[4vh] hover:text-[#44cef6] duration-700">
@@ -159,7 +159,7 @@ export default {
     </div>
   </div>
   </el-scrollbar>
-  <div v-if="scrollPercentage > 20" @click="backTop" class="fixed bottom-[40px] right-[40px] w-[40px] h-[40px] border-[2px] border-[#000000] rounded-full flex flex-row justify-center items-center">
+  <div v-if="scrollPercentage > 20" @click="back_top" class="fixed bottom-[40px] right-[40px] w-[40px] h-[40px] border-[2px] border-[#000000] rounded-full flex flex-row justify-center items-center">
     <el-icon style="width: 20px; height: 20px"><CaretTop style="width: 20px; height: 20px" /></el-icon>
   </div>
 </template>

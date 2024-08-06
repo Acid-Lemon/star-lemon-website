@@ -20,14 +20,14 @@ export default {
     this.info = await get_user();
   },
   methods: {
-    handleClose(done) {
+    handle_close(done) {
       ElMessageBox.confirm('你确定取消更改吗?（已输入的内容不会被保存）').then(() => {
         done()
       }).catch(() => {
         // catch error
       })
     },
-    getTimeGreetings() {
+    get_time_greetings() {
       const now = new Date();
       const hours = now.getHours();
 
@@ -66,7 +66,7 @@ export default {
         </div>
       </template>
       <div @click="web_name_dialog = true">网站名称：{{ web_name }}</div>
-      <template #footer>{{ info.name }}，{{ getTimeGreetings() }}</template>
+      <template #footer>{{ info.name }}，{{ get_time_greetings() }}</template>
     </el-card>
     <el-row class="ml-[20px] mt-[20px]">
       <el-col :span="6">
@@ -78,7 +78,7 @@ export default {
     </el-row>
     <el-dialog
         v-model="web_name_dialog"
-        :before-close="handleClose"
+        :before-close="handle_close"
         title="修改信息"
         width="500"
     >

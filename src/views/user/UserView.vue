@@ -5,7 +5,7 @@ import {call_api} from "@/src/utils/cloud";
 import {Plus} from "@element-plus/icons-vue";
 
 
-import {useUserInfoStore} from "../../stores/userInfo";
+import {use_user_info_store} from "../../stores/userInfo";
 
 
 export default {
@@ -25,25 +25,25 @@ export default {
     };
   },
   mounted() {
-    this.name = this.userInfo.name;
-    this.birthday = this.userInfo.birthday;
-    this.personal_sign = this.userInfo.personal_sign;
-    this.loadAvatars();
+    this.name = this.user_info.name;
+    this.birthday = this.user_info.birthday;
+    this.personal_sign = this.user_info.personal_sign;
+    this.load_avatars();
   },
   computed: {
-    userInfo() {
-      const userInfoStore = useUserInfoStore();
-      return userInfoStore.userInfo;
+    user_info() {
+      const user_info_store = use_user_info_store();
+      return user_info_store.user_info;
     }
   },
   methods: {
-    loadAvatars() {
+    load_avatars() {
       while (this.avatars_nums > 0) {
         this.avatar_list.push(`/static/avatar/${this.avatars_nums}.jpg`);
         this.avatars_nums--;
       }
     },
-    handleClose(done) {
+    handle_close(done) {
       ElMessageBox.confirm('确认关闭？（未提交的信息不会保存）', '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
@@ -113,15 +113,15 @@ export default {
     <div class="bg-[url('/static/background/12.jpg')] bg-cover bg-center h-[40vh] relative">
       <div class="absolute bottom-[-5vh] left-[10vw] flex flex-row items-end">
         <img alt="头像" class="h-[10vh] w-[10vh] rounded-full mr-[10px]" src="/static/favicon/favicon.png"/>
-        <p class="font-['SYST'] text-[24px] mr-[20px] leading-none pb-[5px]">{{ userInfo?.name ? userInfo.name : "未登录" }}</p>
+        <p class="font-['SYST'] text-[24px] mr-[20px] leading-none pb-[5px]">{{ user_info?.name ? user_info.name : "未登录" }}</p>
         <el-tag class="font-['SYST'] text-[18px] mr-[10px] leading-none pb-[5px]" type="primary" >用户</el-tag>
-        <p v-if="userInfo?.birthday" class="font-['SYST'] text-[14px] mr-[20px] leading-none pb-[5px]">生日：{{ userInfo?.birthday }}</p>
-        <p class="font-['SYST'] text-[14px] opacity-50 leading-none pb-[5px]">{{ userInfo?.personal_sign }}</p>
+        <p v-if="user_info?.birthday" class="font-['SYST'] text-[14px] mr-[20px] leading-none pb-[5px]">生日：{{ user_info?.birthday }}</p>
+        <p class="font-['SYST'] text-[14px] opacity-50 leading-none pb-[5px]">{{ user_info?.personal_sign }}</p>
       </div>
       <el-button class="absolute bottom-[-5vh] right-[10vw]" plain @click="dialog_visible = true">
         编辑信息
       </el-button>
-      <el-dialog v-model="dialog_visible" :before-close="handleClose" align-center
+      <el-dialog v-model="dialog_visible" :before-close="handle_close" align-center
                  class="flex flex-col items-center justify-center el-overlay-dialog"
                  style="padding: 50px;height: 56vh;width:120vh">
         <template #header>

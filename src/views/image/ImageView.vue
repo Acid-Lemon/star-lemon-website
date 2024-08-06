@@ -17,7 +17,7 @@ export default {
     }
   },
   computed: {
-    filteredImages() {
+    filtered_images() {
       const searchContent = this.search_content;
       const re = new RegExp(searchContent, 'i');
       const dateRange = this.date_range;
@@ -32,6 +32,9 @@ export default {
     state() {
       return !this.has_more || this.loading_more
     }
+  },
+  watch: {
+
   },
   async mounted() {
     await this.get_images();
@@ -90,14 +93,14 @@ export default {
       }
       return index;
     },
-    onBack() {
+    on_back() {
       if(window.history.length > 1) {
         this.$router.back()
       } else {
         this.$router.push('/album');
       }
     },
-    showDialog() {
+    show_dialog() {
 
     },
   }
@@ -107,7 +110,7 @@ export default {
 <template>
   <div class="h-full w-full flex flex-col justify-start items-center bg-[#F8FAFD]">
     <div class="fixed top-0 left-0 w-full h-[6vh] p-[10px] z-[1000] flex flex-row items-center">
-      <div @click="onBack" class="flex flex-row items-center text-[#000000] font-['RGBZ']">
+      <div @click="on_back" class="flex flex-row items-center text-[#000000] font-['RGBZ']">
         <el-icon style="width: 25px; height: 25px"><arrow-left style="width: 25px; height: 25px" /></el-icon>
         返回
       </div>
@@ -141,18 +144,18 @@ export default {
     </div>
       <div class="h-[82vh] w-[95vw] my-[2vh]">
         <el-scrollbar>
-          <div v-if="filteredImages.length > 0" v-infinite-scroll="get_images" :infinite-scroll-disabled="state" infinite-scroll-delay=1000 infinite-scroll-distance=100
+          <div v-if="filtered_images.length > 0" v-infinite-scroll="get_images" :infinite-scroll-disabled="state" infinite-scroll-delay=1000 infinite-scroll-distance=100
                class="md:columns-5 columns-2 column-gap-[20px]">
-            <div v-for="image in filteredImages"
+            <div v-for="image in filtered_images"
                  :key="image.id"
-                 @click="showDialog"
+                 @click="show_dialog"
                  class="shadow-md break-inside-avoid mb-[20px]">
                 <div @click="console.log(image)">
                   <el-image :src="image.temp_url" class="w-full h-auto" fit="cover"/>
                 </div>
                 <div>
-                  <div class="text-[14px] px-[10px] py-[2px] whitespace-normal break-all">图片：{{ image.name }}</div>
-                  <div class="text-[14px] px-[10px] py-[2px] whitespace-normal break-all">id：{{ image.id }}</div>
+                  <div id="image_name" class="px-[10px] py-[2px] text-[14px] whitespace-normal break-all">图片名：{{ image.name }}</div>
+                  <div id="image_id" class=" px-[10px] py-[2px] text-[14px] whitespace-normal break-all">图片id：{{ image.id }}</div>
                 </div>
             </div>
           </div>

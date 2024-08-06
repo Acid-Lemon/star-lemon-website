@@ -1,5 +1,4 @@
 <script>
-import {nextTick} from 'vue';
 import {call_api} from "@/src/utils/cloud";
 import {ElNotification} from "element-plus";
 
@@ -239,13 +238,6 @@ export default {
     },
   },
   watch: {
-    message_list: {
-      handler() {
-        // 当 message_list 发生变化时，调用插入标签函数
-        this.createLabel();
-      },
-      deep: true
-    }
   },
   methods: {
     async get_sentences() {
@@ -391,7 +383,7 @@ export default {
       });
       this.is_disabled = false;
     },
-    divide(text) {
+    emoji_divide(text) {
       let li = [];
       let emoji_re = /\*\*(.*?)\*\*/;
 
@@ -411,38 +403,6 @@ export default {
       }
 
       return li;
-    },
-    async createLabel() {
-      // 确保 DOM 更新完成
-      await nextTick();
-      this.$refs.messageRef.forEach((messageElement, index) => {
-        // 移除现有标签，避免重复
-        const existingTags = messageElement.querySelectorAll('.additional-tag');
-        existingTags.forEach(tag => tag.remove());
-
-        // 创建新的标签
-        let split_content = this.divide(this.message_list[index].content);
-        let frag = document.createDocumentFragment();
-        for(let i = 0; i < split_content.length; i++) {
-          if (split_content[i].type === "text") {
-            const span = document.createElement('span');
-            span.className = 'additional-tag';
-            span.style.fontSize = "2vh";
-            span.style.fontFamily = "SYST";
-            span.innerText = split_content[i].words;
-            frag.appendChild(span);
-          }
-          if (split_content[i].type === "emoji") {
-            const img = document.createElement('img');
-            img.src = "/static/emoji/" + split_content[i].words + ".png";
-            img.className = 'additional-tag';
-            img.style.width = "3vh";
-            img.style.height = "3vh";
-            frag.appendChild(img);
-          }
-        }
-        messageElement.appendChild(frag);
-      })
     },
     skip_number() {
       let index = 1;
@@ -533,7 +493,12 @@ export default {
                 <div class="text-[1.6vh] font-['SYST'] text-[#000000] opacity-80">{{ message.create_at_format_str }}</div>
               </div>
             </div>
-            <div class="p-[1vh] flex flex-row items-center" ref="messageRef"></div>
+            <div class="p-[1vh] flex flex-row items-center">
+              <div v-for="split_content in emoji_divide(message.content)" class="flex flex-row items-center">
+                <span v-if="split_content.type==='text'" class="text-[2vh] font-['SYST']">{{ split_content.words }}</span>
+                <el-image v-if="split_content.type==='emoji'" :src="'/static/emoji/' + split_content.words + '.png'" class="w-[3vh] h-[3vh]"></el-image>
+              </div>
+            </div>
           </div>
         </div>
         <div class="text-[3vh] font-['RGBZ']" v-if="loading_more">正在加载中</div>

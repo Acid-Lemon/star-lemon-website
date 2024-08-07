@@ -481,9 +481,10 @@ export default {
           <span class="text-[2vh] mb-[1vh] mx-[2vh] font-['FZSX']">{{ message_list.length }}条评论</span>
         </div>
       </div>
-      <div v-infinite-scroll="get_messages" :infinite-scroll-disabled="state" infinite-scroll-delay=1000 infinite-scroll-distance=100 class="h-full w-full flex flex-col items-center">
+      <div v-infinite-scroll="get_messages" :infinite-scroll-disabled="state" infinite-scroll-delay=1000 infinite-scroll-distance=100
+           class="h-full w-full flex flex-col items-center">
         <div v-for="message in message_list" :key="message.id"
-             class="my-[1em] flex flex-col items-center w-full">
+             class="my-[1em] flex flex-col items-center w-full animation">
           <div class="border border-[#000000] md:w-[70%] w-[85%] shadow-md bg-[#FFFFFF]">
             <div class="flex flex-row mt-[1vh] ml-[1vh]">
               <el-avatar style="width:5.4vh;height:5.4vh" :src="message.user.avatar_filename">{{ message.user.name }}
@@ -511,4 +512,22 @@ export default {
   </el-scrollbar>
 </template>
 <style scoped>
+
+@keyframes appear {
+  from {
+    opacity: 0;
+    transform: translateX(-50%)
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0)
+  }
+}
+
+.animation {
+  animation: appear linear;
+  animation-timeline: view();
+  animation-range: entry 0% cover 30%;
+}
+
 </style>

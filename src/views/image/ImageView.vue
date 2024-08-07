@@ -19,7 +19,7 @@ export default {
   computed: {
     filtered_images() {
       const searchContent = this.search_content;
-      const re = new RegExp(searchContent, 'i');
+      const re = new RegExp(this.search_content, 'i');
       const dateRange = this.date_range;
 
       return this.images.filter(image => {
@@ -100,10 +100,27 @@ export default {
         this.$router.push('/album');
       }
     },
-    show_dialog() {
+    search_divide(text) {
+      let li = [];
+      const search_re = new RegExp(this.search_content, 'i');
 
+        while (text.length) {
+          let match_res = search_re.exec(text);
+          if (match_res === null) {
+            li.push({type: "text", words: text});
+            break;
+          }
+          let match_full_text = match_res[0];
+          if (match_res.index > 0) {
+            li.push({type: "text", words: text.substring(0, match_res.index)});
+          }
+          text = text.slice(match_res.index + match_full_text.length);
+          li.push({type: "search", words: match_full_text});
+        }
+
+        return li;
+      }
     },
-  }
 }
 </script>
 
@@ -148,14 +165,24 @@ export default {
                class="md:columns-5 columns-2 column-gap-[20px]">
             <div v-for="image in filtered_images"
                  :key="image.id"
-                 @click="show_dialog"
                  class="shadow-md break-inside-avoid mb-[20px]">
                 <div @click="console.log(image)">
                   <el-image :src="image.temp_url" class="w-full h-auto" fit="cover"/>
                 </div>
                 <div>
-                  <div id="image_name" class="px-[10px] py-[2px] text-[14px] whitespace-normal break-all">图片名：{{ image.name }}</div>
-                  <div id="image_id" class=" px-[10px] py-[2px] text-[14px] whitespace-normal break-all">图片id：{{ image.id }}</div>
+                  <div class="px-[10px] py-[2px]">
+                    <div v-if="search_content!==''" class="flex flex-row items-center">
+                      <span class="text-[14px]">图片名：</span>
+                      <div v-for="split_content in search_divide(image.name)" class="flex flex-row items-center">
+                        <span v-if="split_content.type==='text'" class="text-[14px] text-[#000000]">{{ split_content.words }}</span>
+                        <span v-if="split_content.type==='search'" class="text-[14px] text-[#dd5a00]">{{ split_content.words }}</span>
+                      </div>
+                    </div>
+                    <div v-if="search_content===''" class="text-[14px]">图片名：{{ image.name }}</div>
+                  </div>
+                  <div class="px-[10px] py-[2px]">
+                    <span class="text-[14px]">图片id：{{ image.id }}</span>
+                  </div>
                 </div>
             </div>
           </div>

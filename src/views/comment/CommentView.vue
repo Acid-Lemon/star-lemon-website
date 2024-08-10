@@ -220,6 +220,7 @@ export default {
   async mounted() {
     await this.get_sentences();
     await this.get_messages();
+    console.log(this.message_list);
   },
   computed: {
     style_mode() {
@@ -268,9 +269,10 @@ export default {
       }
 
       return await Promise.all(messages.map((message) => {
-        return new Promise((resolve) => {
-          message.user.avatar_filename = message.user.avatar + ".jpg"
+        return new Promise( async (resolve) => {
           message.create_at_format_str = date_format(new Date(message.create_at));
+          message.user.avatar_url = await this.get_avatar_url(message.user?.avatar?.type, message.user?.avatar?.name);
+          console.log(message.user.avatar_url);
           resolve(message);
         })
       }));
@@ -411,6 +413,29 @@ export default {
       }
       return index;
     },
+    async get_avatar_url(type, name) {
+      if(!type || !name) {
+        return ''
+      }
+      if (type === "upload") {
+        let avatar_url_res = await call_api("user/profile/get_upload_avatar_temp_url", {
+          image_name: name,
+        });
+
+        if (avatar_url_res.success === false) {
+          ElNotification({
+            title: 'Error',
+            message: avatar_url_res,
+            type: 'error',
+          });
+          return;
+        }
+
+        return avatar_url_res.data.temp_url
+      } else {
+        return "/static/avatar/" + name
+      }
+    },
   }
 }
 </script>
@@ -487,7 +512,7 @@ export default {
              class="my-[1em] flex flex-col items-center w-full animation">
           <div class="border border-[#000000] md:w-[70%] w-[85%] shadow-md bg-[#FFFFFF]">
             <div class="flex flex-row mt-[1vh] ml-[1vh]">
-              <el-avatar style="width:5.4vh;height:5.4vh" :src="message.user.avatar_filename">{{ message.user.name }}
+              <el-avatar style="width:5.4vh;height:5.4vh" :src="message.user.avatar_url">{{ message.user.name }}
               </el-avatar>
               <div class="flex flex-col ml-[1vh]">
                 <div class="text-[2.2vh] font-['SYST']">{{ message.user.name }}</div>

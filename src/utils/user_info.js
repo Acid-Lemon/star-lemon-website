@@ -19,7 +19,7 @@ async function load_user() {
 		throw new Error(res.error_message);
 	}
 
-	store_user(res.data.user);
+	store_user(res.data.profile);
 }
 
 function get_user() {

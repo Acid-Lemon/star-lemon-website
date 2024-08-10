@@ -41,5 +41,17 @@ export default defineConfig({
         }),
         Components({
             resolvers: [ElementPlusResolver()],
-        })]
+        })
+    ],
+    build: {
+        rollupOptions: {
+            manualChunks: (id) => {
+                if (id.includes('node_modules/vue')) {
+                    return 'vue-vendor';
+                } else if (id.includes('node_modules')) {
+                    return 'other-vendor';
+                }
+            }
+        }
+    }
 });

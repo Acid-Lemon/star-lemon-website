@@ -12,7 +12,7 @@ export default {
     }
   },
   methods: {
-    releaseArticle(){
+    release_article(){
       console.log(this.value)
     },
 
@@ -35,10 +35,10 @@ export default {
         <p>文章封面：</p>
         <el-Input style="width: auto;height: 30px" placeholder="请输入一个图片链接"></el-Input>
       </div>
-      <el-button type="primary" @click="releaseArticle()">发布</el-button>
+      <el-button type="primary" @click="release_article()">发布</el-button>
     </div>
     <div class="w-[70vw]">
-      <my-editor @update:model-value="(value) => this.value = value"></my-editor>
+      <my-editor @update:model-value="(editor_value) => this.value = editor_value"></my-editor>
     </div>
   </div>
 </template>

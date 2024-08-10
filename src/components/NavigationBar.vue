@@ -1,5 +1,5 @@
 <script>
-import {useUserInfoStore} from "../stores/userInfo";
+import {use_user_info_store} from "../stores/userInfo";
 
 export default {
   name: "NavigationBar",
@@ -17,21 +17,29 @@ export default {
   mounted() {
   },
   computed: {
-    // 过滤掉登录和用户信息页面
-    // 如果用户已经登录，则过滤掉登录页面
-    // 如果用户未登录，则过滤掉用户信息页面 & 管理页面
+
+
+
     filteredPages() {
       return this.pages.filter(page => {
+        // 如果用户已经登录，则过滤掉登录页面
         const loginMatch = !(page.name === "登录" && this.is_login);
+        // 如果用户未登录，则过滤掉用户信息页面
         const userMatch = !(page.name === "个人" && !this.is_login);
-        const adminMatch = !(page.name === "管理" && !this.is_login);
+        // 如果用户不是管理员，则过滤掉管理页面
+        const adminMatch = !(page.name === "管理" && this.user_role === "administrator");
+
         return loginMatch && userMatch && adminMatch;
       });
     },
     is_login() {
-      const userInfoStore = useUserInfoStore();
-      return !!userInfoStore.userInfo;
+      const user_info_store = use_user_info_store();
+      return !!user_info_store.user_info;
     },
+    user_role() {
+      const user_info_store = use_user_info_store();
+      return user_info_store.user_info?.role;
+    }
   },
   methods: {
     // 更新导航栏
@@ -84,8 +92,8 @@ export default {
       localStorage.removeItem("token");
       localStorage.removeItem("user");
       // 更新用户状态
-      const userInfoStore = useUserInfoStore();
-      userInfoStore.userInfo = null;
+      const user_infoStore = useUserInfoStore();
+      user_infoStore.user_info = null;
       // 更新导航栏
       this.updatePages();
       // 如果目前在个人页，则跳转到登录页

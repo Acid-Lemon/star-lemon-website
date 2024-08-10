@@ -1,7 +1,7 @@
 import {
 	call_api
 } from "@/src/utils/cloud";
-import {useUserInfoStore} from "../stores/userInfo";
+import {use_user_info_store} from "../stores/userInfo";
 
 function store_token(token) {
 	uni.setStorageSync("token", token);
@@ -9,17 +9,17 @@ function store_token(token) {
 
 function store_user(user) {
 	uni.setStorageSync("user", user);
-	const userInfoStore = useUserInfoStore();
-	userInfoStore.userInfo = user;
+	const user_infoStore = use_user_info_store();
+	user_infoStore.user_info = user;
 }
 
 async function load_user() {
-	let res = await call_api("user/info/get_info");
+	let res = await call_api("user/profile/get_profile");
 	if (!res.success) {
 		throw new Error(res.error_message);
 	}
 
-	store_user(res.data.user);
+	store_user(res.data.profile);
 }
 
 function get_user() {

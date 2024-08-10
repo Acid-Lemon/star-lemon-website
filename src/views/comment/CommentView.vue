@@ -7,7 +7,7 @@ import {date_format} from "@/src/utils/time";
 import axios from "axios";
 import {Message} from "@element-plus/icons-vue";
 
-import {useUserInfoStore} from "../../stores/userInfo";
+import {use_user_info_store} from "../../stores/userInfo";
 
 export default {
   components:{Message},
@@ -229,12 +229,12 @@ export default {
       return !this.has_more || this.loading_more
     },
     is_login() {
-      const userInfoStore = useUserInfoStore();
-      return userInfoStore.userInfo !== null;
+      const user_infoStore = use_user_info_store();
+      return user_infoStore.user_info !== null;
     },
-    userInfo() {
-      const userInfoStore = useUserInfoStore();
-      return userInfoStore.userInfo;
+    user_info() {
+      const user_infoStore = use_user_info_store();
+      return user_infoStore.user_info;
     },
   },
   watch: {
@@ -252,10 +252,10 @@ export default {
         this.sentences = JSON.parse(window.sessionStorage.getItem("sentences"));
       }
     },
-    onFocus() {
+    on_focus() {
       this.is_focus = true;
     },
-    onBlur() {
+    on_blur() {
       this.is_focus = false;
     },
     clear() {
@@ -369,9 +369,9 @@ export default {
 		    public_state: res.data.public_state
       };
       new_message.user = {
-        id: this.userInfo.id,
-        name: this.userInfo.name,
-        avatar: this.userInfo.avatar
+        id: this.user_info.id,
+        name: this.user_info.name,
+        avatar: this.user_info.avatar
       };
 
       this.message_list.unshift(await this.messages_format([new_message]));
@@ -442,8 +442,8 @@ export default {
       </p>
       <div class="md:w-[70%] w-[85%] mt-[30px] flex flex-row justify-evenly items-center bg-[url('/static/background/17.jpg')] bg-cover rounded-xl shadow-md relative">
         <div class="md:flex md:flex-col md:items-center md:justify-between h-[6vw] hidden self-start mt-[4vh]">
-          <el-avatar style="width: 4vw;height:4vw">{{ userInfo?.name === undefined ? '未登录' : userInfo?.name }}</el-avatar>
-          <div class="font-['SYST']">{{ userInfo?.name === undefined ? '未登录' : userInfo?.name }}</div>
+          <el-avatar style="width: 4vw;height:4vw">{{ user_info?.name === undefined ? '未登录' : user_info?.name }}</el-avatar>
+          <div class="font-['SYST']">{{ user_info?.name === undefined ? '未登录' : user_info?.name }}</div>
       </div>
       <div class="my-[3vh] flex flex-col justify-center md:w-[85%] w-[90%]">
         <div class="mb-[3vh] relative">
@@ -454,7 +454,7 @@ export default {
           </p>
           <textarea id="pl" v-model.lazy="value" maxlength="100"
                     class="w-full h-[20vh] p-[2vh] border border-[#000000] min-h-[20vh] bg-[#FFFFFF] shadow-md bg-opacity-50 font-['SYST']"
-                    type="text" @blur="onBlur" @focus="onFocus"></textarea>
+                    type="text" @blur="on_blur" @focus="on_focus"></textarea>
         </div>
         <div class="w-full flex flex-row justify-around md:justify-end">
           <el-button round style="width: 150px;height: 40px" @click="clear">清除</el-button>
@@ -481,9 +481,10 @@ export default {
           <span class="text-[2vh] mb-[1vh] mx-[2vh] font-['FZSX']">{{ message_list.length }}条评论</span>
         </div>
       </div>
-      <div v-infinite-scroll="get_messages" :infinite-scroll-disabled="state" infinite-scroll-delay=1000 infinite-scroll-distance=100 class="h-full w-full flex flex-col items-center">
+      <div v-infinite-scroll="get_messages" :infinite-scroll-disabled="state" infinite-scroll-delay=1000 infinite-scroll-distance=100
+           class="h-full w-full flex flex-col items-center">
         <div v-for="message in message_list" :key="message.id"
-             class="my-[1em] flex flex-col items-center w-full">
+             class="my-[1em] flex flex-col items-center w-full animation">
           <div class="border border-[#000000] md:w-[70%] w-[85%] shadow-md bg-[#FFFFFF]">
             <div class="flex flex-row mt-[1vh] ml-[1vh]">
               <el-avatar style="width:5.4vh;height:5.4vh" :src="message.user.avatar_filename">{{ message.user.name }}
@@ -511,4 +512,22 @@ export default {
   </el-scrollbar>
 </template>
 <style scoped>
+
+@keyframes appear {
+  from {
+    opacity: 0;
+    transform: translateX(-50%)
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0)
+  }
+}
+
+.animation {
+  animation: appear linear;
+  animation-timeline: view();
+  animation-range: entry 0% cover 30%;
+}
+
 </style>

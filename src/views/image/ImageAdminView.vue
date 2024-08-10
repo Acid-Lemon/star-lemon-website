@@ -29,11 +29,12 @@ export default {
         label: '私密相册'
       },
       devices: [
-        { value: 'Redmi K60 Ultra', label: '红米 K60 至尊版' },
-        { value: 'EOS 500D', label: '佳能 500D' },
+        { value: 'screenshot', label: '截图' },
+        { value: 'phone', label: '手机' },
+        { value: 'camera', label: '相机' },
         { value: 'CCD', label: 'CCD' },
       ],
-      device: { value: 'EOS 500D', label: '佳能 500D' },
+      device: { value: 'screenshot', label: '截图' },
       photo_album_name: "",
       image_list: [],
       photo_list: [],
@@ -124,12 +125,12 @@ export default {
         return;
       }
 
-      this.upload_url = res.data.upload_file_options.url;
-      this.data = res.data.upload_file_options.formData;
+      this.upload_url = res.data.upload_options.url;
+      this.data = res.data.upload_options.formData;
 
       this.$refs.upload.submit();
     },
-    async onSuccess() {
+    async on_success() {
       ElNotification({
         title: 'Success',
         type: "success",
@@ -138,7 +139,7 @@ export default {
       this.index ++;
       await this.uploadImage();
     },
-    async onError() {
+    async on_error() {
       ElNotification({
         title: 'Error',
         type: "error",
@@ -147,7 +148,7 @@ export default {
       this.index ++;
       await this.uploadImage();
     },
-    handleDelete(index, row){
+    handle_delete(index, row){
       console.log("删除")
     },
     async change() {
@@ -156,7 +157,7 @@ export default {
       }
 
     },
-    pageCount() {
+    page_count() {
       return this.images[this.pages - 1]?.length === 20 ? this.pages + 1 : this.pages
     },
     skip_number() {
@@ -166,7 +167,7 @@ export default {
       }
       return index;
     },
-    onBack() {
+    on_back() {
       if(window.history.length > 1) {
         this.$router.back()
       } else {
@@ -180,7 +181,7 @@ export default {
 <template>
   <div class="w-full h-full bg-[#F8FAFD] flex flex-col content-center items-center">
     <div class="fixed top-0 left-0 w-full h-[6vh] p-[10px] z-[1000] flex flex-row items-center">
-      <div @click="onBack" class="flex flex-row items-center text-[#000000] font-['RGBZ']">
+      <div @click="on_back" class="flex flex-row items-center text-[#000000] font-['RGBZ']">
         <el-icon style="width: 25px; height: 25px"><arrow-left style="width: 25px; height: 25px" /></el-icon>
         返回
       </div>
@@ -231,8 +232,8 @@ export default {
                 style="margin-right: 20px"
                 :action = "upload_url"
                 :data = "data"
-                :on-success="onSuccess"
-                :on-error="onError"
+                :on-success="on_success"
+                :on-error="on_error"
             >
               <el-button type="primary" :disabled="disabled">选择图片</el-button>
             </el-upload>
@@ -253,14 +254,14 @@ export default {
             <el-button
                 size="small"
                 type="danger"
-                @click="handleDelete(scope.$index, scope.row)"
+                @click="handle_delete(scope.$index, scope.row)"
             >
               删除
             </el-button>
           </template>
         </el-table-column>
       </el-table>
-      <el-pagination layout="prev, pager, next" v-model:current-page="current_page" :page-count="pageCount()" @change="change()" />
+      <el-pagination layout="prev, pager, next" v-model:current-page="current_page" :page-count="page_count()" @change="change()" />
     </div>
   </div>
 </template>

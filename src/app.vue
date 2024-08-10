@@ -6,7 +6,7 @@ import Copyright from '@/src/components/Copyright.vue'
 
 import el_locale_zh_cn from 'element-plus/es/locale/lang/zh-cn'
 
-import {useUserInfoStore} from "./stores/userInfo";
+import {use_user_info_store} from "./stores/userInfo";
 
 export default {
   data() {
@@ -20,7 +20,7 @@ export default {
       this.show = to?.meta?.show;
     });
 
-    useUserInfoStore().init();
+    use_user_info_store().init();
   },
   methods: {},
   components: {

@@ -17,9 +17,6 @@ export default {
   mounted() {
   },
   computed: {
-
-
-
     filteredPages() {
       return this.pages.filter(page => {
         // 如果用户已经登录，则过滤掉登录页面
@@ -27,9 +24,9 @@ export default {
         // 如果用户未登录，则过滤掉用户信息页面
         const userMatch = !(page.name === "个人" && !this.is_login);
         // 如果用户不是管理员，则过滤掉管理页面
-        const adminMatch = !(page.name === "管理" && this.user_role === "administrator");
+        //const adminMatch = !(page.name === "管理" && this.user_role !== "admin");
 
-        return loginMatch && userMatch && adminMatch;
+        return loginMatch && userMatch// && adminMatch;
       });
     },
     is_login() {
@@ -92,7 +89,7 @@ export default {
       localStorage.removeItem("token");
       localStorage.removeItem("user");
       // 更新用户状态
-      const user_infoStore = useUserInfoStore();
+      const user_infoStore = use_user_info_store();
       user_infoStore.user_info = null;
       // 更新导航栏
       this.updatePages();

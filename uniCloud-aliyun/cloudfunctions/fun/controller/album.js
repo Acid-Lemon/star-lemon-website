@@ -41,7 +41,7 @@ module.exports = class Controller_Album extends Controller {
         return {
             data: {
                 exp_time,
-                upload_file_options
+                upload_options: upload_file_options
             }
         };
     }

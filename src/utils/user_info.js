@@ -14,7 +14,7 @@ function store_user(user) {
 }
 
 async function load_user() {
-	let res = await call_api("user/info/get_info");
+	let res = await call_api("user/profile/get_info");
 	if (!res.success) {
 		throw new Error(res.error_message);
 	}

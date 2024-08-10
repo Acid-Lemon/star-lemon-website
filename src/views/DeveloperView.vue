@@ -67,8 +67,8 @@ export default {
     </div>
     <div class="w-full h-[35%] flex flex-row items-center content-center">
       <div class="w-[15%] h-full flex flex-col justify-center items-center">
-        <img alt="头像"
-             class="w-[15vh] h-[15vh] rounded-full hover:rotate-[360deg] duration-700 border border-[#dedede]"
+        <el-avatar alt="头像" :size=120
+             class="hover:rotate-[360deg] duration-700 border border-[#dedede]"
              src="/static/developer/1.jpg"/>
         <div class="text-[20px] font-['SYST']">{{ star.name }}</div>
         <div class="flex flex-row content-center items-center">
@@ -94,8 +94,8 @@ export default {
         </div>
       </div>
       <div class="w-[15%] h-full flex flex-col justify-center items-center">
-        <img alt="头像"
-             class="w-[15vh] h-[15vh] rounded-full hover:rotate-[360deg] duration-700 border border-[#dedede]"
+        <el-avatar alt="头像" :size=120
+             class="hover:rotate-[360deg] duration-700 border border-[#dedede]"
              src="/static/developer/2.jpg"/>
         <div class="text-[20px] font-['SYST']">{{ lemon.name }}</div>
         <div class="flex flex-row content-center items-center">

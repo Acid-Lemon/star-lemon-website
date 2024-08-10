@@ -29,11 +29,12 @@ export default {
         label: '私密相册'
       },
       devices: [
-        { value: 'Redmi K60 Ultra', label: '红米 K60 至尊版' },
-        { value: 'EOS 500D', label: '佳能 500D' },
+        { value: 'screenshot', label: '截图' },
+        { value: 'phone', label: '手机' },
+        { value: 'camera', label: '相机' },
         { value: 'CCD', label: 'CCD' },
       ],
-      device: { value: 'EOS 500D', label: '佳能 500D' },
+      device: { value: 'screenshot', label: '截图' },
       photo_album_name: "",
       image_list: [],
       photo_list: [],
@@ -124,8 +125,8 @@ export default {
         return;
       }
 
-      this.upload_url = res.data.upload_file_options.url;
-      this.data = res.data.upload_file_options.formData;
+      this.upload_url = res.data.upload_options.url;
+      this.data = res.data.upload_options.formData;
 
       this.$refs.upload.submit();
     },
@@ -260,7 +261,7 @@ export default {
           </template>
         </el-table-column>
       </el-table>
-      <el-pagination layout="prev, pager, next" v-model:current-page="current_page" :page-count="pageCount()" @change="change()" />
+      <el-pagination layout="prev, pager, next" v-model:current-page="current_page" :page-count="page_count()" @change="change()" />
     </div>
   </div>
 </template>

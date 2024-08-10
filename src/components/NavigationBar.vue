@@ -17,14 +17,18 @@ export default {
   mounted() {
   },
   computed: {
-    // 过滤掉登录和用户信息页面
-    // 如果用户已经登录，则过滤掉登录页面
-    // 如果用户未登录，则过滤掉用户信息页面 & 管理页面
+
+
+
     filteredPages() {
       return this.pages.filter(page => {
+        // 如果用户已经登录，则过滤掉登录页面
         const loginMatch = !(page.name === "登录" && this.is_login);
+        // 如果用户未登录，则过滤掉用户信息页面
         const userMatch = !(page.name === "个人" && !this.is_login);
-        const adminMatch = !(page.name === "管理" && !this.is_login);
+        // 如果用户不是管理员，则过滤掉管理页面
+        const adminMatch = !(page.name === "管理" && this.user_role === "administrator");
+
         return loginMatch && userMatch && adminMatch;
       });
     },
@@ -32,6 +36,10 @@ export default {
       const user_info_store = use_user_info_store();
       return !!user_info_store.user_info;
     },
+    user_role() {
+      const user_info_store = use_user_info_store();
+      return user_info_store.user_info?.role;
+    }
   },
   methods: {
     // 更新导航栏

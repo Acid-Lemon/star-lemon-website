@@ -82,7 +82,7 @@ export default {
         });
         return;
       }
-      let res = await call_api("user/info/update_basic_info", {
+      let res = await call_api("user/profile/update_basic_info", {
         name: this.name,
         birthday: this.birthday,
         personal_sign: this.personal_sign

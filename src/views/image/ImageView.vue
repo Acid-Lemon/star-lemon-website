@@ -120,8 +120,8 @@ export default {
 
         return li;
       }
-    },
-}
+    }
+  }
 </script>
 
 <template>
@@ -166,7 +166,7 @@ export default {
             <div v-for="image in filtered_images"
                  :key="image.id"
                  class="shadow-md break-inside-avoid mb-[20px]">
-                <div @click="console.log(image)">
+                <div>
                   <el-image :src="image.temp_url" class="w-full h-auto" fit="cover"/>
                 </div>
                 <div>

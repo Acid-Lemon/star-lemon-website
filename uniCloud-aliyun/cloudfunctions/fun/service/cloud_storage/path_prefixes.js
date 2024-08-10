@@ -1,5 +1,7 @@
 const path_prefixes = {
-    "album": "/album/"
+    "album": "/album/",
+    "avatar": "/avatar/",
+    "profile_background": "/profile_background/"
 }
 
 module.exports = {

@@ -15,10 +15,18 @@ module.exports = class Service_CloudStorage_General extends Service {
     }
 
     get_upload_file_options(manager, file_info) {
-        return manager.getUploadFileOptions({
+        let {
+            expTime: exp_time,
+            uploadFileOptions: upload_file_options
+        } = manager.getUploadFileOptions({
             cloudPath: file_info.cloud_path.slice(1),
             allowUpdate: file_info.allow_update
         });
+
+        return {
+            exp_time,
+            upload_file_options
+        };
     }
 
     async change_file_public_state(manager, file_path, new_state) {
@@ -45,6 +53,18 @@ module.exports = class Service_CloudStorage_General extends Service {
         return file_list.map((temp_url_info) => {
             return temp_url_info.tempFileURL;
         });
+    }
+
+    async delete_files(manager, file_paths) {
+        file_paths = file_paths.map((file_path) => {
+            return file_path.slice(1);
+        });
+
+        let res = await manager.deleteFile({
+            fileList: file_paths
+        });
+
+        console.info("delete file:", res);
     }
 }
 

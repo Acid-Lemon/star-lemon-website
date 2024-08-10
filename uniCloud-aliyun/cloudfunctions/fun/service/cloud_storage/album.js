@@ -35,18 +35,10 @@ module.exports = class Service_CloudStorage_Album extends Service {
         console.info("image_path:", image_path);
 
         let storage_manager = this.service.cloud_storage.general.get_manager();
-        let {
-            expTime: exp_time,
-            uploadFileOptions: upload_file_options
-        } = this.service.cloud_storage.general.get_upload_file_options(storage_manager, {
+        return this.service.cloud_storage.general.get_upload_file_options(storage_manager, {
             cloud_path: image_path,
             allow_update: false
         });
-
-        return {
-            upload_file_options,
-            exp_time
-        };
     }
 
     async create_folder(info) {

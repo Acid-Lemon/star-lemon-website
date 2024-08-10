@@ -288,7 +288,7 @@ module.exports = class Service_CloudStorage_Album extends Service {
         })  .skip(skip_number)
             .limit(image_number)
             .field({
-                id: true,
+                _id: true,
                 name: true,
                 creator_id: true,
                 create_at: true
@@ -307,7 +307,7 @@ module.exports = class Service_CloudStorage_Album extends Service {
         })  .skip(skip_number)
             .limit(image_number)
             .field({
-              id: true,
+              _id: true,
               name: true,
               create_at: true
             })

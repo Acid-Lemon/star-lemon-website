@@ -64,7 +64,7 @@ export default {
         this.click_flag = -1;
       }
     },
-    get_info(field) {
+    get_profile(field) {
       if (!this.info?.[field] && field === "name") {
         return "未登录";
       } else {

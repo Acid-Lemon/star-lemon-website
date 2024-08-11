@@ -220,6 +220,7 @@ export default {
   async mounted() {
     await this.get_sentences();
     await this.get_messages();
+    console.log(this.message_list);
   },
   computed: {
     style_mode() {
@@ -268,9 +269,10 @@ export default {
       }
 
       return await Promise.all(messages.map((message) => {
-        return new Promise((resolve) => {
-          message.user.avatar_filename = message.user.avatar + ".jpg"
+        return new Promise( async (resolve) => {
           message.create_at_format_str = date_format(new Date(message.create_at));
+          message.user.avatar_url = await this.get_avatar_url(message.user?.avatar?.type, message.user?.avatar?.name);
+          console.log(message.user.avatar_url);
           resolve(message);
         })
       }));
@@ -411,6 +413,29 @@ export default {
       }
       return index;
     },
+    async get_avatar_url(type, name) {
+      if(!type || !name) {
+        return ''
+      }
+      if (type === "upload") {
+        let avatar_url_res = await call_api("user/profile/get_upload_avatar_temp_url", {
+          image_name: name,
+        });
+
+        if (avatar_url_res.success === false) {
+          ElNotification({
+            title: 'Error',
+            message: avatar_url_res,
+            type: 'error',
+          });
+          return;
+        }
+
+        return avatar_url_res.data.temp_url
+      } else {
+        return "/static/avatar/" + name
+      }
+    },
   }
 }
 </script>
@@ -440,40 +465,42 @@ export default {
       <p class="mx-[2vh] font-serif text-[2.4vh]">
         很感谢你能访问该页面，如果你有什么和我们说的，或者有什么问题想问的，可以随时在下面评论噢~！我们看见了会第一时间回复你的。
       </p>
-      <div class="md:w-[70%] w-[85%] mt-[30px] flex flex-row justify-evenly items-center bg-[url('/static/background/17.jpg')] bg-cover rounded-xl shadow-md relative">
+      <div v-if="is_login" class="md:w-[70%] w-[85%] mt-[30px] flex flex-row justify-evenly items-center bg-[url('/static/background/17.jpg')] bg-cover rounded-xl shadow-md relative">
         <div class="md:flex md:flex-col md:items-center md:justify-between h-[6vw] hidden self-start mt-[4vh]">
-          <el-avatar style="width: 4vw;height:4vw">{{ user_info?.name === undefined ? '未登录' : user_info?.name }}</el-avatar>
-          <div class="font-['SYST']">{{ user_info?.name === undefined ? '未登录' : user_info?.name }}</div>
-      </div>
-      <div class="my-[3vh] flex flex-col justify-center md:w-[85%] w-[90%]">
-        <div class="mb-[3vh] relative">
-          <p :class="{'text-[#FFFFFF] bg-opacity-100 text-[1.6vh] top-[-1.2vh] left-[1.4vh]':style_mode,
-            'text-[#000000] bg-opacity-0 text-[2vh] top-[1vh] left-[1vh]':!style_mode}
-            " class="absolute pointer-events-none px-[1vh] duration-700 z-50 bg-black font-['FZSX']">
-            你是我一生只会遇见一次的惊喜...
-          </p>
-          <textarea id="pl" v-model.lazy="value" maxlength="100"
-                    class="w-full h-[20vh] p-[2vh] border border-[#000000] min-h-[20vh] bg-[#FFFFFF] shadow-md bg-opacity-50 font-['SYST']"
-                    type="text" @blur="on_blur" @focus="on_focus"></textarea>
+          <el-avatar style="width: 4vw;height:4vw">{{ user_info?.name }}</el-avatar>
+          <div class="font-['SYST']">{{ user_info?.name }}</div>
         </div>
-        <div class="w-full flex flex-row justify-around md:justify-end">
-          <el-button round style="width: 150px;height: 40px" @click="clear">清除</el-button>
-          <el-button round style="width: 150px;height: 40px" type="primary" @click="publish_message">发布</el-button>
-        </div>
-        <div class="absolute bottom-[2vh] left-[16vh] w-[5vh] h-[5vh]">
-        <el-popover
-                     placement="top"
-                     :width="450"
-        >
-          <template #reference>
-            <img src="/static/emoji/doge.png" class="w-[5vh] h-[5vh] absolute top-[-20px]" alt="表情"/>
-          </template>
-          <div class="grid gap-x-[10px] gap-y-[10px] grid-cols-8">
-              <img v-for="i in emoji" :src="i.path" class="w-[30px] h-[30px]" @click="this.value += i.value" alt="emoji">
+        <div class="my-[3vh] flex flex-col justify-center md:w-[85%] w-[90%]">
+          <div class="mb-[3vh] relative">
+            <p :class="{'text-[#FFFFFF] bg-opacity-100 text-[1.6vh] top-[-1.2vh] left-[1.4vh]':style_mode,
+              'text-[#000000] bg-opacity-0 text-[2vh] top-[1vh] left-[1vh]':!style_mode}"
+              class="absolute pointer-events-none px-[1vh] duration-700 z-50 bg-black font-['FZSX']">
+              你是我一生只会遇见一次的惊喜...
+            </p>
+            <textarea id="pl" v-model.lazy="value" maxlength="100"
+              class="w-full h-[20vh] p-[2vh] border border-[#000000] min-h-[20vh] bg-[#FFFFFF] shadow-md bg-opacity-50 font-['SYST']"
+              type="text" @blur="on_blur" @focus="on_focus">
+            </textarea>
           </div>
-        </el-popover>
+          <div class="w-full flex flex-row justify-around md:justify-end">
+            <el-button round style="width: 150px;height: 40px" @click="clear">清除</el-button>
+            <el-button round style="width: 150px;height: 40px" type="primary" @click="publish_message">发布</el-button>
+          </div>
+          <div class="absolute bottom-[2vh] left-[16vh] w-[5vh] h-[5vh]">
+            <el-popover placement="top" :width="450">
+              <template #reference>
+                <img src="/static/emoji/doge.png" class="w-[5vh] h-[5vh] absolute top-[-20px]" alt="表情"/>
+              </template>
+              <div class="grid gap-x-[10px] gap-y-[10px] grid-cols-8">
+                <img v-for="i in emoji" :src="i.path" class="w-[30px] h-[30px]" @click="this.value += i.value" alt="emoji"/>
+              </div>
+            </el-popover>
+          </div>
         </div>
       </div>
+      <div v-if="!is_login" class="md:w-[70%] w-[85%] mt-[30px] flex flex-row justify-evenly items-center bg-[url('/static/background/17.jpg')] bg-cover rounded-xl shadow-md relative">
+        <div class="flex flex-row items-center text-[2.4vh] font-['SYST']">登陆后解锁 发留言 功能！</div>
+        <el-button round style="width: 150px;height: 40px; margin: 20px" type="primary" @click="this.$router.push('/login')">go！登陆</el-button>
       </div>
       <div class="flex flex-row md:w-[70%] w-[85%] mt-[2vh] border-b-[1px] border-[#000000]">
         <div class="flex flex-row items-end">
@@ -487,7 +514,7 @@ export default {
              class="my-[1em] flex flex-col items-center w-full animation">
           <div class="border border-[#000000] md:w-[70%] w-[85%] shadow-md bg-[#FFFFFF]">
             <div class="flex flex-row mt-[1vh] ml-[1vh]">
-              <el-avatar style="width:5.4vh;height:5.4vh" :src="message.user.avatar_filename">{{ message.user.name }}
+              <el-avatar style="width:5.4vh;height:5.4vh" :src="message.user.avatar_url">{{ message.user.name }}
               </el-avatar>
               <div class="flex flex-col ml-[1vh]">
                 <div class="text-[2.2vh] font-['SYST']">{{ message.user.name }}</div>

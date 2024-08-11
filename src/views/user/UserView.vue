@@ -217,7 +217,7 @@ export default {
         return;
       }
 
-      console.log(background_url_res);
+      console.log(background_url_res.data.temp_url);
       this.background_url = background_url_res.data.temp_url
     }
   }
@@ -227,7 +227,11 @@ export default {
 <template>
   <div class="h-full w-full el-overlay-dialog">
     <div class="w-full h-[40vh] relative">
-      <el-image :src="background_url" class="w-full h-[40vh]" fit="cover"></el-image>
+      <el-image :src="background_url" class="w-full h-[40vh]" fit="cover">
+        <template #error>
+          <el-image src="/static/background/23.jpg" class="w-full h-[40vh]" fit="cover"></el-image>
+        </template>
+      </el-image>
       <div class="absolute bottom-[-5vh] left-[10vw] flex flex-row items-end">
         <el-avatar alt="头像" :size=100 class="mr-[10px]" :src=avatar_url>
           {{ user_info?.name ? user_info.name : "未登录" }}

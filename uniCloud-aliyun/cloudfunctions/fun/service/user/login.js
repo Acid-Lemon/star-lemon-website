@@ -8,7 +8,7 @@ const bcrypt = require("bcryptjs");
 
 const config = require("uni-config-center")({ pluginId: "fun" }).config();
 
-const error = require("../../types/error");
+const error = require("../../types/api_error");
 
 module.exports = class Service_User_Login extends Service {
 	create_code() {

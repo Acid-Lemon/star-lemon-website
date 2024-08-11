@@ -6,6 +6,8 @@ const {
     validate
 } = require("../../utils/args_check");
 
+const time_util = require("../../utils/common/time");
+
 module.exports = class Controller_User_Profile extends Controller {
     async get_profile() {
         return {
@@ -112,8 +114,31 @@ module.exports = class Controller_User_Profile extends Controller {
             birthday: {
                 undefined_able: true,
                 type: "string",
-                length: {
-                    max: 50
+                regex: "/^(\d{4})年(0[1-9]|1[0-2])月(0[1-9]|[12][0-9]|3[01])日$/",
+                customize: (args, name) => {
+                    let birthday_str = args[name];
+                    let [year, month, day] = birthday_str.split(/[年月日]/).map((str) => parseInt(str));
+
+                    if (year <= 0) {
+                        return false;
+                    }
+
+                    if (month === 2) {
+                        let add_day = time_util.is_leap_year(year) ? 1 : 0;
+                        if (day > 28 + add_day) {
+                            return false;
+                        }
+                    } else if ([4, 6, 9, 11].includes(month)) {
+                        if (day > 30) {
+                            return false;
+                        }
+                    } else {
+                        if (day > 31) {
+                            return false;
+                        }
+                    }
+
+                    return true;
                 }
             },
             personal_sign: {

@@ -16,6 +16,7 @@ const codes = {
     sms_code_expire: "err_sms_code_expire",
     sms_code_send_limit: "err_sms_code_send_limit",
     err_image_create: "err_image_create",
+    err_image_delete: "err_image_delete",
     err_folder_create: "err_folder_create",
     exist_image: "err_image_exist",
     err_folder_exist: "err_folder_exist",

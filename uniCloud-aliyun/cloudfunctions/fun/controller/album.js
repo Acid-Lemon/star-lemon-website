@@ -9,7 +9,7 @@ const {
 
 const {
     codes
-} = require("../types/error");
+} = require("../types/api_error");
 
 module.exports = class Controller_Album extends Controller {
     async create_image() {

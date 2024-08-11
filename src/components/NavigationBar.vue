@@ -84,17 +84,17 @@ export default {
         this.hovered_page = null;
       }, 300); // 延迟300ms
     },
-    loginOut(){
+    loginOut() {
       // 清除本地存储
       localStorage.removeItem("token");
       localStorage.removeItem("user");
       // 更新用户状态
-      const user_infoStore = use_user_info_store();
-      user_infoStore.user_info = null;
+      const user_info_store = use_user_info_store();
+      user_info_store.user_info = null;
       // 更新导航栏
       this.updatePages();
       // 如果目前在个人页，则跳转到登录页
-      if(this.$route.path === "/user"){
+      if (this.$route.path === "/user") {
         this.$router.push("/login");
       }
     }
@@ -103,26 +103,36 @@ export default {
 </script>
 
 <template>
-  <div class="fixed top-[1.5vw] left-[1.5vw] w-[97vw] md:h-[50px] h-[80px] hover:bg-white hover:bg-opacity-50 duration-700 rounded-md flex md:flex-row flex-col md:justify-between items-center justify-center md:p-[3vh] z-[1000]">
+  <div
+      class="fixed top-[1.5vw] left-[1.5vw] w-[97vw] md:h-[50px] h-[80px] hover:bg-white hover:bg-opacity-50 duration-700 rounded-md flex md:flex-row flex-col md:justify-between items-center justify-center md:p-[3vh] z-[1000]">
     <div class="flex flex-row justify-center items-center">
       <router-link to="/">
-        <div class="md:text-[26px] text-[20px] md:m-[0.5vh] mt-[0.5vh] font-['ZKXW'] hover:text-[#44cef6] duration-700">star和lemon的小站</div>
+        <div class="md:text-[26px] text-[20px] md:m-[0.5vh] mt-[0.5vh] font-['ZKXW'] hover:text-[#44cef6] duration-700">
+          star和lemon的小站
+        </div>
       </router-link>
     </div>
     <div class="flex flex-row justify-center items-center">
-      <div v-for="page in filteredPages" class="m-[1vh] flex flex-col items-center" @mouseenter="onMouseEnter(page)" @mouseleave="onMouseLeave">
+      <div v-for="page in filteredPages" class="m-[1vh] flex flex-col items-center" @mouseenter="onMouseEnter(page)"
+           @mouseleave="onMouseLeave">
         <router-link :to="page.link" class="flex flex-row items-center relative">
           <img
-              class="w-[3vh] md:m-[0.5vh] mb-[0.5vh]"
-              :src="page.svg"
               :alt="page.name"
+              :src="page.svg"
+              class="w-[3vh] md:m-[0.5vh] mb-[0.5vh]"
           />
-          <span class="md:block hidden hover:text-[#44cef6] md:m-[0.5vh] mb-[0.5vh]  font-['SYST'] duration-700">{{ page.name }}</span>
+          <span class="md:block hidden hover:text-[#44cef6] md:m-[0.5vh] mb-[0.5vh]  font-['SYST'] duration-700">{{
+              page.name
+            }}</span>
         </router-link>
-        <div v-show="page.name === '个人' && hovered_page === page" class="absolute flex flex-col items-center justify-center bottom-[-5vh] w-[10vh] h-[4vh] bg-[#FFFFFF] bg-opacity-50 rounded shadow-md duration-700" @mouseenter="onSecondaryMouseEnter" @mouseleave="onSecondaryMouseLeave" @click="loginOut">
+        <div v-show="page.name === '个人' && hovered_page === page"
+             class="absolute flex flex-col items-center justify-center bottom-[-5vh] w-[10vh] h-[4vh] bg-[#FFFFFF] bg-opacity-50 rounded shadow-md duration-700"
+             @click="loginOut" @mouseenter="onSecondaryMouseEnter" @mouseleave="onSecondaryMouseLeave">
           取消登录
         </div>
-        <div v-show="page.name === '文章' && hovered_page === page" class="absolute flex flex-col items-center justify-center bottom-[-5vh] w-[10vh] h-[4vh] bg-[#FFFFFF] bg-opacity-50 rounded shadow-md duration-700" @mouseenter="onSecondaryMouseEnter" @mouseleave="onSecondaryMouseLeave">
+        <div v-show="page.name === '文章' && hovered_page === page"
+             class="absolute flex flex-col items-center justify-center bottom-[-5vh] w-[10vh] h-[4vh] bg-[#FFFFFF] bg-opacity-50 rounded shadow-md duration-700"
+             @mouseenter="onSecondaryMouseEnter" @mouseleave="onSecondaryMouseLeave">
           一件小事
         </div>
       </div>

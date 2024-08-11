@@ -12,7 +12,7 @@ const {
 
 const config = require("uni-config-center")({ pluginId: "fun" }).config();
 
-const {codes} = require("../../types/error");
+const {codes} = require("../../types/api_error");
 
 module.exports = class Service_CloudStorage_Album extends Service {
     async create_image(image_name, folder) {

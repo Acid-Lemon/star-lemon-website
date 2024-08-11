@@ -2,7 +2,7 @@ const {
 	Controller
 } = require("uni-cloud-router");
 
-const error = require("../../types/error");
+const error = require("../../types/api_error");
 
 const {
 	validate

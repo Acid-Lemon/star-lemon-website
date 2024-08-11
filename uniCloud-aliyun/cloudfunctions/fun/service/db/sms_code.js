@@ -6,7 +6,7 @@ const {
     tables
 } = require("./tables");
 
-const error = require("../../types/error");
+const error = require("../../types/api_error");
 
 const { id_name_format } = require("../../utils/db/result_format");
 const obj_utils = require("../../utils/common/object");
@@ -15,7 +15,13 @@ const config = require("uni-config-center")({ pluginId: "fun" }).config();
 
 module.exports = class DBService_SmsCode extends Service {
     async find_code(phone_number) {
-        return id_name_format((await this.db.collection(tables.sms_code).where({phone_number}).get()).data[0]) || null;
+        return await this.db.collection(tables.sms_code).where({phone_number}).get().then(({data}) => {
+            if (!data.length) {
+                return null;
+            }
+
+            return id_name_format(data[0]);
+        });
     }
 
     async delete_code_by_id(id) {
@@ -31,9 +37,14 @@ module.exports = class DBService_SmsCode extends Service {
     }
 
     async update_code_with_limit(code, phone_number) {
+        let exist_code_record = await this.find_code(phone_number);
+        if (!exist_code_record) {
+            return await this.add_code(code, phone_number);
+        }
+
         let transaction = await this.db.startTransaction();
         try {
-            let code_record = await this.find_code(phone_number);
+            let code_record = await transaction.collection(tables.sms_code).doc(exist_code_record.id).get().data;
             if (!code_record) {
                 return await this.add_code(code, phone_number);
             }

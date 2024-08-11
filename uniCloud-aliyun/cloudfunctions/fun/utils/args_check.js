@@ -1,4 +1,4 @@
-const error = require("../types/error");
+const error = require("../types/api_error");
 
 class RuleHandler {
     constructor(args, name, rule_name, rule_config) {

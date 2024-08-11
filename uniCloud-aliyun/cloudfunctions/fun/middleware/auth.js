@@ -3,7 +3,7 @@ const config = require("uni-config-center")({
 	pluginId: "fun"
 }).config();
 
-const error = require("../types/error");
+const error = require("../types/api_error");
 
 module.exports = () => {
 	return async function auth(ctx, next) {

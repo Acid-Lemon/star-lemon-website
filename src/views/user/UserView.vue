@@ -14,9 +14,9 @@ export default {
     return {
       dialog_visible: false,
 
-      name: null,
-      birthday: null,
-      personal_sign: null,
+      name: "",
+      birthday: "",
+      personal_sign: "",
       avatar: [],
       background: [],
       avatar_url: "",
@@ -34,8 +34,8 @@ export default {
   },
   mounted() {
     this.name = this.user_info.name;
-    this.birthday = this.user_info.birthday;
-    this.personal_sign = this.user_info.personal_sign;
+    this.birthday = this.user_info?.birthday;
+    this.personal_sign = this.user_info?.personal_sign;
     this.get_avatar_url();
     this.get_background_url();
     this.load_avatars();
@@ -43,7 +43,6 @@ export default {
   computed: {
     user_info() {
       const user_info_store = use_user_info_store();
-      console.log(user_info_store.user_info);
       return user_info_store.user_info;
     },
   },
@@ -203,7 +202,8 @@ export default {
       }
     },
     async get_background_url() {
-      let name = this.user_info?.profile_background_image.name;
+      let name = this.user_info?.profile_background_image?.name;
+      console.log(this.user_info?.profile_background_image);
       let background_url_res = await call_api("user/profile/get_background_image_temp_url", {
         image_name: name,
       });

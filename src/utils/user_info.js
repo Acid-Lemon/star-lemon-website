@@ -7,6 +7,10 @@ function store_token(token) {
 	uni.setStorageSync("token", token);
 }
 
+function get_token() {
+	return uni.getStorageSync("token");
+}
+
 function store_user(user) {
 	uni.setStorageSync("user", user);
 	const user_infoStore = use_user_info_store();
@@ -22,25 +26,26 @@ async function load_user() {
 	store_user(res.data.profile);
 }
 
-function get_user() {
+async function get_user() {
 	let info = uni.getStorageSync("user");
 	if (info) {
 		return info;
 	}
 
-	let token = uni.getStorageSync("token");
+	let token = get_token();
 	if (!token) {
 		return null;
 	}
 
-	load_user().then(() => {
-		return uni.getStorageSync("user");
-	});
+	await load_user();
+
+	return uni.getStorageSync("user");
 }
 
 export {
 	store_user,
 	load_user,
 	get_user,
-	store_token
+	store_token,
+	get_token
 }

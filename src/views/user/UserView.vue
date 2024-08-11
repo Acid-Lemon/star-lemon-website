@@ -203,24 +203,22 @@ export default {
       }
     },
     async get_background_url() {
-      let name = this.user_info.profile_background_image;
-      if (name) {
-        let background_url_res = await call_api("user/profile/get_background_image_temp_url", {
-          image_name: name,
+      let name = this.user_info?.profile_background_image.name;
+      let background_url_res = await call_api("user/profile/get_background_image_temp_url", {
+        image_name: name,
+      });
+
+      if (background_url_res.success === false) {
+        ElNotification({
+          title: 'Error',
+          message: background_url_res,
+          type: 'error',
         });
-
-        if (background_url_res.success === false) {
-          ElNotification({
-            title: 'Error',
-            message: background_url_res,
-            type: 'error',
-          });
-          return;
-        }
-
-        console.log(background_url_res.data.temp_url);
-        this.background_url = background_url_res.data.temp_url
+        return;
       }
+
+      console.log(background_url_res.data.temp_url);
+      this.background_url = background_url_res.data.temp_url
     }
   }
 }

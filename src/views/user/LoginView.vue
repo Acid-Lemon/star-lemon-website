@@ -146,14 +146,14 @@ export default {
         return;
       }
 
+      await load_user();
+
       if(this.state.is_login) {
         ElNotification({
           title: 'Success',
           type: "success",
           message: "登录成功",
         })
-
-        await load_user();
 
         // 登录成功后跳转回原页面
         this.$router.back();

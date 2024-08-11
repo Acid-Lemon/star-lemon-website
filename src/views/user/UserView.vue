@@ -66,7 +66,7 @@ export default {
           });
     },
     choose(index) {
-      if(this.click_flag !== index) {
+      if (this.click_flag !== index) {
         this.is_disabled = true;
         this.avatar = [];
         this.click_flag = index;
@@ -86,7 +86,7 @@ export default {
     async update_info() {
       this.loading = true;
 
-      if(this.avatar[0]) {
+      if (this.avatar[0]) {
         let split_avatar_name = this.avatar[0].name.split('.');
 
         let avatar_res = await call_api("user/profile/create_upload_avatar", {
@@ -108,7 +108,7 @@ export default {
         this.$refs.avatar.submit();
       }
 
-      if(this.click_flag !== -1) {
+      if (this.click_flag !== -1) {
         let split_avatar_path = this.avatar_list[this.click_flag].split('/');
         let avatar_res = await call_api("user/profile/choose_local_avatar", {
           image_name: split_avatar_path[split_avatar_path.length - 1]
@@ -124,7 +124,7 @@ export default {
         }
       }
 
-      if(this.background[0]) {
+      if (this.background[0]) {
         let split_background_name = this.background[0].name.split('.');
 
         let background_res = await call_api("user/profile/create_background_image", {
@@ -146,7 +146,7 @@ export default {
         this.$refs.background.submit();
       }
 
-      if(this.name !== this.user_info.name || this.birthday !== this.user_info.birthday || this.personal_sign !== this.user_info.personal_sign) {
+      if (this.name !== this.user_info.name || this.birthday !== this.user_info.birthday || this.personal_sign !== this.user_info.personal_sign) {
         if (!this.name || !this.birthday || !this.personal_sign) {
           ElNotification({
             title: 'Info',
@@ -229,16 +229,19 @@ export default {
     <div class="w-full h-[40vh] relative">
       <el-image :src="background_url" class="w-full h-[40vh]" fit="cover">
         <template #error>
-          <el-image src="/static/background/23.jpg" class="w-full h-[40vh]" fit="cover"></el-image>
+          <el-image class="w-full h-[40vh]" fit="cover" src="/static/background/17.jpg"></el-image>
         </template>
       </el-image>
       <div class="absolute bottom-[-5vh] left-[10vw] flex flex-row items-end">
-        <el-avatar alt="头像" :size=100 class="mr-[10px]" :src=avatar_url>
+        <el-avatar :size=100 :src=avatar_url alt="头像" class="mr-[10px]">
           {{ user_info?.name ? user_info.name : "未登录" }}
         </el-avatar>
-        <p class="font-['SYST'] text-[24px] mr-[20px] leading-none pb-[5px]">{{ user_info?.name ? user_info.name : "未登录" }}</p>
-        <el-tag class="font-['SYST'] text-[18px] mr-[10px] leading-none pb-[5px]" type="primary" >用户</el-tag>
-        <p v-if="user_info?.birthday" class="font-['SYST'] text-[14px] mr-[20px] leading-none pb-[5px]">生日：{{ user_info?.birthday }}</p>
+        <p class="font-['SYST'] text-[24px] mr-[20px] leading-none pb-[5px]">{{
+            user_info?.name ? user_info.name : "未登录"
+          }}</p>
+        <el-tag class="font-['SYST'] text-[18px] mr-[10px] leading-none pb-[5px]" type="primary">用户</el-tag>
+        <p v-if="user_info?.birthday" class="font-['SYST'] text-[14px] mr-[20px] leading-none pb-[5px]">
+          生日：{{ user_info?.birthday }}</p>
         <p class="font-['SYST'] text-[14px] opacity-50 leading-none pb-[5px]">{{ user_info?.personal_sign }}</p>
       </div>
       <el-button class="absolute bottom-[-5vh] right-[10vw]" plain @click="dialog_visible = true">
@@ -251,72 +254,80 @@ export default {
           <div class="text-[2vh]">编辑个人信息</div>
         </template>
         <template #default>
-        <div class="w-full h-[25vh] flex flex-row items-center justify-center">
-          <div class="w-[20vh] my-[5px]">
-            <span>头像：</span>
-            <el-upload
-                style="width: 15vh;height: 15vh;border: 1px dashed var(--el-border-color);border-radius: 6px;cursor: pointer;position: relative;overflow: hidden;transition: var(--el-transition-duration-fast);"
-                v-model:file-list = avatar
-                :show-file-list = false
-                :action = avatar_upload_url
-                :data = avatar_data
-                list-type="picture"
-                :auto-upload = false
-                :disabled=is_disabled
-                ref=avatar
-            >
-              <el-image v-if="avatar.length !== 0" :src="avatar[0].url" class="w-[15vh] h-[15vh]" alt="avatar"/>
-              <el-icon v-else style="width: 15vh;height: 15vh;font-size: 28px;color: #8c939d;text-align: center;"><Plus /></el-icon>
-            </el-upload>
-          </div>
-          <div class="w-[35vh] my-[5px]">
-            <span @click="this.background">个人背景：</span>
+          <div class="w-full h-[25vh] flex flex-row items-center justify-center">
+            <div class="w-[20vh] my-[5px]">
+              <span>头像：</span>
               <el-upload
-                  style="width: 30vh;height: 15vh;border: 1px dashed var(--el-border-color);border-radius: 6px;cursor: pointer;position: relative;overflow: hidden;transition: var(--el-transition-duration-fast);"
-                  v-model:file-list = background
-                  :show-file-list = false
-                  :action = background_upload_url
-                  :data = background_data
+                  ref=avatar
+                  v-model:file-list=avatar
+                  :action=avatar_upload_url
+                  :auto-upload=false
+                  :data=avatar_data
+                  :disabled=is_disabled
+                  :show-file-list=false
                   list-type="picture"
-                  :auto-upload = false
-                  ref=background
+                  style="width: 15vh;height: 15vh;border: 1px dashed var(--el-border-color);border-radius: 6px;cursor: pointer;position: relative;overflow: hidden;transition: var(--el-transition-duration-fast);"
               >
-                <el-image v-if="background.length !== 0" :src="background[0].url" class="w-[30vh] h-[15vh]" alt="background"/>
-                <el-icon v-else style="width: 30vh;height: 15vh;font-size: 28px;color: #8c939d;text-align: center;"><Plus /></el-icon>
+                <el-image v-if="avatar.length !== 0" :src="avatar[0].url" alt="avatar" class="w-[15vh] h-[15vh]"/>
+                <el-icon v-else style="width: 15vh;height: 15vh;font-size: 28px;color: #8c939d;text-align: center;">
+                  <Plus/>
+                </el-icon>
               </el-upload>
             </div>
-          <div class="w-[50vh] my-[5px]">
-            <el-scrollbar height="250px">
-              <div class="grid gap-x-4 gap-y-[20px] grid-cols-4 auto-rows-auto w-full h-full">
-                <div v-for="(avatar,index) in avatar_list" :key="avatar"
-                     :class="{'border-[2px] border-[#08d9d6]':click_flag === index}"
-                     class="w-full shadow-md"
-                     @click="choose(index)">
-                  <el-image :src=avatar class="w-full h-full" fit="cover"/>
+            <div class="w-[35vh] my-[5px]">
+              <span @click="this.background">个人背景：</span>
+              <el-upload
+                  ref=background
+                  v-model:file-list=background
+                  :action=background_upload_url
+                  :auto-upload=false
+                  :data=background_data
+                  :show-file-list=false
+                  list-type="picture"
+                  style="width: 30vh;height: 15vh;border: 1px dashed var(--el-border-color);border-radius: 6px;cursor: pointer;position: relative;overflow: hidden;transition: var(--el-transition-duration-fast);"
+              >
+                <el-image v-if="background.length !== 0" :src="background[0].url" alt="background"
+                          class="w-[30vh] h-[15vh]"/>
+                <el-icon v-else style="width: 30vh;height: 15vh;font-size: 28px;color: #8c939d;text-align: center;">
+                  <Plus/>
+                </el-icon>
+              </el-upload>
+            </div>
+            <div class="w-[50vh] my-[5px]">
+              <el-scrollbar height="250px">
+                <div class="grid gap-x-4 gap-y-[20px] grid-cols-4 auto-rows-auto w-full h-full">
+                  <div v-for="(avatar,index) in avatar_list" :key="avatar"
+                       :class="{'border-[2px] border-[#08d9d6]':click_flag === index}"
+                       class="w-full shadow-md"
+                       @click="choose(index)">
+                    <el-image :src=avatar class="w-full h-full" fit="cover"/>
+                  </div>
                 </div>
-              </div>
-            </el-scrollbar>
+              </el-scrollbar>
+            </div>
           </div>
-        </div>
-        <div class="w-full h-[10vh] flex flex-row items-center justify-between">
-          <div class="w-[15vh] my-[5px]">
-            <span>用户名：</span>
-            <el-input v-model="name" class="w-full"/>
+          <div class="w-full h-[10vh] flex flex-row items-center justify-between">
+            <div class="w-[15vh] my-[5px]">
+              <span>用户名：</span>
+              <el-input v-model="name" class="w-full"/>
+            </div>
+            <div class="w-[15vh] my-[5px]">
+              <span>生日：</span>
+              <el-date-picker v-model="birthday" size="default" style="width: 100%" type="date"
+                              value-format="YYYY年MM月DD日"/>
+            </div>
+            <div class="w-[60vh] my-[5px]">
+              <span>个性签名：</span>
+              <el-input v-model="personal_sign" class="w-full"/>
+            </div>
           </div>
-          <div class="w-[15vh] my-[5px]">
-            <span>生日：</span>
-            <el-date-picker v-model="birthday" value-format="YYYY年MM月DD日" size="default" style="width: 100%" type="date"/>
-          </div>
-          <div class="w-[60vh] my-[5px]">
-            <span>个性签名：</span>
-            <el-input v-model="personal_sign" class="w-full"/>
-          </div>
-        </div>
         </template>
         <template #footer>
           <div class="flex flex-row justify-end items-end">
             <el-button class="mx-[40px]" @click="dialog_visible = false">取消</el-button>
-            <el-button class="mx-[40px]" type="primary" @click="update_info()" v-loading.fullscreen.lock="loading">确定</el-button>
+            <el-button v-loading.fullscreen.lock="loading" class="mx-[40px]" type="primary" @click="update_info()">
+              确定
+            </el-button>
           </div>
         </template>
       </el-dialog>
@@ -327,7 +338,7 @@ export default {
 </template>
 
 <style scoped>
-.el-overlay-dialog{
+.el-overlay-dialog {
   overflow: hidden !important;
 }
 </style>

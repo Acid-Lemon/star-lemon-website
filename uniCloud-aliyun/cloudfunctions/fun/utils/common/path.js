@@ -1,5 +1,5 @@
 function path_slash_format(str, type) {
-    str = str.replace('\\', '/');
+    str = str.replaceAll('\\', '/');
     if (type) {
         switch (type) {
             case "folder": {

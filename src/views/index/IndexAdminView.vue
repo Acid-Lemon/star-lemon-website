@@ -71,35 +71,27 @@ export default {
                 <div @click="web_name_dialog = true">网站名称：{{ web_name }}</div>
                 <template #footer>{{ info.name }}，{{ get_time_greetings() }}</template>
             </el-card>
-            <el-row class="ml-[20px] mt-[20px]">
-                <el-col :span="6">
-                    <el-statistic :value="268500" title="浏览量"/>
-                </el-col>
-                <el-col>
-                    <el-statistic :value="268500" title="评论"/>
-                </el-col>
-            </el-row>
-            <el-dialog
-                v-model="web_name_dialog"
-                :before-close="handle_close"
-                title="修改信息"
-                width="500"
-            >
-                <el-input v-model="new_web_name" class="w-[240px]" placeholder="请输入新的网站名称"/>
-                <template #footer>
-                    <div class="dialog-footer">
-                        <el-button
-                            @click="web_name_dialog = false; new_web_name = web_name">取消
-                        </el-button>
-                        <el-button type="primary"
-                                   @click="web_name_dialog = false; web_name = new_web_name">
-                            确定
-                        </el-button>
-                    </div>
-                </template>
-            </el-dialog>
         </div>
     </admin-view>
+    <el-dialog
+        v-model="web_name_dialog"
+        :before-close="handle_close"
+        title="修改信息"
+        width="500"
+    >
+        <el-input v-model="new_web_name" class="w-[240px]" placeholder="请输入新的网站名称"/>
+        <template #footer>
+            <div class="dialog-footer">
+                <el-button
+                    @click="web_name_dialog = false; new_web_name = web_name">取消
+                </el-button>
+                <el-button type="primary"
+                           @click="web_name_dialog = false; web_name = new_web_name">
+                    确定
+                </el-button>
+            </div>
+        </template>
+    </el-dialog>
 </template>
 
 <style scoped>

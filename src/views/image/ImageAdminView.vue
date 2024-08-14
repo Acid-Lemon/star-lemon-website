@@ -111,7 +111,16 @@ export default {
                 image_name: this.image_list[0].name
             });
 
-            if (!res.success) {
+            console.log(res);
+
+            if (res.success) {
+                this.images[this.current_page - 1].push({
+                    name: this.image_list[0].name,
+                    id: "",
+                    temp_url: ""
+                })
+
+            } else {
                 ElNotification({
                     title: 'Error',
                     type: "error",
@@ -136,6 +145,7 @@ export default {
                 type: "success",
                 message: `第${this.index + 1}张上传成功`
             });
+
             this.index++;
             await this.uploadImage();
         },
@@ -181,19 +191,8 @@ export default {
 <template>
     <admin-view>
         <div class="w-full h-full bg-[#F8FAFD] flex flex-col content-center items-center">
-            <div class="fixed top-0 left-0 w-full h-[6vh] p-[10px] z-[1000] flex flex-row items-center">
-                <div class="flex flex-row items-center text-[#000000] font-['RGBZ']" @click="on_back">
-                    <el-icon style="width: 25px; height: 25px">
-                        <arrow-left style="width: 25px; height: 25px"/>
-                    </el-icon>
-                    返回
-                </div>
-                <div class="w-[1px] h-[80%] border border-[#000000] mx-[10px]"></div>
-                <div class="text-[2vh] text-[#000000] font-['RGBZ']">{{ this.$route.params.album_name }}</div>
-            </div>
-            <div class="w-full h-[5vh]"></div>
             <div
-                class="bg-[url('/static/background/17.jpg')] bg-cover rounded-md w-[95vw] h-[15vh] flex flex-col items-start justify-between p-[20px]">
+                class="bg-[url('/static/background/17.jpg')] bg-cover rounded-md w-[90vw] h-[15vh] flex flex-col items-start justify-between mt-[20px] p-[20px]">
                 <div class="w-full flex flex-row justify-between items-center">
                     <div class="flex flex-row justify-center items-center">
                         <div>图片名称：</div>
@@ -241,7 +240,7 @@ export default {
                         >
                             <el-button :disabled="disabled" type="primary">选择图片</el-button>
                         </el-upload>
-                        <div class="mr-[20px]" @click="console.log(this.image_list)">已选择{{
+                        <div class="mr-[20px]">已选择{{
                                 image_list.length
                             }}张照片
                         </div>

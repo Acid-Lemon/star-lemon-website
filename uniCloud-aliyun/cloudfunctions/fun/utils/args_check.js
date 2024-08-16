@@ -93,13 +93,13 @@ class RuleHandler {
                     }
                     return;
                 case "min":
-                    if (len <= length_rule_val) {
+                    if (len < length_rule_val) {
                         throw_handle_error(`args[${name}] invalid. expect length >= ${length_rule_val}, but got length ${len}`);
                     }
                     break;
 
                 case "max":
-                    if (len >= length_rule_val) {
+                    if (len > length_rule_val) {
                         throw_handle_error(`args[${name}] invalid. expect length <= ${length_rule_val}, but got length ${len}`);
                     }
                     break;
@@ -125,13 +125,13 @@ class RuleHandler {
                     }
                     return;
                 case "min":
-                    if (arg <= math_rule_val) {
+                    if (arg < math_rule_val) {
                         throw_handle_error(`args[${name}] invalid. expect length >= ${math_rule_val}, but got length ${arg}`);
                     }
                     break;
 
                 case "max":
-                    if (arg >= math_rule_val) {
+                    if (arg > math_rule_val) {
                         throw_handle_error(`args[${name}] invalid. expect length <= ${math_rule_val}, but got length ${arg}`);
                     }
                     break;

@@ -257,11 +257,12 @@ export default {
     </div>
     <el-dialog v-model="dialog_visible" :before-close="handle_close" align-center
                class="flex flex-col items-center justify-center el-overlay-dialog"
-               style="padding: 10px;height: 55vh; width:65vw">
+               style="padding: 10px;height: 55vh; width:65vw"
+               v-bind="$attrs">
         <template #header>
             <div class="text-[2vh] font-['SYST']">编辑个人信息</div>
         </template>
-        <template #default>
+        <div class="w-full h-[35vh]">
             <div class="w-full h-[25vh] flex flex-row items-center justify-center">
                 <div class="w-[20vh] my-[5px]">
                     <span>头像：</span>
@@ -332,7 +333,7 @@ export default {
                     <el-input v-model="personal_sign" class="w-full"/>
                 </div>
             </div>
-        </template>
+        </div>
         <template #footer>
             <div class="flex flex-row justify-end items-end">
                 <el-button class="mx-[40px]" @click="dialog_visible = false">取消</el-button>

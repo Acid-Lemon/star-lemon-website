@@ -30,7 +30,7 @@ export default {
 
 <template>
     <ElConfigProvider :locale="el_locale">
-        <NavigationBar v-if="show?.hasOwnProperty('navigation_bar') ? show.navigation_bar: true"></NavigationBar>
+        <NavigationBar v-if="show?.hasOwnProperty('navigation_bar') ? show.navigation_bar : true"></NavigationBar>
         <router-view class="w-full h-full"></router-view>
         <Copyright v-if="show?.hasOwnProperty('copyright') ? show.copyright: true"></Copyright>
     </ElConfigProvider>

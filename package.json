@@ -21,6 +21,7 @@
     "element-plus": "^2.7.2",
     "masonry-layout": "^4.2.2",
     "pinia": "^2.1.7",
+    "vditor": "^3.10.5",
     "vue-router": "^4.3.0"
   },
   "name": "lemon-website",

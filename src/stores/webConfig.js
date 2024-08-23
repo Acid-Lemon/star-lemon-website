@@ -1,11 +1,15 @@
 import {defineStore} from 'pinia'
 
-export const useWebConfigStore = defineStore('webConfig', () => {
-    // 其他配置...
-    let web_name = "star和lemon的小站"
-
-    return {
-        web_name
-    }
-
+export const use_web_config_store = defineStore('web_config', {
+    state: () => ({
+        web_config: {
+            web_name: null,
+        }
+    }),
+    actions: {
+        async init() {
+            let web_name = "star和lemon的小站";
+            this.web_config.web_name = web_name ?? null;
+        }
+    },
 })

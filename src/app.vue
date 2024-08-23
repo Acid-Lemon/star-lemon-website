@@ -5,6 +5,7 @@ import Copyright from '@/src/components/Copyright.vue'
 import el_locale_zh_cn from 'element-plus/es/locale/lang/zh-cn'
 
 import {use_user_info_store} from "./stores/userInfo";
+import {use_web_config_store} from "./stores/webConfig";
 
 export default {
     data() {
@@ -19,6 +20,7 @@ export default {
         });
 
         use_user_info_store().init();
+        use_web_config_store().init();
     },
     methods: {},
     components: {

@@ -1,8 +1,8 @@
 <script>
 import {ElMessageBox} from "element-plus";
-import {useWebConfigStore} from "@/src/stores/webConfig";
-import {get_user} from "@/src/utils/user_info";
+import {use_web_config_store} from "../../stores/webConfig";
 import ArticleAdminView from "../write/WriteAdminView.vue";
+import {use_user_info_store} from "../../stores/userInfo";
 
 export default {
     components: {
@@ -11,15 +11,27 @@ export default {
     },
     data() {
         return {
-            web_name: useWebConfigStore()?.web_name,
-            new_web_name: useWebConfigStore()?.web_name,
+            web_name: "",
+            new_web_name: "",
             web_name_dialog: false,
             time_state: "",
             info: "",
         };
     },
+    computed: {
+        web_config() {
+            const web_config_store = use_web_config_store();
+            return web_config_store.web_config;
+        },
+        user_info() {
+            const user_info_store = use_user_info_store();
+            return user_info_store.user_info;
+        }
+    },
     async mounted() {
-        this.info = await get_user();
+        this.web_name = this.web_config?.web_name;
+        this.new_web_name = this.web_config?.web_name;
+
     },
     methods: {
         handle_close(done) {
@@ -54,6 +66,14 @@ export default {
             if (0 <= hours && hours < 5) {
                 return "凌晨好呀，熬夜不好哦";
             }
+        },
+        change_web_name() {
+            this.web_name_dialog = false;
+            this.web_config.web_name = this.new_web_name;
+        },
+        close_dialog() {
+            this.web_name_dialog = false;
+            this.new_web_name = this.web_name;
         }
     }
 };
@@ -69,7 +89,7 @@ export default {
                     </div>
                 </template>
                 <div @click="web_name_dialog = true">网站名称：{{ web_name }}</div>
-                <template #footer>{{ info.name }}，{{ get_time_greetings() }}</template>
+                <template #footer>{{ user_info.name }}，{{ get_time_greetings() }}</template>
             </el-card>
         </div>
     </admin-view>
@@ -83,10 +103,10 @@ export default {
         <template #footer>
             <div class="dialog-footer">
                 <el-button
-                    @click="web_name_dialog = false; new_web_name = web_name">取消
+                    @click="close_dialog">取消
                 </el-button>
                 <el-button type="primary"
-                           @click="web_name_dialog = false; web_name = new_web_name">
+                           @click="change_web_name">
                     确定
                 </el-button>
             </div>

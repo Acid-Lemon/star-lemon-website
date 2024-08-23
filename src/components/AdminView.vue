@@ -1,5 +1,5 @@
 <script>
-import {useWebConfigStore} from "../stores/webConfig";
+import {use_web_config_store} from "../stores/webConfig";
 
 export default {
     name: "AdminView",
@@ -24,7 +24,13 @@ export default {
             pages: [],
         }
     },
-    methods: {useWebConfigStore}
+    computed: {
+        web_config() {
+            const web_config_store = use_web_config_store();
+            return web_config_store.web_config;
+        },
+    },
+    methods: {}
 }
 </script>
 
@@ -32,7 +38,7 @@ export default {
     <div class="bg-blue-500 flex flex-row items-center justify-between pl-[10px] w-full h-[5vh] shadow-md px-[10px]">
         <router-link to="/admin">
             <div class="text-[#FFFFFF] text-[20px] font-['SYST'] duration-700 hover:text-[#44cef6]">
-                {{ useWebConfigStore().web_name }}：后台管理系统
+                {{ web_config?.web_name }}：后台管理系统
             </div>
         </router-link>
         <router-link to="/">

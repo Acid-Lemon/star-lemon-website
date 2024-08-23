@@ -116,7 +116,7 @@ export default {
             <div class="text-[2vh] text-[#FFFFFF] font-['RGBZ']">文章</div>
         </div>
         <div class="h-full w-full flex flex-col items-center justify-start">
-            <el-scrollbar ref="el-scrollbar" ,bn, @scroll="handle_scroll">
+            <el-scrollbar ref="el-scrollbar" @scroll="handle_scroll">
                 <div
                     class="w-full min-h-[40vh] bg-[url('/static/background/23.jpg')] flex flex-col justify-center items-center bg-center bg-cover">
                     <p class="text-[#FFFFFF] font-['FZSX'] text-[4vh] hover:text-[#44cef6] duration-700">

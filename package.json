@@ -4,6 +4,7 @@
     "@types/node": "^20.12.2",
     "@types/uni-app": "^1.4.8",
     "autoprefixer": "^10.4.19",
+    "lightningcss": "^1.26.0",
     "postcss": "^8.4.38",
     "tailwindcss": "^3.4.3",
     "unplugin-auto-import": "^0.17.5",
@@ -16,10 +17,10 @@
   },
   "dependencies": {
     "@element-plus/icons-vue": "^2.3.1",
-    "@wangeditor/editor-for-vue": "^5.1.12",
+    "@rollup/plugin-terser": "^0.4.4",
+    "lightningcss": "^1.26.0",
     "axios": "^1.7.4",
     "element-plus": "^2.7.2",
-    "masonry-layout": "^4.2.2",
     "pinia": "^2.1.7",
     "vditor": "^3.10.5",
     "vue-router": "^4.3.0"

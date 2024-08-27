@@ -31,6 +31,11 @@ export default {
             return user_info_store.user_info;
         }
     },
+    watch: {
+        is_login() {
+            this.updatePages();
+        }
+    },
     methods: {
         // 更新导航栏
         updatePages() {
@@ -91,8 +96,7 @@ export default {
             localStorage.removeItem("token");
             localStorage.removeItem("user");
             // 更新用户状态
-            const user_info_store = use_user_info_store();
-            user_info_store.user_info = null;
+            this.user_info = null;
             // 更新导航栏
             this.updatePages();
             // 如果目前在个人页，则跳转到登录页

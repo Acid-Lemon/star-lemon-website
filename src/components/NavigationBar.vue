@@ -96,7 +96,8 @@ export default {
             localStorage.removeItem("token");
             localStorage.removeItem("user");
             // 更新用户状态
-            this.user_info = null;
+            const user_info_store = use_user_info_store();
+            user_info_store.user_info = null;
             // 更新导航栏
             this.updatePages();
             // 如果目前在个人页，则跳转到登录页

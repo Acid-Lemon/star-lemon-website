@@ -457,7 +457,7 @@ export default {
             </div>
             <div class="flex flex-col items-center justify-center bg-[#F8FAFD]">
                 <div
-                    class="border border-[#000000] m-[5vh] h-[30vh] md:w-[70%] w-[85%] flex flex-col items-center justify-center">
+                    class="border border-black shadow-md m-[5vh] h-[30vh] md:w-[70%] w-[85%] flex flex-col items-center justify-center">
                     <div class="relative top-[-2.5vh] bg-[#F8FAFD]">
                         <p class="mx-[1vw] text-[3.6vh] font-['RGBZ']">网易云音乐热评</p>
                     </div>

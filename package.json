@@ -18,14 +18,14 @@
   "dependencies": {
     "@element-plus/icons-vue": "^2.3.1",
     "@rollup/plugin-terser": "^0.4.4",
-    "lightningcss": "^1.26.0",
     "axios": "^1.7.4",
     "element-plus": "^2.7.2",
+    "lightningcss": "^1.26.0",
     "pinia": "^2.1.7",
     "vditor": "^3.10.5",
     "vue-router": "^4.3.0"
   },
-  "name": "lemon-website",
+  "name": "star-lemon-website",
   "description": "",
   "version": "1.0.0",
   "main": "main.js",

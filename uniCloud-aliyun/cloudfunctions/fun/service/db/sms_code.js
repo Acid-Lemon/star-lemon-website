@@ -44,7 +44,7 @@ module.exports = class DBService_SmsCode extends Service {
 
         let transaction = await this.db.startTransaction();
         try {
-            let code_record = await transaction.collection(tables.sms_code).doc(exist_code_record.id).get().data;
+            let code_record = (await transaction.collection(tables.sms_code).doc(exist_code_record.id).get()).data;
             if (!code_record) {
                 return await this.add_code(code, phone_number);
             }

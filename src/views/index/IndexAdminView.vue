@@ -1,34 +1,35 @@
 <script>
 import {ElMessageBox} from "element-plus";
-import {useWebConfigStore} from "@/src/stores/webConfig";
-import {get_user} from "@/src/utils/user_info";
+import {use_web_config_store} from "../../stores/webConfig";
 import ArticleAdminView from "../write/WriteAdminView.vue";
+import {use_user_info_store} from "../../stores/userInfo";
+import {ArrowRight, CaretBottom, CaretTop, Warning} from "@element-plus/icons-vue";
 
 export default {
     components: {
+        ArrowRight,
+        CaretBottom,
+        Warning,
+        CaretTop,
         ArticleAdminView,
         ElMessageBox
     },
     data() {
-        return {
-            web_name: useWebConfigStore()?.web_name,
-            new_web_name: useWebConfigStore()?.web_name,
-            web_name_dialog: false,
-            time_state: "",
-            info: "",
-        };
+        return {};
+    },
+    computed: {
+        web_config() {
+            const web_config_store = use_web_config_store();
+            return web_config_store.web_config;
+        },
+        user_info() {
+            const user_info_store = use_user_info_store();
+            return user_info_store.user_info;
+        }
     },
     async mounted() {
-        this.info = await get_user();
     },
     methods: {
-        handle_close(done) {
-            ElMessageBox.confirm('你确定取消更改吗?（已输入的内容不会被保存）').then(() => {
-                done()
-            }).catch(() => {
-                // catch error
-            })
-        },
         get_time_greetings() {
             const now = new Date();
             const hours = now.getHours();
@@ -54,7 +55,7 @@ export default {
             if (0 <= hours && hours < 5) {
                 return "凌晨好呀，熬夜不好哦";
             }
-        }
+        },
     }
 };
 </script>
@@ -62,36 +63,108 @@ export default {
 <template>
     <admin-view>
         <div class="w-full h-full bg-[#F8FAFD]">
-            <el-card class="w-[480px] ml-[20px] mt-[20px]">
-                <template #header>
-                    <div class="card-header">
-                        <span>网站信息</span>
-                    </div>
-                </template>
-                <div @click="web_name_dialog = true">网站名称：{{ web_name }}</div>
-                <template #footer>{{ info.name }}，{{ get_time_greetings() }}</template>
-            </el-card>
+            <div class="w-full flex flex-row items-center justify-evenly mt-[20px]">
+                <el-card class="w-[30%] h-[210px]">
+                    <template #header>
+                        <div class="card-header">
+                            <div class="font-['SYST']">管理员信息</div>
+                        </div>
+                    </template>
+                    <div class="font-['SYST']">用户名：{{ user_info.name }}</div>
+                    <div class="font-['SYST']">用户身份：{{ user_info?.role }}</div>
+                    <template #footer>
+                        <div class="font-['SYST']">
+                            {{ get_time_greetings() }}
+                        </div>
+                    </template>
+                </el-card>
+                <el-card class="w-[65%] h-[210px]">
+                    <el-row :gutter="16">
+                        <el-col :span="8">
+                            <div class="statistic-card">
+                                <el-statistic :value="98500">
+                                    <template #title>
+                                        <div style="display: inline-flex; align-items: center">
+                                            Daily active users
+                                            <el-tooltip
+                                                content="Number of users who logged into the product in one day"
+                                                effect="dark"
+                                                placement="top"
+                                            >
+                                                <el-icon :size="12" style="margin-left: 4px">
+                                                    <Warning/>
+                                                </el-icon>
+                                            </el-tooltip>
+                                        </div>
+                                    </template>
+                                </el-statistic>
+                                <div class="statistic-footer">
+                                    <div class="footer-item">
+                                        <span>than yesterday</span>
+                                        <span class="green">
+                                            24%
+                                            <el-icon>
+                                                <CaretTop/>
+                                            </el-icon>
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        </el-col>
+                        <el-col :span="8">
+                            <div class="statistic-card">
+                                <el-statistic :value="693700">
+                                    <template #title>
+                                        <div style="display: inline-flex; align-items: center">
+                                            Monthly Active Users
+                                        </div>
+                                    </template>
+                                </el-statistic>
+                                <div class="statistic-footer">
+                                    <div class="footer-item">
+                                        <span>month on month</span>
+                                        <span class="red">
+                                            12%
+                                            <el-icon>
+                                                <CaretBottom/>
+                                            </el-icon>
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        </el-col>
+                        <el-col :span="8">
+                            <div class="statistic-card">
+                                <el-statistic :value="72000" title="New transactions today">
+                                    <template #title>
+                                        <div style="display: inline-flex; align-items: center">
+                                            New transactions today
+                                        </div>
+                                    </template>
+                                </el-statistic>
+                                <div class="statistic-footer">
+                                    <div class="footer-item">
+                                        <span>than yesterday</span>
+                                        <span class="green">
+                                            16%
+                                            <el-icon>
+                                                <CaretTop/>
+                                            </el-icon>
+                                        </span>
+                                    </div>
+                                    <div class="footer-item">
+                                        <el-icon :size="14">
+                                            <ArrowRight/>
+                                        </el-icon>
+                                    </div>
+                                </div>
+                            </div>
+                        </el-col>
+                    </el-row>
+                </el-card>
+            </div>
         </div>
     </admin-view>
-    <el-dialog
-        v-model="web_name_dialog"
-        :before-close="handle_close"
-        title="修改信息"
-        width="500"
-    >
-        <el-input v-model="new_web_name" class="w-[240px]" placeholder="请输入新的网站名称"/>
-        <template #footer>
-            <div class="dialog-footer">
-                <el-button
-                    @click="web_name_dialog = false; new_web_name = web_name">取消
-                </el-button>
-                <el-button type="primary"
-                           @click="web_name_dialog = false; web_name = new_web_name">
-                    确定
-                </el-button>
-            </div>
-        </template>
-    </el-dialog>
 </template>
 
 <style scoped>

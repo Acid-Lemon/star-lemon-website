@@ -5,6 +5,8 @@ import AutoImport from 'unplugin-auto-import/vite';
 import Components from 'unplugin-vue-components/vite';
 import {ElementPlusResolver} from 'unplugin-vue-components/resolvers';
 
+import terser from "@rollup/plugin-terser";
+
 /** ==== 处理 tailwind cli 的自动启动和打包 ==== */
 const child_process = require('child_process')
 let tailwindMode = process.env.NODE_ENV
@@ -41,7 +43,9 @@ export default defineConfig({
         }),
         Components({
             resolvers: [ElementPlusResolver()],
-        })
+        }),
+
+        terser(),
     ],
     build: {
         rollupOptions: {
@@ -52,6 +56,25 @@ export default defineConfig({
                     return 'other-vendor';
                 }
             }
-        }
-    }
+        },
+        minify: "terser",
+        terserOptions: {
+            compress: {
+                drop_debugger: true,
+                dead_code: true,
+                collapse_vars: true,
+                reduce_vars: true,
+                reduce_funcs: true,
+                pure_funcs: ["console.log", "console.debug", "console.info"],
+            },
+            format: {
+                comments: false
+            }
+        },
+        /*cssCodeSplit: true,
+        cssMinify: "lightningcss"*/
+    },
+    /*css: {
+        transformer: "lightningcss"
+    }*/
 });

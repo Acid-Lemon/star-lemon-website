@@ -200,23 +200,13 @@ module.exports = class DBService_MessageBoard extends Service {
     }
 
     async change_message_public_state(message_id, public_state) {
-        if (public_state) {
-            return await this.db
-                .collection(tables.message_board)
-                .doc(message_id)
-                .update({
-                    "public_state": true,
-                    "review": true
-                })
-        } else {
-            return await this.db
-                .collection(tables.message_board)
-                .doc(message_id)
-                .update({
-                    "public_state": false,
-                    "review": true
-                })
-        }
+        await this.db
+            .collection(tables.message_board)
+            .doc(message_id)
+            .update({
+                "public_state": public_state,
+                "review": true
+            })
 
     }
 
@@ -230,7 +220,7 @@ module.exports = class DBService_MessageBoard extends Service {
     }
 
     async delete_message(message_id) {
-        return await this.db
+        await this.db
             .collection(tables.message_board)
             .doc(message_id)
             .remove()

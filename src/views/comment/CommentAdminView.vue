@@ -154,8 +154,8 @@ export default {
                             <el-table-column type="index" width="50"/>
                             <el-table-column label="留言id" prop="id" width="250"/>
                             <el-table-column label="内容" prop="content"/>
-                            <el-table-column :formatter="(row) => {return row.public_state ? '可见' : '不可见'}"
-                                             label="可见状态"
+                            <el-table-column :formatter="(row) => {return row.public_state ? '公开' : '私有'}"
+                                             label="公开状态"
                                              prop="public_state"
                                              width="100"/>
                             <el-table-column label="发布者" prop="user.name" width="100"/>
@@ -187,8 +187,8 @@ export default {
                             <el-table-column type="index" width="50"/>
                             <el-table-column label="留言id" prop="id" width="250"/>
                             <el-table-column label="内容" prop="content"/>
-                            <el-table-column :formatter="(row) => {return row.public_state ? '可见' : '不可见'}"
-                                             label="可见状态"
+                            <el-table-column :formatter="(row) => {return row.public_state ? '公开' : '私有'}"
+                                             label="公开状态"
                                              prop="public_state"
                                              width="100"/>
                             <el-table-column label="发布者" prop="user.name" width="100"/>
@@ -199,13 +199,13 @@ export default {
                                     <el-button
                                         size="small"
                                         type="primary"
-                                        @click="verify_message(scope.$index, scope.row.id, true)"
+                                        @click="change_message_public_state(scope.$index, scope.row.id, true)"
                                     >
                                         公开
                                     </el-button>
                                     <el-button
                                         size="small"
-                                        @click="verify_message(scope.$index, scope.row.id, false)"
+                                        @click="change_message_public_state(scope.$index, scope.row.id, false)"
                                     >
                                         私有
                                     </el-button>
@@ -233,8 +233,8 @@ export default {
                             <el-table-column type="index" width="50"/>
                             <el-table-column label="留言id" prop="id" width="250"/>
                             <el-table-column label="内容" prop="content"/>
-                            <el-table-column :formatter="(row) => {return row.public_state ? '可见' : '不可见'}"
-                                             label="可见状态"
+                            <el-table-column :formatter="(row) => {return row.public_state ? '公开' : '私有'}"
+                                             label="公开状态"
                                              prop="public_state"
                                              width="100"/>
                             <el-table-column label="发布者" prop="user.name" width="100"/>

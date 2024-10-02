@@ -50,10 +50,10 @@ export default {
                 } else if (e.path === "/user" && !this.is_login) {
                     // 如果用户未登录，则过滤掉用户信息页面
                     return;
-                }/* else if (e.path === "/admin" && this.user_info?.role !== "admin") {
+                } else if (e.path === "/admin" && this.user_info?.role !== "admin") {
                     // 如果用户不是管理员，则过滤掉管理页面
                     return;
-                }*/
+                }
 
                 select_pages.push({
                     ...e.meta.navigation_bar,
@@ -111,7 +111,7 @@ export default {
 
 <template>
     <div
-        class="fixed top-[1.5vw] left-[1.5vw] w-[97vw] md:h-[50px] h-[80px] hover:bg-white hover:bg-opacity-50 duration-700 rounded-md flex md:flex-row flex-col md:justify-between items-center justify-center md:p-[3vh] z-[1000]">
+        class="fixed top-[1.5vw] left-[1.5vw] w-[97vw] md:h-[50px] h-[80px] hover:bg-white hover:backdrop-blur-md hover:bg-opacity-50 duration-700 rounded-md flex md:flex-row flex-col md:justify-between items-center justify-center md:p-[3vh] z-[1000]">
         <div class="flex flex-row justify-center items-center">
             <router-link to="/">
                 <div

@@ -22,7 +22,8 @@ const codes = {
     err_folder_exist: "err_folder_exist",
     permission_denied: "err_permission_denied",
     rate_limit: "err_rate_limit",
-    err_serve: "err_serve"
+    err_serve: "err_serve",
+    err_no_permissions: "err_no_permissions"
 };
 
 module.exports = {

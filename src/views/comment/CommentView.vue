@@ -308,7 +308,6 @@ export default {
             }
 
             this.message_list = this.message_list.concat(await this.messages_format(res.data.messages));
-            console.log(this.message_list);
 
             this.loading_more = false;
             this.has_more = res.data.messages.length === 20;
@@ -368,7 +367,8 @@ export default {
                 id: res.data.id,
                 content: message,
                 create_at: res.data.create_at,
-                public_state: res.data.public_state
+                public_state: res.data.public_state,
+                review: false
             };
             new_message.user = {
                 id: this.user_info.id,
@@ -376,7 +376,7 @@ export default {
                 avatar: this.user_info.avatar
             };
 
-            this.message_list.unshift(await this.messages_format([new_message]));
+            this.message_list = (await this.messages_format([new_message])).concat(this.message_list);
 
             ElNotification({
                 title: 'Success',
@@ -441,6 +441,26 @@ export default {
         random_color() {
             let color_list = ["#fbc2eb", "#c2e9fb", "#FFE6FA", "#ebc0fd", "#abecd6", "#e3eeff", "#fdd6bd", "#bdc2e8", "#D7FFFE", "#FFE6FA", "#ffdde1"];
             return color_list[Math.floor(Math.random() * color_list.length)]
+        },
+        async delete_message(message_id) {
+            let res = await call_api("message_board/delete_message", {
+                message_id: message_id
+            });
+
+            if (res.success) {
+                ElNotification({
+                    title: 'Success',
+                    message: '删除成功',
+                    type: 'success',
+                });
+                this.message_list = this.message_list.filter((message) => message.id !== message_id);
+            } else {
+                ElNotification({
+                    title: 'Error',
+                    message: res,
+                    type: 'error',
+                });
+            }
         }
     }
 }
@@ -552,7 +572,8 @@ export default {
                                     </div>
                                 </div>
                                 <div v-if="this.user_info?.id === message.user.id"
-                                     class="flex flex-row items-center m-[20px]">
+                                     class="flex flex-row items-center m-[20px]"
+                                     @click="delete_message(message.id)">
                                     <el-image class="w-[20px] h-[20px] contrast-0 hover:contrast-100"
                                               src="/static/svg/删除.svg"></el-image>
                                 </div>

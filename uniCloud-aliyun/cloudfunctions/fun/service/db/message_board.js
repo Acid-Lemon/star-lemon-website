@@ -199,7 +199,7 @@ module.exports = class DBService_MessageBoard extends Service {
 
     }
 
-    async verify_message(message_id, public_state) {
+    async change_message_public_state(message_id, public_state) {
         if (public_state) {
             return await this.db
                 .collection(tables.message_board)

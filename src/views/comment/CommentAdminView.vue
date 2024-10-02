@@ -68,9 +68,9 @@ export default {
                 })
             }));
         },
-        async verify_message(id, message_id, public_state) {
+        async change_message_public_state(id, message_id, public_state) {
             console.log(public_state);
-            let res = await call_api("message_board/verify_message", {
+            let res = await call_api("message_board/change_message_public_state", {
                 message_id: message_id,
                 public_state: public_state
             });

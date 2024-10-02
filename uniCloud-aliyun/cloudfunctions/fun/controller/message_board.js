@@ -143,7 +143,7 @@ module.exports = class Controller_MessageBoard extends Controller {
         }
     }
 
-    async verify_message() {
+    async change_message_public_state() {
         let {
             message_id,
             public_state

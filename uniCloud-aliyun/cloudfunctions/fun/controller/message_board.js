@@ -71,7 +71,7 @@ module.exports = class Controller_MessageBoard extends Controller {
         };
     }
 
-    async get_all_messages_admin(review) {
+    async get_all_messages_admin() {
         let {
             time_range = {},
             message_number,
@@ -160,13 +160,13 @@ module.exports = class Controller_MessageBoard extends Controller {
             }
         });
 
-        if (await this.service.message_board.check_permissions_to_verify_message()) {
-            let res = await this.service.message_board.verify_message(message_id, public_state);
-            return {
-                data: res
-            }
-        } else {
+        if (!await this.service.message_board.check_permissions_to_verify_message()) {
             this.throw(codes.err_no_permissions, "No permission to verify message");
+        }
+
+        let res = await this.service.message_board.change_message_public_state(message_id, public_state);
+        return {
+            data: res
         }
     }
 }

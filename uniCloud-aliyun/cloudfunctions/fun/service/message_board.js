@@ -23,8 +23,8 @@ module.exports = class Service_MessageBoard extends Service {
         return await this.service.db.message_board.get_all_messages_admin(message_number, time_range, skip_numbers, type)
     }
 
-    async verify_message(message_id, public_state) {
-        return await this.service.db.message_board.verify_message(message_id, public_state);
+    async change_message_public_state(message_id, public_state) {
+        return await this.service.db.message_board.change_message_public_state(message_id, public_state);
     }
 
     async check_permissions_to_delete_message(message_id) {

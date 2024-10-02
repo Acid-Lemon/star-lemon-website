@@ -143,7 +143,7 @@ class RuleHandler {
 
     regex(args, name, re) {
         if (!(re instanceof RegExp)) {
-            if (!re instanceof String) {
+            if (!(re instanceof String)) {
                 throw TypeError(`rules[${name}]: value of rule[regex] is not a RegExp or RegExp string`);
             }
 

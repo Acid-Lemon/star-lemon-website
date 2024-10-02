@@ -44,7 +44,7 @@ module.exports = class DBService_SmsCode extends Service {
 
         let transaction = await this.db.startTransaction();
         try {
-            let code_record = await transaction.collection(tables.sms_code).doc(exist_code_record.id).get().data;
+            let code_record = await transaction.collection(tables.sms_code).doc(exist_code_record.id).get().then(({data}) => id_name_format(data));
             if (!code_record) {
                 return await this.add_code(code, phone_number);
             }
@@ -95,7 +95,7 @@ module.exports = class DBService_SmsCode extends Service {
         } catch (err) {
             await transaction.rollback();
 
-            console.log("add_code_with_limit error:", err);
+            console.error("add_code_with_limit error:", err);
             this.throw(error.codes.sms_code_send_limit, err.customize ? { renew_time: err.info.renew_time } : {});
         }
     }

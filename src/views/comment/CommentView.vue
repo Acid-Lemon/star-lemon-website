@@ -309,6 +309,8 @@ export default {
 
             this.message_list = this.message_list.concat(await this.messages_format(res.data.messages));
 
+            console.log(this.message_list)
+
             this.loading_more = false;
             this.has_more = res.data.messages.length === 20;
         },
@@ -477,15 +479,15 @@ export default {
             </div>
             <div class="flex flex-col items-center justify-center bg-[#F8FAFD]">
                 <div
-                    class="border border-black shadow-md m-[5vh] h-[30vh] md:w-[70%] w-[85%] flex flex-col items-center justify-center">
+                    class="border border-black shadow-md m-[4vh] h-[25vh] md:w-[70%] w-[85%] flex flex-col items-center justify-center">
                     <div class="relative top-[-2.5vh] bg-[#F8FAFD]">
-                        <p class="mx-[1vw] text-[3.6vh] font-['RGBZ']">网易云音乐热评</p>
+                        <p class="mx-[1vw] text-[3vh] font-['RGBZ']">网易云音乐热评</p>
                     </div>
                     <div class="w-full h-full flex flex-col items-center justify-center">
-                        <p class="text-[2.4vh] m-[2vh] font-['FZSX']">
+                        <p class="text-[2.4vh] mb-[1vh] font-['FZSX']">
                             {{ sentences?.hitokoto }}
                         </p>
-                        <p class="text-[1.9vh] m-[2vh] font-['FZSX']">
+                        <p class="text-[1.9vh] mb-[3vh] font-['FZSX']">
                             ——『{{ sentences?.from }}』{{
                                 sentences?.from_who === null ? '未知' : sentences?.from_who
                             }}</p>
@@ -572,10 +574,22 @@ export default {
                                     </div>
                                 </div>
                                 <div v-if="this.user_info?.id === message.user.id"
-                                     class="flex flex-row items-center m-[20px]"
-                                     @click="delete_message(message.id)">
-                                    <el-image class="w-[20px] h-[20px] contrast-0 hover:contrast-100"
-                                              src="/static/svg/删除.svg"></el-image>
+                                     class="flex flex-row items-center m-[20px]">
+                                    <div class="flex flex-row items-center">
+                                        <div v-if="message.review === false" class="mr-[20px] opacity-50 font-['SYST']">
+                                            未审核
+                                        </div>
+                                        <div v-if="message.review === true && message.public_state === false"
+                                             class="mr-[20px] text-red-500 font-['SYST']">审核未通过
+                                        </div>
+                                    </div>
+                                    <div class="flex flex-row items-center"
+                                         @click="delete_message(message.id)">
+                                        <el-image class="w-[20px] h-[20px] contrast-0 hover:contrast-100"
+                                                  src="/static/svg/删除.svg">
+                                        </el-image>
+                                    </div>
+
                                 </div>
                             </div>
                             <div class="m-[1vh] flex flex-row items-center">

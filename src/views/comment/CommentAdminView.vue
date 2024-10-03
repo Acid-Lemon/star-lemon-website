@@ -11,6 +11,7 @@ export default {
             current_page: 1,
             info: null,
             active_name: "all",
+            loading: false
         }
     },
     async mounted() {
@@ -18,6 +19,8 @@ export default {
     },
     methods: {
         async get_messages() {
+            this.loading = true;
+
             this.pages += 1;
             let start_time = new Date().getTime();
             let skip_number = 0;
@@ -54,6 +57,8 @@ export default {
             }
 
             this.message_list = this.message_list.concat([await this.messages_format(res.data.messages)]);
+
+            this.loading = false;
         },
         async messages_format(messages) {
             if (!messages) {
@@ -143,7 +148,7 @@ export default {
 <template>
     <admin-view>
         <div class="w-full h-[95vh] bg-[#F8FAFD] flex flex-col content-center items-center">
-            <el-tabs v-model="active_name" class="w-[95%]" @tab-change="switch_tab">
+            <el-tabs v-model="active_name" v-loading="loading" class="w-[95%]" @tab-change="switch_tab">
                 <el-tab-pane label="全部" name="all">
                     <div class="w-full">
                         <el-table :data="message_list[current_page - 1]"

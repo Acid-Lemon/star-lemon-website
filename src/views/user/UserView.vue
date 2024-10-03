@@ -84,6 +84,11 @@ export default {
         }
 
     },
+    onLoad() {
+        uni.setNavigationBarTitle({
+            title: '个人|star和lemon的小站'
+        });
+    },
     mounted() {
         this.load_avatars();
     },
@@ -243,7 +248,11 @@ export default {
                 <p class="font-['SYST'] text-[24px] mr-[20px] leading-none pb-[5px]">{{
                         user_info?.name ? user_info.name : "未登录"
                     }}</p>
-                <el-tag class="font-['SYST'] text-[18px] mr-[10px] leading-none pb-[5px]" type="primary">用户</el-tag>
+                <el-tag v-if="user_info?.role==='admin'"
+                        class="font-['SYST'] text-[18px] mr-[10px] leading-none pb-[5px]" type="success">管理员
+                </el-tag>
+                <el-tag v-else class="font-['SYST'] text-[18px] mr-[10px] leading-none pb-[5px]" type="primary">用户
+                </el-tag>
                 <p v-if="user_info?.birthday" class="font-['SYST'] text-[14px] mr-[20px] leading-none pb-[5px]">
                     生日：{{ user_info?.birthday }}</p>
                 <p class="font-['SYST'] text-[14px] opacity-50 leading-none pb-[5px]">{{ user_info?.personal_sign }}</p>

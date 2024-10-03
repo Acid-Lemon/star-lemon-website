@@ -29,6 +29,7 @@ export default {
             has_photo_albums: true,
             active_name: "shared",
             disabled: false,
+            loading: false
         };
     },
     async mounted() {
@@ -36,6 +37,8 @@ export default {
     },
     methods: {
         async get_folders() {
+            this.loading = true;
+
             this.photo_albums = [];
 
             let res = await call_api("album/get_folders", {
@@ -54,6 +57,8 @@ export default {
             this.photo_albums = res.data.folders_info;
 
             this.has_photo_albums = this.photo_albums.length !== 0;
+
+            this.loading = false;
         },
         async create_new_photo_album() {
             let res = await call_api("album/create_folder", {
@@ -93,7 +98,7 @@ export default {
     <admin-view>
         <div class="w-full h-full flex flex-col items-center overflow-y-hidden bg-[#F8FAFD]">
             <div class="h-[95vh] w-[90vw]">
-                <el-tabs v-model="active_name" class="demo-tabs" @tab-change="get_folders">
+                <el-tabs v-model="active_name" v-loading="loading" class="demo-tabs" @tab-change="get_folders">
                     <el-tab-pane label="共享相册" name="shared">
                         <div class="h-[95vh]">
                             <div class="flex flex-row items-center mb-[20px]">

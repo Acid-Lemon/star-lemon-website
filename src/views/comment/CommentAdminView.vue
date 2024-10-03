@@ -245,13 +245,13 @@ export default {
                                     <el-button
                                         size="small"
                                         type="primary"
-                                        @click="verify_message(scope.$index, scope.row.id, true)"
+                                        @click="change_message_public_state(scope.$index, scope.row.id, true)"
                                     >
                                         公开
                                     </el-button>
                                     <el-button
                                         size="small"
-                                        @click="verify_message(scope.$index, scope.row.id, false)"
+                                        @click="change_message_public_state(scope.$index, scope.row.id, false)"
                                     >
                                         私有
                                     </el-button>

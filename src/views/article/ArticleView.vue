@@ -10,11 +10,14 @@ export default {
     data() {
         return {
             pages: 0,
-            article_list: []
+            article_list: [],
+            loading: false
         }
     },
     async mounted() {
+        this.loading = true;
         await this.get_articles();
+        this.loading = false;
     },
     methods: {
         truncate_text,
@@ -81,51 +84,57 @@ export default {
                     一件小事
                 </p>
             </div>
-            <div class="md:w-[70vw] w-[90vw] h-auto bg-[#FFFFFF] shadow-md mt-[20px]">
-                <div v-for="article in article_list">
-                    <router-link :to="'/article/' + article.title + '?article_id=' + article.id">
-                        <div class="w-full h-auto px-[20px] py-[20px] border-b border-[#000000]">
-                            <div class="text-[2.6vh] font-['SYST']">{{ article.title }}</div>
-                            <div
-                                class="flex md:flex-row flex-col md:items-center md:justify-start items-start justify-center mb-[5px]">
-                                <div class="flex flex-row items-center">
-                                    <div class="text-[1.5vh] font-['SYST'] mr-[20px]">{{ article.user.name }}</div>
-                                    <svg class="opacity-50 w-[1.5vh] h-[1.5vh] mr-[3px]" viewBox="0 0 24 24">
-                                        <path
-                                            d="M12 20a8 8 0 0 0 8-8a8 8 0 0 0-8-8a8 8 0 0 0-8 8a8 8 0 0 0 8 8m0-18a10 10 0 0 1 10 10a10 10 0 0 1-10 10C6.47 22 2 17.5 2 12A10 10 0 0 1 12 2m.5 5v5.25l4.5 2.67l-.75 1.23L11 13V7h1.5Z"
-                                            fill="currentColor"></path>
-                                    </svg>
-                                    <div class="text-[1.5vh] font-['SYST'] mr-[20px] opacity-50">{{
-                                            article.create_at_format_str
-                                        }}
+            <div v-loading="loading"
+                 class="w-full md:min-h-[60vh] min-h-[70vh] flex flex-col items-center justify-start">
+                <div
+                    class="md:w-[70vw] w-[90vw] h-auto bg-[#FFFFFF] shadow-md mt-[20px]">
+                    <div v-for="article in article_list">
+                        <router-link :to="'/article/' + article.title + '?article_id=' + article.id">
+                            <div class="w-full h-auto px-[20px] py-[20px] border-b border-[#000000]">
+                                <div class="text-[2.6vh] font-['SYST']">{{ article.title }}</div>
+                                <div
+                                    class="flex md:flex-row flex-col md:items-center md:justify-start items-start justify-center mb-[5px]">
+                                    <div class="flex flex-row items-center">
+                                        <div class="text-[1.5vh] font-['SYST'] mr-[20px]">{{ article.user.name }}</div>
+                                        <svg class="opacity-50 w-[1.5vh] h-[1.5vh] mr-[3px]" viewBox="0 0 24 24">
+                                            <path
+                                                d="M12 20a8 8 0 0 0 8-8a8 8 0 0 0-8-8a8 8 0 0 0-8 8a8 8 0 0 0 8 8m0-18a10 10 0 0 1 10 10a10 10 0 0 1-10 10C6.47 22 2 17.5 2 12A10 10 0 0 1 12 2m.5 5v5.25l4.5 2.67l-.75 1.23L11 13V7h1.5Z"
+                                                fill="currentColor"></path>
+                                        </svg>
+                                        <div class="text-[1.5vh] font-['SYST'] mr-[20px] opacity-50">{{
+                                                article.create_at_format_str
+                                            }}
+                                        </div>
+                                    </div>
+                                    <div class="flex flex-row items-center">
+                                        <img alt="浏览" class="opacity-50 w-[1.5vh] h-[1.5vh] mr-[3px]"
+                                             src="/static/svg/views.svg"/>
+                                        <div class="text-[1.5vh] font-['SYST'] mr-[20px] opacity-50">{{
+                                                article.views
+                                            }}
+                                        </div>
+                                        <img alt="喜欢" class="opacity-50 w-[1.5vh] h-[1.5vh] mr-[3px]"
+                                             src="/static/svg/likes.svg"/>
+                                        <div class="text-[1.5vh] font-['SYST'] mr-[20px] opacity-50">{{
+                                                article.likes
+                                            }}
+                                        </div>
+                                        <img alt="评论"
+                                             class="opacity-50 w-[1.5vh] h-[1.5vh] mr-[3px]"
+                                             src="/static/svg/comments.svg"/>
+                                        <div class="text-[1.5vh] font-['SYST'] opacity-50">{{ article.comments }}</div>
                                     </div>
                                 </div>
-                                <div class="flex flex-row items-center">
-                                    <img alt="浏览" class="opacity-50 w-[1.5vh] h-[1.5vh] mr-[3px]"
-                                         src="/static/svg/views.svg"/>
-                                    <div class="text-[1.5vh] font-['SYST'] mr-[20px] opacity-50">{{
-                                            article.views
-                                        }}
-                                    </div>
-                                    <img alt="喜欢" class="opacity-50 w-[1.5vh] h-[1.5vh] mr-[3px]"
-                                         src="/static/svg/likes.svg"/>
-                                    <div class="text-[1.5vh] font-['SYST'] mr-[20px] opacity-50">{{
-                                            article.likes
-                                        }}
-                                    </div>
-                                    <img alt="评论"
-                                         class="opacity-50 w-[1.5vh] h-[1.5vh] mr-[3px]"
-                                         src="/static/svg/comments.svg"/>
-                                    <div class="text-[1.5vh] font-['SYST'] opacity-50">{{ article.comments }}</div>
-                                </div>
+                                <div class="text-[1.5vh] font-['SYST']">{{ truncate_text(article.content, 300) }}</div>
                             </div>
-                            <div class="text-[1.5vh] font-['SYST']">{{ truncate_text(article.content, 300) }}</div>
-                        </div>
-                    </router-link>
+                        </router-link>
+                    </div>
                 </div>
-            </div>
-            <div class="md:w-[70vw] w-[90vw] h-[100px] flex flex-row items-center justify-center">
-                <div class="text-[3vh] font-['RGBZ']">没有更多文章惹</div>
+                <div class="md:w-[70vw] w-[90vw] h-[100px] flex flex-row items-center justify-center">
+                    <div v-if="this.loading === false && this.article_list.length > 0"
+                         class="text-[3vh] font-['RGBZ']">没有更多文章惹
+                    </div>
+                </div>
             </div>
         </div>
     </el-scrollbar>

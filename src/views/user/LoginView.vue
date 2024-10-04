@@ -117,7 +117,7 @@ export default {
                 ElNotification({
                     title: 'Warning',
                     type: "warning",
-                    message: "未获取验证码",
+                    message: "未填写验证码",
                 });
 
                 return;
@@ -125,7 +125,7 @@ export default {
 
             let loading = ElLoading.service();
             let res;
-            if (this.state.mode === true) {
+            if (this.state.is_login === true && this.state.mode === true) {
                 res = await call_api(`user/login/${this.state.is_login === true ? "login" : "register"}_by_user`, {
                     username: this.username,
                     password: this.password
@@ -141,30 +141,23 @@ export default {
 
             loading.close();
 
-            if (res.success === false) {
+
+            if (!res.success) {
                 // 显示错误
                 ElNotification({
                     title: 'Error',
                     type: "error",
-                    message: res.error_message,
+                    message: res,
                 });
 
                 console.log(res);
-
-                if (!res.api_call_success) {
-                    this.username = "";
-                    this.password = "";
-                    this.confirm_password = "";
-                    this.phone_number = "";
-                    this.code = "";
-                }
 
                 return;
             }
 
             await load_user();
 
-            if (this.state.is_login) {
+            if (this.state.is_login && res.success) {
                 ElNotification({
                     title: 'Success',
                     type: "success",
@@ -176,7 +169,7 @@ export default {
             }
 
 
-            if (!this.state.is_login) {
+            if (!this.state.is_login && res.success) {
                 ElNotification({
                     title: 'Success',
                     type: "success",

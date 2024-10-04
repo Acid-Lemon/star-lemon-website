@@ -31,17 +31,8 @@ export default {
         };
     },
     async beforeCreate() {
-        const user_info_store = use_user_info_store();
-        let user_info = user_info_store.user_info;
-
-        this.name = user_info.name;
-        this.birthday = user_info?.birthday;
-        this.personal_sign = user_info?.personal_sign;
-
-        console.log(user_info);
-
-        let avatar_name = user_info?.avatar.name;
-        let type = user_info?.avatar.type;
+        let avatar_name = this.user_info?.avatar.name;
+        let type = this.user_info?.avatar.type;
         if (avatar_name) {
             if (type === "upload") {
                 let avatar_url_res = await call_api("user/profile/get_upload_avatar_temp_url", {
@@ -64,7 +55,7 @@ export default {
             }
         }
 
-        let background_name = user_info?.profile_background_image?.name;
+        let background_name = this.user_info?.profile_background_image?.name;
         if (background_name) {
             let background_url_res = await call_api("user/profile/get_background_image_temp_url", {
                 image_name: background_name,
@@ -84,13 +75,11 @@ export default {
         }
 
     },
-    onLoad() {
-        uni.setNavigationBarTitle({
-            title: '个人|star和lemon的小站'
-        });
-    },
     mounted() {
         this.load_avatars();
+        this.name = this.user_info.name;
+        this.birthday = this.user_info?.birthday;
+        this.personal_sign = this.user_info?.personal_sign;
     },
     computed: {
         user_info() {
@@ -204,6 +193,8 @@ export default {
                         message: '请填写完整信息',
                         type: 'info',
                     });
+
+                    this.loading = false;
                     return;
                 }
 

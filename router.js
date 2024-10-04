@@ -34,8 +34,8 @@ const router = createRouter({
             component: () => import("@/src/views/article/ArticleView.vue")
         },
         {
-            path: "/article/write",
-            name: "write",
+            path: "/article/:article_title",
+            name: "read",
             meta: {
                 title: "阅读",
                 show: {
@@ -43,7 +43,7 @@ const router = createRouter({
                     side_navigation_bar: false,
                 }
             },
-            component: () => import("@/src/views/write/WriteView.vue")
+            component: () => import("@/src/views/write/ReadView.vue")
         },
         {
             path: "/album",

@@ -2,15 +2,15 @@
 import Vditor from 'vditor';
 
 export default {
-    name: 'MyEditor',
+    name: 'MdEditor',
     data() {
         return {
-            vditorInstance: null
+            vditor: null
         };
     },
     emits: ['update:value'],
     mounted() {
-        this.vditorInstance = new Vditor(this.$refs.vditor, {
+        this.vditor = new Vditor(this.$refs.vditor, {
             // 配置 Vditor 选项
             cache: false,
             lang: 'zh_CN',
@@ -24,8 +24,8 @@ export default {
         });
     },
     beforeDestroy() {
-        if (this.vditorInstance) {
-            this.vditorInstance.destroy();
+        if (this.vditor) {
+            this.vditor.destroy();
         }
     },
 };

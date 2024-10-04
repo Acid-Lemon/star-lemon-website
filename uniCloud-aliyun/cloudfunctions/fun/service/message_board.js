@@ -18,7 +18,7 @@ module.exports = class Service_MessageBoard extends Service {
         return await this.service.db.message_board.get_personal_and_public_messages(message_number, time_range, skip_numbers)
     }
 
-    async get_all_messages_admin(message_number, time_range = {}, skip_numbers = 0, type) {
+    async get_all_messages_admin(message_number, time_range = {}, skip_numbers = 0, type = "all") {
         time_range = time_range ?? {};
         return await this.service.db.message_board.get_all_messages_admin(message_number, time_range, skip_numbers, type)
     }
@@ -27,13 +27,13 @@ module.exports = class Service_MessageBoard extends Service {
         return await this.service.db.message_board.change_message_public_state(message_id, public_state);
     }
 
-    async check_permissions_to_delete_message(message_id) {
-        return this.ctx.user.role === "admin"
-            || await this.service.db.message_board.find_user_id_by_message_id(message_id) === this.ctx.user.id
-    }
-
-    async check_permissions_to_verify_message() {
-        return this.ctx.user.role === "admin"
+    async check_permissions(type, message_id) {
+        if (type === "delete_article") {
+            return this.ctx.user.role === "admin"
+                || await this.service.db.message_board.find_user_id_by_message_id(message_id) === this.ctx.user.id
+        } else if (type === "change_message_public_state") {
+            return this.ctx.user.role === "admin"
+        }
     }
 
     async delete_message(message_id) {

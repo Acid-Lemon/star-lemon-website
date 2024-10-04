@@ -9,7 +9,6 @@ export default {
             message_list: [],
             pages: 0,
             current_page: 1,
-            info: null,
             active_name: "all",
             loading: false
         }

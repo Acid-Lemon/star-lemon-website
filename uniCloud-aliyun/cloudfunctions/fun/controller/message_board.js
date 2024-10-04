@@ -105,9 +105,9 @@ module.exports = class Controller_MessageBoard extends Controller {
 
             type: {
                 type: "string",
-                length: {
-                    max: 100,
-                    min: 1
+                not_null: true,
+                customize: (args, name) => {
+                    return args[name] === "all" || args[name] === "reviewed" || args[name] === "unreviewed";
                 }
             }
         });
@@ -133,7 +133,7 @@ module.exports = class Controller_MessageBoard extends Controller {
             }
         });
 
-        if (await this.service.message_board.check_permissions_to_delete_message(message_id)) {
+        if (await this.service.message_board.check_permissions("delete_article", message_id)) {
             let res = await this.service.message_board.delete_message(message_id);
             return {
                 data: res
@@ -160,8 +160,8 @@ module.exports = class Controller_MessageBoard extends Controller {
             }
         });
 
-        if (!await this.service.message_board.check_permissions_to_verify_message()) {
-            this.throw(codes.err_no_permissions, "No permission to verify message");
+        if (!await this.service.message_board.check_permissions("change_message_public_state")) {
+            this.throw(codes.err_no_permissions, "No permission to change public state");
         }
 
         let res = await this.service.message_board.change_message_public_state(message_id, public_state);

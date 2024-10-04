@@ -119,6 +119,12 @@ export default {
                 });
             }
         },
+        switch_tab() {
+            this.article_list = [];
+            this.pages = 0;
+            this.current_page = 1;
+            this.get_articles();
+        },
         async change() {
             if (this.pages + 1 === this.current_page) {
                 await this.get_articles()
@@ -161,6 +167,12 @@ export default {
                                              width="75"/>
                             <el-table-column label="发布时间" prop="create_at_format_str" width="200"/>
                             <el-table-column label="操作" width="200">
+                                <template #header>
+                                    <el-button class="w-[20%]" type="primary"
+                                               @click="this.$router.push('/admin/article/write')">
+                                        发布新文章
+                                    </el-button>
+                                </template>
                                 <template #default="scope">
                                     <el-button
                                         size="small"

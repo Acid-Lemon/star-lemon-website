@@ -254,7 +254,7 @@ function validate_time_range(time_range) {
                 type: "number",
                 math: {
                     min: 0,
-                    max: now_time
+                    max: now_time + 1000
                 }
             },
             to_time: {

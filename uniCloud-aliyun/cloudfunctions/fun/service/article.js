@@ -7,13 +7,15 @@ module.exports = class Service_Article extends Service {
         let {
             id,
             create_at
-        } = await this.service.db.article.create_article(title, content, type, 0, 0, 0, this.ctx.user.id, true);
+        } = await this.service.db.article.create_article(title, content, type,
+            {num: 0, users: []}, {num: 0, users: []}, {num: 0, users: []},
+            this.ctx.user.id, true);
         return {
             id,
             create_at,
-            views: 0,
-            comments: 0,
-            likes: 0,
+            views: {num: 0, users: []},
+            comments: {num: 0, users: []},
+            likes: {num: 0, users: []},
             public_state: true
         }
     }

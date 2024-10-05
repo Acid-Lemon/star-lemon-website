@@ -10,14 +10,14 @@ const {
     cloud_storage_path_prefixes
 } = require("./path_prefixes");
 
-const config = require("uni-config-center")({ pluginId: "fun" }).config();
+const config = require("uni-config-center")({pluginId: "fun"}).config();
 
 const {codes} = require("../../types/api_error");
 
 module.exports = class Service_CloudStorage_Album extends Service {
     async create_image(image_name, folder) {
         if (folder.public_state === "shared") {
-            return await this.service.db.album.add_shared_image(folder.id, image_name, this.auth.ctx.user_id);
+            return await this.service.db.album.add_shared_image(folder.id, image_name, this.ctx.user.id);
         } else {
             return await this.service.db.album.add_personal_image(folder.id, image_name);
         }
@@ -28,7 +28,7 @@ module.exports = class Service_CloudStorage_Album extends Service {
         if (public_state === "shared") {
             base_path = merge_folder_path(cloud_storage_path_prefixes.album, "shared");
         } else {
-            base_path = merge_folder_path(merge_folder_path(cloud_storage_path_prefixes.album, public_state), this.ctx.auth.user_id);
+            base_path = merge_folder_path(merge_folder_path(cloud_storage_path_prefixes.album, public_state), this.ctx.user.id);
         }
 
         let image_path = merge_folder_path(base_path, folder_name) + image_name;
@@ -67,7 +67,7 @@ module.exports = class Service_CloudStorage_Album extends Service {
         }
     }
 
-    async get_images(folder, image_number, time_range={}, skip_number=0) {
+    async get_images(folder, image_number, time_range = {}, skip_number = 0) {
         let images_info;
         if (folder.public_state === "shared") {
             images_info = await this.service.db.album.find_shared_images(folder.id, image_number, time_range, skip_number);

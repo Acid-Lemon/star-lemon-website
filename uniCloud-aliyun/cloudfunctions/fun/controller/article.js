@@ -28,7 +28,7 @@ module.exports = class Controller_Article extends Controller {
             content: {
                 type: "string",
                 length: {
-                    max: 2000,
+                    max: 5000,
                     min: 1
                 }
             },

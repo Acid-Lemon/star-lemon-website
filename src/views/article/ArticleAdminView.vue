@@ -49,7 +49,7 @@ export default {
                 } else {
                     ElNotification({
                         title: 'Error',
-                        message: '获取留言失败',
+                        message: '获取文章失败',
                         type: 'error',
                     });
                 }
@@ -168,7 +168,7 @@ export default {
                             <el-table-column label="发布时间" prop="create_at_format_str" width="200"/>
                             <el-table-column label="操作" width="200">
                                 <template #header>
-                                    <el-button class="w-[20%]" type="primary"
+                                    <el-button class="w-[50%]" type="primary"
                                                @click="this.$router.push('/admin/article/write')">
                                         发布新文章
                                     </el-button>

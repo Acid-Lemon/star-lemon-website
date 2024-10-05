@@ -142,8 +142,9 @@ export default {
                 </div>
                 <div v-show="page.name === '文章' && hovered_page === page"
                      class="absolute flex flex-col items-center justify-center bottom-[-5vh] w-[10vh] h-[4vh] bg-[#FFFFFF] bg-opacity-50 rounded shadow-md duration-700"
-                     @mouseenter="onSecondaryMouseEnter" @mouseleave="onSecondaryMouseLeave">
-                    一件小事
+                     @click="this.$router.push('/article?type=note')" @mouseenter="onSecondaryMouseEnter"
+                     @mouseleave="onSecondaryMouseLeave">
+                    笔记
                 </div>
             </div>
         </div>

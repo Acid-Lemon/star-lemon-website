@@ -30,7 +30,7 @@ export default {
             background_data: {},
         };
     },
-    async beforeCreate() {
+    async mounted() {
         let avatar_name = this.user_info?.avatar.name;
         let type = this.user_info?.avatar.type;
         if (avatar_name) {
@@ -74,10 +74,9 @@ export default {
             this.background_url = background_url_res.data.temp_url
         }
 
-    },
-    mounted() {
         this.load_avatars();
-        this.name = this.user_info.name;
+
+        this.name = this.user_info?.name;
         this.birthday = this.user_info?.birthday;
         this.personal_sign = this.user_info?.personal_sign;
     },
@@ -187,16 +186,6 @@ export default {
             }
 
             if (this.name !== this.user_info.name || this.birthday !== this.user_info.birthday || this.personal_sign !== this.user_info.personal_sign) {
-                if (!this.name || !this.birthday || !this.personal_sign) {
-                    ElNotification({
-                        title: 'Info',
-                        message: '请填写完整信息',
-                        type: 'info',
-                    });
-
-                    this.loading = false;
-                    return;
-                }
 
                 let basic_info_res = await call_api("user/profile/update_profile", {
                     name: this.name,

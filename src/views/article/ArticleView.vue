@@ -37,7 +37,8 @@ export default {
                     to_time: 0
                 },
                 article_number: 20,
-                skip_number
+                skip_number,
+                type: this.$route.query.type || "all",
             });
 
             if (!res.success) {
@@ -81,7 +82,7 @@ export default {
             <div
                 class="w-full md:min-h-[40vh] min-h-[30vh] bg-[url('/static/background/13.jpg')] flex flex-row justify-center items-center bg-center bg-cover">
                 <p class="text-[#FFFFFF] font-['FZSX'] text-[6vh] hover:text-[#44cef6] duration-700">
-                    一件小事
+                    文章
                 </p>
             </div>
             <div v-loading="loading"

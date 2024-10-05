@@ -118,19 +118,22 @@ export default {
                                         <img alt="浏览" class="opacity-50 w-[1.5vh] h-[1.5vh] mr-[3px]"
                                              src="/static/svg/views.svg"/>
                                         <div class="text-[1.5vh] font-['SYST'] mr-[20px] opacity-50">{{
-                                                article.views
+                                                article.views.num
                                             }}
                                         </div>
                                         <img alt="喜欢" class="opacity-50 w-[1.5vh] h-[1.5vh] mr-[3px]"
                                              src="/static/svg/likes.svg"/>
                                         <div class="text-[1.5vh] font-['SYST'] mr-[20px] opacity-50">{{
-                                                article.likes
+                                                article.likes.num
                                             }}
                                         </div>
                                         <img alt="评论"
                                              class="opacity-50 w-[1.5vh] h-[1.5vh] mr-[3px]"
                                              src="/static/svg/comments.svg"/>
-                                        <div class="text-[1.5vh] font-['SYST'] opacity-50">{{ article.comments }}</div>
+                                        <div class="text-[1.5vh] font-['SYST'] opacity-50">{{
+                                                article.comments.num
+                                            }}
+                                        </div>
                                     </div>
                                 </div>
                                 <div class="text-[1.5vh] font-['SYST']">{{ truncate_text(article.content, 300) }}</div>

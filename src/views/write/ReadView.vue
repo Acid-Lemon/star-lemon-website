@@ -92,16 +92,16 @@ export default {
                         </div>
                         <img alt="浏览" class="opacity-50 w-[2vh] h-[2vh] mr-[3px]" src="/static/svg/views.svg"/>
                         <div class="text-[2vh] text-[#FFFFFF] font-['SYST'] mr-[20px] opacity-50">{{
-                                article.views
+                                article.views.num
                             }}
                         </div>
                         <img alt="喜欢" class="opacity-50 w-[2vh] h-[2vh] mr-[3px]" src="/static/svg/likes.svg"/>
                         <div class="text-[2vh] text-[#FFFFFF] font-['SYST'] mr-[20px] opacity-50">{{
-                                article.likes
+                                article.likes.num
                             }}
                         </div>
                         <img alt="评论" class="opacity-50 w-[2vh] h-[2vh] mr-[3px]" src="/static/svg/comments.svg"/>
-                        <div class="text-[2vh] text-[#FFFFFF] font-['SYST'] opacity-50">{{ article.comments }}</div>
+                        <div class="text-[2vh] text-[#FFFFFF] font-['SYST'] opacity-50">{{ article.comments.num }}</div>
                     </div>
                 </div>
                 <div class="w-full min-h-[60vh] flex flex-row items-start justify-center bg-[#F8FAFD]">

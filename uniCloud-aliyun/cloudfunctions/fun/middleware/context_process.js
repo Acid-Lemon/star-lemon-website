@@ -36,6 +36,7 @@ async function find_user(user_id) {
     });
 
     await redis.hset(user_redis_key, db_val);
+    await redis.expire(user_redis_key, redis_fields.user_info.ex);
 
     return db_val;
 }

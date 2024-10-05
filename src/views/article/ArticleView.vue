@@ -15,14 +15,22 @@ export default {
         }
     },
     async mounted() {
-        this.loading = true;
         await this.get_articles();
-        this.loading = false;
+    },
+    watch: {
+        '$route.query.type': {
+            handler() {
+                this.pages = 0;
+                this.article_list = [];
+                this.get_articles();
+            },
+            immediate: true
+        }
     },
     methods: {
         truncate_text,
         async get_articles() {
-            this.loading_more = true;
+            this.loading = true;
             this.pages += 1;
             let start_time = new Date().getTime();
             let skip_number = 0;
@@ -56,8 +64,7 @@ export default {
 
             console.log(this.article_list)
 
-            this.loading_more = false;
-            this.has_more = res.data.articles.length === 20;
+            this.loading = false;
         },
         async articles_format(articles) {
             if (!articles) {

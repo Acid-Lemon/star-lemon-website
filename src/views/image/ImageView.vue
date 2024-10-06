@@ -1,10 +1,11 @@
 <script>
 import {call_api} from "../../utils/cloud";
 import {ElNotification} from "element-plus";
-import {ArrowLeft} from "@element-plus/icons-vue";
+import {ArrowLeft, Close, Download} from "@element-plus/icons-vue";
+import axios from "axios";
 
 export default {
-    components: {ArrowLeft},
+    components: {Download, Close, ArrowLeft},
     data() {
         return {
             images: [],
@@ -14,6 +15,8 @@ export default {
             has_more: true,
             loading_more: false,
             pages: 0,
+            show_large_image: false,
+            selected_image: null
         }
     },
     computed: {
@@ -117,7 +120,38 @@ export default {
             }
 
             return li;
-        }
+        },
+        view_large_image(image) {
+            this.selected_image = image;
+            this.show_large_image = true;
+        },
+        async download_image() {
+            if (this.selected_image) {
+                try {
+                    const response = await axios({
+                        url: this.selected_image.temp_url,
+                        method: 'GET',
+                        responseType: 'blob',
+                    });
+
+                    const url = window.URL.createObjectURL(new Blob([response.data]));
+                    const link = document.createElement('a');
+                    link.href = url;
+                    link.setAttribute('download', this.selected_image.name || 'image');
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+                    window.URL.revokeObjectURL(url);
+                } catch (error) {
+                    console.error('Download failed:', error);
+                    ElNotification({
+                        title: 'Error',
+                        message: '下载图片失败',
+                        type: 'error'
+                    });
+                }
+            }
+        },
     }
 }
 </script>
@@ -168,7 +202,7 @@ export default {
                     <div v-for="image in filtered_images"
                          :key="image.id"
                          class="shadow-md break-inside-avoid mb-[20px]">
-                        <div>
+                        <div class="cursor-pointer" @click="view_large_image(image)">
                             <el-image :src="image.temp_url" class="w-full h-auto" fit="cover"/>
                         </div>
                         <div>
@@ -205,6 +239,25 @@ export default {
             </el-scrollbar>
         </div>
     </div>
+
+    <el-dialog v-model="show_large_image" :fullscreen="true" :show-close="false">
+        <div class="h-full w-full flex flex-col items-center justify-center relative">
+            <el-image v-if="selected_image" :src="selected_image.temp_url" class="max-h-[100vh] max-w-[100vw]"
+                      fit="contain"/>
+            <div class="absolute top-4 right-4 flex gap-2">
+                <el-button circle type="primary" @click="download_image">
+                    <el-icon>
+                        <Download/>
+                    </el-icon>
+                </el-button>
+                <el-button circle @click="show_large_image = false">
+                    <el-icon>
+                        <Close/>
+                    </el-icon>
+                </el-button>
+            </div>
+        </div>
+    </el-dialog>
 </template>
 
 <style scoped>

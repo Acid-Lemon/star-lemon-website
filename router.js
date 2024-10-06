@@ -222,6 +222,18 @@ const router = createRouter({
             component: () => import("@/src/views/comment/CommentAdminView.vue")
         },
         {
+            path: "/useful_features/separate_audio",
+            name: "separate_audio",
+            meta: {
+                title: "分离音频",
+                show: {
+                    navigation_bar: false,
+                    side_navigation_bar: false
+                }
+            },
+            component: () => import("@/src/views/useful_features/separate_audio.vue")
+        },
+        {
             path: "/404",
             name: "404",
             meta: {

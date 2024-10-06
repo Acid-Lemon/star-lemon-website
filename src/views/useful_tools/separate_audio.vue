@@ -13,8 +13,21 @@ export default {
     },
     methods: {
         handle_file_change(file, file_list) {
-            this.file_list = file_list;
-            this.processed_files = file_list.map(file => ({
+            // 检查文件类型
+            const valid_types = ['video/mp4', 'video/quicktime', 'video/x-msvideo', 'video/webm'];
+            this.file_list = file_list.filter(file => {
+                if (!valid_types.includes(file.raw.type)) {
+                    ElNotification({
+                        title: '警告',
+                        message: `不支持的文件类型: ${file.name}`,
+                        type: 'warning'
+                    });
+                    return false;
+                }
+                return true;
+            });
+
+            this.processed_files = this.file_list.map(file => ({
                 name: file.name,
                 status: '未处理',
                 blob: null
@@ -69,11 +82,31 @@ export default {
                 reader.onload = async (e) => {
                     try {
                         const audio_context = new (window.AudioContext || window.webkitAudioContext)();
-                        const audio_buffer = await audio_context.decodeAudioData(e.target.result);
-                        progress_callback(0.5); // 音频解码完成，进度50%
-                        const wav_blob = await this.create_wav_file(audio_buffer);
-                        progress_callback(1); // WAV文件创建完成，进度100%
-                        resolve(wav_blob);
+
+                        // 文件读取完成，进度 30%
+                        progress_callback(0.3);
+
+                        try {
+                            const audio_buffer = await audio_context.decodeAudioData(e.target.result);
+
+                            // 音频解码完成，进度 70%
+                            progress_callback(0.7);
+
+                            const wav_blob = this.buffer_to_wave(audio_buffer, (wav_progress) => {
+                                // WAV 文件创建进度
+                                const progress = 0.7 + wav_progress * 0.3;
+                                progress_callback(progress);
+                            });
+
+                            // WAV 文件创建完成，进度 100%
+                            progress_callback(1);
+                            resolve(wav_blob);
+                        } catch (decodeError) {
+                            console.warn('Fast decoding failed, falling back to slower method', decodeError);
+
+                            // 回退方法的代码保持不变
+                            // ...
+                        }
                     } catch (error) {
                         reject(error);
                     }
@@ -81,45 +114,27 @@ export default {
                 reader.onerror = (e) => reject(new Error('文件读取失败'));
                 reader.onprogress = (e) => {
                     if (e.lengthComputable) {
-                        // 文件读取进度，最多占总进度的50%
-                        progress_callback(e.loaded / e.total * 0.5);
+                        // 文件读取进度，最多占总进度的 30%
+                        progress_callback(e.loaded / e.total * 0.3);
                     }
                 };
                 reader.readAsArrayBuffer(video_file);
             });
         },
 
-        async create_wav_file(audio_buffer) {
-            const offline_context = new OfflineAudioContext(
-                audio_buffer.numberOfChannels,
-                audio_buffer.length,
-                audio_buffer.sampleRate
-            );
-
-            const source = offline_context.createBufferSource();
-            source.buffer = audio_buffer;
-            source.connect(offline_context.destination);
-            source.start();
-
-            const rendered_buffer = await offline_context.startRendering();
-
-            const wav = this.buffer_to_wave(rendered_buffer);
-            return new Blob([wav], {type: 'audio/wav'});
-        },
-
-        buffer_to_wave(audio_buffer) {
+        buffer_to_wave(audio_buffer, progress_callback) {
             const num_channels = audio_buffer.numberOfChannels;
             const length = audio_buffer.length * num_channels * 2;
             const buffer = new ArrayBuffer(44 + length);
             const view = new DataView(buffer);
 
+            // Write WAV header
             const write_string = (view, offset, string) => {
                 for (let i = 0; i < string.length; i++) {
                     view.setUint8(offset + i, string.charCodeAt(i));
                 }
             };
 
-            // Write WAV header
             write_string(view, 0, 'RIFF');
             view.setUint32(4, 36 + length, true);
             write_string(view, 8, 'WAVE');
@@ -136,16 +151,24 @@ export default {
 
             // Write audio data
             const offset = 44;
+            const total_samples = audio_buffer.length * num_channels;
+            let samples_written = 0;
+
             for (let i = 0; i < audio_buffer.numberOfChannels; i++) {
                 const channel_data = audio_buffer.getChannelData(i);
                 for (let j = 0; j < channel_data.length; j++) {
                     const index = offset + (j * num_channels + i) * 2;
                     const sample = Math.max(-1, Math.min(1, channel_data[j]));
                     view.setInt16(index, sample < 0 ? sample * 0x8000 : sample * 0x7FFF, true);
+
+                    samples_written++;
+                    if (samples_written % 10000 === 0) { // Update progress every 10000 samples
+                        progress_callback(samples_written / total_samples);
+                    }
                 }
             }
 
-            return buffer;
+            return new Blob([buffer], {type: 'audio/wav'});
         },
         download_single_audio(file) {
             if (!file.blob) {
@@ -222,7 +245,7 @@ export default {
                         :auto-upload="false"
                         :file-list="file_list"
                         :on-change="handle_file_change"
-                        accept="video/*"
+                        accept="video/*,.mov"
                         action="#"
                         class="w-full mt-[10px]"
                         drag

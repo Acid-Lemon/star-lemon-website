@@ -36,7 +36,14 @@ export default {
             for (let i = 0; i < this.file_list.length; i++) {
                 const file = this.file_list[i];
                 try {
-                    const audio_blob = await this.extract_audio(file.raw);
+                    // 更新进度显示文件正在处理
+                    this.progress = (i / this.file_list.length) * 100;
+
+                    const audio_blob = await this.extract_audio(file.raw, (progress) => {
+                        // 更新单个文件的处理进度
+                        this.progress = ((i + progress) / this.file_list.length) * 100;
+                    });
+
                     console.log(`处理完成: ${file.name}, blob size: ${audio_blob.size}`);
                     this.processed_files[i].blob = audio_blob;
                     this.processed_files[i].status = '处理完成';
@@ -44,9 +51,9 @@ export default {
                     console.error('音频分离失败:', error);
                     this.processed_files[i].status = '处理失败';
                 }
-                this.progress = ((i + 1) / this.file_list.length) * 100;
             }
 
+            this.progress = 100; // 确保进度到达100%
             this.is_processing = false;
             console.log('处理后的文件:', this.processed_files);
             ElNotification({
@@ -55,20 +62,29 @@ export default {
                 type: 'success'
             });
         },
-        async extract_audio(video_file) {
+
+        async extract_audio(video_file, progress_callback) {
             return new Promise((resolve, reject) => {
                 const reader = new FileReader();
                 reader.onload = async (e) => {
                     try {
                         const audio_context = new (window.AudioContext || window.webkitAudioContext)();
                         const audio_buffer = await audio_context.decodeAudioData(e.target.result);
+                        progress_callback(0.5); // 音频解码完成，进度50%
                         const wav_blob = await this.create_wav_file(audio_buffer);
+                        progress_callback(1); // WAV文件创建完成，进度100%
                         resolve(wav_blob);
                     } catch (error) {
                         reject(error);
                     }
                 };
                 reader.onerror = (e) => reject(new Error('文件读取失败'));
+                reader.onprogress = (e) => {
+                    if (e.lengthComputable) {
+                        // 文件读取进度，最多占总进度的50%
+                        progress_callback(e.loaded / e.total * 0.5);
+                    }
+                };
                 reader.readAsArrayBuffer(video_file);
             });
         },
@@ -227,6 +243,8 @@ export default {
                         >
                             {{ is_processing ? '处理中...' : '处理所有视频' }}
                         </el-button>
+                        <el-progress v-if="is_processing" :format="(percentage) => `${percentage}%`"
+                                     :percentage="progress"></el-progress>
                         <el-button
                             :disabled="processed_files.length === 0"
                             type="success"
@@ -235,9 +253,6 @@ export default {
                             下载所有音频
                         </el-button>
                     </div>
-                </el-form-item>
-                <el-form-item v-if="is_processing">
-                    <el-progress :format="(percentage) => `${percentage}%`" :percentage="progress"></el-progress>
                 </el-form-item>
             </el-form>
             <el-table :data="processed_files" style="width: 100%">

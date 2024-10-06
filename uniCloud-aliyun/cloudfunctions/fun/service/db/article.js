@@ -92,7 +92,7 @@ module.exports = class DBService_Article extends Service {
     }
 
     async get_article(article_id) {
-        if (this.ctx.user.id) {
+        if (this.ctx.user?.id) {
             if (await this.db.collection(tables.article).doc(article_id).get().then(res => res.data[0].views.users.indexOf(this.ctx.user.id)) === -1) {
                 await this.db.collection(tables.article).doc(article_id).update({
                     views: {

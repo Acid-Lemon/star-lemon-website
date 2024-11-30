@@ -5,6 +5,7 @@ import Copyright from '@/src/components/Copyright.vue'
 import el_locale_zh_cn from 'element-plus/es/locale/lang/zh-cn'
 
 import {use_user_info_store} from "./stores/userInfo";
+import AIAssistant from "./components/AIAssistant.vue";
 
 export default {
     data() {
@@ -23,7 +24,8 @@ export default {
     methods: {},
     components: {
         NavigationBar,
-        Copyright
+        Copyright,
+        AIAssistant
     }
 }
 </script>
@@ -33,6 +35,7 @@ export default {
         <NavigationBar v-if="show?.hasOwnProperty('navigation_bar') ? show.navigation_bar : true"></NavigationBar>
         <router-view class="w-full h-full"></router-view>
         <Copyright v-if="show?.hasOwnProperty('copyright') ? show.copyright: true"></Copyright>
+        <AIAssistant/>
     </ElConfigProvider>
 </template>
 

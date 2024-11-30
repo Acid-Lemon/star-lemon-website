@@ -8,7 +8,7 @@ export default {
             isOpen: false,
             userInput: '',
             messages: [],
-            apiKey: 'pat_NBb9YTSOcqhfSRXPb7e6yTAOjM0PhqQg2IET3A6V9DFErTyXnr4uuDFT1nv522Y9',
+            apiKey: '',
             conversation_id: null,
             chat_id: null,
             status: null,

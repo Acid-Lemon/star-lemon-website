@@ -1,6 +1,7 @@
 <script>
 import axios from 'axios';
 import {use_user_info_store} from "../stores/userInfo";
+import {call_api} from "../utils/cloud";
 
 export default {
     data() {
@@ -14,6 +15,10 @@ export default {
             status: null,
             intervalId: null
         };
+    },
+    async mounted() {
+        let res = await call_api("API/get_api_key");
+        this.apiKey = res.data.api_key;
     },
     computed: {
         user_info() {

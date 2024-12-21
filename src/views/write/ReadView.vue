@@ -115,10 +115,7 @@ export default {
                     <div class="w-[15vw] flex flex-col items-start justify-start">
                         <el-affix :offset="5">
                             <div class="p-[20px]">
-                                <div class="text-[1.8vh] my-[5px] font-['FZSX']">这是一个二级标题展示区域</div>
-                                <div class="text-[1.5vh] my-[5px] font-['FZSX']">二级标题1</div>
-                                <div class="text-[1.5vh] my-[5px] font-['FZSX']">二级标题2</div>
-                                <div class="text-[1.5vh] my-[5px] font-['FZSX']">二级标题3</div>
+                                <div id="outline" class="text-[1.8vh] my-[5px] font-['FZSX']"></div>
                                 <el-divider/>
                                 <div class="flex flex-row items-center justify-start">
                                     <svg height="1.5vh" viewBox="0 0 24 24" width="1.5vh"

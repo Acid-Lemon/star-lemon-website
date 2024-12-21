@@ -23,6 +23,19 @@ export default {
                 style: 'github'
             }
         })
+
+        const outlineContainer = document.getElementById('outline');
+        const headers = this.content.match(/^(#{1,6})\s+(.*)$/gm);
+        if (headers) {
+            headers.forEach(header => {
+                const level = header.match(/#/g).length;
+                const title = header.replace(/^#+\s*/, '');
+                const listItem = document.createElement('div');
+                listItem.style.marginLeft = `${(level - 1) * 10}px`; // 根据标题级别设置缩进
+                listItem.innerHTML = `<div>${title}</div>`;
+                outlineContainer.appendChild(listItem);
+            });
+        }
     },
     beforeDestroy() {
         if (this.vditor) {

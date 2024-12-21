@@ -505,9 +505,9 @@ export default {
                     </div>
                     <div class="my-[3vh] flex flex-col justify-center md:w-[85%] w-[90%]">
                         <div class="mb-[3vh] relative">
-                            <p :class="{'text-[#FFFFFF] bg-opacity-100 text-[1.6vh] top-[-1.2vh] left-[1.4vh]':style_mode,
-                                    'text-[#000000] bg-opacity-0 text-[2vh] top-[1vh] left-[1vh]':!style_mode}"
-                               class="absolute pointer-events-none px-[1vh] duration-700 z-50 bg-black font-['FZSX']">
+                            <p :class="['absolute pointer-events-none px-[1vh] duration-700 z-50 bg-black font-[\'FZSX\']',
+                                style_mode ? 'text-[#FFFFFF] bg-opacity-100 text-[1.6vh] top-[-1.2vh] left-[1.4vh]' : 'text-[#000000] bg-opacity-0 text-[2vh] top-[1vh] left-[1vh]']"
+                               class="">
                                 你是我一生只会遇见一次的惊喜...
                             </p>
                             <textarea id="pl" v-model.lazy="value"

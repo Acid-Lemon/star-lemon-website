@@ -38,32 +38,37 @@ export default {
 
 <template>
     <div class="fixed bottom-4 right-4 z-50">
-        <el-button
-            @click="toggle_assistant">
-            AI 助手
-        </el-button>
-        <div v-if="is_open" class="bg-white rounded-lg shadow-xl w-80 h-96 mt-4 flex flex-col">
-            <div class="flex-1 p-4 overflow-y-auto">
-                <div v-for="(message, index) in message_list" :key="index"
-                     :class="['mb-4 p-2 rounded-lg',message.type === 'user' ? 'bg-blue-100 text-blue-800 ml-auto' : 'bg-gray-100 text-gray-800']">
-                    {{ message.content }}
+        <div class="flex flex-col items-end">
+            <div v-if="is_open" class="bg-white rounded-lg shadow-xl w-[500px] h-[400px] my-4 flex flex-col">
+                <div class="flex-1 p-4 overflow-y-auto">
+                    <div v-for="(message, index) in message_list" :key="index"
+                         :class="['mb-4 p-2 rounded-lg',message.type === 'user' ? 'bg-blue-100 text-blue-800 ml-auto' : 'bg-gray-100 text-gray-800']">
+                        {{ message.content }}
+                    </div>
+                </div>
+                <div class="border-t p-4">
+                    <div class="flex">
+                        <el-input
+                            v-model="user_input"
+                            placeholder="输入您的问题..."
+                            style="margin-right: 20px"
+                            @keyup.enter.native="send_message"
+                        >
+                        </el-input>
+                        <el-button
+                            @click="send_message"
+                        >
+                            发送
+                        </el-button>
+                    </div>
                 </div>
             </div>
-            <div class="border-t p-4">
-                <div class="flex">
-                    <el-input
-                        v-model="user_input"
-                        placeholder="输入您的问题..."
-                        @keyup.enter.native="send_message"
-                    >
-                    </el-input>
-                    <el-button
-                        @click="send_message"
-                    >
-                        发送
-                    </el-button>
-                </div>
-            </div>
+            <el-button
+                round
+                @click="toggle_assistant"
+            >
+                AI 助手
+            </el-button>
         </div>
     </div>
 </template>

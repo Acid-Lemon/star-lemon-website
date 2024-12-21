@@ -234,6 +234,18 @@ const router = createRouter({
             component: () => import("@/src/views/useful_tools/separate_audio.vue")
         },
         {
+            path: "/particles/particle_text",
+            name: "particle_text",
+            meta: {
+                title: "粒子文字",
+                show: {
+                    navigation_bar: false,
+                    side_navigation_bar: false
+                }
+            },
+            component: () => import("@/src/views/particles/particle_text.vue")
+        },
+        {
             path: "/404",
             name: "404",
             meta: {

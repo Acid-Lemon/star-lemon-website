@@ -2,8 +2,10 @@
 import {ElNotification} from "element-plus";
 import {call_api} from "@/src/utils/cloud";
 import {date_format} from "@/src/utils/time";
+import AdminView from "@/src/components/AdminView.vue";
 
 export default {
+    components: {AdminView},
     data() {
         return {
             message_list: [],

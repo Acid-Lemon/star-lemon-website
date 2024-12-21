@@ -2,10 +2,11 @@
 import {call_api} from "@/src/utils/cloud";
 import {ElNotification} from "element-plus";
 import {Picture} from "@element-plus/icons-vue";
+import AdminView from "@/src/components/AdminView.vue";
 
 export default {
     name: "ImageView",
-    components: {Picture},
+    components: {AdminView, Picture},
     data() {
         return {
             images: [],

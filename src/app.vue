@@ -21,6 +21,12 @@ export default {
 
         use_user_info_store().init();
     },
+    computed: {
+        user_info() {
+            const user_info_store = use_user_info_store();
+            return user_info_store.user_info;
+        },
+    },
     methods: {},
     components: {
         NavigationBar,
@@ -35,7 +41,7 @@ export default {
         <NavigationBar v-if="show?.hasOwnProperty('navigation_bar') ? show.navigation_bar : true"></NavigationBar>
         <router-view class="w-full h-full"></router-view>
         <Copyright v-if="show?.hasOwnProperty('copyright') ? show.copyright: true"></Copyright>
-        <AIAssistant/>
+        <AIAssistant v-if="user_info"/>
     </ElConfigProvider>
 </template>
 

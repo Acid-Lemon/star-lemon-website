@@ -3,10 +3,11 @@
 import MdEditor from "../../components/MdEditor.vue";
 import {call_api} from "../../utils/cloud";
 import {ElNotification} from "element-plus";
+import AdminView from "@/src/components/AdminView.vue";
 
 export default {
     name: 'ArticleAdminView',
-    components: {MdEditor},
+    components: {AdminView, MdEditor},
     data() {
         return {
             title: '',

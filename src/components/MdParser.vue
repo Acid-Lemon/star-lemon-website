@@ -29,7 +29,7 @@ export default {
         if (headers) {
             headers.forEach(header => {
                 const level = header.match(/#/g).length;
-                const title = header.replace(/^#+\s*/, '');
+                const title = header.replace(/^#+\s*/, '').replace(/\*/g, '');
                 const listItem = document.createElement('div');
                 listItem.style.marginLeft = `${(level - 1) * 10}px`; // 根据标题级别设置缩进
                 listItem.innerHTML = `<div>${title}</div>`;

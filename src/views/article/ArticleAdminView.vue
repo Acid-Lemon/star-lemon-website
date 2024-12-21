@@ -3,10 +3,12 @@
 import {ElNotification} from "element-plus";
 import {call_api} from "../../utils/cloud";
 import {date_format} from "../../utils/time";
+import {truncate_text} from "@/src/utils/truncate_text";
+import AdminView from "@/src/components/AdminView.vue";
 
 export default {
     name: 'ArticleView',
-    components: {},
+    components: {AdminView},
     data() {
         return {
             article_list: [],
@@ -20,6 +22,7 @@ export default {
         await this.get_articles();
     },
     methods: {
+        truncate_text,
         async get_articles() {
             this.loading = true;
 
@@ -159,7 +162,10 @@ export default {
                             <el-table-column type="index" width="50"/>
                             <el-table-column label="文章id" prop="id" width="100"/>
                             <el-table-column label="标题" prop="title" width="100"/>
-                            <el-table-column label="内容" prop="content"/>
+                            <el-table-column
+                                :formatter="(row, column, cellValue, index) => {return truncate_text(cellValue, 300)}"
+                                label="内容"
+                                prop="content"/>
                             <el-table-column label="类型" prop="type" width="75"/>
                             <el-table-column :formatter="(row) => {return row.public_state ? '公开' : '私有'}"
                                              label="公开状态"

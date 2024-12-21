@@ -4,9 +4,11 @@ import {use_web_config_store} from "../../stores/webConfig";
 import ArticleAdminView from "../write/WriteAdminView.vue";
 import {use_user_info_store} from "../../stores/userInfo";
 import {ArrowRight, CaretBottom, CaretTop, Warning} from "@element-plus/icons-vue";
+import AdminView from "@/src/components/AdminView.vue";
 
 export default {
     components: {
+        AdminView,
         ArrowRight,
         CaretBottom,
         Warning,

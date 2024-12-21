@@ -107,10 +107,9 @@ export default {
                 <div class="w-full min-h-[60vh] flex flex-row items-start justify-center bg-[#F8FAFD]">
                     <div class="w-[15vw] flex flex-col items-center justify-start"></div>
                     <div class="w-[70vw] flex flex-col items-center justify-start">
-                        <div class="my-[20px] bg-white shadow-md p-[20px]">
+                        <div class="w-[70vw] min-h-[60vh] my-[20px] bg-white shadow-md p-[20px]">
                             <md-parser :content=article.content></md-parser>
                         </div>
-
                     </div>
                     <div class="w-[15vw] flex flex-col items-start justify-start">
                         <el-affix :offset="5">

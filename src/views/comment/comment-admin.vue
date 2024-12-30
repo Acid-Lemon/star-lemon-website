@@ -2,7 +2,7 @@
 import {ElNotification} from "element-plus";
 import {call_api} from "@/src/utils/cloud";
 import {date_format} from "@/src/utils/time";
-import AdminView from "@/src/components/AdminView.vue";
+import AdminView from "@/src/components/admin.vue";
 
 export default {
     components: {AdminView},

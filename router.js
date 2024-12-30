@@ -16,7 +16,7 @@ const router = createRouter({
                     side_navigation_bar: false,
                 }
             },
-            component: () => import("@/src/views/index/IndexView.vue")
+            component: () => import("@/src/views/index/index.vue")
         },
         {
             path: "/article",
@@ -31,7 +31,7 @@ const router = createRouter({
                     side_navigation_bar: false,
                 }
             },
-            component: () => import("@/src/views/article/ArticleView.vue")
+            component: () => import("@/src/views/article/article.vue")
         },
         {
             path: "/article/:article_title",
@@ -43,7 +43,7 @@ const router = createRouter({
                     side_navigation_bar: false,
                 }
             },
-            component: () => import("@/src/views/write/ReadView.vue")
+            component: () => import("@/src/views/write/read.vue")
         },
         {
             path: "/album",
@@ -58,7 +58,7 @@ const router = createRouter({
                     side_navigation_bar: false,
                 }
             },
-            component: () => import("@/src/views/album/AlbumView.vue")
+            component: () => import("@/src/views/album/album.vue")
         },
         {
             path: "/album/:album_name",
@@ -70,7 +70,7 @@ const router = createRouter({
                     side_navigation_bar: false,
                 }
             },
-            component: () => import("@/src/views/image/ImageView.vue")
+            component: () => import("@/src/views/image/image.vue")
         },
         {
             path: "/developer",
@@ -85,7 +85,7 @@ const router = createRouter({
                     side_navigation_bar: false,
                 }
             },
-            component: () => import("@/src/views/DeveloperView.vue")
+            component: () => import("@/src/views/developer.vue")
         },
         {
             path: "/comment",
@@ -100,7 +100,7 @@ const router = createRouter({
                     side_navigation_bar: false,
                 }
             },
-            component: () => import("@/src/views/comment/CommentView.vue")
+            component: () => import("@/src/views/comment/comment.vue")
         },
         {
             path: "/login",
@@ -116,7 +116,7 @@ const router = createRouter({
                 },
                 login: false
             },
-            component: () => import("@/src/views/user/LoginView.vue")
+            component: () => import("@/src/views/user/login.vue")
         },
         {
             path: "/user",
@@ -131,7 +131,7 @@ const router = createRouter({
                     side_navigation_bar: false,
                 }
             },
-            component: () => import("@/src/views/user/UserView.vue")
+            component: () => import("@/src/views/user/user.vue")
         },
         {
             path: "/admin",
@@ -150,7 +150,7 @@ const router = createRouter({
                     navigation_bar: false
                 },
             },
-            component: () => import("@/src/views/index/IndexAdminView.vue")
+            component: () => import("@/src/views/index/index-admin.vue")
         },
         {
             path: "/admin/article",
@@ -165,7 +165,7 @@ const router = createRouter({
                     navigation_bar: false,
                 }
             },
-            component: () => import("@/src/views/article/ArticleAdminView.vue")
+            component: () => import("@/src/views/article/article-admin.vue")
         },
         {
             path: "/admin/article/write",
@@ -177,7 +177,7 @@ const router = createRouter({
                     side_navigation_bar: false,
                 }
             },
-            component: () => import("@/src/views/write/WriteAdminView.vue")
+            component: () => import("@/src/views/write/write-admin.vue")
         },
         {
             path: "/admin/album",
@@ -192,7 +192,7 @@ const router = createRouter({
                     navigation_bar: false,
                 },
             },
-            component: () => import("@/src/views/album/AlbumAdminView.vue")
+            component: () => import("@/src/views/album/album-admin.vue")
         },
         {
             path: "/admin/album/:album_name",
@@ -204,7 +204,7 @@ const router = createRouter({
                     side_navigation_bar: false,
                 },
             },
-            component: () => import("@/src/views/image/ImageAdminView.vue")
+            component: () => import("@/src/views/image/image-admin.vue")
         },
         {
             path: "/admin/comment",
@@ -219,7 +219,7 @@ const router = createRouter({
                     navigation_bar: false,
                 }
             },
-            component: () => import("@/src/views/comment/CommentAdminView.vue")
+            component: () => import("@/src/views/comment/comment-admin.vue")
         },
         {
             path: "/useful_tools/separate_audio",
@@ -231,7 +231,7 @@ const router = createRouter({
                     side_navigation_bar: false
                 }
             },
-            component: () => import("@/src/views/useful_tools/separate_audio.vue")
+            component: () => import("@/src/views/useful_tools/separate-audio.vue")
         },
         {
             path: "/particles/particle_text",
@@ -243,7 +243,7 @@ const router = createRouter({
                     side_navigation_bar: false
                 }
             },
-            component: () => import("@/src/views/particles/particle_text.vue")
+            component: () => import("@/src/views/particles/particle-text.vue")
         },
         {
             path: "/404",
@@ -255,7 +255,7 @@ const router = createRouter({
                     side_navigation_bar: false,
                 },
             },
-            component: () => import("@/src/views/404View.vue")
+            component: () => import("@/src/views/404.vue")
         },
         {
             path: "/:pathMatch(.*)*",

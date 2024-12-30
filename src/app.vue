@@ -1,11 +1,11 @@
 <script>
-import NavigationBar from '@/src/components/NavigationBar.vue'
-import Copyright from '@/src/components/Copyright.vue'
+import NavigationBar from '@/src/components/navigation-bar.vue'
+import Copyright from '@/src/components/copyright.vue'
 
 import el_locale_zh_cn from 'element-plus/es/locale/lang/zh-cn'
 
 import {use_user_info_store} from "./stores/userInfo";
-import AIAssistant from "./components/AIAssistant.vue";
+import AIAssistant from "./components/ai-assistant.vue";
 
 export default {
     data() {

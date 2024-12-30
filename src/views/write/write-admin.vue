@@ -1,9 +1,9 @@
 <script>
 
-import MdEditor from "../../components/MdEditor.vue";
+import MdEditor from "../../components/md-editor.vue";
 import {call_api} from "../../utils/cloud";
 import {ElNotification} from "element-plus";
-import AdminView from "@/src/components/AdminView.vue";
+import AdminView from "@/src/components/admin.vue";
 
 export default {
     name: 'ArticleAdminView',

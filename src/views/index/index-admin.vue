@@ -1,10 +1,10 @@
 <script>
 import {ElMessageBox} from "element-plus";
 import {use_web_config_store} from "../../stores/webConfig";
-import ArticleAdminView from "../write/WriteAdminView.vue";
+import ArticleAdminView from "../write/write-admin.vue";
 import {use_user_info_store} from "../../stores/userInfo";
 import {ArrowRight, CaretBottom, CaretTop, Warning} from "@element-plus/icons-vue";
-import AdminView from "@/src/components/AdminView.vue";
+import AdminView from "@/src/components/admin.vue";
 
 export default {
     components: {

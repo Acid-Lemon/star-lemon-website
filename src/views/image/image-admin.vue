@@ -2,7 +2,7 @@
 import {ElAutoResizer, ElNotification} from 'element-plus';
 import {ArrowLeft, UploadFilled} from '@element-plus/icons-vue'
 import {call_api} from "@/src/utils/cloud";
-import AdminView from "@/src/components/AdminView.vue";
+import AdminView from "@/src/components/admin.vue";
 
 export default {
     name: "ImageAdminView",

@@ -4,7 +4,7 @@ import {ElNotification} from "element-plus";
 import {call_api} from "../../utils/cloud";
 import {date_format} from "../../utils/time";
 import {truncate_text} from "@/src/utils/truncate_text";
-import AdminView from "@/src/components/AdminView.vue";
+import AdminView from "@/src/components/admin.vue";
 
 export default {
     name: 'ArticleView',

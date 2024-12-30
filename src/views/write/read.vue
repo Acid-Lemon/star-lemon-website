@@ -3,7 +3,7 @@ import {ArrowLeft, CaretTop} from "@element-plus/icons-vue";
 import {call_api} from "../../utils/cloud";
 import {ElNotification} from "element-plus";
 import {date_format} from "../../utils/time";
-import MdParser from "../../components/MdParser.vue";
+import MdParser from "../../components/md-parser.vue";
 
 export default {
     name: 'NoteView',

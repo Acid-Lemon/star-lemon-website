@@ -16,7 +16,11 @@ export default {
             loading_more: false,
             pages: 0,
             show_large_image: false,
-            selected_image: null
+            selected_image: null,
+            scale: 1,
+            position: {x: 0, y: 0},
+            isDragging: false,
+            startPosition: {x: 0, y: 0}
         }
     },
     computed: {
@@ -126,6 +130,8 @@ export default {
             this.show_large_image = true;
         },
         async download_image() {
+            this.scale = 1;
+            this.position = {x: 0, y: 0};
             if (this.selected_image) {
                 try {
                     const response = await axios({
@@ -152,6 +158,28 @@ export default {
                 }
             }
         },
+        onWheel(event) {
+            event.preventDefault();
+            const delta = event.deltaY;
+            if (delta < 0) {
+                this.scale = Math.min(this.scale + 0.1, 3);
+            } else {
+                this.scale = Math.max(this.scale - 0.1, 0.5);
+            }
+        },
+        onMouseDown(event) {
+            this.isDragging = true;
+            this.startPosition = {x: event.clientX - this.position.x, y: event.clientY - this.position.y};
+        },
+        onMouseMove(event) {
+            if (this.isDragging) {
+                this.position.x = event.clientX - this.startPosition.x;
+                this.position.y = event.clientY - this.startPosition.y;
+            }
+        },
+        onMouseUp() {
+            this.isDragging = false;
+        }
     }
 }
 </script>
@@ -241,25 +269,33 @@ export default {
     </div>
 
     <el-dialog v-model="show_large_image" :fullscreen="true" :show-close="false">
-        <div class="h-full w-full flex flex-col items-center justify-center relative">
-            <el-image v-if="selected_image" :src="selected_image.temp_url" class="max-h-[100vh] max-w-[100vw]"
-                      fit="contain"/>
-            <div class="absolute top-4 right-4 flex gap-2">
-                <el-button circle type="primary" @click="download_image">
-                    <el-icon>
-                        <Download/>
-                    </el-icon>
-                </el-button>
-                <el-button circle @click="show_large_image = false">
-                    <el-icon>
-                        <Close/>
-                    </el-icon>
-                </el-button>
-            </div>
+        <div class="z-[1000] absolute top-4 right-4 flex gap-2">
+            <el-button circle type="primary" @click="download_image">
+                <el-icon>
+                    <Download/>
+                </el-icon>
+            </el-button>
+            <el-button circle @click="show_large_image = false">
+                <el-icon>
+                    <Close/>
+                </el-icon>
+            </el-button>
+        </div>
+        <div
+            class="overflow-hidden"
+            @mousedown="onMouseDown"
+            @mouseleave="onMouseUp"
+            @mousemove="onMouseMove"
+            @mouseup="onMouseUp"
+            @wheel="onWheel"
+        >
+            <el-image
+                v-if="selected_image"
+                :src="selected_image.temp_url"
+                :style="{ transform: `scale(${scale}) translate(${position.x}px, ${position.y}px)` }"
+                class="h-[100vh] w-[100vw] select-none pointer-events-none"
+                fit="contain"
+            />
         </div>
     </el-dialog>
 </template>
-
-<style scoped>
-
-</style>

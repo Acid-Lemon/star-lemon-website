@@ -154,6 +154,16 @@ module.exports = class DBService_Article extends Service {
             .then(res => res.data[0].user_id)
     }
 
+    async change_article_public_state(article_id, public_state) {
+        await this.db
+            .collection(tables.article)
+            .doc(article_id)
+            .update({
+                "public_state": public_state
+            })
+
+    }
+
     async delete_article(article_id) {
         await this.db
             .collection(tables.article)

@@ -50,11 +50,11 @@ export default {
                 const file = this.file_list[i];
                 try {
                     // 更新进度显示文件正在处理
-                    this.progress = (i / this.file_list.length) * 100;
+                    this.progress = Math.floor((i / this.file_list.length) * 100);
 
                     const audio_blob = await this.extract_audio(file.raw, (progress) => {
                         // 更新单个文件的处理进度
-                        this.progress = ((i + progress) / this.file_list.length) * 100;
+                        this.progress = Math.floor(((i + progress) / this.file_list.length) * 100);
                     });
 
                     console.log(`处理完成: ${file.name}, blob size: ${audio_blob.size}`);

@@ -84,6 +84,7 @@ export default {
             console.log(`第${this.pages}页数据已加载`);
             this.images = this.images.concat(res.data.images_info);
 
+
             this.has_more = res.data.images_info.length === 20;
             this.loading_more = false;
         },

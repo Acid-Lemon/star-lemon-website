@@ -142,6 +142,27 @@ export default {
             }
             return index;
         },
+        emoji_divide(text) {
+            let li = [];
+            let emoji_re = /\*\*(.*?)\*\*/;
+
+            while (text.length) {
+                let match_res = emoji_re.exec(text);
+                if (match_res === null) {
+                    li.push({type: "text", words: text});
+                    break;
+                }
+                let match_full_text = match_res[0];
+                let match_text = match_res[1];
+                if (match_res.index > 0) {
+                    li.push({type: "text", words: text.substring(0, match_res.index)});
+                }
+                text = text.slice(match_res.index + match_full_text.length);
+                li.push({type: "emoji", words: match_text});
+            }
+
+            return li;
+        },
     },
 }
 </script>
@@ -158,15 +179,28 @@ export default {
                                   max-height="80vh"
                                   style="width: 100%">
                             <el-table-column type="index" width="50"/>
-                            <el-table-column label="留言id" prop="id" width="250"/>
-                            <el-table-column label="内容" prop="content"/>
+                            <el-table-column label="留言id" prop="id" width="100"/>
+                            <el-table-column label="内容" prop="content">
+                                <template #default="{ row }">
+                                    <div class="flex flex-row items-center">
+                                        <div v-for="split_content in emoji_divide(row.content)"
+                                             class="flex flex-row items-center">
+                                        <span v-if="split_content.type==='text'"
+                                              class="text-[1.6vh] font-['SYST']">{{ split_content.words }}</span>
+                                            <el-image v-if="split_content.type==='emoji'"
+                                                      :src="'/static/emoji/' + split_content.words + '.png'"
+                                                      class="w-[2.4vh] h-[2.4vh]"></el-image>
+                                        </div>
+                                    </div>
+                                </template>
+                            </el-table-column>
                             <el-table-column :formatter="(row) => {return row.public_state ? '公开' : '私有'}"
                                              label="公开状态"
                                              prop="public_state"
                                              width="100"/>
                             <el-table-column label="发布者" prop="user.name" width="100"/>
-                            <el-table-column label="发布者id" prop="user.id" width="250"/>
-                            <el-table-column label="发布时间" prop="create_at_format_str" width="250"/>
+                            <el-table-column label="发布者id" prop="user.id" width="100"/>
+                            <el-table-column label="发布时间" prop="create_at_format_str" width="200"/>
                             <el-table-column label="操作" width="200">
                                 <template #default="scope">
                                     <el-button
@@ -191,15 +225,28 @@ export default {
                                   max-height="80vh"
                                   style="width: 100%">
                             <el-table-column type="index" width="50"/>
-                            <el-table-column label="留言id" prop="id" width="250"/>
-                            <el-table-column label="内容" prop="content"/>
+                            <el-table-column label="留言id" prop="id" width="100"/>
+                            <el-table-column label="内容" prop="content">
+                                <template #default="{ row }">
+                                    <div class="flex flex-row items-center">
+                                        <div v-for="split_content in emoji_divide(row.content)"
+                                             class="flex flex-row items-center">
+                                        <span v-if="split_content.type==='text'"
+                                              class="text-[1.6vh] font-['SYST']">{{ split_content.words }}</span>
+                                            <el-image v-if="split_content.type==='emoji'"
+                                                      :src="'/static/emoji/' + split_content.words + '.png'"
+                                                      class="w-[2.4vh] h-[2.4vh]"></el-image>
+                                        </div>
+                                    </div>
+                                </template>
+                            </el-table-column>
                             <el-table-column :formatter="(row) => {return row.public_state ? '公开' : '私有'}"
                                              label="公开状态"
                                              prop="public_state"
                                              width="100"/>
                             <el-table-column label="发布者" prop="user.name" width="100"/>
-                            <el-table-column label="发布者id" prop="user.id" width="250"/>
-                            <el-table-column label="发布时间" prop="create_at_format_str" width="250"/>
+                            <el-table-column label="发布者id" prop="user.id" width="100"/>
+                            <el-table-column label="发布时间" prop="create_at_format_str" width="200"/>
                             <el-table-column label="操作" width="200">
                                 <template #default="scope">
                                     <el-button
@@ -237,15 +284,28 @@ export default {
                                   max-height="80vh"
                                   style="width: 100%">
                             <el-table-column type="index" width="50"/>
-                            <el-table-column label="留言id" prop="id" width="250"/>
-                            <el-table-column label="内容" prop="content"/>
+                            <el-table-column label="留言id" prop="id" width="100"/>
+                            <el-table-column label="内容" prop="content">
+                                <template #default="{ row }">
+                                    <div class="flex flex-row items-center">
+                                        <div v-for="split_content in emoji_divide(row.content)"
+                                             class="flex flex-row items-center">
+                                        <span v-if="split_content.type==='text'"
+                                              class="text-[1.6vh] font-['SYST']">{{ split_content.words }}</span>
+                                            <el-image v-if="split_content.type==='emoji'"
+                                                      :src="'/static/emoji/' + split_content.words + '.png'"
+                                                      class="w-[2.4vh] h-[2.4vh]"></el-image>
+                                        </div>
+                                    </div>
+                                </template>
+                            </el-table-column>
                             <el-table-column :formatter="(row) => {return row.public_state ? '公开' : '私有'}"
                                              label="公开状态"
                                              prop="public_state"
                                              width="100"/>
                             <el-table-column label="发布者" prop="user.name" width="100"/>
-                            <el-table-column label="发布者id" prop="user.id" width="250"/>
-                            <el-table-column label="发布时间" prop="create_at_format_str" width="250"/>
+                            <el-table-column label="发布者id" prop="user.id" width="100"/>
+                            <el-table-column label="发布时间" prop="create_at_format_str" width="200"/>
                             <el-table-column label="操作" width="200">
                                 <template #default="scope">
                                     <el-button

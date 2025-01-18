@@ -4,21 +4,35 @@ export default {
         return {
             star: {
                 name: "star",
-                contact: [{
-                    name: "bilibili",
-                    svg: "/static/svg/哔哩哔哩.svg",
-                    link: "https://space.bilibili.com/25124707",
-                }],
+                contact: [
+                    {
+                        name: "github",
+                        svg: "/static/svg/github.svg",
+                        link: "https://github.com/star-starry-sea"
+                    },
+                    {
+                        name: "bilibili",
+                        svg: "/static/svg/哔哩哔哩.svg",
+                        link: "https://space.bilibili.com/25124707",
+                    }
+                ],
                 say: "诶嘿～"
             },
             lemon: {
                 name: "lemon",
-                contact: [{
-                    name: "bilibili",
-                    svg: "/static/svg/哔哩哔哩.svg",
-                    link: "https://space.bilibili.com/400932209",
-                }],
-                say: "大家好！我是lemon，一位普普通通的少年。喜欢编程，喜欢摄影，喜欢音乐，喜欢记录生活。嗯...好吧，结果每一件事都做得不是很好。"
+                contact: [
+                    {
+                        name: "github",
+                        svg: "/static/svg/github.svg",
+                        link: "https://github.com/Acid-Lemon"
+                    },
+                    {
+                        name: "bilibili",
+                        svg: "/static/svg/哔哩哔哩.svg",
+                        link: "https://space.bilibili.com/400932209",
+                    }
+                ],
+                say: "大家好！我是lemon，一位普普通通的少年。喜欢编程，喜欢摄影，喜欢音乐，喜欢记录生活。"
             },
             power: [
                 {
@@ -72,9 +86,9 @@ export default {
                            src="/static/developer/1.jpg"/>
                 <div class="text-[20px] font-['SYST']">{{ star.name }}</div>
                 <div class="flex flex-row content-center items-center">
-                    <div v-for="i in star.contact" class="mx-[2vh] flex flex-row content-center items-center">
+                    <div v-for="i in star.contact" class="m-[1vh] flex flex-row content-center items-center">
                         <a :href="i.link" target="_blank">
-                            <img :src="i.svg" :title="i.name" alt="联系方式" class="w-[4vh] h-[4vh]"/>
+                            <img :src="i.svg" :title="i.name" alt="联系方式" class="w-[3vh] h-[3vh]"/>
                         </a>
                     </div>
                 </div>
@@ -99,9 +113,9 @@ export default {
                            src="/static/developer/2.jpg"/>
                 <div class="text-[20px] font-['SYST']">{{ lemon.name }}</div>
                 <div class="flex flex-row content-center items-center">
-                    <div v-for="i in lemon.contact" class="mx-[2vh] flex flex-row content-center items-center">
+                    <div v-for="i in lemon.contact" class="m-[1vh] flex flex-row content-center items-center">
                         <a :href="i.link" target="_blank">
-                            <img :src="i.svg" :title="i.name" alt="联系方式" class="w-[4vh] h-[4vh]"/>
+                            <img :src="i.svg" :title="i.name" alt="联系方式" class="w-[3vh] h-[3vh]"/>
                         </a>
                     </div>
                 </div>

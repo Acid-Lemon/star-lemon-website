@@ -37,7 +37,7 @@ export default {
                                         <span>实用功能</span>
                                     </div>
                                 </template>
-                                <el-button @click="this.$router.push('/useful_tools/separate_audio')">分离音频
+                                <el-button @click="this.$router.push('/useful_tools/separate_audio')">视频音频分离
                                 </el-button>
                             </el-card>
                         </div>

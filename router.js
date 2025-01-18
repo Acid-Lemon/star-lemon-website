@@ -34,7 +34,7 @@ const router = createRouter({
             component: () => import("@/src/views/article/article.vue")
         },
         {
-            path: "/article/:article_title",
+            path: "/article/read",
             name: "read",
             meta: {
                 title: "阅读",

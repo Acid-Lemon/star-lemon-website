@@ -75,6 +75,9 @@ export default {
                 return new Promise((resolve) => {
                     article.user.avatar_filename = article.user.avatar + ".jpg"
                     article.create_at_format_str = date_format(new Date(article.create_at));
+                    const regex = /#|\*|https:\/\/\S+/g;
+                    article.content = article.content.replace(regex, '');
+                    article.content = truncate_text(article.content, 200);
                     resolve(article);
                 })
             }));
@@ -92,7 +95,7 @@ export default {
                     message: '修改成功',
                     type: 'success',
                 });
-                this.article_list[this.current_page - 1][id].public_state = !this.article_list[this.current_page - 1][id].public_state;
+                this.article_list[this.current_page - 1][id].public_state = public_state;
             } else {
                 ElNotification({
                     title: 'Error',
@@ -121,6 +124,9 @@ export default {
                     type: 'error',
                 });
             }
+        },
+        row_dblclick(row) {
+            this.$router.push(`/article/read?article_id=${row.id}`);
         },
         switch_tab() {
             this.article_list = [];
@@ -158,23 +164,23 @@ export default {
                                   :row-style="(row) => {return row.row.public_state ? '--el-table-tr-bg-color: var(--el-color-success-light-9)' : '--el-table-tr-bg-color: var(--el-color-warning-light-9)'}"
                                   border
                                   max-height="80vh"
-                                  style="width: 100%">
+                                  style="width: 100%"
+                                  @row-dblclick="(row) => row_dblclick(row)">
                             <el-table-column type="index" width="50"/>
                             <el-table-column label="文章id" prop="id" width="100"/>
-                            <el-table-column label="标题" prop="title" width="100"/>
+                            <el-table-column label="标题" prop="title" width="200"/>
                             <el-table-column
-                                :formatter="(row, column, cellValue, index) => {return truncate_text(cellValue, 300)}"
                                 label="内容"
                                 prop="content"/>
-                            <el-table-column label="类型" prop="type" width="75"/>
+                            <el-table-column label="类型" prop="type" width="100"/>
                             <el-table-column :formatter="(row) => {return row.public_state ? '公开' : '私有'}"
                                              label="公开状态"
                                              prop="public_state"
-                                             width="75"/>
+                                             width="100"/>
                             <el-table-column label="发布时间" prop="create_at_format_str" width="200"/>
                             <el-table-column label="操作" width="200">
                                 <template #header>
-                                    <el-button class="w-[50%]" type="primary"
+                                    <el-button class="w-full" type="primary"
                                                @click="this.$router.push('/admin/article/write')">
                                         发布新文章
                                     </el-button>

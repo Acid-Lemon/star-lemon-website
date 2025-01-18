@@ -75,6 +75,9 @@ export default {
                 return new Promise(async (resolve) => {
                     article.user.avatar_filename = article.user.avatar + ".jpg"
                     article.create_at_format_str = date_format(new Date(article.create_at));
+                    const regex = /#|\*|https:\/\/\S+/g;
+                    article.content = article.content.replace(regex, '');
+                    article.content = truncate_text(article.content, 300);
                     resolve(article);
                 })
             }));
@@ -97,7 +100,7 @@ export default {
                 <div
                     class="md:w-[70vw] w-[90vw] h-auto bg-[#FFFFFF] shadow-md mt-[20px]">
                     <div v-for="article in article_list">
-                        <router-link :to="'/article/' + article.title + '?article_id=' + article.id">
+                        <router-link :to="'/article/read' + '?article_id=' + article.id">
                             <div class="w-full h-auto px-[20px] py-[20px] border-b border-[#000000]">
                                 <div class="text-[2.6vh] font-['SYST']">{{ article.title }}</div>
                                 <div
@@ -136,7 +139,7 @@ export default {
                                         </div>
                                     </div>
                                 </div>
-                                <div class="text-[1.5vh] font-['SYST']">{{ truncate_text(article.content, 300) }}</div>
+                                <div class="text-[1.5vh] font-['SYST']">{{ article.content }}</div>
                             </div>
                         </router-link>
                     </div>

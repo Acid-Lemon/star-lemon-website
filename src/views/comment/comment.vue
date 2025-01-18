@@ -22,7 +22,7 @@ export default {
             sentences: null,
             loading_more: false,
             has_more: true,
-            emoji: [
+            emoji_list: [
                 {
                     value: "**doge**",
                     path: "/static/emoji/doge.png",
@@ -529,8 +529,11 @@ export default {
                                          src="/static/emoji/doge.png"/>
                                 </template>
                                 <div class="grid gap-x-[10px] gap-y-[10px] grid-cols-8">
-                                    <img v-for="i in emoji" :src="i.path" alt="emoji" class="w-[30px] h-[30px]"
-                                         @click="this.value += i.value"/>
+                                    <div v-for="emoji in emoji_list">
+                                        <img :src="emoji.path" alt="emoji"
+                                             class="w-[30px] h-[30px]"
+                                             @click="this.value += emoji.value"/>
+                                    </div>
                                 </div>
                             </el-popover>
                         </div>
@@ -595,9 +598,8 @@ export default {
                             <div class="m-[1vh] flex flex-row items-center">
                                 <div v-for="split_content in emoji_divide(message.content)"
                                      class="flex flex-row items-center">
-                  <span v-if="split_content.type==='text'" class="text-[2vh] font-['SYST']">{{
-                          split_content.words
-                      }}</span>
+                                    <span v-if="split_content.type==='text'"
+                                          class="text-[2vh] font-['SYST']">{{ split_content.words }}</span>
                                     <el-image v-if="split_content.type==='emoji'"
                                               :src="'/static/emoji/' + split_content.words + '.png'"
                                               class="w-[3vh] h-[3vh]"></el-image>

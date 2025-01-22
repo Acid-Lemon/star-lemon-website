@@ -8,134 +8,99 @@ export default {
     data() {
         return {
             state: {
-                is_login: true,// 登录和注册，登陆状态是true，注册状态是false
-                mode: true,// 用户名登录和手机号登录，用户名登录是true，手机号登录是false
+                is_login: true,
+                is_email: false,
             },
-            username: "",
-            password: "",
-            confirm_password: "",
-            phone_number: "",
-            code: "",
-            code_state: false,
-            countdown: 60,
-            username_tip: "",
-            password_tip: "",
-            confirm_password_tip: "",
-            phone_number_tip: "",
-            code_tip: "",
+            form: {
+                username: "",
+                password: "",
+                confirm_password: "",
+                email: "",
+            }
 
         };
     },
-    methods: {
-        register_mode() {
-            this.state.is_login = false;
-            this.phone_number_tip = "如若没有可不填";
-        },
-        username_mode() {
-            this.state.is_login = true;
-            this.state.mode = true;
-        },
-        phone_number_mode() {
-            this.state.is_login = true;
-            this.state.mode = false;
-            this.phone_number_tip = "";
-
-        },
-        check() {
-            if (this.username.length < 1 || this.username.length > 15) {
-                this.username_tip = "用户名不符合要求";
-                this.username = "";
-                return false;
-            }
-            if (this.password.length < 5 || this.password.length > 25) {
-                this.password_tip = "密码不符合要求";
-                this.password = "";
-                this.confirm_password = "";
-                return false;
-            }
-            if (this.password !== this.confirm_password) {
-                this.confirm_password_tip = "前后密码不一致";
-                this.confirm_password = "";
-                return false;
-            }
-            return true;
-        },
-        async send_code() {
-            this.code_state = true;
-
-            if (!(/^1[3456789]\d{9}$/.test(this.phone_number))) {
-                ElNotification({
-                    title: 'Warning',
-                    type: "warning",
-                    message: "手机号格式错误",
-                });
-
-                this.code_state = false;
-                return;
-            }
-
-            let res = await call_api("user/login/send_code", {
-                phone_number: this.phone_number,
-                mode: this.state.is_login === true ? "登录" : "注册"
-            });
-
-            if (res.success) {
-                ElNotification({
-                    title: 'Success',
-                    type: "success",
-                    message: "发送成功",
-                });
-
-                this.code_state = true;
-                this.timer = setInterval(() => {
-                    this.countdown--;
-
-                    if (this.countdown === 0) {
-                        // 结束倒计时，恢复按钮状态
-                        clearInterval(this.timer);
-                        this.code_state = false;
-                        this.countdown = 60; // 重置倒计时
-                    }
-                }, 1000);
+    computed: {
+        rules() {
+            if (!this.state.is_login) {
+                return {
+                    email: [
+                        {required: true, message: '请输入邮箱', trigger: 'blur'},
+                        {type: 'email', message: '请输入正确的邮箱地址', trigger: ['blur', 'change']}
+                    ],
+                    username: [
+                        {required: true, message: '请输入用户名', trigger: 'blur'},
+                        {min: 1, max: 15, message: '用户名必须在 1 到 15 个字符之内', trigger: 'blur'}
+                    ],
+                    password: [
+                        {required: true, message: '请输入密码', trigger: 'blur'},
+                        {min: 5, max: 25, message: '密码必须在 5 到 25 个字符之内', trigger: 'blur'}
+                    ],
+                    confirm_password: [
+                        {
+                            validator: (rule, value, callback) => {
+                                if (this.form.password !== value) {
+                                    callback("确认密码和密码不同")
+                                } else {
+                                    callback()
+                                }
+                            }
+                        },
+                        {required: true, message: '请输入确认密码', trigger: 'blur'},
+                        {min: 5, max: 25, trigger: 'blur'}
+                    ]
+                }
+            } else if (this.state.is_login && this.state.is_email) {
+                return {
+                    email: [
+                        {required: true, message: '请输入邮箱', trigger: 'blur'},
+                        {type: 'email', message: '请输入正确的邮箱地址', trigger: ['blur', 'change']}
+                    ],
+                }
             } else {
+                return {
+                    username: [
+                        {required: true, message: '请输入用户名', trigger: 'blur'},
+                        {min: 1, max: 15, message: '用户名必须在 1 到 15 个字符之内', trigger: 'blur'}
+                    ],
+                    password: [
+                        {required: true, message: '请输入密码', trigger: 'blur'},
+                        {min: 5, max: 25, message: '密码必须在 5 到 25 个字符之内', trigger: 'blur'}
+                    ],
+                }
+            }
+        }
+    },
+    methods: {
+        async login() {
+            const valid = await new Promise(resolve => {
+                this.$refs.form_ref.validate((valid) => {
+                    resolve(valid)
+                })
+            })
+
+            if (!valid) {
                 ElNotification({
                     title: 'Error',
                     type: "error",
-                    message: "发送失败：" + res.code,
+                    message: "请填写完整信息！",
                 });
-            }
-            this.code_state = false;
-        },
-        async login() {
-            if (this.state.is_login === false) {
-                if (!this.check()) {
-                    return;
-                }
-            }
-
-            if (!this.state.mode && !this.code) {
-                ElNotification({
-                    title: 'Warning',
-                    type: "warning",
-                    message: "未填写验证码",
-                });
-
                 return;
             }
 
             let loading = ElLoading.service();
+
             let res;
-            if ((this.state.is_login === true && this.state.mode === true) || (this.state.is_login === false && this.phone_number === "")) {
+            if (this.state.is_login && !this.state.is_email) {
                 res = await call_api(`user/login/${this.state.is_login === true ? "login" : "register"}_by_user`, {
-                    username: this.username,
-                    password: this.password
+                    username: this.form.username,
+                    password: this.form.password
                 });
             } else {
                 res = await call_api(`user/login/${this.state.is_login === true ? "login" : "register"}_by_sms`, {
-                    username: this.username,
-                    password: this.password,
-                    phone_number: this.phone_number,
-                    code: this.code
+                    username: this.form.username,
+                    password: this.form.password,
+                    email: this.form.email,
                 });
             }
 
@@ -157,27 +122,22 @@ export default {
 
             await load_user();
 
-            if (this.state.is_login && res.success) {
+            if (this.state.is_login) {
                 ElNotification({
                     title: 'Success',
                     type: "success",
                     message: "登录成功",
                 })
-
-                // 登录成功后跳转回原页面
-                this.$router.back();
-            }
-
-
-            if (!this.state.is_login && res.success) {
+            } else {
                 ElNotification({
                     title: 'Success',
                     type: "success",
                     message: "注册成功",
                 })
-
-                this.state.is_login = true
             }
+
+            // 登录/注册成功后跳转回原页面
+            this.$router.back();
         }
     }
 }
@@ -194,74 +154,55 @@ export default {
         </div>
         <div
             class="bg-white bg-opacity-80 backdrop-blur-md md:w-[360px] w-[95vw] h-[85vh] shadow-sm rounded-lg p-[3vh] mt-[12vh] mb-[3vh]">
-            <div class="w-full h-full">
-                <span class="text-[4vh] font-['SYST']">{{ state.is_login === true ? "登录" : "注册" }}</span>
-                <div class="my-[2vh] flex flex-col justify-between align-top w-full">
-                    <!--    注册或用户名密码登录        -->
-                    <div v-if="!state.is_login || (state.mode && state.is_login)" class="flex flex-col">
-                        <span class="my-[0.5vh] text-[2vh] font-['FZSX']">用户名：</span>
-                        <el-input v-model="username" :placeholder="username_tip"
-                                  style="width: 100%;height:4vh;"/>
-                    </div>
-                    <!--    手机号登录注册或用户名注册        -->
-                    <div v-if="!state.mode || !state.is_login" class="flex flex-col">
-                        <span class="my-[0.5vh] text-[2vh] font-['FZSX']">手机号码：</span>
-                        <el-input v-model="phone_number" :placeholder="phone_number_tip"
-                                  style="width: 100%;height:4vh"/>
-                    </div>
-                    <!--    手机号登录注册或用户名注册        -->
-                    <div v-if="!state.mode || !state.is_login" class="flex flex-col">
-                        <span class="my-[0.5vh] text-[2vh] font-['FZSX']">验证码：</span>
-                        <div class="flex flex-row justify-between">
-                            <el-input v-model="code" :placeholder="code_tip" style="width: 50%;height:4vh"/>
-                            <el-button :disabled="code_state" round style="width: 40%;height: 4vh" @click="send_code">
-                                {{ countdown < 60 ? `${countdown}s` : '获取验证码' }}
-                            </el-button>
-                        </div>
-                    </div>
-                    <!--     注册或用户名密码登录       -->
-                    <div v-if="!state.is_login || (state.mode && state.is_login)" class="flex flex-col">
-                        <span class="my-1 text-[2vh] font-['FZSX']">密码：</span>
-                        <el-input v-model="password" :placeholder="password_tip" style="width: 100%;height:4vh"
-                                  type="password"/>
-                    </div>
-                    <!--      注册      -->
-                    <div v-if="!state.is_login" class="flex flex-col">
-                        <span class="my-1 text-[2vh] font-['FZSX']">确认密码：</span>
-                        <el-input v-model="confirm_password" :placeholder="confirm_password_tip"
-                                  style="width: 100%;height:4vh"
-                                  type="password"/>
-                    </div>
-                </div>
-                <el-button round style="width: 100%;height: 4vh" type="primary" @click="login">
-                    {{ state.is_login === true ? "登录" : "注册" }}
-                </el-button>
+            <el-form ref="form_ref" :model="form" :rules="rules" label-position="top">
+                <div class="text-[4vh] font-['SYST']">{{ state.is_login === true ? "登录" : "注册" }}</div>
+                <el-form-item v-if="!this.state.is_login || !this.state.is_email"
+                              class="my-[0.5vh] text-[2.5vh] font-['FZSX']"
+                              label="用户名："
+                              prop="username" @click="console.log(this.state)">
+                    <el-input v-model="form.username" style="width: 100%;height:4vh;"/>
+                </el-form-item>
+                <el-form-item v-if="!state.is_login || this.state.is_email"
+                              class="my-[0.5vh] text-[2.5vh] font-['FZSX']"
+                              label="邮箱：" prop="email">
+                    <el-input v-model="form.email"
+                              style="width: 100%;height:4vh"/>
+                </el-form-item>
+                <el-form-item v-if="!this.state.is_login || !this.state.is_email"
+                              class="my-[0.5vh] text-[2.5vh] font-['FZSX']"
+                              label="密码：" prop="password">
+                    <el-input v-model="form.password" style="width: 100%;height:4vh"
+                              type="password"/>
+                </el-form-item>
+                <el-form-item v-if="!state.is_login" class="my-[0.5vh] text-[2.5vh] font-['FZSX']"
+                              label="确认密码：" prop="confirm_password">
+                    <el-input v-model="form.confirm_password"
+                              style="width: 100%;height:4vh"
+                              type="password"/>
+                </el-form-item>
+                <el-form-item>
+                    <el-button round style="width: 100%;height: 4vh" type="primary" @click="login">
+                        {{ state.is_login === true ? "登录" : "注册" }}
+                    </el-button>
+                </el-form-item>
                 <!--    用户名密码登录      -->
-                <div v-if="state.is_login && state.mode" class="flex flex-row justify-between">
-                    <div class="my-2" @click="register_mode">
+                <div class="flex flex-row justify-between">
+                    <div v-if="state.is_login" class="my-2" @click="this.state.is_login = false">
                         <span class="text-[#40A2E3] text-[1.8vh] font-['FZSX']">注册</span>
                     </div>
-                    <div class="my-2" @click="phone_number_mode">
-                        <span class="text-[#40A2E3] text-[1.8vh] font-['FZSX']">手机号登录</span>
-                    </div>
-                </div>
-                <div v-if="!state.is_login" class="flex flex-row justify-between">
-                    <div class="my-2" @click="username_mode">
+                    <div v-if="!state.is_login || state.is_email" class="my-2"
+                         @click="this.state.is_login = true; this.state.is_email = false">
                         <span class="text-[#40A2E3] text-[1.8vh] font-['FZSX']">用户名登录</span>
                     </div>
-                    <div class="my-2" @click="phone_number_mode">
-                        <span class="text-[#40A2E3] text-[1.8vh] font-['FZSX']">手机号登录</span>
+                    <div v-if="!state.is_login || !state.is_email" class="my-2"
+                         @click="this.state.is_login = true; this.state.is_email = true">
+                        <span class="text-[#40A2E3] text-[1.8vh] font-['FZSX']">邮箱登录</span>
                     </div>
                 </div>
-                <div v-if="state.is_login && !state.mode" class="flex flex-row justify-between">
-                    <div class="my-2" @click="register_mode">
-                        <span class="text-[#40A2E3] text-[1.8vh] font-['FZSX']">注册</span>
-                    </div>
-                    <div class="my-2" @click="username_mode">
-                        <span class="text-[#40A2E3] text-[1.8vh] font-['FZSX']">用户名登录</span>
-                    </div>
+                <div>
+                    <el-image alt="" src="/static/login/QQ登录.png"/>
                 </div>
-            </div>
+            </el-form>
         </div>
     </div>
 </template>

@@ -20,6 +20,7 @@
     "@rollup/plugin-terser": "^0.4.4",
     "axios": "^1.7.4",
     "element-plus": "^2.7.2",
+    "jszip": "^3.10.1",
     "lightningcss": "^1.26.0",
     "pinia": "^2.1.7",
     "vditor": "^3.10.5",

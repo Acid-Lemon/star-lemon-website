@@ -22,7 +22,7 @@ export default {
             avatar: [],
             background: [],
             avatar_list: [],
-            avatars_nums: 99,
+            avatars_nums: 46,
             click_flag: -1,
             is_disabled: false,
             loading: false,

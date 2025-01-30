@@ -111,10 +111,7 @@ export default {
                                         </div>
                                         <div>
                                             <div class="text-[14px] px-[10px] py-[2px] whitespace-normal break-all">
-                                                相册名：{{ photo_album.name }}
-                                            </div>
-                                            <div class="text-[14px] px-[10px] py-[2px] whitespace-normal break-all">
-                                                id：{{ photo_album.id }}
+                                                相册：{{ photo_album.name }}
                                             </div>
                                         </div>
                                     </router-link>

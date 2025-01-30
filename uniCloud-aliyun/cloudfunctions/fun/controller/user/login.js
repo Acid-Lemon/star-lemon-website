@@ -40,16 +40,16 @@ module.exports = class Controller_User_Login extends Controller {
 		};
 	}
 
-	async register_by_sms() {
+	async register_by_email() {
 		let {
-			username,
+			email,
+			code,
 			password,
-			phone_number,
-			code
+			username
 		} = validate(this.ctx.event.args, {
-			phone_number: {
+			email: {
 				type: "string",
-				regex: /^1[3456789]\d{9}$/
+				regex: /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 			},
 			code: {
 				type: "string",
@@ -71,22 +71,22 @@ module.exports = class Controller_User_Login extends Controller {
 			}
 		});
 
-		let code_record = await this.service.db.sms_code.find_code(phone_number);
+		let code_record = await this.service.db.email_code.find_code(email);
 		console.info("code_record: ", code_record);
 
 		if (!code_record) {
-			this.throw(error.codes.no_sms_code, "no sms code. please send first");
+			this.throw(error.codes.no_email_code, "no email code. please send first");
 		}
 
-		this.service.user.login.verify_code(code, code_record);
+		this.service.user.login.verify_email_code(code, code_record);
 
 		let user = await this.service.user.login.create_user({
-			phone_number,
+			email,
 			name: username,
 			password
 		});
 
-		await this.service.db.sms_code.delete_code_by_id(code_record.id);
+		await this.service.db.email_code.delete_code_by_id(code_record.id);
 
 		return {
 			data: user
@@ -123,52 +123,51 @@ module.exports = class Controller_User_Login extends Controller {
 		};
 	}
 
-	async login_by_sms() {
+	async login_by_email() {
 		let {
-			phone_number,
+			email,
 			code
 		} = validate(this.ctx.event.args, {
-			phone_number: {
+			email: {
 				type: "string",
-				regex: /^1[3456789]\d{9}$/
+				regex: /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 			},
 			code: {
-				type: "string",
-				not_null: true
+				type: "string"
 			}
 		});
 
-		let code_record = await this.service.db.sms_code.find_code(phone_number);
+		let code_record = await this.service.db.email_code.find_code(phone_number);
 		console.info("code_record: ", code_record);
 
 		if (!code_record) {
-			this.throw(error.codes.no_sms_code, "sms code not found");
+			this.throw(error.codes.no_email_code, "email code not found");
 		}
 
 		if (code !== code_record.code) {
-			this.throw(error.codes.invalid_sms_code, "sms code wrong");
+			this.throw(error.codes.invalid_email_code, "email code wrong");
 		}
 
-		let user = await this.service.db.user.find_user_by_phone_number(phone_number);
+		let user = await this.service.db.user.find_user_by_email(email);
 		if (!user) {
 			this.throw(error.codes.no_user, "user not found");
 		}
 
-		await this.service.db.sms_code.delete_code_by_id(code_record.id);
+		await this.service.db.email_code.delete_code_by_id(code_record.id);
 
 		return {
 			token: this.service.user.login.create_token(user)
 		};
 	}
 
-	async send_code() {
+	async send_email_code() {
 		let {
-			phone_number,
+			email,
 			mode
 		} = validate(this.ctx.event.args, {
-			phone_number: {
+			email: {
 				type: "string",
-				regex: /^1[3456789]\d{9}$/
+				regex: /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 			},
 			mode: {
 				type: "string",
@@ -180,11 +179,11 @@ module.exports = class Controller_User_Login extends Controller {
 		});
 
 		let code = this.service.user.login.create_code();
-		let id = await this.service.db.sms_code.update_code_with_limit(code, phone_number);
+		let id = await this.service.db.email_code.update_code_with_limit(code, email);
 		try {
-			await this.service.user.login.send_code(phone_number, code, mode);
+			await this.service.user.login.send_email_code(email, code, mode);
 		} catch (err) {
-			await this.service.db.sms_code.delete_code_last_send_record(id);
+			await this.service.db.email_code.delete_code_last_send_record(id);
 		}
 
 		return {};

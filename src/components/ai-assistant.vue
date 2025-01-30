@@ -65,20 +65,23 @@ export default {
             this.is_open = !this.is_open;
         },
 
-        async send_message() {
+        async get_answer() {
             if (!this.user_input.trim()) return;
-
-            this.message_list.push({'role': 'user', 'content': this.user_input});
-
             this.user_input = "";
 
-            let res = await call_api("AI_assistant/get_answer", {
+            this.message_list.push({'role': 'user', 'content': this.user_input});
+            this.message_list.push({'role': 'assistant', 'content': ''});
+
+            const channel = new uniCloud.SSEChannel();
+            channel.on('message', (message) => {
+                this.message_list[this.message_list.length - 1].content += message;
+            });
+            await channel.open();
+
+            await call_api("AI_assistant/get_answer", {
+                channel,
                 message_list: this.message_list
-            })
-
-            this.message_list = res.data.message_list.filter(message => message.role !== 'system');
-
-
+            });
         },
     },
 };
@@ -106,11 +109,11 @@ export default {
                             v-model="user_input"
                             placeholder="输入您的问题..."
                             style="margin-right: 20px"
-                            @keyup.enter.native="send_message"
+                            @keyup.enter.native="get_answer"
                         >
                         </el-input>
                         <el-button
-                            @click="send_message"
+                            @click="get_answer"
                         >
                             发送
                         </el-button>

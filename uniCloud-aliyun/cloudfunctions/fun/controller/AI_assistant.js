@@ -16,8 +16,9 @@ module.exports = class Controller_AI_assistant extends Controller {
             }
         });
 
-        let res = await this.ctx.service.AI_assistant.get_answer(message_list);
+        let channel = uniCloud.deserializeSSEChannel(this.ctx.event.args.channel);
 
+        let res = await this.service.AI_assistant.get_answer(message_list, channel);
 
         return {
             data: res

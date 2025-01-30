@@ -38,8 +38,8 @@ module.exports = class DBService_User extends Service {
         return id_name_format((await this.db.collection(tables.user).where({name}).get()).data[0]);
     }
 
-    async find_user_by_phone_number(phone_number) {
-        return id_name_format((await this.db.collection(tables.user).where({phone_number}).get()).data[0]);
+    async find_user_by_email(email) {
+        return id_name_format((await this.db.collection(tables.user).where({email}).get()).data[0]);
     }
 
     async check_user_exist_by_name(name) {

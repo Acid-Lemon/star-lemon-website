@@ -97,7 +97,7 @@ export default {
                     password: this.form.password
                 });
             } else {
-                res = await call_api(`user/login/${this.state.is_login === true ? "login" : "register"}_by_sms`, {
+                res = await call_api(`user/login/${this.state.is_login === true ? "login" : "register"}_by_email`, {
                     username: this.form.username,
                     password: this.form.password,
                     email: this.form.email,

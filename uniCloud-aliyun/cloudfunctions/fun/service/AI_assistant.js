@@ -9,7 +9,7 @@ const OpenAI = require("openai");
 
 const openai = new OpenAI({
     baseURL: 'https://api.deepseek.com',
-    apiKey: config['API_KEY']
+    apiKey: config['DEEPSEEK_API_KEY']
 });
 
 const personality = "# 角色\n" +
@@ -49,19 +49,26 @@ const personality = "# 角色\n" +
 
 module.exports = class Service_AI_assistant extends Service {
 
-    async get_answer(message_list) {
+    async get_answer(message_list, channel) {
         if (message_list.length === 1) {
             message_list.unshift({'role': 'system', 'content': personality});
         }
-        const completion = await openai.chat.completions.create({
+
+        let stream = await openai.chat.completions.create({
             messages: message_list,
             model: "deepseek-chat",
+            stream: true
         });
 
-        const answer = completion.choices[0].message.content;
-
-        return {
-            message_list: message_list.concat({'role': 'assistant', 'content': answer})
+        for await (const chunk of stream) {
+            let content = chunk.choices[0]?.delta?.content || '';
+            if (content) {
+                await channel.write(content);
+            }
         }
+
+        await channel.end();
+
+        return null;
     }
 };

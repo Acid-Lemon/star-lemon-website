@@ -22,9 +22,10 @@ export default {
 
         async get_answer() {
             if (!this.user_input.trim()) return;
-            this.user_input = "";
 
             this.message_list.push({'role': 'user', 'content': this.user_input});
+            this.user_input = "";
+
             this.message_list.push({'role': 'assistant', 'content': ''});
 
             const channel = new uniCloud.SSEChannel();

@@ -26,8 +26,6 @@ export default {
             this.message_list.push({'role': 'user', 'content': this.user_input});
             this.user_input = "";
 
-            let message_list_till_ask = this.message_list;
-
             // 流式响应，对message的处理
             this.message_list.push({'role': 'assistant', 'content': ''});
 
@@ -39,7 +37,7 @@ export default {
 
             await call_api("AI_assistant/get_answer", {
                 channel,
-                message_list: message_list_till_ask
+                message_list: this.message_list.slice(0, -1)
             });
         }
     },
@@ -53,11 +51,12 @@ export default {
                 <div class="w-full h-[350px] p-4 overflow-y-auto">
                     <div v-for="(message, index) in message_list" :key="index"
                          class="flex flex-row">
-                        <el-avatar :size=40 :src="message.role === 'user' ? this.avatar_url : null">
+                        <el-avatar :size=40
+                                   :src="message.role === 'user' ? this.avatar_url : '/static/ai_avatar/girl.png'">
                             {{ message.role === 'user' ? "user" : "AI" }}
                         </el-avatar>
                         <div
-                            :class="['ml-4 mb-4 p-2 rounded-lg w-[90%]',message.role === 'user' ? 'bg-blue-100 text-blue-800' : 'bg-gray-100 text-gray-800']">
+                            :class="['ml-4 mb-4 p-2 rounded-lg w-[90%] min-h-10',message.role === 'user' ? 'bg-blue-100 text-blue-800' : 'bg-gray-100 text-gray-800']">
                             {{ message.content }}
                         </div>
                     </div>

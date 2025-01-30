@@ -37,7 +37,7 @@ child_process.exec(
 
 export default defineConfig({
   server: {
-      port: 3000 // 修改为其他未被占用的端口
+      port: 8000 // 修改为其他未被占用的端口
     },
     plugins: [
         uni(),

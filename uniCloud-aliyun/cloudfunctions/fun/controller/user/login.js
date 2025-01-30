@@ -9,37 +9,6 @@ const {
 } = require("../../utils/args_check");
 
 module.exports = class Controller_User_Login extends Controller {
-	async register_by_user() {
-		let {
-			username,
-			password
-		} = validate(this.ctx.event.args, {
-			username: {
-				type: "string",
-				length: {
-					max: 20,
-					min: 2
-				}
-			},
-			password: {
-				type: "string",
-				length: {
-					max: 30,
-					min: 5
-				}
-			}
-		});
-
-		let user = await this.service.user.login.create_user({
-			name: username,
-			password
-		});
-
-		return {
-			data: user
-		};
-	}
-
 	async register_by_email() {
 		let {
 			email,
@@ -160,6 +129,55 @@ module.exports = class Controller_User_Login extends Controller {
 		};
 	}
 
+	async login_with_qq() {
+		let {
+			auth_code,
+			app_id,
+			app_secret,
+			redirect_uri
+		} = validate(this.ctx.event.args, {
+			auth_code: {
+				type: "string"
+			},
+			app_id: {
+				type: "string"
+			},
+			app_secret: {
+				type: "string"
+			},
+			redirect_uri: {
+				type: "string"
+			}
+		});
+
+		let qq_user_info = await this.service.user.login.get_qq_user_info_by_code({
+			auth_code,
+			app_id,
+			app_secret,
+			redirect_uri
+		});
+
+		let exist_user = await this.service.db.user.find_user_by_qq_openid(qq_user_info.qq_openid);
+		if (exist_user) {
+			return {
+				token: this.service.user.login.create_token(exist_user)
+			};
+		}
+
+		let new_user = await this.service.user.login.create_user({
+			name: qq_user_info.nickname,
+			qq_openid: qq_user_info.qq_openid,
+			avatar: {
+				url: qq_user_info.avatar_url,
+				type: "url"
+			}
+		});
+
+		return {
+			data: new_user
+		};
+	}
+
 	async send_email_code() {
 		let {
 			email,
@@ -172,9 +190,7 @@ module.exports = class Controller_User_Login extends Controller {
 			mode: {
 				type: "string",
 				not_null: true,
-				customize: (args, name) => {
-					return args[name] === "登录" || args[name] === "注册";
-				}
+				within: ["登录", "注册"]
 			}
 		});
 

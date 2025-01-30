@@ -34,7 +34,7 @@ module.exports = class Controller_User_Profile extends Controller {
         };
     }
 
-    async get_background_image_temp_url() {
+    async get_upload_background_image_temp_url() {
         let {
             image_name
         } = validate(this.ctx.event.args, {
@@ -43,7 +43,7 @@ module.exports = class Controller_User_Profile extends Controller {
             }
         });
 
-        let temp_url = await this.service.cloud_storage.profile.get_background_image_temp_url(image_name);
+        let temp_url = await this.service.cloud_storage.profile.get_upload_background_image_temp_url(image_name);
         return {
             data: {
                 temp_url

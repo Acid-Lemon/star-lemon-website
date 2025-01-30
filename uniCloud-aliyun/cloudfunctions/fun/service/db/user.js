@@ -42,6 +42,10 @@ module.exports = class DBService_User extends Service {
         return id_name_format((await this.db.collection(tables.user).where({email}).get()).data[0]);
     }
 
+    async find_user_by_qq_openid(qq_openid) {
+        return id_name_format((await this.db.collection(tables.user).where({qq_openid}).get()).data[0]);
+    }
+
     async check_user_exist_by_name(name) {
         return Boolean((await this.db.collection(tables.user).where({
             name

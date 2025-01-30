@@ -6,6 +6,7 @@ const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
 
 const email_send = require("../../utils/email_send");
+const qq_connect = require("../../utils/qq_connect");
 
 const config = require("uni-config-center")({ pluginId: "fun" }).config();
 
@@ -36,13 +37,25 @@ module.exports = class Service_User_Login extends Service {
 		}, config["JWT_SECRET"]);
 	}
 
+	async get_qq_user_info_by_code(info) {
+		let token = await qq_connect.get_access_token_by_code(info);
+		let openid = await qq_connect.get_user_openid(token);
+		let user_info = await qq_connect.get_user_info(token, openid);
+		return {
+			...user_info,
+			qq_openid: openid
+		};
+	}
+
 	async create_user(info) {
 		if (!info instanceof Object) {
 			throw TypeError("create_user: info is not an object");
 		}
 
-		info.hash = await bcrypt.hash(info.password, 10);
-		delete info.password;
+		if (info.hasOwnProperty("password")) {
+			info.hash = await bcrypt.hash(info.password, 10);
+			delete info.password;
+		}
 
 		return await this.service.db.user.create_user(info);
 	}

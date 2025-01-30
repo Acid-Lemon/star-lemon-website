@@ -25,7 +25,8 @@ const codes = {
     permission_denied: "err_permission_denied",
     rate_limit: "err_rate_limit",
     err_serve: "err_serve",
-    err_no_permissions: "err_no_permissions"
+    err_no_permissions: "err_no_permissions",
+    err_qq_connect_login: "err_qq_login",
 };
 
 module.exports = {

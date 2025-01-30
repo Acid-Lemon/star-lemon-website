@@ -50,7 +50,7 @@ module.exports = class Service_CloudStorage_Album extends Service {
         )[0];
     }
 
-    async get_background_image_temp_url(image_name) {
+    async get_upload_background_image_temp_url(image_name) {
         let file_path = cloud_storage_path_prefixes.profile_background + image_name;
 
         let manager = this.service.cloud_storage.general.get_manager();

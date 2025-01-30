@@ -137,7 +137,7 @@ module.exports = class Controller_User_Login extends Controller {
 			}
 		});
 
-		let code_record = await this.service.db.email_code.find_code(phone_number);
+		let code_record = await this.service.db.email_code.find_code(email);
 		console.info("code_record: ", code_record);
 
 		if (!code_record) {

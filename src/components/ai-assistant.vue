@@ -26,6 +26,9 @@ export default {
             this.message_list.push({'role': 'user', 'content': this.user_input});
             this.user_input = "";
 
+            let message_list_till_ask = this.message_list;
+
+            // 流式响应，对message的处理
             this.message_list.push({'role': 'assistant', 'content': ''});
 
             const channel = new uniCloud.SSEChannel();
@@ -36,9 +39,9 @@ export default {
 
             await call_api("AI_assistant/get_answer", {
                 channel,
-                message_list: this.message_list
+                message_list: message_list_till_ask
             });
-        },
+        }
     },
 };
 </script>

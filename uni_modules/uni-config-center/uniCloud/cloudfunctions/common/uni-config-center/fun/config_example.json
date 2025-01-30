@@ -6,7 +6,13 @@
     "hour": 6,
     "minute": 1
   },
-  "CLOUD_FUNCTION_PUBLIC_PATH_PREFIX": [],
+  "EMAIL_CODE_SENDER": {
+  	"host": "url",
+  	"port": 465,
+  	"email": "email",
+  	"password": "pass"
+  },
+  "CLOUD_FUNCTION_PUBLIC_PATH_PREFIX": ["user/login/", "message_board/get_personal_and_public_messages", "user/profile/get_upload_avatar_temp_url"],
   "UNICLOUD_EXT_STORAGE_DOMAIN": "xxx",
   "UNICLOUD_EXT_STORAGE_BUCKET_NAME": "xxx",
   "UNICLOUD_EXT_STORAGE_BUCKET_SECRET": "xxx",

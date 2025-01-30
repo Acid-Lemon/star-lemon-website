@@ -1,15 +1,17 @@
+const config = require("uni-config-center")({pluginId: "fun"}).config();
+
 const errors = require("../types/api_error");
 
-async function get_access_token_by_code(info) {
+async function get_access_token_by_code(auth_code, redirect_uri) {
     let {data} = await uniCloud.request({
         url: "https://graph.qq.com/oauth2.0/token",
         method: "GET",
         data: {
             grant_type: 'authorization_code',
-            client_id: info["app_id"],
-            client_secret: info["app_key"],
-            code: info["auth_code"],
-            redirect_uri: info["redirect_uri"],
+            client_id: config["QQ_CONNECT_APPID"],
+            client_secret: config["QQ_CONNECT_APPKEY"],
+            code: auth_code,
+            redirect_uri: redirect_uri,
             fmt: "json"
         },
         dataType: "json",
@@ -43,13 +45,13 @@ async function get_user_openid(access_token) {
     return data.openid;
 }
 
-async function get_user_info(access_token, app_id, openid) {
+async function get_user_info(access_token, openid) {
     let {data} = await uniCloud.request({
         url: "https://graph.qq.com/user/get_user_info",
         method: "GET",
         data: {
             access_token: access_token,
-            oauth_consumer_key: app_id,
+            oauth_consumer_key: config["QQ_CONNECT_APPID"],
             openid: openid
         },
         dataType: "json",

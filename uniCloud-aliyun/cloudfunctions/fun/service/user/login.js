@@ -27,7 +27,7 @@ module.exports = class Service_User_Login extends Service {
 		console.log("email verify code send info:", info);
 	}
 
-	async compare_password(password, hash) {
+	async compare_password(password, hash)  {
 		return await bcrypt.compare(password, hash);
 	}
 
@@ -37,8 +37,8 @@ module.exports = class Service_User_Login extends Service {
 		}, config["JWT_SECRET"]);
 	}
 
-	async get_qq_user_info_by_code(info) {
-		let token = await qq_connect.get_access_token_by_code(info);
+	async get_qq_user_info_by_code(auth_code, redirect_uri) {
+		let token = await qq_connect.get_access_token_by_code(auth_code, redirect_uri);
 		let openid = await qq_connect.get_user_openid(token);
 		let user_info = await qq_connect.get_user_info(token, openid);
 		return {

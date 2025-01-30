@@ -132,17 +132,9 @@ module.exports = class Controller_User_Login extends Controller {
 	async login_with_qq() {
 		let {
 			auth_code,
-			app_id,
-			app_secret,
 			redirect_uri
 		} = validate(this.ctx.event.args, {
 			auth_code: {
-				type: "string"
-			},
-			app_id: {
-				type: "string"
-			},
-			app_secret: {
 				type: "string"
 			},
 			redirect_uri: {
@@ -150,12 +142,7 @@ module.exports = class Controller_User_Login extends Controller {
 			}
 		});
 
-		let qq_user_info = await this.service.user.login.get_qq_user_info_by_code({
-			auth_code,
-			app_id,
-			app_secret,
-			redirect_uri
-		});
+		let qq_user_info = await this.service.user.login.get_qq_user_info_by_code(auth_code, redirect_uri);
 
 		let exist_user = await this.service.db.user.find_user_by_qq_openid(qq_user_info.qq_openid);
 		if (exist_user) {

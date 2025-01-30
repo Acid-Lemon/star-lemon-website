@@ -1,8 +1,6 @@
 <script>
 import {call_api} from "../utils/cloud";
-import {use_user_info_store} from "@/src/stores/userInfo";
-import {ElNotification} from "element-plus";
-import axios from "axios";
+import {get_avatar} from "@/src/utils/get_avatar";
 
 export default {
     data() {
@@ -14,53 +12,10 @@ export default {
         };
     },
     async mounted() {
-        await this.get_avatar();
-    },
-    computed: {
-        user_info() {
-            const user_info_store = use_user_info_store();
-            return user_info_store.user_info;
-        },
+        this.avatar_url = await get_avatar();
     },
     methods: {
-        async get_avatar() {
-            let avatar_name = this.user_info?.avatar.name;
-            let type = this.user_info?.avatar.type;
-            if (avatar_name) {
-                if (type === "upload") {
-                    let avatar_url_res = await call_api("user/profile/get_upload_avatar_temp_url", {
-                        image_name: avatar_name,
-                    });
 
-                    if (!avatar_url_res.success) {
-                        ElNotification({
-                            title: 'Error',
-                            message: avatar_url_res,
-                            type: 'error',
-                        });
-                        console.log(avatar_url_res);
-                        return;
-                    } else {
-                        try {
-                            const response = await axios.get(avatar_url_res.data.temp_url, {
-                                responseType: 'blob',
-                                headers: {
-                                    'Cache-Control': 'max-age=86400', // 缓存24小时
-                                },
-                            });
-                            this.avatar_url = URL.createObjectURL(response.data);
-                        } catch (error) {
-                            console.error('获取头像时出错:', error);
-                        }
-
-                    }
-
-                    this.avatar_url = avatar_url_res.data.temp_url
-                } else {
-                    this.avatar_url = "/static/avatar/" + avatar_name
-                }
-            }
-        },
         toggle_assistant() {
             this.is_open = !this.is_open;
         },

@@ -16,59 +16,63 @@ export default {
                 password: "",
                 confirm_password: "",
                 email: "",
+                code: "",
             }
 
         };
     },
     computed: {
         rules() {
+            const email = [
+                {required: true, message: '请输入邮箱', trigger: 'blur'},
+                {type: 'email', message: '请输入正确的邮箱地址', trigger: ['blur', 'change']}
+            ];
+            const code = [
+                {required: true, message: '请输入验证码', trigger: 'blur'},
+            ];
+            const username = [
+                {required: true, message: '请输入用户名', trigger: 'blur'},
+                {min: 1, max: 15, message: '用户名必须在 1 到 15 个字符之内', trigger: 'blur'}
+            ];
+            const password = [
+                {required: true, message: '请输入密码', trigger: 'blur'},
+                {min: 5, max: 25, message: '密码必须在 5 到 25 个字符之内', trigger: 'blur'}
+            ];
+            const confirm_password = [
+                {
+                    validator: (rule, value, callback) => {
+                        if (this.form.password !== value) {
+                            callback("确认密码和密码不同")
+                        } else {
+                            callback()
+                        }
+                    }
+                },
+                {required: true, message: '请输入确认密码', trigger: 'blur'},
+                {min: 5, max: 25, trigger: 'blur'}
+            ];
+
+            let res;
             if (!this.state.is_login) {
-                return {
-                    email: [
-                        {required: true, message: '请输入邮箱', trigger: 'blur'},
-                        {type: 'email', message: '请输入正确的邮箱地址', trigger: ['blur', 'change']}
-                    ],
-                    username: [
-                        {required: true, message: '请输入用户名', trigger: 'blur'},
-                        {min: 1, max: 15, message: '用户名必须在 1 到 15 个字符之内', trigger: 'blur'}
-                    ],
-                    password: [
-                        {required: true, message: '请输入密码', trigger: 'blur'},
-                        {min: 5, max: 25, message: '密码必须在 5 到 25 个字符之内', trigger: 'blur'}
-                    ],
-                    confirm_password: [
-                        {
-                            validator: (rule, value, callback) => {
-                                if (this.form.password !== value) {
-                                    callback("确认密码和密码不同")
-                                } else {
-                                    callback()
-                                }
-                            }
-                        },
-                        {required: true, message: '请输入确认密码', trigger: 'blur'},
-                        {min: 5, max: 25, trigger: 'blur'}
-                    ]
+                res = {
+                    email,
+                    code,
+                    username,
+                    password,
+                    confirm_password
                 }
             } else if (this.state.is_login && this.state.is_email) {
-                return {
-                    email: [
-                        {required: true, message: '请输入邮箱', trigger: 'blur'},
-                        {type: 'email', message: '请输入正确的邮箱地址', trigger: ['blur', 'change']}
-                    ],
+                res = {
+                    email,
+                    code
                 }
             } else {
-                return {
-                    username: [
-                        {required: true, message: '请输入用户名', trigger: 'blur'},
-                        {min: 1, max: 15, message: '用户名必须在 1 到 15 个字符之内', trigger: 'blur'}
-                    ],
-                    password: [
-                        {required: true, message: '请输入密码', trigger: 'blur'},
-                        {min: 5, max: 25, message: '密码必须在 5 到 25 个字符之内', trigger: 'blur'}
-                    ],
+                res = {
+                    username,
+                    password
                 }
             }
+            return res
         }
     },
     methods: {
@@ -157,31 +161,40 @@ export default {
             <el-form ref="form_ref" :model="form" :rules="rules" label-position="top">
                 <div class="text-[4vh] font-['SYST']">{{ state.is_login === true ? "登录" : "注册" }}</div>
                 <el-form-item v-if="!this.state.is_login || !this.state.is_email"
-                              class="my-[0.5vh] text-[2.5vh] font-['FZSX']"
+                              class="text-[2.5vh] font-['FZSX']"
                               label="用户名："
                               prop="username" @click="console.log(this.state)">
                     <el-input v-model="form.username" style="width: 100%;height:4vh;"/>
                 </el-form-item>
                 <el-form-item v-if="!state.is_login || this.state.is_email"
-                              class="my-[0.5vh] text-[2.5vh] font-['FZSX']"
+                              class="text-[2.5vh] font-['FZSX']"
                               label="邮箱：" prop="email">
                     <el-input v-model="form.email"
                               style="width: 100%;height:4vh"/>
                 </el-form-item>
+                <el-form-item v-if="!state.is_login || this.state.is_email"
+                              class="text-[2.5vh] font-['FZSX']"
+                              label="验证码：" prop="email">
+                    <div class="flex flex-row justify-between">
+                        <el-input v-model="form.email"
+                                  style="width: 55%;height:4vh"/>
+                        <el-button style="width: 40%;height:4vh">获取验证码</el-button>
+                    </div>
+                </el-form-item>
                 <el-form-item v-if="!this.state.is_login || !this.state.is_email"
-                              class="my-[0.5vh] text-[2.5vh] font-['FZSX']"
+                              class="text-[2.5vh] font-['FZSX']"
                               label="密码：" prop="password">
                     <el-input v-model="form.password" style="width: 100%;height:4vh"
                               type="password"/>
                 </el-form-item>
-                <el-form-item v-if="!state.is_login" class="my-[0.5vh] text-[2.5vh] font-['FZSX']"
+                <el-form-item v-if="!state.is_login" class="text-[2.5vh] font-['FZSX']"
                               label="确认密码：" prop="confirm_password">
                     <el-input v-model="form.confirm_password"
                               style="width: 100%;height:4vh"
                               type="password"/>
                 </el-form-item>
                 <el-form-item>
-                    <el-button round style="width: 100%;height: 4vh" type="primary" @click="login">
+                    <el-button round style="width: 100%;height: 4vh; margin-top: 10px" type="primary" @click="login">
                         {{ state.is_login === true ? "登录" : "注册" }}
                     </el-button>
                 </el-form-item>
@@ -199,8 +212,14 @@ export default {
                         <span class="text-[#40A2E3] text-[1.8vh] font-['FZSX']">邮箱登录</span>
                     </div>
                 </div>
-                <div>
-                    <el-image alt="" src="/static/login/QQ登录.png"/>
+                <div class="flex flex-row justify-center">
+                    <div class="my-2">
+                        <span class="text-[2vh] font-['SYST']">第三方登录</span>
+                    </div>
+                </div>
+                <div class="flex flex-row justify-center items-center">
+                    <el-image alt="QQ登录" class="w-[1.8vh] h-[1.8vh]" src="/static/login/QQ登录.png"/>
+                    <span class="text-[1.8vh] font-['FZSX']">QQ登录</span>
                 </div>
             </el-form>
         </div>

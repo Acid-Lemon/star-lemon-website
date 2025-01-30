@@ -5,8 +5,8 @@ import {call_api} from "@/src/utils/cloud";
 import {Plus} from "@element-plus/icons-vue";
 
 import {use_user_info_store} from "../../stores/userInfo";
-
-import axios from 'axios';
+import {get_background} from "@/src/utils/get_background";
+import {get_avatar} from "@/src/utils/get_avatar";
 
 
 export default {
@@ -33,7 +33,8 @@ export default {
         };
     },
     async mounted() {
-        await this.get_avatar_and_background();
+        this.avatar_url = await get_avatar();
+        this.background_url = await get_background();
 
         this.load_avatars();
 
@@ -48,75 +49,6 @@ export default {
         },
     },
     methods: {
-        async get_avatar_and_background() {
-            let avatar_name = this.user_info?.avatar.name;
-            let type = this.user_info?.avatar.type;
-            if (avatar_name) {
-                if (type === "upload") {
-                    let avatar_url_res = await call_api("user/profile/get_upload_avatar_temp_url", {
-                        image_name: avatar_name,
-                    });
-
-                    if (!avatar_url_res.success) {
-                        ElNotification({
-                            title: 'Error',
-                            message: avatar_url_res,
-                            type: 'error',
-                        });
-                        console.log(avatar_url_res);
-                        return;
-                    } else {
-                        try {
-                            const response = await axios.get(avatar_url_res.data.temp_url, {
-                            responseType: 'blob',
-                            headers: {
-                                'Cache-Control': 'max-age=86400', // 缓存24小时
-                            },
-                        });
-                        this.avatar_url = URL.createObjectURL(response.data);
-                        } catch (error) {
-                            console.error('获取头像时出错:', error);
-                        }
-
-                    }
-
-                    this.avatar_url = avatar_url_res.data.temp_url
-                } else {
-                    this.avatar_url = "/static/avatar/" + avatar_name
-                }
-            }
-
-            let background_name = this.user_info?.profile_background_image?.name;
-            if (background_name) {
-                let background_url_res = await call_api("user/profile/get_background_image_temp_url", {
-                    image_name: background_name,
-                });
-
-                if (!background_url_res.success) {
-                    ElNotification({
-                        title: 'Error',
-                        message: background_url_res,
-                        type: 'error',
-                    });
-                    console.log(background_url_res);
-                    return;
-                } else {
-                    try {
-          const response = await axios.get(background_url_res.data.temp_url, {
-            responseType: 'blob',
-            headers: {
-              'Cache-Control': 'max-age=86400', // 缓存24小时
-            },
-          });
-                    this.background_url = URL.createObjectURL(response.data);
-                    } catch (error) {
-                        console.error('获取背景图片时出错:', error);
-                    }
-                }
-
-                this.background_url = background_url_res.data.temp_url
-            }
-        },
         load_avatars() {
             while (this.avatars_nums > 0) {
                 this.avatar_list.push(`/static/avatar/${this.avatars_nums}.jpg`);

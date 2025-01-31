@@ -80,7 +80,7 @@ export default {
         }
     },
     methods: {
-        async login() {
+        async common_login() {
             const valid = await new Promise(resolve => {
                 this.$refs.form_ref.validate((valid) => {
                     resolve(valid)
@@ -189,6 +189,9 @@ export default {
                     }
                 }
             }, 1000)
+        },
+        QQ_login() {
+            window.open('https://graph.qq.com/oauth2.0/authorize?response_type=code&client_id=102645267&redirect_uri=https://star-lemon.top/#/login&state=login', '_blank')
         }
     }
 }
@@ -243,7 +246,8 @@ export default {
                               type="password"/>
                 </el-form-item>
                 <el-form-item>
-                    <el-button round style="width: 100%;height: 4vh; margin-top: 10px" type="primary" @click="login">
+                    <el-button round style="width: 100%;height: 4vh; margin-top: 10px" type="primary"
+                               @click="common_login">
                         {{ state.is_login === true ? "登录" : "注册" }}
                     </el-button>
                 </el-form-item>
@@ -267,8 +271,9 @@ export default {
                     </div>
                 </div>
                 <div class="flex flex-row justify-center items-center">
-                    <el-image alt="QQ登录" class="w-[1.8vh] h-[1.8vh]" src="/static/login/QQ登录.png"/>
-                    <span class="text-[1.8vh] font-['FZSX']">QQ登录</span>
+                    <el-button circle @click="QQ_login">
+                        <el-image alt="QQ登录" class="w-[1.8vh] h-[1.8vh]" src="/static/login/QQ登录.png"/>
+                    </el-button>
                 </div>
             </el-form>
         </div>

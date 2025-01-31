@@ -11,7 +11,7 @@ async function get_background() {
     let background_name = user_info?.profile_background_image?.name;
 
     if (background_name) {
-        let background_url_res = await call_api("user/profile/get_background_image_temp_url", {
+        let background_url_res = await call_api("user/profile/get_upload_background_image_temp_url", {
             image_name: background_name,
         });
 

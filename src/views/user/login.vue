@@ -17,8 +17,12 @@ export default {
                 confirm_password: "",
                 email: "",
                 code: "",
+            },
+            code: {
+                text: "获取验证码",
+                disabled: false,
+                wait_time: 60
             }
-
         };
     },
     computed: {
@@ -95,16 +99,22 @@ export default {
             let loading = ElLoading.service();
 
             let res;
-            if (this.state.is_login && !this.state.is_email) {
-                res = await call_api(`user/login/${this.state.is_login === true ? "login" : "register"}_by_user`, {
-                    username: this.form.username,
-                    password: this.form.password
-                });
-            } else {
-                res = await call_api(`user/login/${this.state.is_login === true ? "login" : "register"}_by_email`, {
+            if (!this.state.is_login) {
+                res = await call_api(`user/login/register_by_email`, {
                     username: this.form.username,
                     password: this.form.password,
                     email: this.form.email,
+                    code: this.form.code
+                });
+            } else if (this.state.is_login && this.state.is_email) {
+                res = await call_api(`user/login/login_by_email`, {
+                    email: this.form.email,
+                    code: this.form.code
+                });
+            } else if (this.state.is_login && !this.state.is_email) {
+                res = await call_api(`user/login/login_by_user`, {
+                    username: this.form.username,
+                    password: this.form.password,
                 });
             }
 
@@ -142,6 +152,43 @@ export default {
 
             // 登录/注册成功后跳转回原页面
             this.$router.back();
+        },
+        async get_email_code() {
+            this.code.disabled = true;
+
+            let res = await call_api(`user/login/send_email_code`, {
+                email: this.form.email,
+                mode: this.state.is_login ? "登录" : "注册"
+            })
+
+            if (!res.success) {
+                ElNotification({
+                    title: 'Error',
+                    type: "error",
+                    message: res,
+                });
+                this.code.disabled = false;
+                return;
+            }
+
+            ElNotification({
+                title: 'Success',
+                type: "success",
+                message: "验证码已发送",
+            })
+
+            let Interval = setInterval(() => {
+                this.code.text = `${this.code.wait_time}s`;
+                this.code.wait_time--;
+                if (this.code.wait_time === 0) {
+                    clearInterval(Interval);
+                    this.code = {
+                        text: "获取验证码",
+                        disabled: false,
+                        wait_time: 60
+                    }
+                }
+            }, 1000)
         }
     }
 }
@@ -166,19 +213,21 @@ export default {
                               prop="username" @click="console.log(this.state)">
                     <el-input v-model="form.username" style="width: 100%;height:4vh;"/>
                 </el-form-item>
-                <el-form-item v-if="!state.is_login || this.state.is_email"
+                <el-form-item v-if="!this.state.is_login || this.state.is_email"
                               class="text-[2.5vh] font-['FZSX']"
                               label="邮箱：" prop="email">
                     <el-input v-model="form.email"
                               style="width: 100%;height:4vh"/>
                 </el-form-item>
-                <el-form-item v-if="!state.is_login || this.state.is_email"
+                <el-form-item v-if="!this.state.is_login || this.state.is_email"
                               class="text-[2.5vh] font-['FZSX']"
-                              label="验证码：" prop="email">
+                              label="验证码：" prop="code">
                     <div class="flex flex-row justify-between">
-                        <el-input v-model="form.email"
+                        <el-input v-model="form.code"
                                   style="width: 55%;height:4vh"/>
-                        <el-button style="width: 40%;height:4vh">获取验证码</el-button>
+                        <el-button :disabled="code.disabled" style="width: 40%;height:4vh" @click="get_email_code">
+                            {{ this.code.text }}
+                        </el-button>
                     </div>
                 </el-form-item>
                 <el-form-item v-if="!this.state.is_login || !this.state.is_email"

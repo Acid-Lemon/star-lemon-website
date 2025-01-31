@@ -57,9 +57,27 @@ export default {
             }
             this.photo_albums = res.data.folders_info;
 
+            for (let i = 0; i < this.photo_albums.length; i++) {
+                this.photo_albums[i].cover = await this.get_album_cover(this.photo_albums[i].id)
+            }
+
             this.has_photo_albums = this.photo_albums.length !== 0;
 
             this.loading = false;
+        },
+        async get_album_cover(folder_id) {
+            let start_time = new Date().getTime();
+            let res = await call_api("album/get_images", {
+                folder_id: folder_id,
+                time_range: {
+                    from_time: start_time,
+                    to_time: 0
+                },
+                image_number: 1,
+                skip_number: 0
+            })
+
+            return res.data.images_info[0].temp_url;
         },
         async create_new_photo_album() {
             let res = await call_api("album/create_folder", {
@@ -118,7 +136,10 @@ export default {
                                         <router-link
                                             :to="'/admin/album/' + photo_album.name + '?album_id=' + photo_album.id">
                                             <div>
-                                                <el-image class="w-full h-[20vh]" fit="cover" src="">
+                                                <el-image
+                                                    :src="photo_album.cover"
+                                                    class="w-full h-[20vh]"
+                                                    fit="cover">
                                                     <template #error>
                                                         <div class="image-slot">
                                                             <el-icon style="width:100%; height:20vh">
@@ -163,7 +184,10 @@ export default {
                                         <router-link
                                             :to="'/admin/album/' + photo_album.name + '?album_id=' + photo_album.id">
                                             <div>
-                                                <el-image class="w-full h-[20vh]" fit="cover" src="">
+                                                <el-image
+                                                    :src="photo_album.cover"
+                                                    class="w-full h-[20vh]"
+                                                    fit="cover">
                                                     <template #error>
                                                         <div class="image-slot">
                                                             <el-icon style="width:100%; height:20vh">
@@ -208,7 +232,10 @@ export default {
                                         <router-link
                                             :to="'/admin/album/' + photo_album.name + '?album_id=' + photo_album.id">
                                             <div>
-                                                <el-image class="w-full h-[20vh]" fit="cover" src="">
+                                                <el-image
+                                                    :src="photo_album.cover"
+                                                    class="w-full h-[20vh]"
+                                                    fit="cover">
                                                     <template #error>
                                                         <div class="image-slot">
                                                             <el-icon style="width:100%; height:20vh">

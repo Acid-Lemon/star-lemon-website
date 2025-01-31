@@ -57,7 +57,8 @@ module.exports = class Service_AI_assistant extends Service {
         let stream = await openai.chat.completions.create({
             messages: message_list,
             model: "deepseek-chat",
-            stream: true
+            stream: true,
+            max_tokens: 1500
         });
 
         for await (const chunk of stream) {

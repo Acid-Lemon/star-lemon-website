@@ -4,6 +4,7 @@
     "@vercel/kv": "^2.0.0",
     "bcryptjs": "^2.4.3",
     "jsonwebtoken": "^9.0.2",
+    "lodash": "^4.17.21",
     "node-fetch": "^3.3.2",
     "nodemailer": "^6.10.0",
     "openai": "^4.80.0",

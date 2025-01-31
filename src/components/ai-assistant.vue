@@ -9,6 +9,8 @@ export default {
             user_input: '',
             message_list: [],
             avatar_url: '',
+            disabled: false,
+            channel: null
         };
     },
     async mounted() {
@@ -25,21 +27,29 @@ export default {
 
             this.message_list.push({'role': 'user', 'content': this.user_input});
             this.user_input = "";
+            this.disabled = true;
 
             // 流式响应，对message的处理
             this.message_list.push({'role': 'assistant', 'content': ''});
 
-            let channel = new uniCloud.SSEChannel();
-            channel.on('message', (message) => {
+            this.channel = new uniCloud.SSEChannel();
+            this.channel.on('message', (message) => {
                 this.message_list[this.message_list.length - 1].content += message;
             });
-            await channel.open();
+            await this.channel.open();
 
             await call_api("AI_assistant/get_answer", {
-                channel,
+                channel: this.channel,
                 message_list: this.message_list.slice(0, -1)
             });
-            await channel.close();
+            await this.channel.close();
+
+            this.disabled = false;
+        },
+        stop_answer() {
+            this.channel.close();
+            this.channel = null;
+            this.disabled = false;
         }
     },
 };
@@ -72,9 +82,17 @@ export default {
                         >
                         </el-input>
                         <el-button
+                            v-if="!disabled"
                             @click="get_answer"
                         >
                             发送
+                        </el-button>
+                        <el-button
+                            v-else
+                            type="danger"
+                            @click="stop_answer"
+                        >
+                            停止
                         </el-button>
                     </div>
                 </div>

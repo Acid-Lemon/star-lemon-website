@@ -220,7 +220,7 @@ export default {
     },
     async mounted() {
         await this.get_sentences();
-        await this.get_messages();
+        await this.get_message_list();
         this.avatar = await this.get_avatar_url(this.user_info?.avatar?.type, this.user_info?.avatar?.name);
     },
     computed: {
@@ -277,12 +277,12 @@ export default {
                 })
             }));
         },
-        async get_messages() {
+        async get_message_list() {
             this.loading_more = true;
             this.pages += 1;
             let start_time = new Date().getTime();
             let skip_number = 0;
-            if (this.pages !== 1) {
+            if (this.pages > 1) {
                 start_time = this.message_list[this.message_list.length - 1].create_at;
                 skip_number = this.skip_number();
             }
@@ -554,8 +554,8 @@ export default {
                         <span class="text-[2vh] mb-[1vh] mx-[2vh] font-['FZSX']">{{ message_list.length }}条评论</span>
                     </div>
                 </div>
-                <div v-infinite-scroll="get_messages" :infinite-scroll-disabled="state"
-                     class="h-full w-full flex flex-col items-center"
+                <div v-infinite-scroll="get_message_list"
+                     :infinite-scroll-disabled="state" class="h-full w-full flex flex-col items-center"
                      infinite-scroll-delay=1000
                      infinite-scroll-distance=100>
                     <div v-for="message in message_list" :key="message.id"

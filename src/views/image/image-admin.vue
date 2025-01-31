@@ -5,7 +5,8 @@ import {call_api} from "@/src/utils/cloud";
 import AdminView from "@/src/components/admin.vue";
 
 export default {
-    name: "ImageAdminView",
+    name: "image-admin",
+    inheritAttrs: false,
     components: {AdminView, ElAutoResizer, UploadFilled, ArrowLeft},
     data() {
         return {
@@ -191,9 +192,9 @@ export default {
 
 <template>
     <admin-view>
-        <div class="w-full h-full bg-[#F8FAFD] flex flex-col content-center items-center">
+        <div class="w-full h-[95vh] bg-[#F8FAFD] flex flex-col content-center items-center">
             <div
-                class="bg-[url('/static/background/17.jpg')] bg-cover rounded-md w-[90vw] h-[15vh] flex flex-col items-start justify-between mt-[20px] p-[20px]">
+                class="bg-[url('/static/background/17.jpg')] bg-cover rounded-md w-[95%] h-[15vh] flex flex-col items-start justify-between mt-[20px] p-[20px]">
                 <div class="w-full flex flex-row justify-between items-center">
                     <div class="flex flex-row justify-center items-center">
                         <div>图片名称：</div>

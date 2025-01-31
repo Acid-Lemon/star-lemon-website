@@ -7,7 +7,8 @@ import {truncate_text} from "@/src/utils/truncate_text";
 import AdminView from "@/src/components/admin.vue";
 
 export default {
-    name: 'ArticleView',
+    name: 'article-admin',
+    inheritAttrs: false,
     components: {AdminView},
     data() {
         return {
@@ -19,17 +20,17 @@ export default {
         }
     },
     async mounted() {
-        await this.get_articles();
+        await this.get_article_list();
     },
     methods: {
         truncate_text,
-        async get_articles() {
+        async get_article_list() {
             this.loading = true;
 
             this.pages += 1;
             let start_time = new Date().getTime();
             let skip_number = 0;
-            if (this.pages !== 1) {
+            if (this.pages > 1) {
                 start_time = this.article_list[this.pages - 2][this.article_list[this.pages - 2].length - 1].create_at;
                 skip_number = this.skip_number()
             }
@@ -82,6 +83,13 @@ export default {
                 })
             }));
         },
+        skip_number() {
+            let index = 1;
+            while (this.article_list[this.pages - 2][this.article_list[this.pages - 2].length - index].create_at === this.article_list[this.pages - 2][this.article_list[this.pages - 2].length - index - 1].create_at) {
+                index += 1;
+            }
+            return index;
+        },
         async change_article_public_state(id, article_id, public_state) {
             console.log(public_state);
             let res = await call_api("article/change_article_public_state", {
@@ -132,24 +140,17 @@ export default {
             this.article_list = [];
             this.pages = 0;
             this.current_page = 1;
-            this.get_articles();
+            this.get_article_list();
         },
         async change() {
             if (this.pages + 1 === this.current_page) {
-                await this.get_articles()
+                await this.get_article_list()
             }
 
         },
         page_count() {
             return this.article_list[this.pages - 1]?.length === 20 ? this.pages + 1 : this.pages
-        },
-        skip_number() {
-            let index = 1;
-            while (this.article_list[this.pages - 2][this.article_list[this.pages - 2].length - index].create_at === this.article_list[this.pages - 2][this.article_list[this.pages - 2].length - index - 1].create_at) {
-                index += 1;
-            }
-            return index;
-        },
+        }
     },
 }
 </script>

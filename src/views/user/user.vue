@@ -94,20 +94,20 @@ export default {
                     image_type: split_avatar_name[split_avatar_name.length - 1],
                 });
 
-                if (avatar_res.success) {
-                    ElNotification({
-                        title: 'Success',
-                        message: "修改头像成功",
-                        type: 'success',
-                    })
-                } else {
+                if (!avatar_res.success) {
                     ElNotification({
                         title: 'Error',
                         message: avatar_res,
                         type: 'error',
                     });
                     return;
+
                 }
+                ElNotification({
+                    title: 'Success',
+                    message: "修改头像成功",
+                    type: 'success',
+                })
 
                 this.avatar_upload_url = avatar_res.data.upload_options.url;
                 this.avatar_data = avatar_res.data.upload_options.formData;
@@ -121,7 +121,7 @@ export default {
                     image_name: split_avatar_path[split_avatar_path.length - 1]
                 });
 
-                if (avatar_res.success === false) {
+                if (!avatar_res.success) {
                     ElNotification({
                         title: 'Error',
                         message: avatar_res,
@@ -129,6 +129,12 @@ export default {
                     });
                     return;
                 }
+
+                ElNotification({
+                    title: 'Success',
+                    message: "修改头像成功",
+                    type: 'success',
+                })
             }
 
             if (this.background[0]) {
@@ -138,20 +144,20 @@ export default {
                     image_type: split_background_name[split_background_name.length - 1],
                 });
 
-                if (background_res.success) {
-                    ElNotification({
-                        title: 'Success',
-                        message: "修改背景成功",
-                        type: 'success',
-                    })
-                } else {
+                if (!background_res.success) {
                     ElNotification({
                         title: 'Error',
                         message: background_res,
                         type: 'error',
                     });
                     return;
+
                 }
+                ElNotification({
+                    title: 'Success',
+                    message: "修改背景成功",
+                    type: 'success',
+                })
 
                 this.background_upload_url = background_res.data.upload_options.url;
                 this.background_data = background_res.data.upload_options.formData;
@@ -166,14 +172,8 @@ export default {
                     birthday: this.birthday,
                     personal_sign: this.personal_sign
                 });
+
                 if (!basic_info_res.success) {
-                    ElNotification({
-                        title: 'Success',
-                        message: "修改基本信息成功",
-                        type: 'success',
-                    });
-                    return;
-                } else {
                     ElNotification({
                         title: 'Error',
                         message: basic_info_res,
@@ -181,6 +181,12 @@ export default {
                     });
                     return;
                 }
+                
+                ElNotification({
+                    title: 'Success',
+                    message: "修改基本信息成功",
+                    type: 'success',
+                })
             }
 
             localStorage.removeItem("user");
@@ -225,15 +231,12 @@ export default {
         </div>
     </div>
     <el-dialog v-model="dialog_visible" :before-close="handle_close" align-center
-               class="flex flex-col items-center justify-center el-overlay-dialog"
-               style="padding: 10px;height: 55vh; width:65vw"
+               style="padding: 10px;height: 28vw; width:60vw; display: flex; flex-direction: column; justify-content: center; align-items: center;"
                v-bind="$attrs">
-        <template #header>
-            <div class="text-[2vh] font-['SYST']">编辑个人信息</div>
-        </template>
-        <div class="w-full h-[35vh]">
-            <div class="w-full h-[25vh] flex flex-row items-center justify-center">
-                <div class="w-[20vh] my-[5px]">
+        <div class="w-full mb-[1vw] text-center text-[1.5vw] font-['SYST']">编辑个人信息</div>
+        <div class="w-full h-[16vw] flex flex-col items-center justify-center">
+            <div class="flex flex-row">
+                <div class="w-[8vw] m-[1vw]">
                     <span>头像：</span>
                     <el-upload
                         ref=avatar
@@ -244,17 +247,18 @@ export default {
                         :disabled=is_disabled
                         :show-file-list=false
                         list-type="picture"
-                        style="width: 15vh;height: 15vh;border: 1px dashed var(--el-border-color);border-radius: 6px;cursor: pointer;position: relative;overflow: hidden;transition: var(--el-transition-duration-fast);"
+                        style="width: 8vw;height: 8vw; border: 1px dashed var(--el-border-color); border-radius: 6px; cursor: pointer; position: relative;overflow: hidden; transition: var(--el-transition-duration-fast);"
                     >
                         <el-image v-if="avatar.length !== 0" :src="avatar[0].url" alt="avatar"
-                                  class="w-[15vh] h-[15vh]"/>
+                                  class="w-full h-full"/>
                         <el-icon v-else
-                                 style="width: 15vh;height: 15vh;font-size: 28px;color: #8c939d;text-align: center;">
+                                 :class="['transition-transform duration-300 ease-in-out', this.is_disabled ? 'rotate-45' : '']"
+                                 style="width: 8vw;height: 8vw;font-size: 28px;color: #8c939d;text-align: center;">
                             <Plus/>
                         </el-icon>
                     </el-upload>
                 </div>
-                <div class="w-[35vh] my-[5px]">
+                <div class="w-[16vw] m-[1vw]">
                     <span @click="this.background">个人背景：</span>
                     <el-upload
                         ref=background
@@ -264,18 +268,19 @@ export default {
                         :data=background_data
                         :show-file-list=false
                         list-type="picture"
-                        style="width: 30vh;height: 15vh;border: 1px dashed var(--el-border-color);border-radius: 6px;cursor: pointer;position: relative;overflow: hidden;transition: var(--el-transition-duration-fast);"
+                        style="width: 16vw; height: 8vw; border: 1px dashed var(--el-border-color);border-radius: 6px;cursor: pointer;position: relative;overflow: hidden;transition: var(--el-transition-duration-fast);"
                     >
                         <el-image v-if="background.length !== 0" :src="background[0].url" alt="background"
-                                  class="w-[30vh] h-[15vh]"/>
+                                  class="w-[16vw] h-[8vw]"/>
                         <el-icon v-else
-                                 style="width: 30vh;height: 15vh;font-size: 28px;color: #8c939d;text-align: center;">
+                                 style="width: 16vw;height: 8vw;font-size: 28px;color: #8c939d;text-align: center;">
                             <Plus/>
                         </el-icon>
                     </el-upload>
                 </div>
-                <div class="w-[50vh] my-[5px]">
-                    <el-scrollbar height="250px">
+                <div class="w-[25vw] m-[1vw]">
+                    <div>默认头像：</div>
+                    <el-scrollbar style="width: 100%; height: 8vw">
                         <div class="grid gap-x-4 gap-y-[20px] grid-cols-4 auto-rows-auto w-full h-full">
                             <div v-for="(avatar,index) in avatar_list" :key="avatar"
                                  :class="{'border-[2px] border-[#08d9d6]':click_flag === index}"
@@ -287,36 +292,31 @@ export default {
                     </el-scrollbar>
                 </div>
             </div>
-            <div class="w-full h-[10vh] flex flex-row items-center justify-between">
-                <div class="w-[15vh] my-[5px]">
+            <div class="flex flex-row">
+                <div class="w-[10vw] m-[1vw]">
                     <span>用户名：</span>
                     <el-input v-model="name" class="w-full"/>
                 </div>
-                <div class="w-[15vh] my-[5px]">
+                <div class="w-[10vw] m-[1vw]">
                     <span>生日：</span>
                     <el-date-picker v-model="birthday" size="default" style="width: 100%" type="date"
                                     value-format="YYYY年MM月DD日"/>
                 </div>
-                <div class="w-[60vh] my-[5px]">
+                <div class="w-[30vw] m-[1vw]">
                     <span>个性签名：</span>
                     <el-input v-model="personal_sign" class="w-full"/>
                 </div>
             </div>
         </div>
-        <template #footer>
-            <div class="flex flex-row justify-end items-end">
-                <el-button class="mx-[40px]" @click="dialog_visible = false">取消</el-button>
-                <el-button v-loading.fullscreen.lock="loading" class="mx-[40px]" type="primary"
-                           @click="update_info()">
-                    确定
-                </el-button>
-            </div>
-        </template>
+        <div class="w-full flex flex-row justify-end items-center m-[1vw] pr-[1vw]">
+            <el-button class="mx-[1vw]" @click="dialog_visible = false">取消</el-button>
+            <el-button v-loading.fullscreen.lock="loading" class="mx-[1vw]" type="primary"
+                       @click="update_info()">
+                确定
+            </el-button>
+        </div>
     </el-dialog>
 </template>
 
 <style scoped>
-.el-overlay-dialog {
-    overflow: hidden !important;
-}
 </style>

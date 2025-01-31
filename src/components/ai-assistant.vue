@@ -57,7 +57,7 @@ export default {
                             {{ message.role === 'user' ? "user" : "AI" }}
                         </el-avatar>
                         <div
-                            :class="['ml-4 mb-4 p-2 rounded-lg w-[90%] min-h-10',message.role === 'user' ? 'bg-blue-100 text-blue-800' : 'bg-gray-100 text-gray-800']">
+                            :class="['ml-4 mb-4 p-2 rounded-lg w-[90%] min-h-10 select-text',message.role === 'user' ? 'bg-blue-100 text-blue-800' : 'bg-gray-100 text-gray-800']">
                             {{ message.content }}
                         </div>
                     </div>

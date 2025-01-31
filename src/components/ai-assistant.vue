@@ -29,7 +29,7 @@ export default {
             // 流式响应，对message的处理
             this.message_list.push({'role': 'assistant', 'content': ''});
 
-            const channel = new uniCloud.SSEChannel();
+            let channel = new uniCloud.SSEChannel();
             channel.on('message', (message) => {
                 this.message_list[this.message_list.length - 1].content += message;
             });
@@ -39,6 +39,7 @@ export default {
                 channel,
                 message_list: this.message_list.slice(0, -1)
             });
+            await channel.close();
         }
     },
 };

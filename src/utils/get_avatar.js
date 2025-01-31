@@ -8,8 +8,8 @@ async function get_avatar() {
 
     const user_info_store = use_user_info_store();
     const user_info = user_info_store.user_info;
-    let avatar_name = user_info?.avatar.name;
-    let type = user_info?.avatar.type;
+    let avatar_name = user_info?.avatar?.name;
+    let type = user_info?.avatar?.type;
     if (avatar_name) {
         if (type === "upload") {
             let avatar_url_res = await call_api("user/profile/get_upload_avatar_temp_url", {

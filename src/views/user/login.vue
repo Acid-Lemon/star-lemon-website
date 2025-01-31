@@ -149,7 +149,6 @@ export default {
                     message: "注册成功",
                 })
             }
-
             // 登录/注册成功后跳转回原页面
             this.$router.back();
         },

@@ -36,9 +36,6 @@ child_process.exec(
     })
 
 export default defineConfig({
-  server: {
-      port: 8000 // 修改为其他未被占用的端口
-    },
     plugins: [
         uni(),
         AutoImport({
@@ -51,15 +48,6 @@ export default defineConfig({
         terser(),
     ],
     build: {
-        rollupOptions: {
-            manualChunks: (id) => {
-                if (id.includes('node_modules/vue')) {
-                    return 'vue-vendor';
-                } else if (id.includes('node_modules')) {
-                    return 'other-vendor';
-                }
-            }
-        },
         minify: "terser",
         terserOptions: {
             compress: {

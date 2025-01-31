@@ -5,6 +5,8 @@ import {date_format} from "@/src/utils/time";
 import AdminView from "@/src/components/admin.vue";
 
 export default {
+    name: "comment-admin",
+    inheritAttrs: false,
     components: {AdminView},
     data() {
         return {
@@ -16,16 +18,16 @@ export default {
         }
     },
     async mounted() {
-        await this.get_messages();
+        await this.get_message_list();
     },
     methods: {
-        async get_messages() {
+        async get_message_list() {
             this.loading = true;
 
             this.pages += 1;
             let start_time = new Date().getTime();
             let skip_number = 0;
-            if (this.pages !== 1) {
+            if (this.pages > 1) {
                 start_time = this.message_list[this.pages - 2][this.message_list[this.pages - 2].length - 1].create_at;
                 skip_number = this.skip_number()
             }
@@ -68,7 +70,9 @@ export default {
 
             return await Promise.all(messages.map((message) => {
                 return new Promise((resolve) => {
-                    message.user.avatar_filename = message.user.avatar + ".jpg"
+                    if (message?.user) {
+                        message.user.avatar_filename = message.user.avatar + ".jpg"
+                    }
                     message.create_at_format_str = date_format(new Date(message.create_at));
                     resolve(message);
                 })
@@ -124,11 +128,11 @@ export default {
             this.message_list = [];
             this.pages = 0;
             this.current_page = 1;
-            this.get_messages();
+            this.get_message_list();
         },
         async change() {
             if (this.pages + 1 === this.current_page) {
-                await this.get_messages()
+                await this.get_message_list()
             }
 
         },

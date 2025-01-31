@@ -7,6 +7,8 @@ import {ArrowRight, CaretBottom, CaretTop, Warning} from "@element-plus/icons-vu
 import AdminView from "@/src/components/admin.vue";
 
 export default {
+    name: "index-admin",
+    inheritAttrs: false,
     components: {
         AdminView,
         ArrowRight,

@@ -7,7 +7,8 @@ import article from "@/src/views/article/article.vue";
 import {call_api} from "@/src/utils/cloud";
 
 export default {
-    name: 'ArticleAdminView',
+    name: "write-admin",
+    inheritAttrs: false,
     computed: {
         article() {
             return article

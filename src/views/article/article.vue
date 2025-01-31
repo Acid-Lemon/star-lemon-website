@@ -11,34 +11,38 @@ export default {
         return {
             pages: 0,
             article_list: [],
-            loading: false
+            loading_more: false,
+            has_more: true,
         }
     },
     async mounted() {
-        await this.get_articles();
+        await this.get_article_list();
     },
     watch: {
-        '$route.query.type': {
-            handler() {
-                this.pages = 0;
-                this.article_list = [];
-                this.get_articles();
-            },
-            immediate: true
+        '$route.query.type'() {
+            this.pages = 0;
+            this.article_list = [];
+            this.has_more = true;
+            this.get_article_list();
         }
+    },
+    computed: {
+        state() {
+            return !this.has_more || this.loading_more
+        },
     },
     methods: {
         truncate_text,
-        async get_articles() {
-            this.loading = true;
+        async get_article_list() {
+            this.loading_more = true;
+
             this.pages += 1;
             let start_time = new Date().getTime();
             let skip_number = 0;
-            if (this.pages !== 1) {
+            if (this.pages > 1) {
                 start_time = this.article_list[this.article_list.length - 1].create_at;
                 skip_number = this.skip_number();
             }
-
             let res = await call_api("article/get_personal_and_public_articles", {
                 time_range: {
                     from_time: start_time,
@@ -46,25 +50,30 @@ export default {
                 },
                 article_number: 20,
                 skip_number,
-                type: this.$route.query.type || "all",
             });
 
             if (!res.success) {
-                ElNotification({
-                    title: 'Error',
-                    message: '获取文章失败',
-                    type: 'error',
-                });
+                if (res.code === "err_no_token") {
+                    ElNotification({
+                        title: 'Error',
+                        message: '请检查您的登陆状态',
+                        type: 'error',
+                    })
+                } else {
+                    ElNotification({
+                        title: 'Error',
+                        message: '获取文章失败',
+                        type: 'error',
+                    });
+                }
                 this.pages -= 1;
-                this.loading_more = false;
                 return;
             }
 
             this.article_list = this.article_list.concat(await this.articles_format(res.data.articles));
 
-            console.log(this.article_list)
-
-            this.loading = false;
+            this.loading_more = false;
+            this.has_more = res.data.articles.length === 20;
         },
         async articles_format(articles) {
             if (!articles) {
@@ -82,12 +91,19 @@ export default {
                 })
             }));
         },
+        skip_number() {
+            let index = 1;
+            while (this.article_list[this.article_list.length - index].create_at === this.article_list[this.article_list.length - index - 1].create_at) {
+                index += 1;
+            }
+            return index;
+        },
     },
 }
 </script>
 
 <template>
-    <el-scrollbar class="h-full w-full bg-[#F8FAFD]">
+    <el-scrollbar>
         <div class="w-full h-full flex flex-col items-center justify-start">
             <div
                 class="w-full md:min-h-[40vh] min-h-[30vh] bg-[url('/static/background/13.jpg')] flex flex-row justify-center items-center bg-center bg-cover">
@@ -95,10 +111,12 @@ export default {
                     文章
                 </p>
             </div>
-            <div v-loading="loading"
-                 class="w-full md:min-h-[60vh] min-h-[70vh] flex flex-col items-center justify-start">
+            <div class="w-full md:min-h-[60vh] min-h-[70vh] flex flex-col items-center justify-start">
                 <div
-                    class="md:w-[70vw] w-[90vw] h-auto bg-[#FFFFFF] shadow-md mt-[20px]">
+                    v-infinite-scroll="get_article_list"
+                    :infinite-scroll-disabled="state"
+                    class="md:w-[70vw] w-[90vw] h-auto bg-[#FFFFFF] shadow-md mt-[20px]"
+                    infinite-scroll-delay=1000 infinite-scroll-distance=100>
                     <div v-for="article in article_list">
                         <router-link :to="'/article/read' + '?article_id=' + article.id">
                             <div class="w-full h-auto px-[20px] py-[20px] border-b border-[#000000]">
@@ -145,7 +163,8 @@ export default {
                     </div>
                 </div>
                 <div class="md:w-[70vw] w-[90vw] h-[100px] flex flex-row items-center justify-center">
-                    <div v-if="this.loading === false && this.article_list.length > 0"
+                    <div v-if="loading_more" class="text-[3vh] font-['RGBZ']">正在加载中</div>
+                    <div v-if="!this.has_more"
                          class="text-[3vh] font-['RGBZ']">没有更多文章惹
                     </div>
                 </div>

@@ -58,7 +58,8 @@ module.exports = class Controller_User_Login extends Controller {
 		await this.service.db.email_code.delete_code_by_id(code_record.id);
 
 		return {
-			data: user
+			data: user,
+			token: this.service.user.login.create_token(user)
 		};
 	}
 

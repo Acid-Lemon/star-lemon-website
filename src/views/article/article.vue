@@ -53,19 +53,11 @@ export default {
             });
 
             if (!res.success) {
-                if (res.code === "err_no_token") {
-                    ElNotification({
-                        title: 'Error',
-                        message: '请检查您的登陆状态',
-                        type: 'error',
-                    })
-                } else {
-                    ElNotification({
-                        title: 'Error',
-                        message: '获取文章失败',
-                        type: 'error',
-                    });
-                }
+                ElNotification({
+                    title: 'Error',
+                    message: '获取文章失败',
+                    type: 'error',
+                });
                 this.pages -= 1;
                 return;
             }

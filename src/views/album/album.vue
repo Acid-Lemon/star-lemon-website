@@ -49,8 +49,8 @@ export default {
                     type: "error",
                     message: `获取相册失败`
                 });
-                console.log(res);
-
+                console.error(res);
+                this.loading = false;
                 return;
             }
             this.photo_albums = res.data.folders_info;

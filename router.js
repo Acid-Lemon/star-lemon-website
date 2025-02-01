@@ -1,4 +1,5 @@
 import {createRouter, createWebHashHistory} from "vue-router";
+import {use_user_info_store} from "@/src/stores/userInfo";
 
 const router = createRouter({
     history: createWebHashHistory(import.meta.env.BASE_URL),
@@ -253,12 +254,32 @@ const router = createRouter({
 });
 
 
-router.beforeEach((to, from) => {//beforeEach是router的钩子函数，在进入路由前执行
+router.beforeEach((to, from, next) => {
+    const user_info_store = use_user_info_store();
+    const user_info = user_info_store.user_info;
+
+    const to_user = to.path === '/user'
+    const to_admin = to.matched.some(record => record.path === '/admin')
+
+    if (!user_info) {
+        if (to_user || to_admin) {
+            next('/login');
+            return;
+        }
+    } else {
+        if (to_admin && this.user_info?.role !== 'admin') {
+            next('/user');
+            return;
+        }
+    }
+
     if (to.meta?.title) {
-        document.title = to.meta.title + "|star和lemon的小站"
+        document.title = to.meta.title + " | star和lemon的小站"
     } else {
         document.title = "star和lemon的小站"
     }
+
+    next()
 });
 
 

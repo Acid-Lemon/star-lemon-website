@@ -139,7 +139,7 @@ module.exports = class Controller_MessageBoard extends Controller {
                 data: res
             }
         } else {
-            this.throw(codes.err_no_permissions, "No permission to delete message");
+            this.throw(codes.err_permission_denied, "No permission to delete message");
         }
     }
 
@@ -161,7 +161,7 @@ module.exports = class Controller_MessageBoard extends Controller {
         });
 
         if (!await this.service.message_board.check_permissions("change_message_public_state")) {
-            this.throw(codes.err_no_permissions, "No permission to change public state");
+            this.throw(codes.err_permission_denied, "No permission to change public state");
         }
 
         let res = await this.service.message_board.change_message_public_state(message_id, public_state);

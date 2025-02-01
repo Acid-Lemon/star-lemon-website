@@ -137,7 +137,7 @@ module.exports = class Controller_Article extends Controller {
         });
 
         if (!await this.service.article.check_permissions("change_article_public_state")) {
-            this.throw(codes.err_no_permissions, "No permission to change public state");
+            this.throw(codes.err_permission_denied, "No permission to change public state");
         }
 
         let res = await this.service.article.change_article_public_state(article_id, public_state);
@@ -165,7 +165,7 @@ module.exports = class Controller_Article extends Controller {
                 data: res
             }
         } else {
-            this.throw(codes.err_no_permissions, "No permission to delete article");
+            this.throw(codes.err_permission_denied, "No permission to delete article");
         }
     }
 }

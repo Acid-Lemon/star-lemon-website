@@ -209,6 +209,19 @@ export default {
                                 <template #default="scope">
                                     <el-button
                                         size="small"
+                                        type="primary"
+                                        @click="change_message_public_state(scope.$index, scope.row.id, true)"
+                                    >
+                                        公开
+                                    </el-button>
+                                    <el-button
+                                        size="small"
+                                        @click="change_message_public_state(scope.$index, scope.row.id, false)"
+                                    >
+                                        私有
+                                    </el-button>
+                                    <el-button
+                                        size="small"
                                         type="danger"
                                         @click="delete_message(scope.row.id)"
                                     >

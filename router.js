@@ -267,7 +267,7 @@ router.beforeEach((to, from, next) => {
             return;
         }
     } else {
-        if (to_admin && this.user_info?.role !== 'admin') {
+        if (to_admin && user_info?.role !== 'admin') {
             next('/user');
             return;
         }

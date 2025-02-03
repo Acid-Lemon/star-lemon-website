@@ -254,7 +254,7 @@ const router = createRouter({
 
 
 router.beforeEach((to, from, next) => {
-    const user_info = JSON.parse(localStorage.getItem('user')).data;
+    const user_info = JSON.parse(localStorage.getItem('user'))?.data;
 
     const to_user = to.path === '/user'
     const to_admin = to.matched.some(record => record.path === '/admin')

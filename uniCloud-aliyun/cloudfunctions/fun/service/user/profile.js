@@ -83,7 +83,7 @@ module.exports = class Service_User_Info extends Service {
                     this.throw(errors.codes.rate_limit, "距离上次更改背景图不足一天");
                 }
 
-                await this.service.cloud_storage.profile.delete_background_image(user_avatar.name);
+                await this.service.cloud_storage.profile.delete_background_image(background_image.name);
             }
 
             await this.service.db.user.update_user(this.ctx.auth.user_id, {

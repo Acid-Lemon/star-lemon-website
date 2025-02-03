@@ -2,7 +2,7 @@
 import {ElMessageBox, ElNotification} from "element-plus";
 import {load_user} from "../../utils/user_info";
 import {call_api} from "@/src/utils/cloud";
-import {Plus} from "@element-plus/icons-vue";
+import {Delete, Plus} from "@element-plus/icons-vue";
 
 import {use_user_info_store} from "../../stores/userInfo";
 import {get_background} from "@/src/utils/get_background";
@@ -10,7 +10,7 @@ import {get_avatar} from "@/src/utils/get_avatar";
 
 
 export default {
-    components: {Plus},
+    components: {Delete, Plus},
     data() {
         return {
             avatar_url: "",
@@ -24,7 +24,6 @@ export default {
             avatar_list: [],
             avatars_nums: 46,
             click_flag: -1,
-            is_disabled: false,
             loading: false,
             avatar_upload_url: "",
             avatar_data: {},
@@ -47,6 +46,9 @@ export default {
             const user_info_store = use_user_info_store();
             return user_info_store.user_info;
         },
+        disabled() {
+            return this.avatar.length !== 0 || this.click_flag !== -1
+        }
     },
     methods: {
         load_avatars() {
@@ -68,11 +70,9 @@ export default {
         },
         choose(index) {
             if (this.click_flag !== index) {
-                this.is_disabled = true;
                 this.avatar = [];
                 this.click_flag = index;
             } else {
-                this.is_disabled = false;
                 this.click_flag = -1;
             }
         },
@@ -95,13 +95,8 @@ export default {
                 });
 
                 if (!avatar_res.success) {
-                    ElNotification({
-                        title: 'Error',
-                        message: avatar_res,
-                        type: 'error',
-                    });
+                    this.loading = false;
                     return;
-
                 }
                 ElNotification({
                     title: 'Success',
@@ -122,11 +117,7 @@ export default {
                 });
 
                 if (!avatar_res.success) {
-                    ElNotification({
-                        title: 'Error',
-                        message: avatar_res,
-                        type: 'error',
-                    });
+                    this.loading = false;
                     return;
                 }
 
@@ -145,14 +136,10 @@ export default {
                 });
 
                 if (!background_res.success) {
-                    ElNotification({
-                        title: 'Error',
-                        message: background_res,
-                        type: 'error',
-                    });
+                    this.loading = false;
                     return;
-
                 }
+
                 ElNotification({
                     title: 'Success',
                     message: "修改背景成功",
@@ -174,14 +161,10 @@ export default {
                 });
 
                 if (!basic_info_res.success) {
-                    ElNotification({
-                        title: 'Error',
-                        message: basic_info_res,
-                        type: 'error',
-                    });
+                    this.loading = false;
                     return;
                 }
-                
+
                 ElNotification({
                     title: 'Success',
                     message: "修改基本信息成功",
@@ -244,18 +227,26 @@ export default {
                         :action=avatar_upload_url
                         :auto-upload=false
                         :data=avatar_data
-                        :disabled=is_disabled
+                        :disabled=disabled
                         :show-file-list=false
                         list-type="picture"
+                        on-remove="handleRemove"
                         style="width: 8vw;height: 8vw; border: 1px dashed var(--el-border-color); border-radius: 6px; cursor: pointer; position: relative;overflow: hidden; transition: var(--el-transition-duration-fast);"
                     >
                         <el-image v-if="avatar.length !== 0" :src="avatar[0].url" alt="avatar"
                                   class="w-full h-full"/>
                         <el-icon v-else
-                                 :class="['transition-transform duration-300 ease-in-out', this.is_disabled ? 'rotate-45' : '']"
+                                 :class="['transition-transform duration-300 ease-in-out', disabled ? 'rotate-45' : '']"
                                  style="width: 8vw;height: 8vw;font-size: 28px;color: #8c939d;text-align: center;">
                             <Plus/>
                         </el-icon>
+                        <div v-if="avatar.length !== 0"
+                             class="w-full h-full absolute bg-black hover:bg-opacity-50 bg-opacity-0 hover:opacity-100 opacity-0 transform duration-300">
+                            <el-icon style="width: 8vw;height: 8vw;font-size: 28px;color: #8c939d;text-align: center;"
+                                     @click="this.avatar = []">
+                                <Delete/>
+                            </el-icon>
+                        </div>
                     </el-upload>
                 </div>
                 <div class="w-[16vw] m-[1vw]">
@@ -276,12 +267,21 @@ export default {
                                  style="width: 16vw;height: 8vw;font-size: 28px;color: #8c939d;text-align: center;">
                             <Plus/>
                         </el-icon>
+                        <div v-if="background.length !== 0"
+                             class="w-full h-full absolute bg-black hover:bg-opacity-50 bg-opacity-0 hover:opacity-100 opacity-0 transform duration-300">
+                            <el-icon
+                                style="width: 16vw;height: 8vw;font-size: 28px;color: #8c939d;text-align: center;"
+                                @click="this.background = []">
+                                <Delete/>
+                            </el-icon>
+                        </div>
                     </el-upload>
                 </div>
                 <div class="w-[25vw] m-[1vw]">
                     <div>默认头像：</div>
                     <el-scrollbar style="width: 100%; height: 8vw">
-                        <div class="grid gap-x-4 gap-y-[20px] grid-cols-4 auto-rows-auto w-full h-full">
+                        <div
+                            :class="['w-full h-full grid gap-x-4 gap-y-[20px] grid-cols-4 auto-rows-auto', this.avatar.length !== 0 ? 'pointer-events-none opacity-50' : 'pointer-events-auto opacity-100']">
                             <div v-for="(avatar,index) in avatar_list" :key="avatar"
                                  :class="{'border-[2px] border-[#08d9d6]':click_flag === index}"
                                  class="w-full shadow-md"
@@ -290,6 +290,8 @@ export default {
                             </div>
                         </div>
                     </el-scrollbar>
+
+
                 </div>
             </div>
             <div class="flex flex-row">

@@ -44,7 +44,7 @@ export default {
             ];
             const confirm_password = [
                 {
-                    validator: (rule, value, callback) => {
+                    validator: (_rule, value, callback) => {
                         if (this.form.password !== value) {
                             callback("确认密码和密码不同")
                         } else {
@@ -56,7 +56,7 @@ export default {
                 {min: 5, max: 25, trigger: 'blur'}
             ];
 
-            let res;
+            let res = null;
             if (!this.state.is_login) {
                 res = {
                     email,

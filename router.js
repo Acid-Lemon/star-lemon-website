@@ -1,5 +1,4 @@
 import {createRouter, createWebHashHistory} from "vue-router";
-import {use_user_info_store} from "@/src/stores/userInfo";
 
 const router = createRouter({
     history: createWebHashHistory(import.meta.env.BASE_URL),
@@ -255,8 +254,7 @@ const router = createRouter({
 
 
 router.beforeEach((to, from, next) => {
-    const user_info_store = use_user_info_store();
-    const user_info = user_info_store.user_info;
+    const user_info = JSON.parse(localStorage.getItem('user'))?.data;
 
     const to_user = to.path === '/user'
     const to_admin = to.matched.some(record => record.path === '/admin')
@@ -267,7 +265,7 @@ router.beforeEach((to, from, next) => {
             return;
         }
     } else {
-        if (to_admin && this.user_info?.role !== 'admin') {
+        if (to_admin && user_info?.role !== 'admin') {
             next('/user');
             return;
         }

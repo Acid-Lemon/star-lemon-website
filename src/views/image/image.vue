@@ -246,10 +246,7 @@ export default {
                                               class="text-[14px] text-[#dd5a00]">{{ split_content.words }}</span>
                                     </div>
                                 </div>
-                                <div v-if="search_content===''" class="text-[14px]">图片名：{{ image.name }}</div>
-                            </div>
-                            <div class="px-[10px] py-[2px]">
-                                <span class="text-[14px]">图片id：{{ image.id }}</span>
+                                <div v-else class="text-[14px]">图片名：{{ image.name }}</div>
                             </div>
                         </div>
                     </div>

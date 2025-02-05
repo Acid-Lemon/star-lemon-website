@@ -1,6 +1,6 @@
 <script>
 import {call_api} from "../../utils/cloud.js";
-import {load_user, store_token, store_user} from "../../utils/user_info";
+import {store_token, store_user} from "../../utils/user_info";
 
 import {ElLoading, ElNotification} from "element-plus";
 
@@ -149,17 +149,16 @@ export default {
                 return;
             }
 
+            store_token(res.token);
+            store_user(res.data);
 
             if (this.state.is_login) {
-                await load_user();
                 ElNotification({
                     title: 'Success',
                     type: "success",
                     message: "登录成功",
                 })
             } else {
-                store_user(res.data);
-                store_token(res.token);
                 ElNotification({
                     title: 'Success',
                     type: "success",

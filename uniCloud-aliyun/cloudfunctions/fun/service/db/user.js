@@ -53,7 +53,8 @@ module.exports = class DBService_User extends Service {
     }
 
     async create_user(user) {
-        if (await this.service.db.user.check_user_exist_by_name(user.name)) {
+        if (Object.hasOwn(user, "name") &&
+            await this.service.db.user.check_user_exist_by_name(user.name)) {
             this.throw(codes.err_exist_username, "username exist");
         }
 

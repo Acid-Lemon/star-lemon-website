@@ -60,9 +60,12 @@ module.exports = class Service_User_Login extends Service {
 		try {
 			return await this.service.db.user.create_user(info);
 		} catch (err) {
+			console.error(err);
 			if (typeof err === "string" && err.startsWith("E11000")) {
 				this.throw(error.codes.err_email_exist, "the email is already registered.");
 			}
+
+			throw err;
 		}
 	}
 

@@ -152,8 +152,8 @@ module.exports = class Controller_User_Login extends Controller {
 			};
 		}
 
+		console.info("qq_user_info", qq_user_info);
 		let new_user = await this.service.user.login.create_user({
-			name: qq_user_info.nickname,
 			qq_openid: qq_user_info.qq_openid,
 			avatar: {
 				url: qq_user_info.avatar_url,

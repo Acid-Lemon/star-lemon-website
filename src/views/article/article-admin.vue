@@ -171,17 +171,22 @@ export default {
                                   max-height="80vh"
                                   style="width: 100%"
                                   @row-dblclick="(row) => row_dblclick(row)">
+                            <el-table-column type="expand">
+                                <template #default="props">
+                                    <div class="px-[10px]">
+                                        {{ props.row.content }}
+                                    </div>
+                                </template>
+                            </el-table-column>
                             <el-table-column type="index" width="50"/>
                             <el-table-column label="文章id" prop="id" width="100"/>
-                            <el-table-column label="标题" prop="title" width="200"/>
-                            <el-table-column
-                                label="内容"
-                                prop="content"/>
-                            <el-table-column label="类型" prop="type" width="100"/>
+                            <el-table-column label="标题" prop="title"/>
                             <el-table-column :formatter="(row) => {return row.public_state ? '公开' : '私有'}"
                                              label="公开状态"
                                              prop="public_state"
                                              width="100"/>
+                            <el-table-column label="发布者" prop="user.name" width="100"/>
+                            <el-table-column label="发布者id" prop="user.id" width="100"/>
                             <el-table-column label="发布时间" prop="create_at_format_str" width="200"/>
                             <el-table-column label="操作" width="250">
                                 <template #header>

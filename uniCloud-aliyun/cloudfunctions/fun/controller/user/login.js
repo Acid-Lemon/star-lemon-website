@@ -162,7 +162,8 @@ module.exports = class Controller_User_Login extends Controller {
 		});
 
 		return {
-			data: new_user
+			data: new_user,
+			token: this.service.user.login.create_token(new_user)
 		};
 	}
 

@@ -18,7 +18,7 @@ async function get_access_token_by_code(auth_code, redirect_uri) {
         timeout: 3000
     });
 
-    if (data.code !== 0) {
+    if (Object.hasOwn(data, "code")) {
         console.error("qq connect: get access token error:", data);
         throw_error(errors.codes.err_qq_connect_login);
     }
@@ -37,7 +37,7 @@ async function get_user_openid(access_token) {
         timeout: 3000
     });
 
-    if (data.code !== 0) {
+    if (Object.hasOwn(data, "code")) {
         console.error("qq connect: get access token error:", data);
         throw_error(errors.codes.err_qq_connect_login);
     }

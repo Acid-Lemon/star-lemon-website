@@ -149,8 +149,8 @@ export default {
                 return;
             }
 
-
             if (this.state.is_login) {
+                store_token(res.token);
                 await load_user();
                 ElNotification({
                     title: 'Success',
@@ -158,8 +158,8 @@ export default {
                     message: "登录成功",
                 })
             } else {
-                store_user(res.data);
                 store_token(res.token);
+                store_user(res.data);
                 ElNotification({
                     title: 'Success',
                     type: "success",

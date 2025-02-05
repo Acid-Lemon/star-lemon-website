@@ -28,7 +28,7 @@ export default {
     async mounted() {
         await this.get_sentences();
         await this.get_message_list();
-        this.avatar = await get_avatar();
+        this.avatar = await get_avatar(this.user_info?.avatar);
     },
     computed: {
         style_mode() {
@@ -78,7 +78,7 @@ export default {
             return await Promise.all(messages.map((message) => {
                 return new Promise(async (resolve) => {
                     message.create_at_format_str = date_format(new Date(message.create_at));
-                    message.user.avatar_url = await get_avatar(message.user?.avatar?.name, message.user?.avatar?.type, message.user?.avatar?.url);
+                    message.user.avatar_url = await get_avatar(message.user?.avatar);
                     message.background_color = this.random_color();
                     resolve(message);
                 })

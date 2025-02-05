@@ -2,41 +2,19 @@ import axios from "axios";
 import {ElNotification} from "element-plus";
 
 import {call_api} from "@/src/utils/cloud";
-import {use_user_info_store} from "@/src/stores/userInfo";
 
-const user_info_store = use_user_info_store();
-
-async function get_avatar(name, type, url) {
-    let avatar;
-    if ((name || url) && type) {
-        avatar = {
-            name,
-            type,
-            url
-        }
-    } else {
-        // 不传入name和type，默认获取自己的头像
-        let user_info = user_info_store.user_info;
-        // 如果没有头像，则返回null
-        if (!user_info.hasOwnProperty("avatar")) {
-            return null;
-        }
-
-        avatar = {
-            name: user_info.avatar?.name,
-            type: user_info.avatar.type,
-            url: user_info.avatar?.url
-        }
+async function get_avatar(avatar) {
+    if (!avatar?.type || !(avatar?.name || avatar?.url)) {
+        return null;
     }
 
-
     // 直接有第三方头像链接
-    if (type === "url") {
+    if (avatar.type === "url") {
         return avatar.url;
     }
 
     // 本地头像
-    if (type === "local") {
+    if (avatar.type === "local") {
         return "/static/avatar/" + avatar.name;
     }
 

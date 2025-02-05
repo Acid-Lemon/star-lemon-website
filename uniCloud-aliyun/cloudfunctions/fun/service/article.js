@@ -20,9 +20,24 @@ module.exports = class Service_Article extends Service {
         }
     }
 
+    async update_article(article_id, title, content, type) {
+        let {
+            update_at
+        } = await this.service.db.article.update_article(article_id, title, content, type);
+        return {
+            article_id,
+            update_at,
+        }
+    }
+
     async get_personal_and_public_articles(article_number, time_range = {}, skip_numbers = 0, type = "all") {
         time_range = time_range ?? {};
         return await this.service.db.article.get_personal_and_public_articles(article_number, time_range, skip_numbers, type)
+    }
+
+    async get_all_articles_admin(article_number, time_range = {}, skip_numbers = 0, type = "all") {
+        time_range = time_range ?? {};
+        return await this.service.db.article.get_all_articles_admin(article_number, time_range, skip_numbers, type)
     }
 
     async get_article(article_id) {

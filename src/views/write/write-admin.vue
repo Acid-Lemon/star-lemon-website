@@ -3,17 +3,11 @@
 import MdEditor from "../../components/md-editor.vue";
 import {ElNotification} from "element-plus";
 import AdminView from "@/src/components/admin.vue";
-import article from "@/src/views/article/article.vue";
 import {call_api} from "@/src/utils/cloud";
 
 export default {
     name: "write-admin",
     inheritAttrs: false,
-    computed: {
-        article() {
-            return article
-        }
-    },
     components: {AdminView, MdEditor},
     data() {
         return {
@@ -49,6 +43,21 @@ export default {
             type: null
         }
     },
+    async mounted() {
+        if (this.$route.query.article_id) {
+            let res = await call_api("article/get_article", {
+                article_id: this.$route.query.article_id
+            })
+
+            if (!res.success) {
+                return;
+            }
+
+            this.article = {
+                ...res.data
+            }
+        }
+    },
     methods: {
         async release_article() {
             const is_valid = await new Promise((resolve) => {
@@ -65,25 +74,34 @@ export default {
                 });
                 return;
             }
-            let res = await call_api("article/create_article", {
-                title: this.article.title,
-                content: this.article.content,
-                type: this.article.type
-            })
 
-            if (res.success) {
-                ElNotification({
-                    title: 'Success',
-                    message: '发布成功',
-                    type: 'success',
-                });
+            let res;
+            if (this.$route.query.article_id) {
+                res = await call_api("article/update_article", {
+                    article_id: this.$route.query.article_id,
+                    title: this.article.title,
+                    content: this.article.content,
+                    type: this.article.type
+                })
             } else {
-                ElNotification({
-                    title: 'Error',
-                    message: res,
-                    type: 'error',
-                });
+                res = await call_api("article/create_article", {
+                    title: this.article.title,
+                    content: this.article.content,
+                    type: this.article.type
+                })
             }
+
+            if (!res.success) {
+                return;
+            }
+
+            ElNotification({
+                title: 'Success',
+                message: '发布成功',
+                type: 'success',
+            });
+
+            this.$router.back();
         }
     }
 }
@@ -118,8 +136,9 @@ export default {
                 </div>
                 <div class="w-full h-[85vh] flex flex-col items-center justify-center">
                     <el-form-item class="w-full h-full mb-0" prop="content">
-                        <md-editor class="w-full h-full"
-                                   @update:value="value => this.article.content = value"></md-editor>
+                        <md-editor
+                            v-model="article.content"
+                            class="w-full h-full"></md-editor>
                     </el-form-item>
                 </div>
             </el-form>

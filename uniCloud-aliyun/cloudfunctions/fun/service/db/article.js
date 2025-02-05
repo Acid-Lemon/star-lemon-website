@@ -32,6 +32,21 @@ module.exports = class DBService_Article extends Service {
         };
     }
 
+    async update_article(article_id, title, content, type) {
+        let now_time = Date.now();
+        await this.db.collection(tables.article).doc(article_id).update({
+            title,
+            content,
+            type,
+            update_at: now_time
+        });
+        console.info("article_id:", article_id);
+
+        return {
+            update_at: now_time
+        };
+    }
+
     async get_personal_and_public_articles(limit_num, time_range = {}, skip_number = 0, type = "all") {
         let {
             create_at_match_obj,
@@ -52,6 +67,63 @@ module.exports = class DBService_Article extends Service {
                     {user_id: this.ctx.auth?.user_id ?? ""}
                 ])
             ]))
+            .sort({
+                create_at: time_sort_direction
+            })
+            .skip(skip_number)
+            .limit(limit_num)
+            .lookup({
+                from: tables.user,
+                let: {
+                    user_id: "$user_id"
+                },
+                pipeline: this.db.command.aggregate.pipeline()
+                    .match(this.db.command.expr(this.db.command.eq(["$_id", "$$user_id"])
+                    ))
+                    .project({
+                        id: "$_id",
+                        _id: false,
+                        name: true,
+                        avatar: true
+                    })
+                    .done(),
+                as: "user"
+            })
+            .project({
+                id: "$_id",
+                _id: false,
+                title: true,
+                content: true,
+                type: true,
+                views: true,
+                comments: true,
+                likes: true,
+                user: this.db.command.aggregate.arrayElemAt(["$user", 0]),
+                create_at: true,
+                public_state: true
+            })
+            .end())
+            .data;
+    }
+
+    async get_all_articles_admin(limit_num, time_range = {}, skip_number = 0, type = "all") {
+        let {
+            create_at_match_obj,
+            time_sort_direction
+        } = convert_time_range(time_range);
+
+        let type_match_obj = {};
+        if (type === "reviewed") {
+            type_match_obj = {review: true}
+        } else if (type === "unreviewed") {
+            type_match_obj = {review: false}
+        }
+
+        return (await this.db.collection(tables.article).aggregate()
+            .match({
+                ...create_at_match_obj,
+                ...type_match_obj
+            })
             .sort({
                 create_at: time_sort_direction
             })

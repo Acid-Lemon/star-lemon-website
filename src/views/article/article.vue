@@ -1,6 +1,5 @@
 <script>
 import {truncate_text} from "@/src/utils/truncate_text";
-import {ElNotification} from "element-plus";
 import {call_api} from "../../utils/cloud";
 import {date_format} from "../../utils/time";
 
@@ -53,11 +52,6 @@ export default {
             });
 
             if (!res.success) {
-                ElNotification({
-                    title: 'Error',
-                    message: '获取文章失败',
-                    type: 'error',
-                });
                 this.pages -= 1;
                 return;
             }

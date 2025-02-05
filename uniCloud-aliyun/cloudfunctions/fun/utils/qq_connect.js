@@ -20,7 +20,7 @@ async function get_access_token_by_code(auth_code, redirect_uri) {
 
     if (data.code !== 0) {
         console.error("qq connect: get access token error:", data);
-        this.throw(errors.codes.err_qq_connect_login);
+        throw_error(errors.codes.err_qq_connect_login);
     }
 
     return data.access_token;
@@ -39,7 +39,7 @@ async function get_user_openid(access_token) {
 
     if (data.code !== 0) {
         console.error("qq connect: get access token error:", data);
-        this.throw(errors.codes.err_qq_connect_login);
+        throw_error(errors.codes.err_qq_connect_login);
     }
 
     return data.openid;
@@ -60,13 +60,28 @@ async function get_user_info(access_token, openid) {
 
     if (data.ret < 0) {
         console.error("qq connect: get user info error:", data);
-        this.throw(errors.codes.err_qq_connect_login);
+        throw_error(errors.codes.err_qq_connect_login);
     }
 
     return {
         avatar_url: data["figureurl_qq_1"],
         nickname: data["nickname"]
     };
+}
+
+function throw_error(code, message=null) {
+    if (!message) {
+        throw {
+            code,
+            customize: true
+        };
+    } else {
+        throw {
+            code,
+            message,
+            customize: true
+        };
+    }
 }
 
 module.exports = {

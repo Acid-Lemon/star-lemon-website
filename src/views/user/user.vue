@@ -153,7 +153,6 @@ export default {
             }
 
             if (this.name !== this.user_info.name || this.birthday !== this.user_info.birthday || this.personal_sign !== this.user_info.personal_sign) {
-
                 let basic_info_res = await call_api("user/profile/update_profile", {
                     name: this.name,
                     birthday: this.birthday,

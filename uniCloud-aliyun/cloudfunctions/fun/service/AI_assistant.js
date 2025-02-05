@@ -48,7 +48,6 @@ const personality = "# 角色\n" +
     "- 着重突出温馨可爱的氛围，让访客感受到愉悦和舒适。"
 
 module.exports = class Service_AI_assistant extends Service {
-
     async get_answer(message_list, channel) {
         if (message_list.length === 1) {
             message_list.unshift({'role': 'system', 'content': personality});

@@ -13,6 +13,7 @@ const codes = {
     invalid_args: "err_args",
     err_user_create: "err_user_create",
     err_exist_username: "err_username_exist",
+    err_email_exist: "err_email_exist",
     err_send_code: "err_send_code",
     token_expire: "err_token_expire",
     sms_code_expire: "err_sms_code_expire",

@@ -57,7 +57,13 @@ module.exports = class Service_User_Login extends Service {
 			delete info.password;
 		}
 
-		return await this.service.db.user.create_user(info);
+		try {
+			return await this.service.db.user.create_user(info);
+		} catch (err) {
+			if (typeof err === "string" && err.startsWith("E11000")) {
+				this.throw(error.codes.err_email_exist, "the email is already registered.");
+			}
+		}
 	}
 
 	verify_email_code(code, code_record) {

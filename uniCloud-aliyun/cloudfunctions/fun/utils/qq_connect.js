@@ -23,7 +23,6 @@ async function get_access_token_by_code(auth_code, redirect_uri) {
         throw_error(errors.codes.err_qq_connect_login);
     }
 
-    console.info("qq data", data)
     console.info("qq access token:", data.access_token);
 
     return data.access_token;

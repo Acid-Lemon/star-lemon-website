@@ -136,15 +136,25 @@ export default {
                         }}</span>
                 </router-link>
                 <div v-show="page.name === '个人' && hovered_page === page"
-                     class="absolute flex flex-col items-center justify-center bottom-[-5vh] w-[10vh] h-[4vh] bg-[#FFFFFF] bg-opacity-50 rounded shadow-md duration-700"
-                     @click="loginOut" @mouseenter="onSecondaryMouseEnter" @mouseleave="onSecondaryMouseLeave">
-                    取消登录
+                     class="absolute flex flex-col items-center justify-center top-[7vh] w-[10vh] bg-[#FFFFFF] bg-opacity-50 rounded shadow-md duration-700"
+                     @mouseenter="onSecondaryMouseEnter" @mouseleave="onSecondaryMouseLeave">
+                    <div class="h-[4vh] flex flex-row items-center justify-center" @click="loginOut">取消登录</div>
                 </div>
                 <div v-show="page.name === '文章' && hovered_page === page"
-                     class="absolute flex flex-col items-center justify-center bottom-[-5vh] w-[10vh] h-[4vh] bg-[#FFFFFF] bg-opacity-50 rounded shadow-md duration-700"
-                     @click="this.$router.push('/article?type=note')" @mouseenter="onSecondaryMouseEnter"
-                     @mouseleave="onSecondaryMouseLeave">
-                    笔记
+                     class="absolute flex flex-col items-center justify-center top-[7vh] w-[10vh] bg-[#FFFFFF] bg-opacity-50 rounded shadow-md duration-700"
+                     @mouseenter="onSecondaryMouseEnter" @mouseleave="onSecondaryMouseLeave">
+                    <div class="h-[4vh] flex flex-row items-center justify-center"
+                         @click="this.$router.push('/article?type=note')">笔记
+                    </div>
+                    <div class="h-[4vh] flex flex-row items-center justify-center"
+                         @click="this.$router.push('/article?type=diary')">日记
+                    </div>
+                    <div class="h-[4vh] flex flex-row items-center justify-center"
+                         @click="this.$router.push('/article?type=sentence')">句子
+                    </div>
+                    <div class="h-[4vh] flex flex-row items-center justify-center"
+                         @click="this.$router.push('/article?type=other')">其它
+                    </div>
                 </div>
             </div>
         </div>

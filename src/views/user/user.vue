@@ -13,7 +13,10 @@ export default {
     components: {Delete, Plus},
     data() {
         return {
-            dialog_visible: false,
+            dialog_visible: {
+                update_user_info: false,
+                update_account_security: false
+            },
             avatar_url: "",
             background_url: "",
             new_user_info: {
@@ -23,6 +26,9 @@ export default {
                 name: "",
                 birthday: "",
                 personal_sign: "",
+            },
+            new_account_security: {
+                email: "",
             },
             avatar_list: [],
             avatars_nums: 46,
@@ -49,6 +55,8 @@ export default {
             background: [],
             click_flag: -1,
         };
+
+        this.new_account_security.email = this.user_info?.email;
     },
     computed: {
         user_info() {
@@ -66,7 +74,7 @@ export default {
                 this.avatars_nums--;
             }
         },
-        handle_close(done) {
+        handle_close_update_user_info(done) {
             if (this.new_user_info.click_flag !== -1 || this.new_user_info.avatar.length !== 0 || this.new_user_info.background.length !== 0
                 || this.new_user_info.name !== this.user_info.name || this.new_user_info.birthday !== this.user_info.birthday || this.new_user_info.personal_sign !== this.user_info.personal_sign) {
                 ElMessageBox.confirm('确认关闭？（未提交的信息不会保存）', '提示', {
@@ -86,6 +94,21 @@ export default {
             }
             done();
         },
+        handle_close_update_account_security(done) {
+            if (this.new_account_security.email !== this.user_info?.email) {
+                ElMessageBox.confirm('确认关闭？（未提交的信息不会保存）', '提示', {
+                    confirmButtonText: '确定',
+                    cancelButtonText: '取消',
+                    type: 'warning'
+                }).then(() => {
+                    done();
+                }).catch(() => {
+                    this.new_account_security.email = "";
+                })
+                return;
+            }
+            done();
+        },
         choose(index) {
             if (this.new_user_info.click_flag !== index) {
                 this.new_user_info.click_flag = index;
@@ -93,7 +116,7 @@ export default {
                 this.new_user_info.click_flag = -1;
             }
         },
-        async update_info() {
+        async update_user_info() {
             this.loading = true;
 
             if (this.new_user_info.avatar[0]) {
@@ -186,16 +209,24 @@ export default {
             await load_user();
 
             this.loading = false;
-            this.dialog_visible = false;
+            this.dialog_visible.update_user_info = false;
         },
-        cancel_update() {
+        update_account_security() {
+            this.dialog_visible.update_account_security = false;
+        },
+        cancel_update_user_info() {
             this.new_user_info.avatar = [];
             this.new_user_info.click_flag = -1;
             this.new_user_info.name = this.user_info?.name;
             this.new_user_info.birthday = this.user_info?.birthday;
             this.new_user_info.personal_sign = this.user_info?.personal_sign;
 
-            this.dialog_visible = false;
+            this.dialog_visible.update_user_info = false;
+        },
+        cancel_update_account_security() {
+            this.new_account_security.email = "";
+
+            this.dialog_visible.update_account_security = false;
         }
     }
 }
@@ -209,28 +240,34 @@ export default {
                     <el-image class="w-full h-[40vh]" fit="cover" src="/static/background/17.jpg"></el-image>
                 </template>
             </el-image>
-            <div class="absolute bottom-[-5vh] left-[10vw] flex flex-row items-end">
-                <el-avatar :size=100 :src="this.avatar_url" alt="头像" class="mr-[10px]">
+            <div class="absolute bottom-[-5vh] left-[5vw] flex flex-row items-end">
+                <el-avatar :size=80 :src="this.avatar_url" alt="头像" class="mr-[10px]">
                     {{ user_info?.name ? user_info.name : "无名" }}
                 </el-avatar>
-                <p class="font-['SYST'] text-[24px] mr-[20px] leading-none pb-[5px]">
+                <p class="font-['SYST'] text-[20px] mr-[20px] leading-none pb-[5px]">
                     {{ user_info?.name ? user_info.name : "无名" }}
                 </p>
-                <el-tag class="font-['SYST'] text-[18px] mr-[10px] leading-none pb-[5px]" type="primary">
+                <el-tag class="font-['SYST'] text-[16px] mr-[10px] leading-none pb-[5px]" type="primary">
                     {{ user_info?.role === 'admin' ? '管理员' : '用户' }}
                 </el-tag>
-                <p v-if="user_info?.birthday" class="font-['SYST'] text-[14px] mr-[20px] leading-none pb-[5px]">
+                <p v-if="user_info?.birthday" class="font-['SYST'] text-[16px] mr-[20px] leading-none pb-[5px]">
                     生日：{{ user_info?.birthday }}</p>
-                <p class="font-['SYST'] text-[14px] opacity-50 leading-none pb-[5px]">{{ user_info?.personal_sign }}</p>
+                <p class="font-['SYST'] text-[16px] opacity-50 leading-none pb-[5px]">{{ user_info?.personal_sign }}</p>
             </div>
-            <el-button class="absolute bottom-[-5vh] right-[10vw]" plain @click="dialog_visible = true">
+            <el-button class="absolute bottom-[-5vh] right-[10vw]" plain
+                       @click="this.dialog_visible.update_user_info = true">
                 编辑信息
             </el-button>
         </div>
-        <div class="w-full h-[60vh] flex flex-col items-center justify-center bg-[#F8FAFD]">
+        <div class="w-full h-[60vh] flex flex-col mt-[3vh] p-[5vh] bg-[#F8FAFD]">
+            <div class="flex flex-row items-center">
+                <span class="mr-[20px]">邮箱：{{ user_info?.email }}</span>
+                <el-button @click="this.dialog_visible.update_account_security = true">修改邮箱</el-button>
+            </div>
+
         </div>
     </div>
-    <el-dialog v-model="dialog_visible" :before-close="handle_close" align-center
+    <el-dialog v-model="this.dialog_visible.update_user_info" :before-close="handle_close_update_user_info" align-center
                style="padding: 10px;height: 28vw; width:60vw; display: flex; flex-direction: column; justify-content: center; align-items: center;"
                v-bind="$attrs">
         <div class="w-full mb-[1vw] text-center text-[1.5vw] font-['SYST']">编辑个人信息</div>
@@ -332,9 +369,29 @@ export default {
             </div>
         </div>
         <div class="w-full flex flex-row justify-end items-center m-[1vw] pr-[1vw]">
-            <el-button class="mx-[1vw]" @click="cancel_update()">取消</el-button>
+            <el-button class="mx-[1vw]" @click="cancel_update_user_info()">取消</el-button>
             <el-button v-loading.fullscreen.lock="loading" class="mx-[1vw]" type="primary"
-                       @click="update_info()">
+                       @click="update_user_info()">
+                确定
+            </el-button>
+        </div>
+    </el-dialog>
+
+    <el-dialog v-model="dialog_visible.update_account_security" :before-close="handle_close_update_account_security"
+               align-center
+               style="padding: 10px;height: 16vw; width:40vw; display: flex; flex-direction: column; justify-content: center; align-items: center;"
+               v-bind="$attrs">
+        <div class="w-full mb-[1vw] text-center text-[1.5vw] font-['SYST']">账号安全</div>
+        <div class="w-full h-[5vw] flex flex-col items-center justify-center">
+            <div class="w-full flex flex-row items-center">
+                <div class="w-[80px]">新邮箱：</div>
+                <el-input v-model="new_account_security.email"></el-input>
+            </div>
+        </div>
+        <div class="w-full flex flex-row justify-center items-center m-[1vw]">
+            <el-button class="mx-[1vw]" @click="cancel_update_account_security()">取消</el-button>
+            <el-button v-loading.fullscreen.lock="loading" class="mx-[1vw]" type="primary"
+                       @click="update_account_security()">
                 确定
             </el-button>
         </div>

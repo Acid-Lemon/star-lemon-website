@@ -49,6 +49,7 @@ export default {
                 },
                 article_number: 20,
                 skip_number,
+                type: this.$route.query.type
             });
 
             if (!res.success) {

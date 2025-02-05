@@ -21,10 +21,10 @@ async function call_api(action, args = {}) {
         if (api_res.success && api_res.hasOwnProperty("token")) {
             await store_token(api_res.token);
         }
-        if (!api_res.success && api_res.hasOwnProperty("code")) {
+        if (!api_res.success) {
             ElNotification({
                 title: "Error",
-                message: handle_error(api_res.code),
+                message: api_res?.info?.message || handle_error(api_res.code),
                 type: "error"
             })
             console.error(api_res);

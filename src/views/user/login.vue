@@ -1,6 +1,6 @@
 <script>
 import {call_api} from "../../utils/cloud.js";
-import {load_user} from "../../utils/user_info";
+import {load_user, store_token, store_user} from "../../utils/user_info";
 
 import {ElLoading, ElNotification} from "element-plus";
 
@@ -22,8 +22,33 @@ export default {
                 text: "获取验证码",
                 disabled: false,
                 wait_time: 60
+            },
+            QQ: {
+                client_id: 102645267,
+                redirect_uri: "https%3A%2F%2Fstar-lemon.top%2F%23%2Flogin",
             }
         };
+    },
+    async mounted() {
+        if (this.$route.query.code) {
+            let res = call_api("user/login/login_with_qq", {
+                auth_code: this.$route.query.code,
+                redirect_uri: this.QQ.redirect_uri
+            })
+
+            if (!res.success) {
+                return;
+            }
+
+            store_user(res.data);
+
+            ElNotification({
+                title: 'Success',
+                type: "success",
+                message: "登录成功",
+            })
+            this.$router.push("/");
+        }
     },
     computed: {
         rules() {
@@ -120,29 +145,21 @@ export default {
 
             loading.close();
 
-
             if (!res.success) {
-                // 显示错误
-                ElNotification({
-                    title: 'Error',
-                    type: "error",
-                    message: res,
-                });
-
-                console.log(res);
-
                 return;
             }
 
-            await load_user();
 
             if (this.state.is_login) {
+                await load_user();
                 ElNotification({
                     title: 'Success',
                     type: "success",
                     message: "登录成功",
                 })
             } else {
+                store_user(res.data);
+                store_token(res.token);
                 ElNotification({
                     title: 'Success',
                     type: "success",
@@ -190,7 +207,7 @@ export default {
             }, 1000)
         },
         QQ_login() {
-            window.open('https://graph.qq.com/oauth2.0/authorize?response_type=code&client_id=102645267&redirect_uri=https://star-lemon.top/#/login&state=login', '_blank')
+            window.open(`https://graph.qq.com/oauth2.0/authorize?response_type=code&client_id=${this.QQ.client_id}&redirect_uri=${this.QQ.redirect_uri}&state=login`, '_blank')
         }
     }
 }
@@ -208,7 +225,9 @@ export default {
         <div
             class="bg-white bg-opacity-80 backdrop-blur-md md:w-[360px] w-[95vw] h-[85vh] shadow-sm rounded-lg p-[3vh] mt-[12vh] mb-[3vh]">
             <el-form ref="form_ref" :model="form" :rules="rules" label-position="top">
-                <div class="text-[4vh] font-['SYST']">{{ state.is_login === true ? "登录" : "注册" }}</div>
+                <div class="text-[4vh] font-['SYST']">
+                    {{ state.is_login === true ? "登录" : "注册" }}
+                </div>
                 <el-form-item v-if="!this.state.is_login || !this.state.is_email"
                               class="text-[2.5vh] font-['FZSX']"
                               label="用户名："

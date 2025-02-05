@@ -58,15 +58,23 @@ export default {
             }
         },
         handle_close(done) {
-            ElMessageBox.confirm('确认关闭？（未提交的信息不会保存）', '提示', {
-                confirmButtonText: '确定',
-                cancelButtonText: '取消',
-                type: 'warning'
-            }).then(() => {
-                done();
-            })
-                .catch(() => {
-                });
+            if (this.click_flag !== -1 || this.avatar.length !== 0 || this.name !== this.user_info.name || this.birthday !== this.user_info.birthday || this.personal_sign !== this.user_info.personal_sign) {
+                ElMessageBox.confirm('确认关闭？（未提交的信息不会保存）', '提示', {
+                    confirmButtonText: '确定',
+                    cancelButtonText: '取消',
+                    type: 'warning'
+                }).then(() => {
+                    done();
+                }).catch(() => {
+                    this.avatar = [];
+                    this.click_flag = -1;
+                    this.name = this.user_info?.name;
+                    this.birthday = this.user_info?.birthday;
+                    this.personal_sign = this.user_info?.personal_sign;
+                })
+                return;
+            }
+            done();
         },
         choose(index) {
             if (this.click_flag !== index) {
@@ -177,6 +185,15 @@ export default {
             this.loading = false;
             this.dialog_visible = false;
         },
+        cancel_update() {
+            this.avatar = [];
+            this.click_flag = -1;
+            this.name = this.user_info?.name;
+            this.birthday = this.user_info?.birthday;
+            this.personal_sign = this.user_info?.personal_sign;
+
+            this.dialog_visible = false;
+        }
     }
 }
 </script>
@@ -310,7 +327,7 @@ export default {
             </div>
         </div>
         <div class="w-full flex flex-row justify-end items-center m-[1vw] pr-[1vw]">
-            <el-button class="mx-[1vw]" @click="dialog_visible = false">取消</el-button>
+            <el-button class="mx-[1vw]" @click="cancel_update()">取消</el-button>
             <el-button v-loading.fullscreen.lock="loading" class="mx-[1vw]" type="primary"
                        @click="update_info()">
                 确定

@@ -208,11 +208,11 @@ export default {
             </el-image>
             <div class="absolute bottom-[-5vh] left-[10vw] flex flex-row items-end">
                 <el-avatar :size=100 :src=avatar_url alt="头像" class="mr-[10px]">
-                    {{ user_info?.name ? user_info.name : "未登录" }}
+                    {{ user_info?.name ? user_info.name : "无名" }}
                 </el-avatar>
-                <p class="font-['SYST'] text-[24px] mr-[20px] leading-none pb-[5px]">{{
-                        user_info?.name ? user_info.name : "未登录"
-                    }}</p>
+                <p class="font-['SYST'] text-[24px] mr-[20px] leading-none pb-[5px]">
+                    {{ user_info?.name ? user_info.name : "无名" }}
+                </p>
                 <el-tag v-if="user_info?.role==='admin'"
                         class="font-['SYST'] text-[18px] mr-[10px] leading-none pb-[5px]" type="success">管理员
                 </el-tag>

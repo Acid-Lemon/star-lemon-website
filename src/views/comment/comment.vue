@@ -221,7 +221,7 @@ export default {
     async mounted() {
         await this.get_sentences();
         await this.get_message_list();
-        this.avatar = await this.get_avatar_url(this.user_info?.avatar?.type, this.user_info?.avatar?.name);
+        this.avatar = await this.get_avatar();
     },
     computed: {
         style_mode() {
@@ -271,7 +271,7 @@ export default {
             return await Promise.all(messages.map((message) => {
                 return new Promise(async (resolve) => {
                     message.create_at_format_str = date_format(new Date(message.create_at));
-                    message.user.avatar_url = await this.get_avatar_url(message.user?.avatar?.type, message.user?.avatar?.name);
+                    message.user.avatar_url = await this.get_avatar(message.user?.avatar?.name, message.user?.avatar?.type, message.user?.avatar?.url);
                     message.background_color = this.random_color();
                     resolve(message);
                 })
@@ -415,31 +415,6 @@ export default {
             }
             return index;
         },
-        async get_avatar_url(type, name) {
-            console.log(type, name);
-
-            if (!type || !name) {
-                return ''
-            }
-            if (type === "upload") {
-                let avatar_url_res = await call_api("user/profile/get_upload_avatar_temp_url", {
-                    image_name: name,
-                });
-
-                if (avatar_url_res.success === false) {
-                    ElNotification({
-                        title: 'Error',
-                        message: avatar_url_res,
-                        type: 'error',
-                    });
-                    return;
-                }
-
-                return avatar_url_res.data.temp_url
-            } else {
-                return "/static/avatar/" + name
-            }
-        },
         random_color() {
             let color_list = ["#fbc2eb", "#c2e9fb", "#FFE6FA", "#ebc0fd", "#abecd6", "#e3eeff", "#fdd6bd", "#bdc2e8", "#D7FFFE", "#FFE6FA", "#ffdde1"];
             return color_list[Math.floor(Math.random() * color_list.length)]
@@ -500,8 +475,12 @@ export default {
                      class="md:w-[70%] w-[85%] mt-[30px] flex flex-row justify-evenly items-center bg-[url('/static/background/17.jpg')] bg-cover rounded-xl shadow-md relative">
                     <div
                         class="md:flex md:flex-col md:items-center md:justify-between h-[6vw] hidden self-start mt-[4vh]">
-                        <el-avatar :src="avatar" style="width: 4vw;height:4vw">{{ user_info?.name }}</el-avatar>
-                        <div class="font-['SYST']">{{ user_info?.name }}</div>
+                        <el-avatar :src="avatar" style="width: 4vw;height:4vw">
+                            {{ user_info?.name || "无名" }}
+                        </el-avatar>
+                        <div class="font-['SYST']">
+                            {{ user_info?.name || "无名" }}
+                        </div>
                     </div>
                     <div class="my-[3vh] flex flex-col justify-center md:w-[85%] w-[90%]">
                         <div class="mb-[3vh] relative">

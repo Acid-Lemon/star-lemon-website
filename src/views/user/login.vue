@@ -227,8 +227,8 @@ export default {
         class="bg-[url('/static/background/22.jpg')] h-full w-full bg-cover flex flex-row justify-between items-center p-[5vh]">
         <div class="md:block hidden w-[100%]">
             <div class="flex flex-col items-center">
-                <span class="font-['RGBZ'] text-[5vw] text-[#FFFFFF]">“海阔凭鱼跃，</span>
-                <span class="font-['RGBZ'] text-[5vw] text-[#FFFFFF] pl-[20%]">天高任鸟飞。”</span>
+                <span class="font-['SYST'] text-[5vw] text-[#FFFFFF]">“海阔凭鱼跃，</span>
+                <span class="font-['SYST'] text-[5vw] text-[#FFFFFF] pl-[20%]">天高任鸟飞。”</span>
             </div>
         </div>
         <div
@@ -238,19 +238,19 @@ export default {
                     {{ state.is_login === true ? "登录" : "注册" }}
                 </div>
                 <el-form-item v-if="!this.state.is_login || !this.state.is_email"
-                              class="text-[2.5vh] font-['FZSX']"
+                              class="text-[2.5vh] font-['SYST']"
                               label="用户名："
                               prop="username" @click="console.log(this.state)">
                     <el-input v-model="form.username" style="width: 100%;height:4vh;"/>
                 </el-form-item>
                 <el-form-item v-if="!this.state.is_login || this.state.is_email"
-                              class="text-[2.5vh] font-['FZSX']"
+                              class="text-[2.5vh] font-['SYST']"
                               label="邮箱：" prop="email">
                     <el-input v-model="form.email"
                               style="width: 100%;height:4vh"/>
                 </el-form-item>
                 <el-form-item v-if="!this.state.is_login || this.state.is_email"
-                              class="text-[2.5vh] font-['FZSX']"
+                              class="text-[2.5vh] font-['SYST']"
                               label="验证码：" prop="code">
                     <div class="flex flex-row justify-between">
                         <el-input v-model="form.code"
@@ -261,12 +261,12 @@ export default {
                     </div>
                 </el-form-item>
                 <el-form-item v-if="!this.state.is_login || !this.state.is_email"
-                              class="text-[2.5vh] font-['FZSX']"
+                              class="text-[2.5vh] font-['SYST']"
                               label="密码：" prop="password">
                     <el-input v-model="form.password" style="width: 100%;height:4vh"
                               type="password"/>
                 </el-form-item>
-                <el-form-item v-if="!state.is_login" class="text-[2.5vh] font-['FZSX']"
+                <el-form-item v-if="!state.is_login" class="text-[2.5vh] font-['SYST']"
                               label="确认密码：" prop="confirm_password">
                     <el-input v-model="form.confirm_password"
                               style="width: 100%;height:4vh"
@@ -281,15 +281,15 @@ export default {
                 <!--    用户名密码登录      -->
                 <div class="flex flex-row justify-between">
                     <div v-if="state.is_login" class="my-2" @click="this.state.is_login = false">
-                        <span class="text-[#40A2E3] text-[1.8vh] font-['FZSX']">注册</span>
+                        <span class="text-[#40A2E3] text-[1.8vh] font-['SYST']">注册</span>
                     </div>
                     <div v-if="!state.is_login || state.is_email" class="my-2"
                          @click="this.state.is_login = true; this.state.is_email = false">
-                        <span class="text-[#40A2E3] text-[1.8vh] font-['FZSX']">用户名登录</span>
+                        <span class="text-[#40A2E3] text-[1.8vh] font-['SYST']">用户名登录</span>
                     </div>
                     <div v-if="!state.is_login || !state.is_email" class="my-2"
                          @click="this.state.is_login = true; this.state.is_email = true">
-                        <span class="text-[#40A2E3] text-[1.8vh] font-['FZSX']">邮箱登录</span>
+                        <span class="text-[#40A2E3] text-[1.8vh] font-['SYST']">邮箱登录</span>
                     </div>
                 </div>
                 <div class="flex flex-row justify-center">

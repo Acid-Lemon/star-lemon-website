@@ -46,5 +46,5 @@ export default {
 </template>
 
 <style>
-@import "/static/font/font.css";
+@import "/static/css/font.css";
 </style>

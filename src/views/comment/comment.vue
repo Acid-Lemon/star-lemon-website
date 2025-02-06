@@ -255,7 +255,7 @@ export default {
         <div class="w-full h-full">
             <div
                 class="bg-[url('/static/background/11.jpg')] bg-center bg-cover w-full md:h-[40vh] flex flex-col items-center justify-center h-[30vh]">
-                <p class="text-[#FFFFFF] font-['FZSX'] text-[6vh] hover:text-[#44cef6] duration-700">
+                <p class="text-[#FFFFFF] font-['SYST'] text-[6vh] hover:text-[#44cef6] duration-700">
                     留言板
                 </p>
             </div>
@@ -263,13 +263,13 @@ export default {
                 <div
                     class="border border-black shadow-md m-[4vh] h-[25vh] md:w-[70%] w-[85%] flex flex-col items-center justify-center">
                     <div class="relative top-[-2.5vh] bg-[#F8FAFD]">
-                        <p class="mx-[1vw] text-[3vh] font-['RGBZ']">网易云音乐热评</p>
+                        <p class="mx-[1vw] text-[3vh] font-['SYST']">网易云音乐热评</p>
                     </div>
                     <div class="w-full h-full flex flex-col items-center justify-center">
-                        <p class="text-[2.4vh] mb-[1vh] font-['FZSX']">
+                        <p class="text-[2.4vh] mb-[1vh] font-['SYST']">
                             {{ sentences?.hitokoto }}
                         </p>
-                        <p class="text-[1.9vh] mb-[3vh] font-['FZSX']">
+                        <p class="text-[1.9vh] mb-[3vh] font-['SYST']">
                             ——『{{ sentences?.from }}』{{
                                 sentences?.from_who === null ? '未知' : sentences?.from_who
                             }}</p>
@@ -291,9 +291,8 @@ export default {
                     </div>
                     <div class="my-[3vh] flex flex-col justify-center md:w-[85%] w-[90%]">
                         <div class="mb-[3vh] relative">
-                            <p :class="['absolute pointer-events-none px-[1vh] duration-700 z-50 bg-black font-[\'FZSX\']',
-                                style_mode ? 'text-[#FFFFFF] bg-opacity-100 text-[1.6vh] top-[-1.2vh] left-[1.4vh]' : 'text-[#000000] bg-opacity-0 text-[2vh] top-[1vh] left-[1vh]']"
-                               class="">
+                            <p :class="['absolute pointer-events-none px-[1vh] duration-700 z-50 bg-black font-[\'SYST\']',
+                                style_mode ? 'text-[#FFFFFF] bg-opacity-100 text-[1.6vh] top-[-1.2vh] left-[1.4vh]' : 'text-[#000000] bg-opacity-0 text-[2vh] top-[1vh] left-[1vh']">
                                 你是我一生只会遇见一次的惊喜...
                             </p>
                             <textarea id="pl" v-model.lazy="value"
@@ -336,8 +335,8 @@ export default {
                 </div>
                 <div class="flex flex-row md:w-[70%] w-[85%] mt-[2vh] border-b-[1px] border-[#000000]">
                     <div class="flex flex-row items-end">
-                        <span class="text-[4vh] font-bold font-['RGBZ']">comment</span>
-                        <span class="text-[2vh] mb-[1vh] mx-[2vh] font-['FZSX']">{{ message_list.length }}条评论</span>
+                        <span class="text-[4vh] font-bold font-['SYST']">comment</span>
+                        <span class="text-[2vh] mb-[1vh] mx-[2vh] font-['SYST']">{{ message_list.length }}条评论</span>
                     </div>
                 </div>
                 <div v-infinite-scroll="get_message_list"
@@ -393,8 +392,8 @@ export default {
                             </div>
                         </div>
                     </div>
-                    <div v-if="loading_more" class="text-[3vh] font-['RGBZ']">正在加载中</div>
-                    <div v-if="!has_more" class="text-[3vh] font-['RGBZ']">没有更多留言惹</div>
+                    <div v-if="loading_more" class="text-[3vh] font-['SYST']">正在加载中</div>
+                    <div v-if="!has_more" class="text-[3vh] font-['SYST']">没有更多留言惹</div>
                     <div class="w-[70%]">
                         <el-divider content-position="left">列车已到站</el-divider>
                     </div>

@@ -29,28 +29,35 @@ export default {
             }
         };
     },
-    async mounted() {
-        if (this.$route.query.code) {
-            let res = call_api("user/login/login_with_qq", {
-                auth_code: this.$route.query.code,
-                redirect_uri: this.QQ.redirect_uri
-            })
+    watch: {
+        '$route.query.code': {
+            async handler(newValue, _oldValue) {
+                if (newValue !== "") {
+                    let res = call_api("user/login/login_with_qq", {
+                        auth_code: newValue,
+                        redirect_uri: this.QQ.redirect_uri
+                    })
 
-            if (!res.success) {
-                return;
-            }
+                    if (!res.success) {
+                        return;
+                    }
 
-            store_token(res.token);
-            await load_user();
+                    store_token(res.token);
+                    await load_user();
 
-            ElNotification({
-                title: 'Success',
-                type: "success",
-                message: "登录成功",
-            })
+                    ElNotification({
+                        title: 'Success',
+                        type: "success",
+                        message: "登录成功",
+                    })
 
-            this.$router.push("/");
+                    this.$router.push("/");
+                }
+            },
+            deep: true // 启用深度监听
         }
+    },
+    async mounted() {
     },
     computed: {
         rules() {

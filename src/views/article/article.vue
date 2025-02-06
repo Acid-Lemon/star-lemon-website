@@ -18,11 +18,14 @@ export default {
         await this.get_article_list();
     },
     watch: {
-        '$route.query.type'() {
-            this.pages = 0;
-            this.article_list = [];
-            this.has_more = true;
-            this.get_article_list();
+        '$route.query.type': {
+            handler() {
+                this.pages = 0;
+                this.article_list = [];
+                this.has_more = true;
+                this.get_article_list();
+            },
+            deep: true // 启用深度监听
         }
     },
     computed: {

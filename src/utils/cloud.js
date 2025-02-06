@@ -24,7 +24,7 @@ async function call_api(action, args = {}) {
         if (!api_res.success) {
             ElNotification({
                 title: "Error",
-                message: api_res.info.message || handle_error(api_res.code),
+                message: handle_error(api_res.code),
                 type: "error"
             })
             console.error(api_res);

@@ -234,32 +234,30 @@ export default {
 
 <template>
     <div class="h-full w-full el-overlay-dialog">
-        <div class="w-full h-[40vh] relative">
-            <el-image :src="this.background_url" class="w-full h-[40vh]" fit="cover">
-                <template #error>
-                    <el-image class="w-full h-[40vh]" fit="cover" src="/static/background/17.jpg"></el-image>
-                </template>
-            </el-image>
-            <div class="absolute bottom-[-5vh] left-[5vw] flex flex-row items-end">
-                <el-avatar :size=80 :src="this.avatar_url" alt="头像" class="mr-[10px]">
-                    {{ user_info?.name ? user_info.name : "无名" }}
-                </el-avatar>
-                <p class="font-['SYST'] text-[20px] mr-[20px] leading-none pb-[5px]">
-                    {{ user_info?.name ? user_info.name : "无名" }}
-                </p>
-                <el-tag class="font-['SYST'] text-[16px] mr-[10px] leading-none pb-[5px]" type="primary">
-                    {{ user_info?.role === 'admin' ? '管理员' : '用户' }}
-                </el-tag>
-                <p v-if="user_info?.birthday" class="font-['SYST'] text-[16px] mr-[20px] leading-none pb-[5px]">
-                    生日：{{ user_info?.birthday }}</p>
-                <p class="font-['SYST'] text-[16px] opacity-50 leading-none pb-[5px]">{{ user_info?.personal_sign }}</p>
-            </div>
-            <el-button class="absolute bottom-[-5vh] right-[10vw]" plain
-                       @click="this.dialog_visible.update_user_info = true">
-                编辑信息
-            </el-button>
+        <el-image :src="this.background_url" class="w-full h-[40vh]" fit="cover">
+            <template #error>
+                <el-image class="w-full h-[40vh]" fit="cover" src="/static/background/17.jpg"></el-image>
+            </template>
+        </el-image>
+        <div class="fixed top-[35vh] left-[5vw] flex flex-row items-end">
+            <el-avatar :size=80 :src="this.avatar_url" alt="头像" class="mr-[10px]">
+                {{ user_info?.name ? user_info.name : "无名" }}
+            </el-avatar>
+            <p class="font-['SYST'] text-[20px] mr-[20px] leading-none pb-[5px]">
+                {{ user_info?.name ? user_info.name : "无名" }}
+            </p>
+            <el-tag class="font-['SYST'] text-[16px] mr-[10px] leading-none pb-[5px]" type="primary">
+                {{ user_info?.role === 'admin' ? '管理员' : '用户' }}
+            </el-tag>
+            <p v-if="user_info?.birthday" class="font-['SYST'] text-[16px] mr-[20px] leading-none pb-[5px]">
+                生日：{{ user_info?.birthday }}</p>
+            <p class="font-['SYST'] text-[16px] opacity-50 leading-none pb-[5px]">{{ user_info?.personal_sign }}</p>
         </div>
-        <div class="w-full h-[60vh] flex flex-col mt-[3vh] p-[5vh] bg-[#F8FAFD]">
+        <el-button class="absolute bottom-[-5vh] right-[10vw]" plain
+                   @click="this.dialog_visible.update_user_info = true">
+            编辑信息
+        </el-button>
+        <div class="w-full h-[60vh] flex flex-col p-[5vh] bg-[#F8FAFD]">
             <div class="flex flex-row items-center">
                 <span class="mr-[20px]">邮箱：{{ user_info?.email }}</span>
                 <el-button @click="this.dialog_visible.update_account_security = true">修改邮箱</el-button>
@@ -267,6 +265,7 @@ export default {
 
         </div>
     </div>
+
     <el-dialog v-model="this.dialog_visible.update_user_info" :before-close="handle_close_update_user_info" align-center
                style="padding: 10px;height: 28vw; width:60vw; display: flex; flex-direction: column; justify-content: center; align-items: center;"
                v-bind="$attrs">

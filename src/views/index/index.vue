@@ -50,7 +50,6 @@ export default {
                         <div class="w-[500px] ml-[20px] mt-[20px]">
                         </div>
                     </div>
-
                 </div>
             </div>
         </div>

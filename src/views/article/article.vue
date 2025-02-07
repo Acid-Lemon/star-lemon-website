@@ -34,7 +34,6 @@ export default {
         },
     },
     methods: {
-        truncate_text,
         async get_article_list() {
             this.loading_more = true;
 
@@ -57,6 +56,7 @@ export default {
 
             if (!res.success) {
                 this.pages -= 1;
+                this.loading_more = false;
                 return;
             }
 

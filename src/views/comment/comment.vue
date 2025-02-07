@@ -163,12 +163,7 @@ export default {
             }
 
             if (!res.success) {
-                ElNotification({
-                    title: 'Error',
-                    type: "error",
-                    message: res.error_message,
-                });
-
+                this.is_disabled = false;
                 return;
             }
 
@@ -303,7 +298,8 @@ export default {
                         </div>
                         <div class="w-full flex flex-row justify-around md:justify-end">
                             <el-button round style="width: 150px;height: 40px" @click="clear">清除</el-button>
-                            <el-button round style="width: 150px;height: 40px" type="primary" @click="publish_message">
+                            <el-button :disabled="is_disabled" round style="width: 150px;height: 40px" type="primary"
+                                       @click="publish_message">
                                 发布
                             </el-button>
                         </div>

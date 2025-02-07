@@ -21,6 +21,9 @@ async function call_api(action, args = {}) {
         if (api_res.success && api_res.hasOwnProperty("token")) {
             await store_token(api_res.token);
         }
+        if (!api_res.success && api_res.code === "err_no_token") {
+            this.$router.push('/login')
+        }
         if (!api_res.success) {
             ElNotification({
                 title: "Error",

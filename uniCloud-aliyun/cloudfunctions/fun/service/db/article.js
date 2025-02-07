@@ -163,24 +163,15 @@ module.exports = class DBService_Article extends Service {
             .data;
     }
 
-    async get_article(article_id) {
-        if (this.ctx.user?.id) {
-            if (await this.db.collection(tables.article).doc(article_id).get().then(res => res.data[0].views.users.indexOf(this.ctx.user.id)) === -1) {
-                await this.db.collection(tables.article).doc(article_id).update({
-                    views: {
-                        num: this.db.command.inc(1),
-                        users: this.db.command.push(this.ctx.user.id)
-                    }
-                });
-            }
-        }
+    async get_article(article_id, user_id) {
+        await this.add_views(article_id, user_id);
 
         return (await this.db.collection(tables.article).aggregate()
             .match(this.db.command.and([
                 {_id: article_id},
                 this.db.command.or([
                     {public_state: true},
-                    {user_id: this.ctx.auth?.user_id ?? ""}
+                    {user_id: user_id}
                 ])
             ]))
             .lookup({
@@ -215,6 +206,23 @@ module.exports = class DBService_Article extends Service {
             })
             .end())
             .data[0];
+    }
+
+    async add_views(article_id, user_id) {
+        const is_exist = await this.db.collection(tables.article).doc(article_id)
+            .field({'_id': false, 'views': true})
+            .get().then(res => res.data[0].views.users.includes(user_id))
+
+        if (is_exist) {
+            return;
+        }
+
+        await this.db.collection(tables.article).doc(article_id).update({
+            views: {
+                num: this.db.command.inc(1),
+                users: this.db.command.push(this.ctx.user.id)
+            }
+        });
     }
 
     async find_user_id_by_article_id(article_id) {

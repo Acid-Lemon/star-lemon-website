@@ -139,7 +139,11 @@ module.exports = class Controller_User_Profile extends Controller {
                 length: {
                     max: 100
                 }
-            }
+            },
+            email: {
+                type: "string",
+                regex: /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+            },
         });
 
         // 可能只传入要更改的属性，如果没有validate会给出该字段值为undefined，需要删除
@@ -147,6 +151,10 @@ module.exports = class Controller_User_Profile extends Controller {
             if (value === undefined) {
                 delete new_information[key];
             }
+        }
+
+        if (Object.hasOwn(new_information, "email")) {
+            await this.service.user.profile.remove_email_code(new_information.email);
         }
 
         await this.service.db.user.update_user(this.ctx.auth.user_id, new_information);

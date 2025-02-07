@@ -39,7 +39,15 @@ module.exports = class Service_User_Login extends Service {
 
 	async get_qq_user_info_by_code(auth_code, redirect_uri) {
 		let token = await qq_connect.get_access_token_by_code(auth_code, redirect_uri);
+		if (!token) {
+			this.throw(error.codes.err_qq_connect_login);
+		}
+
 		let openid = await qq_connect.get_user_openid(token);
+		if (!openid) {
+			this.throw(error.codes.err_qq_connect_login);
+		}
+
 		let user_info = await qq_connect.get_user_info(token, openid);
 		return {
 			...user_info,

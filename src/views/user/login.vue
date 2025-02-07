@@ -31,10 +31,10 @@ export default {
     },
     async mounted() {
         if (this.$route.query.code) {
-            let res = call_api("user/login/login_with_qq", {
+            let res = await call_api("user/login/login_with_qq", {
                 auth_code: this.$route.query.code,
                 redirect_uri: this.QQ.redirect_uri
-            })
+            });
 
             if (!res.success) {
                 return;

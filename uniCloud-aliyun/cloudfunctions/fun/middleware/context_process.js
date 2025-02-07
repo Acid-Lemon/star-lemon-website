@@ -7,11 +7,16 @@ const {
     id_name_format
 } = require("../utils/db/result_format");
 
+const errors = require("../types/api_error");
+
 module.exports = () => {
     return async function (ctx, next) {
         let auth = ctx.auth;
         if (auth) {
             ctx.user = await find_user(auth.user_id);
+            if (ctx.user === null || ctx.user === undefined) {
+                ctx.throw(errors.codes.no_user)
+            }
             console.info("user:", ctx.user);
         }
 
@@ -34,6 +39,10 @@ async function find_user(user_id) {
 
         return id_name_format(data[0]);
     });
+
+    if (!db_val) {
+        return null;
+    }
 
     await redis.hset(user_redis_key, db_val);
     await redis.expire(user_redis_key, redis_fields.user_info.ex);

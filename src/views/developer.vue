@@ -68,7 +68,7 @@ export default {
         <div class="w-full h-[10%]">
         </div>
         <div class="w-full h-[20%]">
-            <div class="text-[30px] font-['RGBZ'] my-[20px]">
+            <div class="text-[30px] font-['SYST'] my-[20px]">
                 此网站主要所用到的技术
             </div>
             <div class="flex flex-row my-[20px]">
@@ -95,7 +95,7 @@ export default {
             </div>
             <div class="w-[85%] h-full p-[20px]">
                 <div
-                    class="w-full h-full bg-[#FFFFFF] rounded-[25px] p-[20px] text-[20px] font-['FZSX'] border border-[#dedede] shadow-md">
+                    class="w-full h-full bg-[#FFFFFF] rounded-[25px] p-[20px] text-[20px] font-['SYST'] border border-[#dedede] shadow-md">
                     {{ star.say }}
                 </div>
             </div>
@@ -103,7 +103,7 @@ export default {
         <div class="w-full h-[35%] flex flex-row items-center content-center">
             <div class="w-[85%] h-full p-[20px]">
                 <div
-                    class="w-full h-full bg-[#FFFFFF] rounded-[25px] p-[20px] text-[20px] font-['FZSX'] border border-[#dedede] shadow-md">
+                    class="w-full h-full bg-[#FFFFFF] rounded-[25px] p-[20px] text-[20px] font-['SYST'] border border-[#dedede] shadow-md">
                     {{ lemon.say }}
                 </div>
             </div>

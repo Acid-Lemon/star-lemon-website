@@ -115,7 +115,7 @@ export default {
         <div class="flex flex-row justify-center items-center">
             <router-link to="/">
                 <div
-                    class="md:text-[26px] text-[20px] md:m-[0.5vh] mt-[0.5vh] font-['ZKXW'] hover:text-[#44cef6] duration-700">
+                    class="md:text-[22px] text-[20px] md:m-[0.5vh] mt-[0.5vh] font-['SYST'] font-semibold hover:text-[#44cef6] duration-700">
                     {{ web_config?.web_name }}
                 </div>
             </router-link>
@@ -131,20 +131,33 @@ export default {
                         class="w-[3vh] md:m-[0.5vh] mb-[0.5vh]"
                     />
                     <span
-                        class="md:block hidden hover:text-[#44cef6] md:m-[0.5vh] mb-[0.5vh]  font-['SYST'] duration-700">{{
-                            page.name
-                        }}</span>
+                        class="md:block hidden hover:text-[#44cef6] md:m-[0.5vh] mb-[0.5vh]  font-['SYST'] duration-700">
+                        {{ page.name }}
+                    </span>
                 </router-link>
                 <div v-show="page.name === '个人' && hovered_page === page"
-                     class="absolute flex flex-col items-center justify-center bottom-[-5vh] w-[10vh] h-[4vh] bg-[#FFFFFF] bg-opacity-50 rounded shadow-md duration-700"
-                     @click="loginOut" @mouseenter="onSecondaryMouseEnter" @mouseleave="onSecondaryMouseLeave">
-                    取消登录
+                     class="absolute flex flex-col items-center justify-center top-[7vh] w-[10vh] bg-[#FFFFFF] bg-opacity-50 rounded shadow-md duration-700"
+                     @mouseenter="onSecondaryMouseEnter" @mouseleave="onSecondaryMouseLeave">
+                    <div class="h-[4vh] flex flex-row items-center justify-center font-['SYST']"
+                         @click="loginOut">
+                        取消登录
+                    </div>
                 </div>
                 <div v-show="page.name === '文章' && hovered_page === page"
-                     class="absolute flex flex-col items-center justify-center bottom-[-5vh] w-[10vh] h-[4vh] bg-[#FFFFFF] bg-opacity-50 rounded shadow-md duration-700"
-                     @click="this.$router.push('/article?type=note')" @mouseenter="onSecondaryMouseEnter"
-                     @mouseleave="onSecondaryMouseLeave">
-                    笔记
+                     class="absolute flex flex-col items-center justify-center top-[7vh] w-[10vh] bg-[#FFFFFF] bg-opacity-50 rounded shadow-md duration-700"
+                     @mouseenter="onSecondaryMouseEnter" @mouseleave="onSecondaryMouseLeave">
+                    <div class="h-[4vh] flex flex-row items-center justify-center font-['SYST']"
+                         @click="this.$router.push('/article?type=note')">笔记
+                    </div>
+                    <div class="h-[4vh] flex flex-row items-center justify-center font-['SYST']"
+                         @click="this.$router.push('/article?type=diary')">日记
+                    </div>
+                    <div class="h-[4vh] flex flex-row items-center justify-center font-['SYST']"
+                         @click="this.$router.push('/article?type=sentence')">句子
+                    </div>
+                    <div class="h-[4vh] flex flex-row items-center justify-center font-['SYST']"
+                         @click="this.$router.push('/article?type=other')">其它
+                    </div>
                 </div>
             </div>
         </div>

@@ -14,28 +14,38 @@ export default {
             vditor: null
         };
     },
-    mounted() {
-        VditorPreview.preview(this.$refs.vditor, this.content, {
-            theme: {
-                current: 'light'
-            },
-            hljs: {
-                style: 'github'
-            }
-        })
+    watch: {
+        'content': {
+            handler() {
+                VditorPreview.preview(this.$refs.vditor, this.content, {
+                    theme: {
+                        current: 'light'
+                    },
+                    hljs: {
+                        style: 'github'
+                    }
+                })
 
-        const outlineContainer = document.getElementById('outline');
-        const headers = this.content.match(/^(#{1,6})\s+(.*)$/gm);
-        if (headers) {
-            headers.forEach(header => {
-                const level = header.match(/#/g).length;
-                const title = header.replace(/^#+\s*/, '').replace(/\*/g, '');
-                const listItem = document.createElement('div');
-                listItem.style.marginLeft = `${(level - 1) * 10}px`; // 根据标题级别设置缩进
-                listItem.innerHTML = `<div>${title}</div>`;
-                outlineContainer.appendChild(listItem);
-            });
+                const outlineContainer = document.getElementById('outline');
+                const headers = this.content.match(/^(#{1,6})\s+(.*)$/gm);
+                console.log(headers);
+                if (headers) {
+                    headers.forEach(header => {
+                        const level = header.match(/#/g).length;
+                        const title = header.replace(/^#+\s/, '').replace(/\*/g, '');
+                        console.log(level, title);
+                        const listItem = document.createElement('div');
+                        listItem.style.marginLeft = `${(level - 1) * 10}px`; // 根据标题级别设置缩进
+                        listItem.innerHTML = `<div>${title}</div>`;
+                        outlineContainer.appendChild(listItem);
+                    });
+                }
+            },
+            deep: true
         }
+    },
+    mounted() {
+
     },
     beforeDestroy() {
         if (this.vditor) {

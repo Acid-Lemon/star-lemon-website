@@ -8,11 +8,12 @@ function truncate_text(text, max_chinese_len) {
         let ti_english_len = text[i].match(/[\u4e00-\u9fff]/) ? 2 : 1;
 
         if (english_len_sum + ti_english_len > max_english_len) {
-            return text.substring(0, i);
+            return text.substring(0, i) + "...";
         }
 
         english_len_sum += ti_english_len;
     }
+
 
     return text;
 }

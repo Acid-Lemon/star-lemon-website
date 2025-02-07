@@ -47,6 +47,45 @@ module.exports = class Controller_Article extends Controller {
         };
     }
 
+    async update_article() {
+        let {
+            article_id,
+            title,
+            content,
+            type
+        } = validate(this.ctx.event.args, {
+            article_id: {
+                type: "string",
+            },
+            title: {
+                type: "string",
+                length: {
+                    max: 100,
+                    min: 1
+                }
+            },
+            content: {
+                type: "string",
+                length: {
+                    max: 5000,
+                    min: 1
+                }
+            },
+            type: {
+                type: "string",
+                not_null: true,
+                customize: (args, name) => {
+                    return args[name] === "note" || args[name] === "diary" || args[name] === "sentence" || args[name] === "other";
+                }
+            }
+        });
+
+        let res = await this.service.article.update_article(article_id, title, content, type)
+        return {
+            data: res
+        };
+    }
+
     async get_personal_and_public_articles() {
         let {
             time_range = {},
@@ -92,6 +131,55 @@ module.exports = class Controller_Article extends Controller {
         validate_time_range(time_range);
 
         let articles = await this.service.article.get_personal_and_public_articles(article_number, time_range, skip_number, type);
+        return {
+            data: {
+                articles
+            }
+        };
+    }
+
+    async get_all_articles_admin() {
+        let {
+            time_range = {},
+            article_number,
+            skip_number = 0,
+            type
+        } = validate(this.ctx.event.args, {
+            time_range: {
+                undefined_able: true,
+                null_able: true,
+                type: "object"
+            },
+
+            article_number: {
+                type: "number",
+                math: {
+                    max: 20,
+                    min: 1
+                }
+            },
+
+            skip_number: {
+                undefined_able: true,
+                null_able: true,
+                type: "number",
+
+                math: {
+                    min: 0,
+                    max: 200
+                }
+            },
+
+            type: {
+                type: "string",
+                not_null: true,
+                customize: (args, name) => {
+                    return args[name] === "all" || args[name] === "reviewed" || args[name] === "unreviewed";
+                }
+            }
+        });
+
+        let articles = await this.service.article.get_all_articles_admin(article_number, time_range, skip_number, type);
         return {
             data: {
                 articles

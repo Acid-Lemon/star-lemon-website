@@ -1,13 +1,13 @@
 <script>
-import {call_api} from "@/src/utils/cloud";
-import {ElNotification} from "element-plus";
-
-import {date_format} from "@/src/utils/time";
-
 import axios from "axios";
+import {ElNotification} from "element-plus";
 import {Message} from "@element-plus/icons-vue";
-
 import {use_user_info_store} from "../../stores/userInfo";
+
+import {call_api} from "@/src/utils/cloud";
+import {date_format} from "@/src/utils/time";
+import {get_avatar} from "@/src/utils/get_avatar";
+import {emoji} from "@/src/utils/emoji";
 
 export default {
     components: {Message},
@@ -22,206 +22,13 @@ export default {
             sentences: null,
             loading_more: false,
             has_more: true,
-            emoji_list: [
-                {
-                    value: "**doge**",
-                    path: "/static/emoji/doge.png",
-                },
-                {
-                    value: "**OK**",
-                    path: "/static/emoji/OK.png",
-                },
-                {
-                    value: "**偷笑**",
-                    path: "/static/emoji/偷笑.png",
-                },
-                {
-                    value: "**傲娇**",
-                    path: "/static/emoji/傲娇.png",
-                },
-                {
-                    value: "**冷**",
-                    path: "/static/emoji/冷.png",
-                },
-                {
-                    value: "**吃瓜**",
-                    path: "/static/emoji/吃瓜.png",
-                },
-                {
-                    value: "**哈欠**",
-                    path: "/static/emoji/哈欠.png",
-                },
-                {
-                    value: "**哦呼**",
-                    path: "/static/emoji/哦呼.png",
-                },
-                {
-                    value: "**喜极而泣**",
-                    path: "/static/emoji/喜极而泣.png",
-                },
-                {
-                    value: "**喜欢**",
-                    path: "/static/emoji/喜欢.png",
-                },
-                {
-                    value: "**大哭**",
-                    path: "/static/emoji/大哭.png",
-                },
-                {
-                    value: "**大笑**",
-                    path: "/static/emoji/大笑.png",
-                },
-                {
-                    value: "**奋斗**",
-                    path: "/static/emoji/奋斗.png",
-                },
-                {
-                    value: "**奶茶干杯**",
-                    path: "/static/emoji/奶茶干杯.png",
-                },
-                {
-                    value: "**妙啊**",
-                    path: "/static/emoji/妙啊.png",
-                },
-                {
-                    value: "**委屈**",
-                    path: "/static/emoji/委屈.png",
-                },
-                {
-                    value: "**害羞**",
-                    path: "/static/emoji/害羞.png",
-                },
-                {
-                    value: "**尴尬**",
-                    path: "/static/emoji/尴尬.png",
-                },
-                {
-                    value: "**干杯**",
-                    path: "/static/emoji/干杯.png",
-                },
-                {
-                    value: "**微笑**",
-                    path: "/static/emoji/微笑.png",
-                },
-                {
-                    value: "**惊喜**",
-                    path: "/static/emoji/惊喜.png",
-                },
-                {
-                    value: "**惊讶**",
-                    path: "/static/emoji/惊讶.png",
-                },
-                {
-                    value: "**打call**",
-                    path: "/static/emoji/打call.png",
-                },
-                {
-                    value: "**抓狂**",
-                    path: "/static/emoji/抓狂.png",
-                },
-                {
-                    value: "**拥抱**",
-                    path: "/static/emoji/拥抱.png",
-                },
-                {
-                    value: "**捂脸**",
-                    path: "/static/emoji/捂脸.png",
-                },
-                {
-                    value: "**撇嘴**",
-                    path: "/static/emoji/撇嘴.png",
-                },
-                {
-                    value: "**支持**",
-                    path: "/static/emoji/支持.png",
-                },
-                {
-                    value: "**无语**",
-                    path: "/static/emoji/无语.png",
-                },
-                {
-                    value: "**星星眼**",
-                    path: "/static/emoji/星星眼.png",
-                },
-                {
-                    value: "**滑稽**",
-                    path: "/static/emoji/滑稽.png",
-                },
-                {
-                    value: "**热**",
-                    path: "/static/emoji/热.png",
-                },
-                {
-                    value: "**爱心**",
-                    path: "/static/emoji/爱心.png",
-                },
-                {
-                    value: "**生气**",
-                    path: "/static/emoji/生气.png",
-                },
-                {
-                    value: "**生病**",
-                    path: "/static/emoji/生病.png",
-                },
-                {
-                    value: "**疑惑**",
-                    path: "/static/emoji/疑惑.png",
-                },
-                {
-                    value: "**疼**",
-                    path: "/static/emoji/疼.png",
-                },
-                {
-                    value: "**笑哭**",
-                    path: "/static/emoji/笑哭.png",
-                },
-                {
-                    value: "**给心心**",
-                    path: "/static/emoji/给心心.png",
-                },
-                {
-                    value: "**胜利**",
-                    path: "/static/emoji/胜利.png",
-                },
-                {
-                    value: "**脱单doge**",
-                    path: "/static/emoji/脱单doge.png",
-                },
-                {
-                    value: "**调皮**",
-                    path: "/static/emoji/调皮.png",
-                },
-                {
-                    value: "**辣眼睛**",
-                    path: "/static/emoji/辣眼睛.png",
-                },
-                {
-                    value: "**酸了**",
-                    path: "/static/emoji/酸了.png",
-                },
-                {
-                    value: "**难过**",
-                    path: "/static/emoji/难过.png",
-                },
-                {
-                    value: "**雪花**",
-                    path: "/static/emoji/雪花.png",
-                },
-                {
-                    value: "**鸡腿**",
-                    path: "/static/emoji/鸡腿.png",
-                },
-                {
-                    value: "**鼓掌**",
-                    path: "/static/emoji/鼓掌.png",
-                }
-            ],
+            emoji_list: emoji,
         };
     },
     async mounted() {
         await this.get_sentences();
         await this.get_message_list();
-        this.avatar = await this.get_avatar_url(this.user_info?.avatar?.type, this.user_info?.avatar?.name);
+        this.avatar = await get_avatar(this.user_info?.avatar);
     },
     computed: {
         style_mode() {
@@ -271,7 +78,7 @@ export default {
             return await Promise.all(messages.map((message) => {
                 return new Promise(async (resolve) => {
                     message.create_at_format_str = date_format(new Date(message.create_at));
-                    message.user.avatar_url = await this.get_avatar_url(message.user?.avatar?.type, message.user?.avatar?.name);
+                    message.user.avatar_url = await get_avatar(message.user?.avatar);
                     message.background_color = this.random_color();
                     resolve(message);
                 })
@@ -415,31 +222,6 @@ export default {
             }
             return index;
         },
-        async get_avatar_url(type, name) {
-            console.log(type, name);
-
-            if (!type || !name) {
-                return ''
-            }
-            if (type === "upload") {
-                let avatar_url_res = await call_api("user/profile/get_upload_avatar_temp_url", {
-                    image_name: name,
-                });
-
-                if (avatar_url_res.success === false) {
-                    ElNotification({
-                        title: 'Error',
-                        message: avatar_url_res,
-                        type: 'error',
-                    });
-                    return;
-                }
-
-                return avatar_url_res.data.temp_url
-            } else {
-                return "/static/avatar/" + name
-            }
-        },
         random_color() {
             let color_list = ["#fbc2eb", "#c2e9fb", "#FFE6FA", "#ebc0fd", "#abecd6", "#e3eeff", "#fdd6bd", "#bdc2e8", "#D7FFFE", "#FFE6FA", "#ffdde1"];
             return color_list[Math.floor(Math.random() * color_list.length)]
@@ -473,7 +255,7 @@ export default {
         <div class="w-full h-full">
             <div
                 class="bg-[url('/static/background/11.jpg')] bg-center bg-cover w-full md:h-[40vh] flex flex-col items-center justify-center h-[30vh]">
-                <p class="text-[#FFFFFF] font-['FZSX'] text-[6vh] hover:text-[#44cef6] duration-700">
+                <p class="text-[#FFFFFF] font-['SYST'] text-[6vh] hover:text-[#44cef6] duration-700">
                     留言板
                 </p>
             </div>
@@ -481,13 +263,13 @@ export default {
                 <div
                     class="border border-black shadow-md m-[4vh] h-[25vh] md:w-[70%] w-[85%] flex flex-col items-center justify-center">
                     <div class="relative top-[-2.5vh] bg-[#F8FAFD]">
-                        <p class="mx-[1vw] text-[3vh] font-['RGBZ']">网易云音乐热评</p>
+                        <p class="mx-[1vw] text-[3vh] font-['SYST']">网易云音乐热评</p>
                     </div>
                     <div class="w-full h-full flex flex-col items-center justify-center">
-                        <p class="text-[2.4vh] mb-[1vh] font-['FZSX']">
+                        <p class="text-[2.4vh] mb-[1vh] font-['SYST']">
                             {{ sentences?.hitokoto }}
                         </p>
-                        <p class="text-[1.9vh] mb-[3vh] font-['FZSX']">
+                        <p class="text-[1.9vh] mb-[3vh] font-['SYST']">
                             ——『{{ sentences?.from }}』{{
                                 sentences?.from_who === null ? '未知' : sentences?.from_who
                             }}</p>
@@ -500,14 +282,17 @@ export default {
                      class="md:w-[70%] w-[85%] mt-[30px] flex flex-row justify-evenly items-center bg-[url('/static/background/17.jpg')] bg-cover rounded-xl shadow-md relative">
                     <div
                         class="md:flex md:flex-col md:items-center md:justify-between h-[6vw] hidden self-start mt-[4vh]">
-                        <el-avatar :src="avatar" style="width: 4vw;height:4vw">{{ user_info?.name }}</el-avatar>
-                        <div class="font-['SYST']">{{ user_info?.name }}</div>
+                        <el-avatar :src="avatar" style="width: 4vw;height:4vw">
+                            {{ user_info?.name || "无名" }}
+                        </el-avatar>
+                        <div class="font-['SYST']">
+                            {{ user_info?.name || "无名" }}
+                        </div>
                     </div>
                     <div class="my-[3vh] flex flex-col justify-center md:w-[85%] w-[90%]">
                         <div class="mb-[3vh] relative">
-                            <p :class="['absolute pointer-events-none px-[1vh] duration-700 z-50 bg-black font-[\'FZSX\']',
-                                style_mode ? 'text-[#FFFFFF] bg-opacity-100 text-[1.6vh] top-[-1.2vh] left-[1.4vh]' : 'text-[#000000] bg-opacity-0 text-[2vh] top-[1vh] left-[1vh]']"
-                               class="">
+                            <p :class="['absolute pointer-events-none px-[1vh] duration-700 z-50 bg-black font-[\'SYST\']',
+                                style_mode ? 'text-[#FFFFFF] bg-opacity-100 text-[1.6vh] top-[-1.2vh] left-[1.4vh]' : 'text-[#000000] bg-opacity-0 text-[2vh] top-[1vh] left-[1vh']">
                                 你是我一生只会遇见一次的惊喜...
                             </p>
                             <textarea id="pl" v-model.lazy="value"
@@ -550,8 +335,8 @@ export default {
                 </div>
                 <div class="flex flex-row md:w-[70%] w-[85%] mt-[2vh] border-b-[1px] border-[#000000]">
                     <div class="flex flex-row items-end">
-                        <span class="text-[4vh] font-bold font-['RGBZ']">comment</span>
-                        <span class="text-[2vh] mb-[1vh] mx-[2vh] font-['FZSX']">{{ message_list.length }}条评论</span>
+                        <span class="text-[4vh] font-bold font-['SYST']">comment</span>
+                        <span class="text-[2vh] mb-[1vh] mx-[2vh] font-['SYST']">{{ message_list.length }}条评论</span>
                     </div>
                 </div>
                 <div v-infinite-scroll="get_message_list"
@@ -607,8 +392,8 @@ export default {
                             </div>
                         </div>
                     </div>
-                    <div v-if="loading_more" class="text-[3vh] font-['RGBZ']">正在加载中</div>
-                    <div v-if="!has_more" class="text-[3vh] font-['RGBZ']">没有更多留言惹</div>
+                    <div v-if="loading_more" class="text-[3vh] font-['SYST']">正在加载中</div>
+                    <div v-if="!has_more" class="text-[3vh] font-['SYST']">没有更多留言惹</div>
                     <div class="w-[70%]">
                         <el-divider content-position="left">列车已到站</el-divider>
                     </div>

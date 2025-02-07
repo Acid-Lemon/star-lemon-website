@@ -118,7 +118,7 @@ export default {
                                 </div>
                             </div>
                             <div v-else class="w-full h-[85vh] flex flex-row items-center justify-center">
-                                <span class="font-['RGBZ'] text-[40px]">当前分类没有相册</span>
+                                <span class="font-['SYST'] text-[40px]">当前分类没有相册</span>
                             </div>
                         </el-scrollbar>
                     </div>
@@ -156,7 +156,7 @@ export default {
                                 </div>
                             </div>
                             <div v-else class="w-full h-[85vh] flex flex-row items-center justify-center">
-                                <span class="font-['RGBZ'] text-[40px]">当前分类没有相册</span>
+                                <span class="font-['SYST'] text-[40px]">当前分类没有相册</span>
                             </div>
                         </el-scrollbar>
                     </div>
@@ -194,7 +194,7 @@ export default {
                                 </div>
                             </div>
                             <div v-else class="w-full h-[85vh] flex flex-row items-center justify-center">
-                                <span class="font-['RGBZ'] text-[40px]">当前分类没有相册</span>
+                                <span class="font-['SYST'] text-[40px]">当前分类没有相册</span>
                             </div>
                         </el-scrollbar>
                     </div>

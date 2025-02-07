@@ -1,6 +1,7 @@
 <script>
 import {call_api} from "../utils/cloud";
 import {get_avatar} from "@/src/utils/get_avatar";
+import {use_user_info_store} from "@/src/stores/userInfo";
 
 export default {
     data() {
@@ -14,10 +15,15 @@ export default {
         };
     },
     async mounted() {
-        this.avatar_url = await get_avatar();
+        this.avatar_url = await get_avatar(this.user_info?.avatar);
+    },
+    computed: {
+        user_info() {
+            const user_info_store = use_user_info_store();
+            return user_info_store.user_info;
+        },
     },
     methods: {
-
         toggle_assistant() {
             this.is_open = !this.is_open;
         },

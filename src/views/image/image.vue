@@ -188,14 +188,14 @@ export default {
 <template>
     <div class="h-full w-full flex flex-col justify-start items-center bg-[#F8FAFD]">
         <div class="fixed top-0 left-0 w-full h-[6vh] p-[10px] z-[1000] flex flex-row items-center">
-            <div class="flex flex-row items-center text-[#000000] font-['RGBZ']" @click="on_back">
+            <div class="flex flex-row items-center text-[#000000] font-['SYST']" @click="on_back">
                 <el-icon style="width: 25px; height: 25px">
                     <arrow-left style="width: 25px; height: 25px"/>
                 </el-icon>
                 返回
             </div>
             <div class="w-[1px] h-[80%] border border-[#000000] mx-[10px]"></div>
-            <div class="text-[2vh] text-[#000000] font-['RGBZ']">{{ this.$route.params.album_name }}</div>
+            <div class="text-[2vh] text-[#000000] font-['SYST']">{{ this.$route.params.album_name }}</div>
         </div>
         <div
             class="bg-[url('/static/background/17.jpg')] bg-cover rounded-md md:h-[6vh] h-[14vh] w-[95vw] flex flex-col justify-center mt-[5vh] md:p-[20px] p-[10px]">
@@ -253,14 +253,14 @@ export default {
                 </div>
                 <div v-if="filtered_images.length === 0 && !loading_more"
                      class="w-full h-[85vh] flex flex-row items-center justify-center">
-                    <div class="font-['RGBZ'] text-[40px]">当前相册没有图片</div>
+                    <div class="font-['SYST'] text-[40px]">当前相册没有图片</div>
                 </div>
                 <div v-if="loading_more" class="w-full h-[20vh] flex flex-row items-center justify-center">
-                    <div class="text-[3vh] font-['RGBZ']">正在加载中</div>
+                    <div class="text-[3vh] font-['SYST']">正在加载中</div>
                 </div>
                 <div v-if="!has_more && filtered_images.length > 0"
                      class="w-full h-[20vh] flex flex-row items-center justify-center">
-                    <div class="text-[3vh] font-['RGBZ']">没有更多图片惹</div>
+                    <div class="text-[3vh] font-['SYST']">没有更多图片惹</div>
                 </div>
             </el-scrollbar>
         </div>

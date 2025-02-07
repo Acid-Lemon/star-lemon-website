@@ -40,7 +40,8 @@ export default {
                 return;
             }
 
-            store_user(res.data);
+            store_token(res.token);
+            await load_user();
 
             ElNotification({
                 title: 'Success',

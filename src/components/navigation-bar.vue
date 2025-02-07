@@ -32,8 +32,11 @@ export default {
         }
     },
     watch: {
-        is_login() {
-            this.updatePages();
+        is_login: {
+            handler() {
+                this.updatePages();
+            },
+            deep: true
         }
     },
     methods: {

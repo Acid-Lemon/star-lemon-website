@@ -6,7 +6,8 @@ let tables = {
     email_code: "email_code",
     message_board: "message_board",
     album: "album",
-    article: "article"
+    article: "article",
+    online_tools: "online_tools",
 }
 
 module.exports = {

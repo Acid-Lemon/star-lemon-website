@@ -1,6 +1,6 @@
 <script>
 export default {
-    name: "404View"
+    name: "404"
 }
 </script>
 

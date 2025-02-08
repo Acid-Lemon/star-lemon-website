@@ -37,7 +37,7 @@ export default {
 <template>
     <div class="bg-blue-500 flex flex-row items-center justify-between pl-[10px] w-full h-[5vh] shadow-md px-[10px]">
         <router-link to="/admin">
-            <div class="text-[#FFFFFF] text-[20px] font-['SYST'] duration-700 hover:text-[#44cef6]">
+            <div class="text-[#FFFFFF] text-[20px] font-['SYST'] font-semibold duration-700 hover:text-[#44cef6]">
                 {{ web_config?.web_name }}：后台管理系统
             </div>
         </router-link>
@@ -64,7 +64,8 @@ export default {
                             :src="page.svg"
                             class="w-[3vh] m-[0.5vh]"
                         />
-                        <span class="md:block hidden hover:text-[#44cef6] m-[0.5vh] font-['SYST'] duration-700">{{
+                        <span
+                            class="md:block hidden hover:text-[#44cef6] m-[0.5vh] font-['SYST'] font-semibold duration-700">{{
                                 page.name
                             }}</span>
                     </router-link>

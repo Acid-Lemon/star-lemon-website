@@ -134,14 +134,14 @@ export default {
                         class="w-[3vh] md:m-[0.5vh] mb-[0.5vh]"
                     />
                     <span
-                        class="md:block hidden hover:text-[#44cef6] md:m-[0.5vh] mb-[0.5vh]  font-['SYST'] duration-700">
+                        class="md:block hidden hover:text-[#44cef6] md:m-[0.5vh] mb-[0.5vh]  font-['SYST'] font-semibold duration-700">
                         {{ page.name }}
                     </span>
                 </router-link>
                 <div v-show="page.name === '个人' && hovered_page === page"
                      class="absolute flex flex-col items-center justify-center top-[7vh] w-[10vh] bg-[#FFFFFF] bg-opacity-50 rounded shadow-md duration-700"
                      @mouseenter="onSecondaryMouseEnter" @mouseleave="onSecondaryMouseLeave">
-                    <div class="h-[4vh] flex flex-row items-center justify-center font-['SYST']"
+                    <div class="h-[4vh] flex flex-row items-center justify-center font-['SYST'] font-semibold"
                          @click="loginOut">
                         取消登录
                     </div>
@@ -149,16 +149,16 @@ export default {
                 <div v-show="page.name === '文章' && hovered_page === page"
                      class="absolute flex flex-col items-center justify-center top-[7vh] w-[10vh] bg-[#FFFFFF] bg-opacity-50 rounded shadow-md duration-700"
                      @mouseenter="onSecondaryMouseEnter" @mouseleave="onSecondaryMouseLeave">
-                    <div class="h-[4vh] flex flex-row items-center justify-center font-['SYST']"
+                    <div class="h-[4vh] flex flex-row items-center justify-center font-['SYST'] font-semibold"
                          @click="this.$router.push('/article?type=note')">笔记
                     </div>
-                    <div class="h-[4vh] flex flex-row items-center justify-center font-['SYST']"
+                    <div class="h-[4vh] flex flex-row items-center justify-center font-['SYST'] font-semibold"
                          @click="this.$router.push('/article?type=diary')">日记
                     </div>
-                    <div class="h-[4vh] flex flex-row items-center justify-center font-['SYST']"
+                    <div class="h-[4vh] flex flex-row items-center justify-center font-['SYST'] font-semibold"
                          @click="this.$router.push('/article?type=sentence')">句子
                     </div>
-                    <div class="h-[4vh] flex flex-row items-center justify-center font-['SYST']"
+                    <div class="h-[4vh] flex flex-row items-center justify-center font-['SYST'] font-semibold"
                          @click="this.$router.push('/article?type=other')">其它
                     </div>
                 </div>

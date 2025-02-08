@@ -235,18 +235,21 @@ export default {
                             <el-image :src="image.temp_url" class="w-full h-auto" fit="cover"/>
                         </div>
                         <div>
-                            <div class="px-[10px] py-[2px]">
+                            <div class="text-[14px] font-['SYHT'] font-semibold px-[10px] py-[5px]">
                                 <div v-if="search_content!==''" class="flex flex-row items-center">
-                                    <span class="text-[14px]">图片名：</span>
+                                    <span>图片名：</span>
                                     <div v-for="split_content in search_divide(image.name)"
                                          class="flex flex-row items-center">
                                         <span v-if="split_content.type==='text'"
-                                              class="text-[14px] text-[#000000]">{{ split_content.words }}</span>
+                                              class="text-[#000000]">{{ split_content.words }}</span>
                                         <span v-if="split_content.type==='search'"
-                                              class="text-[14px] text-[#dd5a00]">{{ split_content.words }}</span>
+                                              class="text-[#dd5a00]">{{ split_content.words }}</span>
                                     </div>
                                 </div>
-                                <div v-else class="text-[14px]">图片名：{{ image.name }}</div>
+                                <div v-else class="text-[14px] font-['SYHT'] font-semibold px-[10px] py-[5px]">图片名：{{
+                                        image.name
+                                    }}
+                                </div>
                             </div>
                         </div>
                     </div>

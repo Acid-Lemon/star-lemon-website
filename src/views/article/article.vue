@@ -110,7 +110,7 @@ export default {
                     <div v-for="article in article_list"
                          class="w-full h-auto px-[20px] py-[20px] hover:shadow-md bg-white hover:bg-[#F5F5F5] hover:scale-[1.02] duration-300"
                          @click="this.$router.push(`/article/read?article_id=${article.id}`)">
-                        <div class="text-[2.6vh] font-['SYST']">{{ article.title }}</div>
+                        <div class="text-[2.6vh] font-['SYST'] font-bold">{{ article.title }}</div>
                         <div
                             class="flex md:flex-row flex-col md:items-center md:justify-start items-start justify-center mb-[5px]">
                             <div class="flex flex-row items-center">

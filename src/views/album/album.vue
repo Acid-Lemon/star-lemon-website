@@ -90,31 +90,27 @@ export default {
                     <div class="h-[85vh]">
                         <el-scrollbar>
                             <div v-if="has_photo_albums"
-                                 class="md:columns-5 columns-2 column-gap-[20px]">
+                                 class="md:columns-5 columns-2 gap-[20px]">
                                 <div v-for="photo_album in photo_albums"
                                      :key="photo_album.id"
-                                     class="shadow-md break-inside-avoid mb-[20px]">
-                                    <router-link :to="'/album/' + photo_album.name + '?album_id=' + photo_album.id">
-                                        <div>
-                                            <el-image
-                                                :src="photo_album.cover"
-                                                class="w-full h-[20vh]"
-                                                fit="cover">
-                                                <template #error>
-                                                    <div class="image-slot">
-                                                        <el-icon style="width:100%; height:20vh">
-                                                            <Picture style="width: 50px;height:50px"/>
-                                                        </el-icon>
-                                                    </div>
-                                                </template>
-                                            </el-image>
-                                        </div>
-                                        <div>
-                                            <div class="text-[14px] px-[10px] py-[2px] whitespace-normal break-all">
-                                                相册：{{ photo_album.name }}
+                                     class="shadow-md break-inside-avoid"
+                                     @click="this.$router.push(`/album/image?album_id=${photo_album.id}`)">
+                                    <el-image
+                                        :src="photo_album.cover"
+                                        class="w-full h-[20vh]"
+                                        fit="cover">
+                                        <template #error>
+                                            <div class="image-slot">
+                                                <el-icon style="width:100%; height:20vh">
+                                                    <Picture style="width: 50px;height:50px"/>
+                                                </el-icon>
                                             </div>
-                                        </div>
-                                    </router-link>
+                                        </template>
+                                    </el-image>
+                                    <div
+                                        class="font-['SYHT'] font-semibold text-[14px] px-[10px] py-[5px] whitespace-normal break-all">
+                                        相册：{{ photo_album.name }}
+                                    </div>
                                 </div>
                             </div>
                             <div v-else class="w-full h-[85vh] flex flex-row items-center justify-center">

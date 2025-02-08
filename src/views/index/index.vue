@@ -1,5 +1,7 @@
 <script>
 
+import {call_api} from "@/src/utils/cloud";
+
 export default {
     data() {
         return {
@@ -7,11 +9,23 @@ export default {
                 "/static/picture/1.jpg",
                 "/static/picture/2.jpg"
             ],
+            online_tools: []
         };
     },
     mounted() {
+        this.get_online_tools();
     },
-    methods: {}
+    methods: {
+        async get_online_tools() {
+            let res = await call_api("online_tools/get_online_tools");
+
+            if (!res.success) {
+                return;
+            }
+            
+            this.online_tools = this.online_tools.concat(res.data.tools);
+        },
+    },
 };
 </script>
 
@@ -37,7 +51,22 @@ export default {
                                         <span>实用功能</span>
                                     </div>
                                 </template>
-                                <el-button @click="this.$router.push('/useful_tools/separate_audio')">视频音频分离
+                                <el-button @click="this.$router.push('/useful_tools/separate_audio')">
+                                    视频音频分离
+                                </el-button>
+                            </el-card>
+                        </div>
+                        <div class="w-[500px] ml-[20px] mt-[20px]">
+                            <el-card style="max-width: 500px">
+                                <template #header>
+                                    <div class="card-header">
+                                        <span>在线小工具</span>
+                                        <span class="text-[#88888888]">（来源于外部网站）</span>
+                                    </div>
+                                </template>
+                                <el-button v-for="tool in online_tools"
+                                           @click="this.$router.push(`/intermediate?url=${tool.url}`)">
+                                    {{ tool.name }}
                                 </el-button>
                             </el-card>
                         </div>

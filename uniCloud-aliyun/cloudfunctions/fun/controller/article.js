@@ -56,6 +56,10 @@ module.exports = class Controller_Article extends Controller {
         } = validate(this.ctx.event.args, {
             article_id: {
                 type: "string",
+                length: {
+                    max: 100,
+                    min: 1
+                }
             },
             title: {
                 type: "string",

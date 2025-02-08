@@ -61,7 +61,7 @@ const router = createRouter({
             component: () => import("@/src/views/album/album.vue")
         },
         {
-            path: "/album/:album_name",
+            path: "/album/image",
             name: "image",
             meta: {
                 title: "图片",
@@ -222,6 +222,21 @@ const router = createRouter({
             component: () => import("@/src/views/comment/comment-admin.vue")
         },
         {
+            path: "/admin/online-tools",
+            name: "online-tools-admin",
+            meta: {
+                title: "在线工具管理",
+                side_navigation_bar: {
+                    name: "工具",
+                    svg: "/static/svg/工具.svg"
+                },
+                show: {
+                    navigation_bar: false,
+                }
+            },
+            component: () => import("@/src/views/index/online-tools-admin.vue")
+        },
+        {
             path: "/useful_tools/separate_audio",
             name: "separate_audio",
             meta: {
@@ -232,6 +247,18 @@ const router = createRouter({
                 }
             },
             component: () => import("@/src/views/useful_tools/separate-audio.vue")
+        },
+        {
+            path: "/intermediate",
+            name: "intermediate",
+            meta: {
+                title: "中间页",
+                show: {
+                    navigation_bar: false,
+                    side_navigation_bar: false,
+                },
+            },
+            component: () => import("@/src/views/intermediate.vue")
         },
         {
             path: "/404",

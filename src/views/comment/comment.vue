@@ -258,7 +258,7 @@ export default {
                 <div
                     class="border border-black shadow-md m-[4vh] h-[25vh] md:w-[70%] w-[85%] flex flex-col items-center justify-center">
                     <div class="relative top-[-2.5vh] bg-[#F8FAFD]">
-                        <p class="mx-[1vw] text-[3vh] font-['SYST']">网易云音乐热评</p>
+                        <p class="mx-[1vw] text-[3vh] font-['SYHT'] font-semibold">网易云音乐热评</p>
                     </div>
                     <div class="w-full h-full flex flex-col items-center justify-center">
                         <p class="text-[2.4vh] mb-[1vh] font-['SYST']">

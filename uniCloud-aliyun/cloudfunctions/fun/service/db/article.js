@@ -209,9 +209,15 @@ module.exports = class DBService_Article extends Service {
     }
 
     async add_views(article_id, user_id) {
-        const is_exist = await this.db.collection(tables.article).doc(article_id)
-            .field({'_id': false, 'views': true})
-            .get().then(res => res.data[0].views.users.includes(user_id))
+        const is_exist = (await this.db.collection(tables.article).aggregate()
+            .match({
+                _id: this.db.command.eq(article_id)
+            })
+            .project({
+                included: this.db.command.aggregate.in([user_id, '$views.users'])
+            })
+            .end())
+            .data[0].included
 
         if (is_exist) {
             return;
@@ -220,7 +226,7 @@ module.exports = class DBService_Article extends Service {
         await this.db.collection(tables.article).doc(article_id).update({
             views: {
                 num: this.db.command.inc(1),
-                users: this.db.command.push(this.ctx.user.id)
+                users: this.db.command.push(user_id)
             }
         });
     }

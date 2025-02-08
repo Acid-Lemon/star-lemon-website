@@ -21,6 +21,9 @@ export default {
             disabled: {
                 add: false,
                 delete: false
+            },
+            dialog_visible: {
+                add: false
             }
         };
     },
@@ -113,6 +116,14 @@ export default {
             this.tools = this.tools.filter((tool) => tool.id !== tool_id);
 
             this.disabled.delete = false;
+        },
+        cancel_add() {
+            this.tool = {
+                name: "",
+                url: ""
+            }
+
+            this.dialog_visible.add = false;
         }
     }
 };
@@ -121,19 +132,6 @@ export default {
 <template>
     <admin-view>
         <div class="w-full [95vh] bg-[#F8FAFD] flex flex-col items-center">
-            <div class="w-full h-[10vh] flex flex-row items-center justify-around">
-                <el-form inline>
-                    <el-form-item label="工具名称：">
-                        <el-input v-model="tool.name" placeholder="请输入工具名称"/>
-                    </el-form-item>
-                    <el-form-item label="工具链接：">
-                        <el-input v-model="tool.url" placeholder="请输入工具链接"/>
-                    </el-form-item>
-                    <el-form-item>
-                        <el-button :disabled="disabled.add" type="primary" @click="add_tool">添加工具</el-button>
-                    </el-form-item>
-                </el-form>
-            </div>
             <div class="w-[95%] h-[85vh]">
                 <el-table :data="tools"
                           border
@@ -147,6 +145,11 @@ export default {
                     <el-table-column label="添加者id" prop="user.id" width="100"/>
                     <el-table-column label="添加时间" prop="create_at_format_str" width="200"/>
                     <el-table-column label="操作" width="200">
+                        <template #header>
+                            <el-button class="w-full" type="primary" @click="dialog_visible.add = true">
+                                添加工具
+                            </el-button>
+                        </template>
                         <template #default="scope">
                             <el-button
                                 :disabled="disabled.delete"
@@ -162,6 +165,21 @@ export default {
             </div>
         </div>
     </admin-view>
+
+    <el-dialog v-model="dialog_visible.add" align-center title="添加工具" width="30%">
+        <el-form>
+            <el-form-item label="工具名称：">
+                <el-input v-model="tool.name" placeholder="请输入工具名称"/>
+            </el-form-item>
+            <el-form-item label="工具链接：">
+                <el-input v-model="tool.url" placeholder="请输入工具链接"/>
+            </el-form-item>
+        </el-form>
+        <template #footer>
+            <el-button @click="cancel_add">取消</el-button>
+            <el-button :disabled="disabled.add" type="primary" @click="add_tool">添加工具</el-button>
+        </template>
+    </el-dialog>
 </template>
 
 <style scoped>

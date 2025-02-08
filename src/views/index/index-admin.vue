@@ -5,6 +5,7 @@ import ArticleAdminView from "../write/write-admin.vue";
 import {use_user_info_store} from "../../stores/userInfo";
 import {ArrowRight, CaretBottom, CaretTop, Warning} from "@element-plus/icons-vue";
 import AdminView from "@/src/components/admin.vue";
+import {call_api} from "@/src/utils/cloud";
 
 export default {
     name: "index-admin",
@@ -19,7 +20,12 @@ export default {
         ElMessageBox
     },
     data() {
-        return {};
+        return {
+            statistical_data: {
+                article_num: 0,
+                message_num: 0
+            }
+        };
     },
     computed: {
         web_config() {
@@ -32,6 +38,15 @@ export default {
         }
     },
     async mounted() {
+        let res = await call_api("statistical_data/get_num");
+
+        if (!res.success) {
+            return;
+        }
+
+        this.statistical_data = {
+            ...res.data
+        };
     },
     methods: {
         get_time_greetings() {
@@ -82,7 +97,23 @@ export default {
                         </div>
                     </template>
                 </el-card>
-                <el-card class="w-[65%] h-[210px]">
+                <el-card body-class="w-full h-full flex flex-row items-center justify-around" class="w-[65%] h-[210px]">
+                    <el-statistic :value="statistical_data.article_num"
+                                  class="flex flex-col items-center justify-center">
+                        <template #title>
+                            <div class="font-['SYST'] text-[2vh]">
+                                文章数量
+                            </div>
+                        </template>
+                    </el-statistic>
+                    <el-statistic :value="statistical_data.message_num"
+                                  class="flex flex-col items-center justify-center">
+                        <template #title>
+                            <div class="font-['SYST'] text-[2vh]">
+                                留言数量
+                            </div>
+                        </template>
+                    </el-statistic>
                 </el-card>
             </div>
         </div>

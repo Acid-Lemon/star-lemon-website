@@ -10,35 +10,7 @@ export default {
     components: {AdminView, ElAutoResizer, UploadFilled, ArrowLeft},
     data() {
         return {
-            photo_albums: [],
-            photo_album: null,
-            photo_albums_types: [
-                {
-                    value: 'shared',
-                    label: '共享相册'
-                },
-                {
-                    value: 'public',
-                    label: '公开相册'
-                },
-                {
-                    value: 'private',
-                    label: '私密相册'
-                },
-            ],
-            photo_albums_type: {
-                value: 'private',
-                label: '私密相册'
-            },
-            devices: [
-                {value: 'screenshot', label: '截图'},
-                {value: 'phone', label: '手机'},
-                {value: 'camera', label: '相机'},
-                {value: 'CCD', label: 'CCD'},
-            ],
-            device: {value: 'screenshot', label: '截图'},
-            photo_album_name: "",
-            image_list: [],
+            upload_list: [],
             photo_list: [],
             upload_url: "",
             data: {},
@@ -47,7 +19,6 @@ export default {
             index: 0,
             pages: 0,
             current_page: 1,
-            date: null
         }
     },
     async mounted() {
@@ -93,31 +64,31 @@ export default {
         upload() {
             console.log("开始");
             this.disabled = true;
-            this.photo_list = this.image_list;
+            this.photo_list = this.upload_list;
             this.uploadImage();
         },
         async uploadImage() {
             if (this.index >= this.photo_list.length) {
                 this.photo_list = [];
-                this.image_list = [];
+                this.upload_list = [];
                 this.index = 0;
                 this.disabled = false;
                 return;
             }
 
-            this.image_list = [];
-            this.image_list.push(this.photo_list[this.index]);
+            this.upload_list = [];
+            this.upload_list.push(this.photo_list[this.index]);
 
             let res = await call_api("album/create_image", {
                 folder_id: this.$route.query.album_id,
-                image_name: this.image_list[0].name
+                image_name: this.upload_list[0].name
             });
 
             console.log(res);
 
             if (res.success) {
                 this.images[this.current_page - 1].push({
-                    name: this.image_list[0].name,
+                    name: this.upload_list[0].name,
                     id: "",
                     temp_url: ""
                 })
@@ -194,43 +165,12 @@ export default {
     <admin-view>
         <div class="w-full h-[95vh] bg-[#F8FAFD] flex flex-col content-center items-center">
             <div
-                class="bg-[url('/static/background/17.jpg')] bg-cover rounded-md w-[95%] h-[15vh] flex flex-col items-start justify-between mt-[20px] p-[20px]">
-                <div class="w-full flex flex-row justify-between items-center">
-                    <div class="flex flex-row justify-center items-center">
-                        <div>图片名称：</div>
-                        <el-input style="width: 10vw; height: 30px"></el-input>
-                    </div>
-                    <div class="flex flex-row justify-center items-center">
-                        <div>拍摄时间：</div>
-                        <el-date-picker v-model="date"
-                                        style="width: 10vw; height: 30px"
-                                        type="date"
-                        />
-                    </div>
-                    <div class="flex flex-row justify-center items-center">
-                        <div>拍摄地点：</div>
-                        <el-input style="width: 10vw; height: 30px"></el-input>
-                    </div>
-                    <div class="flex flex-row justify-center items-center">
-                        <div>拍摄设备：</div>
-                        <el-select
-                            v-model="device"
-                            style="width: 10vw; height: 30px"
-                        >
-                            <el-option
-                                v-for="device in devices"
-                                :key="device.value"
-                                :label="device.label"
-                                :value="device.value"
-                            />
-                        </el-select>
-                    </div>
-                </div>
+                class="bg-[url('/static/background/17.jpg')] bg-cover rounded-md w-[95%] h-[8vh] flex flex-col items-start justify-between mt-[20px] p-[20px]">
                 <div class="w-full flex flex-row justify-between items-center">
                     <div class="flex flex-row justify-center items-center">
                         <el-upload
                             ref="upload"
-                            v-model:file-list="image_list"
+                            v-model:file-list="upload_list"
                             :action="upload_url"
                             :auto-upload=false
                             :data="data"
@@ -243,13 +183,16 @@ export default {
                             <el-button :disabled="disabled" type="primary">选择图片</el-button>
                         </el-upload>
                         <div class="mr-[20px]">已选择{{
-                                image_list.length
+                                upload_list.length
                             }}张照片
                         </div>
-                        <el-button :disabled="disabled" style="margin-right: 100px" @click="this.image_list = []">清除
+                        <el-button :disabled="disabled" style="margin-right: 100px" @click="this.upload_list = []">清除
                         </el-button>
                     </div>
-                    <el-button :disabled="disabled" type="primary" @click="upload">上传</el-button>
+                    <div>
+                        <el-button @click="on_back">返回</el-button>
+                        <el-button :disabled="disabled" type="primary" @click="upload">上传</el-button>
+                    </div>
                 </div>
             </div>
             <div class="w-[95%] my-[2vh]">

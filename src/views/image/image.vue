@@ -31,7 +31,7 @@ export default {
 
             return this.images.filter(image => {
                 const nameMatch = re.test(image.name) || !searchContent;
-                const dateMatch = !dateRange || new Date(image.time) >= dateRange[0] && new Date(image.time) <= dateRange[1];
+                const dateMatch = !dateRange || new Date(image.create_at) >= dateRange[0] && new Date(image.create_at) <= dateRange[1];
 
                 return nameMatch && dateMatch;
             });
@@ -70,18 +70,12 @@ export default {
                     this.$router.push('/404');
                     return
                 }
-                ElNotification({
-                    title: 'Error',
-                    type: "error",
-                    message: `获取图片失败`
-                });
                 this.pages -= 1;
                 this.loading_more = false;
-                console.log(res);
-
                 return
             }
             console.log(`第${this.pages}页数据已加载`);
+            console.log(res);
             this.images = this.images.concat(res.data.images_info);
 
 
@@ -236,17 +230,24 @@ export default {
                         </div>
                         <div>
                             <div class="text-[14px] font-['SYHT'] font-semibold px-[10px] py-[5px]">
-                                <div v-if="search_content!==''" class="flex flex-row items-center">
-                                    <span>图片名：</span>
+                                <div v-if="search_content!==''"
+                                     class="flex flex-row items-center whitespace-normal break-all">
+                                    <span class="whitespace-nowrap">图片名：</span>
                                     <div v-for="split_content in search_divide(image.name)"
                                          class="flex flex-row items-center">
                                         <span v-if="split_content.type==='text'"
-                                              class="text-[#000000]">{{ split_content.words }}</span>
+                                              class="text-[#000000] whitespace-nowrap">{{
+                                                split_content.words
+                                            }}</span>
                                         <span v-if="split_content.type==='search'"
-                                              class="text-[#dd5a00]">{{ split_content.words }}</span>
+                                              class="text-[#dd5a00] whitespace-nowrap">{{
+                                                split_content.words
+                                            }}</span>
                                     </div>
                                 </div>
-                                <div v-else class="text-[14px] font-['SYHT'] font-semibold px-[10px] py-[5px]">图片名：{{
+                                <div v-else
+                                     class="text-[14px] font-['SYHT'] font-semibold whitespace-normal break-all px-[10px] py-[5px]">
+                                    图片名：{{
                                         image.name
                                     }}
                                 </div>

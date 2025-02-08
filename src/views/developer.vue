@@ -68,15 +68,15 @@ export default {
         <div class="w-full h-[10%]">
         </div>
         <div class="w-full h-[20%]">
-            <div class="text-[30px] font-['SYST'] my-[20px]">
+            <div class="text-[3vh] font-['SYST'] my-[20px]">
                 此网站主要所用到的技术
             </div>
             <div class="flex flex-row my-[20px]">
                 <div v-for="i in power" class="flex flex-row">
-                    <img :alt="i.name" :src="i.svg" class="w-[8vh] h-[8vh] m-[5px]"/>
-                    <img alt="加号" class="w-[8vh] h-[8vh] m-[5px]" src="/static/svg/加号.svg"/>
+                    <img :alt="i.name" :src="i.svg" class="w-[5vh] h-[5vh] m-[5px]"/>
+                    <img alt="加号" class="w-[5vh] h-[5vh] m-[5px]" src="/static/svg/加号.svg"/>
                 </div>
-                <img alt="省略号" class="w-[8vh] h-[8vh] m-[5px]" src="/static/svg/省略号.svg"/>
+                <img alt="省略号" class="w-[5vh] h-[5vh] m-[5px]" src="/static/svg/省略号.svg"/>
             </div>
         </div>
         <div class="w-full h-[35%] flex flex-row items-center content-center">

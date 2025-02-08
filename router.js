@@ -109,7 +109,7 @@ const router = createRouter({
                 title: "登录",
                 navigation_bar: {
                     name: "登录",
-                    svg: "/static/svg/登录.svg"
+                    svg: "/static/svg/用户.svg"
                 },
                 show: {
                     side_navigation_bar: false,
@@ -125,7 +125,7 @@ const router = createRouter({
                 title: "个人",
                 navigation_bar: {
                     name: "个人",
-                    svg: "/static/svg/登录.svg"
+                    svg: "/static/svg/用户.svg"
                 },
                 show: {
                     side_navigation_bar: false,

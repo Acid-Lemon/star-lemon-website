@@ -17,13 +17,22 @@ export default {
     },
     methods: {
         async get_online_tools() {
-            let res = await call_api("online_tools/get_online_tools");
 
-            if (!res.success) {
-                return;
+
+            if (!window.sessionStorage.getItem("online_tools")) {
+                let res = await call_api("online_tools/get_online_tools");
+
+                if (!res.success) {
+                    return;
+                }
+
+                window.sessionStorage.setItem("online_tools", JSON.stringify(res.data));
+                this.online_tools = this.online_tools.concat(res.data.tools);
+            } else {
+                this.online_tools = JSON.parse(window.sessionStorage.getItem("online_tools")).tools;
             }
-            
-            this.online_tools = this.online_tools.concat(res.data.tools);
+
+
         },
     },
 };
@@ -37,14 +46,14 @@ export default {
             <div class="flex flex-row">
                 <div class="flex flex-row mt-[20px]">
                     <div class="flex flex-col">
-                        <div class="md:w-[500px] w-[90vw] md:h-[280px] h-[50vw] md:ml-[20px] ml-[5vw]">
+                        <div class="sm:w-[500px] w-[90vw] sm:h-[280px] h-[50vw] sm:ml-[20px] ml-[5vw]">
                             <el-carousel motion-blur trigger="click">
                                 <el-carousel-item v-for="picture in picture_url" :key="picture">
                                     <el-image :src="picture" fit="cover"/>
                                 </el-carousel-item>
                             </el-carousel>
                         </div>
-                        <div class="w-[500px] ml-[20px] mt-[20px]">
+                        <div class="sm:w-[500px] w-[90vw] ml-[20px] mt-[20px]">
                             <el-card style="max-width: 500px">
                                 <template #header>
                                     <div class="card-header">
@@ -56,7 +65,7 @@ export default {
                                 </el-button>
                             </el-card>
                         </div>
-                        <div class="w-[500px] ml-[20px] mt-[20px]">
+                        <div class="sm:w-[500px] w-[90vw] ml-[20px] mt-[20px]">
                             <el-card style="max-width: 500px">
                                 <template #header>
                                     <div class="card-header">

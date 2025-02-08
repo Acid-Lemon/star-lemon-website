@@ -235,7 +235,7 @@ export default {
                 message: '删除成功',
                 type: 'success',
             });
-            
+
             this.message_list = this.message_list.filter((message) => message.id !== message_id);
         }
     }
@@ -328,7 +328,7 @@ export default {
                 </div>
                 <div class="flex flex-row md:w-[70%] w-[85%] mt-[2vh] border-b-[1px] border-[#000000]">
                     <div class="flex flex-row items-end">
-                        <span class="text-[4vh] font-bold font-['SYST']">comment</span>
+                        <span class="text-[4vh] font-semibold font-['SYHT']">comment</span>
                         <span class="text-[2vh] mb-[1vh] mx-[2vh] font-['SYST']">{{ message_list.length }}条评论</span>
                     </div>
                 </div>

@@ -120,7 +120,7 @@ export default {
 
 <template>
     <admin-view>
-        <div class="w-full [95vh] bg-[#F8FAFD]">
+        <div class="w-full [95vh] bg-[#F8FAFD] flex flex-col items-center">
             <div class="w-full h-[10vh] flex flex-row items-center justify-around">
                 <el-form inline>
                     <el-form-item label="工具名称：">
@@ -134,30 +134,32 @@ export default {
                     </el-form-item>
                 </el-form>
             </div>
-            <el-table :data="tools"
-                      border
-                      max-height="80vh"
-                      style="width: 100%">
-                <el-table-column type="index" width="50"/>
-                <el-table-column label="工具id" prop="id" width="100"/>
-                <el-table-column label="工具名称" prop="name"/>
-                <el-table-column label="工具链接" prop="url"/>
-                <el-table-column label="添加者" prop="user.name" width="100"/>
-                <el-table-column label="添加者id" prop="user.id" width="100"/>
-                <el-table-column label="添加时间" prop="create_at_format_str" width="200"/>
-                <el-table-column label="操作" width="200">
-                    <template #default="scope">
-                        <el-button
-                            :disabled="disabled.delete"
-                            size="small"
-                            type="danger"
-                            @click="delete_tool(scope.row.id)"
-                        >
-                            删除
-                        </el-button>
-                    </template>
-                </el-table-column>
-            </el-table>
+            <div class="w-[95%] h-[85vh]">
+                <el-table :data="tools"
+                          border
+                          max-height="80vh"
+                          style="width: 100%">
+                    <el-table-column type="index" width="50"/>
+                    <el-table-column label="工具id" prop="id" width="100"/>
+                    <el-table-column label="工具名称" prop="name"/>
+                    <el-table-column label="工具链接" prop="url"/>
+                    <el-table-column label="添加者" prop="user.name" width="100"/>
+                    <el-table-column label="添加者id" prop="user.id" width="100"/>
+                    <el-table-column label="添加时间" prop="create_at_format_str" width="200"/>
+                    <el-table-column label="操作" width="200">
+                        <template #default="scope">
+                            <el-button
+                                :disabled="disabled.delete"
+                                size="small"
+                                type="danger"
+                                @click="delete_tool(scope.row.id)"
+                            >
+                                删除
+                            </el-button>
+                        </template>
+                    </el-table-column>
+                </el-table>
+            </div>
         </div>
     </admin-view>
 </template>

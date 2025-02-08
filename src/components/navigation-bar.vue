@@ -13,6 +13,19 @@ export default {
             hovered_page: null,
             hovered_timeout: null,
             is_hovered_secondary: false,
+            types: [{
+                label: "笔记",
+                value: "note"
+            }, {
+                label: "日记",
+                value: 'diary'
+            }, {
+                label: "句子",
+                value: 'sentence'
+            }, {
+                label: "其他",
+                value: 'other'
+            }],
         };
     },
     mounted() {
@@ -149,17 +162,10 @@ export default {
                 <div v-show="page.name === '文章' && hovered_page === page"
                      class="absolute flex flex-col items-center justify-center top-[7vh] w-[10vh] bg-[#FFFFFF] bg-opacity-50 rounded shadow-md duration-700"
                      @mouseenter="onSecondaryMouseEnter" @mouseleave="onSecondaryMouseLeave">
-                    <div class="h-[4vh] flex flex-row items-center justify-center font-['SYST'] font-semibold"
-                         @click="this.$router.push('/article?type=note')">笔记
-                    </div>
-                    <div class="h-[4vh] flex flex-row items-center justify-center font-['SYST'] font-semibold"
-                         @click="this.$router.push('/article?type=diary')">日记
-                    </div>
-                    <div class="h-[4vh] flex flex-row items-center justify-center font-['SYST'] font-semibold"
-                         @click="this.$router.push('/article?type=sentence')">句子
-                    </div>
-                    <div class="h-[4vh] flex flex-row items-center justify-center font-['SYST'] font-semibold"
-                         @click="this.$router.push('/article?type=other')">其它
+                    <div v-for="type in types"
+                         class="h-[4vh] flex flex-row items-center justify-center font-['SYST'] font-semibold"
+                         @click="this.$router.push(`/article?type=${type.value}`)">
+                        {{ type.label }}
                     </div>
                 </div>
             </div>

@@ -27,7 +27,9 @@ export default {
     watch: {
         modelValue: {
             handler(newValue, _oldValue) {
-                this.vditor.setValue(newValue);
+                if (newValue !== this.vditor.getValue()) {
+                    this.vditor.setValue(newValue);
+                }
             },
             deep: true // 启用深度监听
         }

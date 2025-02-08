@@ -37,7 +37,10 @@ module.exports = class Controller_OnlineTools extends Controller {
             }
         });
 
-        return await this.service.online_tools.add_online_tool(name, url);
+        let res = await this.service.online_tools.add_online_tool(name, url);
+        return {
+            data: res
+        }
     }
 
     async delete_online_tool() {
@@ -53,6 +56,9 @@ module.exports = class Controller_OnlineTools extends Controller {
             }
         });
 
-        return await this.service.online_tools.delete_online_tool(tool_id);
+        let res = await this.service.online_tools.delete_online_tool(tool_id);
+        return {
+            data: res
+        }
     }
 }

@@ -69,6 +69,7 @@ export default {
             }
 
             this.tools = this.tools.concat({
+                id: res.data.id,
                 name: this.tool.name,
                 url: this.tool.url,
                 user: {
@@ -91,11 +92,11 @@ export default {
 
             this.disabled.add = false;
         },
-        async delete_tool(id) {
+        async delete_tool(tool_id) {
             this.disabled.delete = true;
 
             let res = await call_api("online_tools/delete_online_tool", {
-                tool_id: id
+                tool_id: tool_id
             })
 
             if (!res.success) {
@@ -108,6 +109,8 @@ export default {
                 message: "删除成功",
                 type: "success"
             })
+
+            this.tools = this.tools.filter((tool) => tool.id !== tool_id);
 
             this.disabled.delete = false;
         }

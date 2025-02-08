@@ -226,20 +226,17 @@ export default {
                 message_id: message_id
             });
 
-            if (res.success) {
-                ElNotification({
-                    title: 'Success',
-                    message: '删除成功',
-                    type: 'success',
-                });
-                this.message_list = this.message_list.filter((message) => message.id !== message_id);
-            } else {
-                ElNotification({
-                    title: 'Error',
-                    message: res,
-                    type: 'error',
-                });
+            if (!res.success) {
+                return;
             }
+
+            ElNotification({
+                title: 'Success',
+                message: '删除成功',
+                type: 'success',
+            });
+            
+            this.message_list = this.message_list.filter((message) => message.id !== message_id);
         }
     }
 }

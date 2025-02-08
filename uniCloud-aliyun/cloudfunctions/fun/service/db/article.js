@@ -164,8 +164,6 @@ module.exports = class DBService_Article extends Service {
     }
 
     async get_article(article_id, user_id) {
-        await this.add_views(article_id, user_id);
-
         return (await this.db.collection(tables.article).aggregate()
             .match(this.db.command.and([
                 {_id: article_id},
@@ -208,7 +206,7 @@ module.exports = class DBService_Article extends Service {
             .data[0];
     }
 
-    async add_views(article_id, user_id) {
+    async add_view(article_id, user_id) {
         const is_exist = (await this.db.collection(tables.article).aggregate()
             .match({
                 _id: this.db.command.eq(article_id)

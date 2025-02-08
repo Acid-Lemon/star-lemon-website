@@ -41,6 +41,7 @@ module.exports = class Service_Article extends Service {
     }
 
     async get_article(article_id) {
+        await this.service.db.article.add_view(article_id, this.ctx.user.id);
         return await this.service.db.article.get_article(article_id, this.ctx.user.id);
     }
 

@@ -1,24 +1,38 @@
 <script>
 
 import {call_api} from "@/src/utils/cloud";
+import snowflake from "@/src/components/snowflake.vue";
 
 export default {
+    components: {snowflake},
     data() {
         return {
             picture_url: [
                 "/static/picture/1.jpg",
                 "/static/picture/2.jpg"
             ],
-            online_tools: []
+            online_tools: [],
+            snowflakes: []
         };
     },
     mounted() {
         this.get_online_tools();
+        this.generateSnowflakes(300);
     },
     methods: {
+        generateSnowflakes(count) {
+            for (let i = 0; i < count; i++) {
+                this.snowflakes.push({
+                    x: Math.random() * window.innerWidth,
+                    y: Math.random() * -window.innerHeight,
+                    size: Math.random() * 5 + 2, // 雪花大小在2px到7px之间
+                    opacity: Math.random() * 0.5 + 0.5, // 透明度在0.5到1之间
+                    duration: Math.random() * 5 + 5, // 下落速度在5s到10s之间
+                });
+            }
+        },
+
         async get_online_tools() {
-
-
             if (!window.sessionStorage.getItem("online_tools")) {
                 let res = await call_api("online_tools/get_online_tools");
 
@@ -92,6 +106,15 @@ export default {
             </div>
         </div>
     </div>
+    <snowflake
+        v-for="(snowflake, index) in snowflakes"
+        :key="index"
+        :duration="snowflake.duration"
+        :opacity="snowflake.opacity"
+        :size="snowflake.size"
+        :x="snowflake.x"
+        :y="snowflake.y"
+    />
 </template>
 
 <style scoped>

@@ -6,12 +6,14 @@ import el_locale_zh_cn from 'element-plus/es/locale/lang/zh-cn'
 
 import {use_user_info_store} from "./stores/userInfo";
 import AIAssistant from "./components/ai-assistant.vue";
+import snowflake from "@/src/components/snowflake.vue";
 
 export default {
     data() {
         return {
             show: this.$route?.meta?.show,
-            el_locale: el_locale_zh_cn
+            el_locale: el_locale_zh_cn,
+            snowflakes: []
         };
     },
     onLoad() {
@@ -29,6 +31,7 @@ export default {
     },
     methods: {},
     components: {
+        snowflake,
         NavigationBar,
         Copyright,
         AIAssistant

@@ -267,7 +267,7 @@ export default {
                             }}</p>
                     </div>
                 </div>
-                <p class="mx-[2vh] font-serif text-[2.4vh]">
+                <p class="mx-[2vh] font-['SYST'] font-medium text-[2.4vh]">
                     很感谢你能访问该页面，如果你有什么和我们说的，或者有什么问题想问的，可以随时在下面评论噢~！我们看见了会第一时间回复你的。
                 </p>
                 <div v-if="is_login"
@@ -347,10 +347,14 @@ export default {
                                         {{ message.user.name }}
                                     </el-avatar>
                                     <div class="flex flex-col ml-[1vh]">
-                                        <div class="text-[2.2vh] font-['SYST']">{{ message.user.name }}</div>
-                                        <div class="text-[1.6vh] font-['SYST'] text-[#000000] opacity-80">{{
-                                                message.create_at_format_str
-                                            }}
+                                        <div class="text-[2vh] font-['SYST'] font-medium flex flex-row items-center">
+                                            <div class="mr-[5px]">{{ message.user.name }}</div>
+                                            <el-tag v-if="message.user?.role"
+                                                    effect="plain" round size="small">管理员
+                                            </el-tag>
+                                        </div>
+                                        <div class="text-[1.6vh] font-['SYST'] text-[#000000] opacity-80">
+                                            {{ message.create_at_format_str }}
                                         </div>
                                     </div>
                                 </div>

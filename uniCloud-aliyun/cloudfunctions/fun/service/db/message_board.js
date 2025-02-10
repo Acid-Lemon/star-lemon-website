@@ -59,7 +59,8 @@ module.exports = class DBService_MessageBoard extends Service {
                         id: "$_id",
                         _id: false,
                         name: true,
-                        avatar: true
+                        avatar: true,
+                        role: true
                     })
                     .done(),
                 as: "user"

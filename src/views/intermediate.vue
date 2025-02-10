@@ -4,18 +4,24 @@ export default {
     data() {
         return {
             url: "",
-            countdown: 3
+            countdown: 3,
+            interval: null
         }
     },
     mounted() {
         this.url = this.$route.query.url;
-        const interval = setInterval(() => {
+        this.interval = setInterval(() => {
             this.countdown--;
             if (this.countdown === 0) {
+                clearInterval(this.interval);
                 window.open(this.url, '_blank');
-                clearInterval(interval);
             }
         }, 1000);
+    },
+    unmounted() {
+        if (this.interval) {
+            clearInterval(this.interval);
+        }
     },
     methods: {}
 }

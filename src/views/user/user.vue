@@ -15,7 +15,6 @@ export default {
         return {
             dialog_visible: {
                 update_user_info: false,
-                update_account_security: false
             },
             avatar_url: "",
             background_url: "",
@@ -23,12 +22,10 @@ export default {
                 avatar: [],
                 background: [],
                 click_flag: -1,
+                email: "",
                 name: "",
                 birthday: "",
                 personal_sign: "",
-            },
-            new_account_security: {
-                email: "",
             },
             avatar_list: [],
             avatars_nums: 46,
@@ -55,8 +52,6 @@ export default {
             background: [],
             click_flag: -1,
         };
-
-        this.new_account_security.email = this.user_info?.email;
     },
     computed: {
         user_info() {
@@ -89,21 +84,6 @@ export default {
                     this.new_user_info.name = this.user_info?.name;
                     this.new_user_info.birthday = this.user_info?.birthday;
                     this.new_user_info.personal_sign = this.user_info?.personal_sign;
-                })
-                return;
-            }
-            done();
-        },
-        handle_close_update_account_security(done) {
-            if (this.new_account_security.email !== this.user_info?.email) {
-                ElMessageBox.confirm('确认关闭？（未提交的信息不会保存）', '提示', {
-                    confirmButtonText: '确定',
-                    cancelButtonText: '取消',
-                    type: 'warning'
-                }).then(() => {
-                    done();
-                }).catch(() => {
-                    this.new_account_security.email = "";
                 })
                 return;
             }
@@ -211,9 +191,6 @@ export default {
             this.loading = false;
             this.dialog_visible.update_user_info = false;
         },
-        update_account_security() {
-            this.dialog_visible.update_account_security = false;
-        },
         cancel_update_user_info() {
             this.new_user_info.avatar = [];
             this.new_user_info.click_flag = -1;
@@ -223,11 +200,6 @@ export default {
 
             this.dialog_visible.update_user_info = false;
         },
-        cancel_update_account_security() {
-            this.new_account_security.email = "";
-
-            this.dialog_visible.update_account_security = false;
-        }
     }
 }
 </script>
@@ -260,11 +232,6 @@ export default {
                 <el-button class="ml-[2vw]" plain
                            @click="this.dialog_visible.update_user_info = true">
                     编辑信息
-                </el-button>
-            </div>
-            <div class="flex flex-row items-center">
-                <span class="ml-[10vw]">邮箱：{{ user_info?.email }}</span>
-                <el-button class="ml-[2vw]" @click="this.dialog_visible.update_account_security = true">修改邮箱
                 </el-button>
             </div>
         </div>
@@ -353,11 +320,13 @@ export default {
                             </div>
                         </div>
                     </el-scrollbar>
-
-
                 </div>
             </div>
             <div class="flex flex-row">
+                <div class="w-[10vw] m-[1vw]">
+                    <span>邮箱：</span>
+                    <el-input v-model="new_user_info.email" class="w-full"/>
+                </div>
                 <div class="w-[10vw] m-[1vw]">
                     <span>用户名：</span>
                     <el-input v-model="new_user_info.name" class="w-full"/>
@@ -367,7 +336,7 @@ export default {
                     <el-date-picker v-model="new_user_info.birthday" size="default" style="width: 100%" type="date"
                                     value-format="YYYY年MM月DD日"/>
                 </div>
-                <div class="w-[30vw] m-[1vw]">
+                <div class="w-[20vw] m-[1vw]">
                     <span>个性签名：</span>
                     <el-input v-model="new_user_info.personal_sign" class="w-full"/>
                 </div>
@@ -380,22 +349,6 @@ export default {
                 确定
             </el-button>
         </div>
-    </el-dialog>
-
-    <el-dialog v-model="dialog_visible.update_account_security" :before-close="handle_close_update_account_security"
-               align-center
-               title="账号安全" width="30%">
-        <div class="flex flex-row items-center">
-            <div class="w-[80px]">新邮箱：</div>
-            <el-input v-model="new_account_security.email"></el-input>
-        </div>
-        <template #footer>
-            <el-button @click="cancel_update_account_security()">取消</el-button>
-            <el-button v-loading.fullscreen.lock="loading" type="primary"
-                       @click="update_account_security()">
-                确定
-            </el-button>
-        </template>
     </el-dialog>
 </template>
 

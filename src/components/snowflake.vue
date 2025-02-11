@@ -41,7 +41,7 @@ export default {
 
 <style scoped>
 .snowflake {
-    position: absolute;
+    position: fixed;
     background-color: white;
     border-radius: 50%;
     pointer-events: none;
@@ -52,7 +52,7 @@ export default {
 
 @keyframes fall {
     to {
-        transform: translateY(95vh);
+        transform: translateY(100vh);
     }
 }
 </style>

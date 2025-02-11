@@ -52,7 +52,7 @@ export default {
 
 @keyframes fall {
     to {
-        transform: translateY(100vh);
+        transform: translateY(95vh);
     }
 }
 </style>

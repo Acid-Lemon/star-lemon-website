@@ -348,7 +348,9 @@ export default {
                                     </el-avatar>
                                     <div class="flex flex-col ml-[1vh]">
                                         <div class="text-[2vh] font-['SYST'] font-medium flex flex-row items-center">
-                                            <div class="mr-[5px]">{{ message.user.name }}</div>
+                                            <div class="mr-[5px]">
+                                                {{ message.user.name || "无名" }}
+                                            </div>
                                             <el-tag v-if="message.user?.role"
                                                     effect="plain" round size="small">管理员
                                             </el-tag>

@@ -147,7 +147,7 @@ export default {
                         class="w-[3vh] md:m-[0.5vh] mb-[0.5vh]"
                     />
                     <span
-                        class="md:block hidden hover:text-[#44cef6] md:m-[0.5vh] mb-[0.5vh]  font-['SYST'] font-semibold duration-700">
+                        class="md:block hidden hover:text-[#44cef6] md:m-[0.5vh] mb-[0.5vh] font-['SYST'] font-semibold duration-700">
                         {{ page.name }}
                     </span>
                 </router-link>

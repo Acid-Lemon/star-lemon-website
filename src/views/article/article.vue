@@ -88,6 +88,20 @@ export default {
             }
             return index;
         },
+        // 在元素进入之前设置初始状态
+        beforeEnter(el) {
+            el.classList.add('opacity-0', 'translate-y-[70vh]');
+        },
+        // 在元素进入时应用动画
+        enter(el, done) {
+            const delay = el.dataset.index * 100; // 每个元素的延迟时间（100ms * index）
+            console.log(el.dataset.index);
+            setTimeout(() => {
+                el.classList.remove('opacity-0', 'translate-y-[70vh]');
+                el.classList.add('opacity-100', 'translate-y-0');
+                done(); // 通知 Vue 动画完成
+            }, delay);
+        },
     },
 }
 </script>
@@ -107,45 +121,50 @@ export default {
                     :infinite-scroll-disabled="state"
                     class="md:w-[70vw] w-[90vw] h-auto bg-[#FFFFFF] shadow-md mt-[20px]"
                     infinite-scroll-delay=1000 infinite-scroll-distance=100>
-                    <div v-for="article in article_list"
-                         class="w-full h-auto px-[20px] py-[20px] hover:shadow-md bg-white hover:bg-[#F5F5F5] hover:scale-[1.02] duration-300"
-                         @click="this.$router.push(`/article/read?article_id=${article.id}`)">
-                        <div class="text-[2.6vh] font-['SYST'] font-bold">{{ article.title }}</div>
-                        <div
-                            class="flex md:flex-row flex-col md:items-center md:justify-start items-start justify-center mb-[5px]">
-                            <div class="flex flex-row items-center">
-                                <div class="text-[1.5vh] font-['SYST'] mr-[20px]">{{ article.user.name }}</div>
-                                <svg class="opacity-50 w-[1.5vh] h-[1.5vh] mr-[3px]" viewBox="0 0 24 24">
-                                    <path
-                                        d="M12 20a8 8 0 0 0 8-8a8 8 0 0 0-8-8a8 8 0 0 0-8 8a8 8 0 0 0 8 8m0-18a10 10 0 0 1 10 10a10 10 0 0 1-10 10C6.47 22 2 17.5 2 12A10 10 0 0 1 12 2m.5 5v5.25l4.5 2.67l-.75 1.23L11 13V7h1.5Z"
-                                        fill="currentColor">
-                                    </path>
-                                </svg>
-                                <div class="text-[1.5vh] font-['SYST'] mr-[20px] opacity-50">
-                                    {{ article.create_at_format_str }}
+                    <transition-group name="fade"
+                                      tag="div"
+                                      @enter="enter"
+                                      @before-enter="beforeEnter">
+                        <div v-for="(article, index) in article_list" :key="article.id" :data-index="index"
+                             class="w-full h-auto px-[20px] py-[20px] hover:shadow-md bg-white hover:bg-[#F5F5F5] z-0 hover:z-[1000] hover:scale-[1.02] ease-in-out transition duration-300"
+                             @click="this.$router.push(`/article/read?article_id=${article.id}`)">
+                            <div class="text-[2.6vh] font-['SYST'] font-bold">{{ article.title }}</div>
+                            <div
+                                class="flex md:flex-row flex-col md:items-center md:justify-start items-start justify-center mb-[5px]">
+                                <div class="flex flex-row items-center">
+                                    <div class="text-[1.5vh] font-['SYST'] mr-[20px]">{{ article.user.name }}</div>
+                                    <svg class="opacity-50 w-[1.5vh] h-[1.5vh] mr-[3px]" viewBox="0 0 24 24">
+                                        <path
+                                            d="M12 20a8 8 0 0 0 8-8a8 8 0 0 0-8-8a8 8 0 0 0-8 8a8 8 0 0 0 8 8m0-18a10 10 0 0 1 10 10a10 10 0 0 1-10 10C6.47 22 2 17.5 2 12A10 10 0 0 1 12 2m.5 5v5.25l4.5 2.67l-.75 1.23L11 13V7h1.5Z"
+                                            fill="currentColor">
+                                        </path>
+                                    </svg>
+                                    <div class="text-[1.5vh] font-['SYST'] mr-[20px] opacity-50">
+                                        {{ article.create_at_format_str }}
+                                    </div>
+                                </div>
+                                <div class="flex flex-row items-center">
+                                    <img alt="浏览" class="opacity-50 w-[1.5vh] h-[1.5vh] mr-[3px]"
+                                         src="/static/svg/views.svg"/>
+                                    <div class="text-[1.5vh] font-['SYST'] mr-[20px] opacity-50">
+                                        {{ article.views.num }}
+                                    </div>
+                                    <img alt="喜欢" class="opacity-50 w-[1.5vh] h-[1.5vh] mr-[3px]"
+                                         src="/static/svg/likes.svg"/>
+                                    <div class="text-[1.5vh] font-['SYST'] mr-[20px] opacity-50">
+                                        {{ article.likes.num }}
+                                    </div>
+                                    <img alt="评论"
+                                         class="opacity-50 w-[1.5vh] h-[1.5vh] mr-[3px]"
+                                         src="/static/svg/comments.svg"/>
+                                    <div class="text-[1.5vh] font-['SYST'] opacity-50">
+                                        {{ article.comments.num }}
+                                    </div>
                                 </div>
                             </div>
-                            <div class="flex flex-row items-center">
-                                <img alt="浏览" class="opacity-50 w-[1.5vh] h-[1.5vh] mr-[3px]"
-                                     src="/static/svg/views.svg"/>
-                                <div class="text-[1.5vh] font-['SYST'] mr-[20px] opacity-50">
-                                    {{ article.views.num }}
-                                </div>
-                                <img alt="喜欢" class="opacity-50 w-[1.5vh] h-[1.5vh] mr-[3px]"
-                                     src="/static/svg/likes.svg"/>
-                                <div class="text-[1.5vh] font-['SYST'] mr-[20px] opacity-50">
-                                    {{ article.likes.num }}
-                                </div>
-                                <img alt="评论"
-                                     class="opacity-50 w-[1.5vh] h-[1.5vh] mr-[3px]"
-                                     src="/static/svg/comments.svg"/>
-                                <div class="text-[1.5vh] font-['SYST'] opacity-50">
-                                    {{ article.comments.num }}
-                                </div>
-                            </div>
+                            <div class="text-[1.5vh] font-['SYST']">{{ article.content }}</div>
                         </div>
-                        <div class="text-[1.5vh] font-['SYST']">{{ article.content }}</div>
-                    </div>
+                    </transition-group>
                 </div>
                 <div class="md:w-[70vw] w-[90vw] h-[100px] flex flex-row items-center justify-center">
                     <div v-if="loading_more" class="text-[3vh] font-['SYST']">正在加载中</div>

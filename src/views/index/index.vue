@@ -45,9 +45,11 @@ export default {
             } else {
                 this.online_tools = JSON.parse(window.sessionStorage.getItem("online_tools")).tools;
             }
-
-
         },
+
+        open_url(url) {
+            window.open(url, "_blank");
+        }
     },
 };
 </script>
@@ -87,8 +89,7 @@ export default {
                                         <span class="text-[#88888888]">（来源于外部网站）</span>
                                     </div>
                                 </template>
-                                <el-button v-for="tool in online_tools"
-                                           @click="this.$router.push(`/intermediate?url=${tool.url}`)">
+                                <el-button v-for="tool in online_tools" @click="open_url(tool.url)">
                                     {{ tool.name }}
                                 </el-button>
                             </el-card>

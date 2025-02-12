@@ -75,7 +75,7 @@ export default {
         <div class="h-full w-full flex flex-col items-center justify-start">
             <el-scrollbar ref="el-scrollbar" @scroll="handle_scroll">
                 <div
-                    class="w-full min-h-[40vh] bg-[url('/static/background/23.jpg')] flex flex-col justify-center items-center bg-center bg-cover">
+                    class="w-full min-h-[40vh] bg-[url('/static/background/1.jpg')] flex flex-col justify-center items-center bg-center bg-cover">
                     <p class="text-[#FFFFFF] font-['SYST'] text-[3.6vh] hover:text-[#44cef6] duration-700"
                        style="text-shadow: 1px 1px 2px black">
                         {{ article?.title }}
@@ -114,7 +114,7 @@ export default {
                 <div class="w-full min-h-[60vh] flex flex-row items-start justify-center bg-[#F8FAFD]">
                     <div class="w-[15vw] flex flex-col items-center justify-start"></div>
                     <div class="w-[70vw] flex flex-col items-center justify-start">
-                        <div class="w-[70vw] min-h-[60vh] my-[20px] bg-white shadow-md p-[20px]">
+                        <div class="w-[70vw] min-h-[60vh] mt-[20px] mb-[50px] bg-white shadow-md p-[20px]">
                             <md-parser :content=article?.content></md-parser>
                         </div>
                     </div>

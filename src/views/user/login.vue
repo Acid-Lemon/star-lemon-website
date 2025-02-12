@@ -219,8 +219,8 @@ export default {
         class="bg-[url('/static/background/22.jpg')] h-full w-full bg-cover flex flex-row justify-between items-center p-[5vh]">
         <div class="md:block hidden w-[100%]">
             <div class="flex flex-col items-center">
-                <span class="font-['RGBZ'] text-[5vw] text-[#FFFFFF]">“海阔凭鱼跃，</span>
-                <span class="font-['RGBZ'] text-[5vw] text-[#FFFFFF] pl-[20%]">天高任鸟飞。”</span>
+                <span class="font-['SYST'] font-medium text-[5vw] text-[#FFFFFF]">“海阔凭鱼跃，</span>
+                <span class="font-['SYST'] font-medium text-[5vw] text-[#FFFFFF] pl-[20%]">天高任鸟飞。”</span>
             </div>
         </div>
         <div

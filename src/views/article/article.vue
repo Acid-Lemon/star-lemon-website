@@ -126,7 +126,7 @@ export default {
                                       @enter="enter"
                                       @before-enter="beforeEnter">
                         <div v-for="(article, index) in article_list" :key="article.id" :data-index="index"
-                             class="w-full h-auto px-[20px] py-[20px] hover:shadow-md bg-white hover:bg-[#F5F5F5] z-0 hover:z-[1000] hover:scale-[1.02] ease-in-out transition duration-300"
+                             class="relative w-full h-auto px-[20px] py-[20px] hover:shadow-md bg-white hover:bg-[#F5F5F5] z-0 hover:z-10 hover:scale-[1.02] ease-in-out transition duration-300"
                              @click="this.$router.push(`/article/read?article_id=${article.id}`)">
                             <div class="text-[2.6vh] font-['SYST'] font-bold">{{ article.title }}</div>
                             <div

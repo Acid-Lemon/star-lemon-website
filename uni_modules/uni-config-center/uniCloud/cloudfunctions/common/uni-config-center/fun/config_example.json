@@ -7,12 +7,21 @@
     "minute": 1
   },
   "EMAIL_CODE_SENDER": {
-  	"host": "url",
-  	"port": 465,
-  	"email": "email",
-  	"password": "pass"
+    "host": "url",
+    "port": 465,
+    "email": "email",
+    "password": "pass"
   },
-  "CLOUD_FUNCTION_PUBLIC_PATH_PREFIX": ["user/login/", "message_board/get_personal_and_public_messages", "user/profile/get_upload_avatar_temp_url"],
+  "CLOUD_FUNCTION_PUBLIC_PATH_PREFIX": [
+    "user/login/",
+    "message_board/get_personal_and_public_messages",
+    "user/profile/get_upload_avatar_temp_url",
+    "article/get_personal_and_public_articles",
+    "article/get_article",
+    "album/get_folders",
+    "album/get_images",
+    "online_tools/get_online_tools"
+  ],
   "UNICLOUD_EXT_STORAGE_DOMAIN": "xxx",
   "UNICLOUD_EXT_STORAGE_BUCKET_NAME": "xxx",
   "UNICLOUD_EXT_STORAGE_BUCKET_SECRET": "xxx",

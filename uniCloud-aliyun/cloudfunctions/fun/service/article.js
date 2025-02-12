@@ -39,8 +39,10 @@ module.exports = class Service_Article extends Service {
     }
 
     async get_article(article_id) {
-        await this.service.db.article.add_view(article_id, this.ctx.user.id);
-        return await this.service.db.article.get_article(article_id, this.ctx.user.id);
+        if (this.ctx?.user?.id) {
+            await this.service.db.article.add_view(article_id, this.ctx.user.id);
+        }
+        return await this.service.db.article.get_article(article_id, this.ctx?.user?.id);
     }
 
     async change_article_public_state(article_id, public_state) {

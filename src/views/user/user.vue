@@ -167,8 +167,9 @@ export default {
                 this.$refs.background.submit();
             }
 
-            if (this.new_user_info.name !== this.user_info.name || this.new_user_info.birthday !== this.user_info?.birthday || this.new_user_info.personal_sign !== this.user_info?.personal_sign) {
+            if (this.new_user_info.email !== this.user_info.email || this.new_user_info.name !== this.user_info.name || this.new_user_info.birthday !== this.user_info?.birthday || this.new_user_info.personal_sign !== this.user_info?.personal_sign) {
                 let basic_info_res = await call_api("user/profile/update_profile", {
+                    email: this.new_user_info.email,
                     name: this.new_user_info.name,
                     birthday: this.new_user_info.birthday,
                     personal_sign: this.new_user_info.personal_sign

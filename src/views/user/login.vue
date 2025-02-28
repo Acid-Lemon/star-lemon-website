@@ -31,6 +31,8 @@ export default {
     },
     async mounted() {
         if (this.$route.query.code) {
+            let loading = ElLoading.service();
+
             let res = await call_api("user/login/login_with_qq", {
                 auth_code: this.$route.query.code,
                 redirect_uri: this.QQ.redirect_uri
@@ -42,6 +44,8 @@ export default {
 
             store_token(res.token);
             await load_user();
+
+            loading.close();
 
             ElNotification({
                 title: 'Success',
@@ -225,7 +229,7 @@ export default {
         </div>
         <div
             class="bg-white bg-opacity-80 backdrop-blur-md md:w-[360px] w-[95vw] h-[85vh] shadow-sm rounded-lg p-[3vh] mt-[12vh] mb-[3vh]">
-            <el-form ref="form_ref" :model="form" :rules="rules" label-position="top">
+            <el-form ref="form_ref" :model="form" :rules="rules" label-position="top" @keyup.enter="common_login">
                 <div class="text-[4vh] font-['SYST']">
                     {{ state.is_login === true ? "登录" : "注册" }}
                 </div>

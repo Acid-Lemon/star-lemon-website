@@ -131,7 +131,7 @@ export default {
 
 <template>
     <admin-view>
-        <div class="w-full [95vh] bg-[#F8FAFD] flex flex-col items-center">
+        <div class="w-full [95vh] bg-[#F8FAFD] flex flex-col items-center mt-[3vh]">
             <div class="w-[95%] h-[85vh]">
                 <el-table :data="tools"
                           border
@@ -144,7 +144,7 @@ export default {
                     <el-table-column label="添加者" prop="user.name" width="100"/>
                     <el-table-column label="添加者id" prop="user.id" width="100"/>
                     <el-table-column label="添加时间" prop="create_at_format_str" width="200"/>
-                    <el-table-column label="操作" width="200">
+                    <el-table-column align="center" label="操作" width="100">
                         <template #header>
                             <el-button class="w-full" type="primary" @click="dialog_visible.add = true">
                                 添加工具

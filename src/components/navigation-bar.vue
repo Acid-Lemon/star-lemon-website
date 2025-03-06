@@ -1,6 +1,5 @@
 <script>
 import {use_user_info_store} from "../stores/userInfo";
-import {use_web_config_store} from "../stores/webConfig";
 
 export default {
     name: "NavigationBar",
@@ -9,6 +8,7 @@ export default {
     },
     data() {
         return {
+            website_name: import.meta.env.VITE_WEBSITE_NAME,
             pages: [],
             hovered_page: null,
             hovered_timeout: null,
@@ -34,10 +34,6 @@ export default {
         is_login() {
             const user_info_store = use_user_info_store();
             return !!user_info_store.user_info;
-        },
-        web_config() {
-            const web_config_store = use_web_config_store();
-            return web_config_store.web_config;
         },
         user_info() {
             const user_info_store = use_user_info_store();
@@ -132,7 +128,7 @@ export default {
             <router-link to="/">
                 <div
                     class="md:text-[22px] text-[20px] md:m-[0.5vh] mt-[0.5vh] font-['SYST'] font-semibold hover:text-[#44cef6] duration-700">
-                    {{ web_config?.web_name }}
+                    {{ website_name }}
                 </div>
             </router-link>
         </div>

@@ -27,6 +27,11 @@ export default {
                 birthday: "",
                 personal_sign: "",
             },
+            code: {
+                disabled: false,
+                wait_time: 60,
+                text: "获取验证码",
+            },
             avatar_list: [],
             avatars_nums: 46,
             loading: false,
@@ -201,6 +206,43 @@ export default {
 
             this.dialog_visible.update_user_info = false;
         },
+        async get_email_code() {
+            this.code.disabled = true;
+
+            let res = await call_api(`user/login/send_email_code`, {
+                email: this.new_user_info.email,
+                mode: "登录"
+            })
+
+            if (!res.success) {
+                ElNotification({
+                    title: 'Error',
+                    type: "error",
+                    message: res,
+                });
+                this.code.disabled = false;
+                return;
+            }
+
+            ElNotification({
+                title: 'Success',
+                type: "success",
+                message: "验证码已发送",
+            })
+
+            let Interval = setInterval(() => {
+                this.code.text = `${this.code.wait_time}s`;
+                this.code.wait_time--;
+                if (this.code.wait_time === 0) {
+                    clearInterval(Interval);
+                    this.code = {
+                        text: "获取验证码",
+                        disabled: false,
+                        wait_time: 60
+                    }
+                }
+            }, 1000)
+        },
     }
 }
 </script>
@@ -243,76 +285,90 @@ export default {
 
     <el-dialog v-model="this.dialog_visible.update_user_info" :before-close="handle_close_update_user_info"
                align-center width="60%">
-        <div class="w-full mb-[1vw] text-center text-[1.5vw] font-['SYST']">编辑个人信息</div>
-        <div class="w-full h-[16vw] flex flex-col items-center justify-center">
-            <div class="flex flex-row">
-                <div class="w-[8vw] m-[1vw]">
-                    <span>头像：</span>
-                    <el-upload
-                        ref=avatar
-                        v-model:file-list=this.new_user_info.avatar
-                        :action=this.avatar_data.upload_url
-                        :auto-upload=false
-                        :data=this.avatar_data.upload_data
-                        :disabled=this.disabled
-                        :show-file-list=false
-                        list-type="picture"
-                        on-remove="handleRemove"
-                        style="width: 8vw;height: 8vw; border: 1px dashed var(--el-border-color); border-radius: 6px; cursor: pointer; position: relative;overflow: hidden; transition: var(--el-transition-duration-fast);"
-                    >
-                        <el-image v-if="this.new_user_info?.avatar?.length !== 0"
-                                  :src="this.new_user_info?.avatar[0]?.url || null"
-                                  alt="avatar"
-                                  class="w-full h-full"/>
-                        <el-icon v-else
-                                 :class="['transition-transform duration-300 ease-in-out', this.disabled ? 'rotate-45' : '']"
-                                 style="width: 8vw;height: 8vw;font-size: 28px;color: #8c939d;text-align: center;">
-                            <Plus/>
-                        </el-icon>
-                        <div v-if="this.new_user_info.avatar.length !== 0"
-                             class="w-full h-full absolute bg-black hover:bg-opacity-50 bg-opacity-0 hover:opacity-100 opacity-0 transform duration-300">
-                            <el-icon style="width: 8vw;height: 8vw;font-size: 28px;color: #8c939d;text-align: center;"
-                                     @click="this.new_user_info.avatar = []">
-                                <Delete/>
-                            </el-icon>
+        <div class="w-full min-h-[1.5vw] mb-[1vw] text-center text-[1.2vw] font-['SYST']">编辑个人信息</div>
+        <div class="w-full min-h-[16vw] flex flex-col items-center justify-center">
+            <div class="w-full flex flex-row justify-between">
+                <div class="w-[50%] flex flex-col">
+                    <div class="flex flex-row">
+                        <div class="w-[8vw] m-[1vw]">
+                            <span>头像：</span>
+                            <el-upload
+                                ref=avatar
+                                v-model:file-list=this.new_user_info.avatar
+                                :action=this.avatar_data.upload_url
+                                :auto-upload=false
+                                :data=this.avatar_data.upload_data
+                                :disabled=this.disabled
+                                :show-file-list=false
+                                list-type="picture"
+                                on-remove="handleRemove"
+                                style="width: 8vw;height: 8vw; border: 1px dashed var(--el-border-color); border-radius: 6px; cursor: pointer; position: relative;overflow: hidden; transition: var(--el-transition-duration-fast);"
+                            >
+                                <el-image v-if="this.new_user_info?.avatar?.length !== 0"
+                                          :src="this.new_user_info?.avatar[0]?.url || null"
+                                          alt="avatar"
+                                          class="w-full h-full"/>
+                                <el-icon v-else
+                                         :class="['transition-transform duration-300 ease-in-out', this.disabled ? 'rotate-45' : '']"
+                                         style="width: 8vw;height: 8vw;font-size: 28px;color: #8c939d;text-align: center;">
+                                    <Plus/>
+                                </el-icon>
+                                <div v-if="this.new_user_info.avatar.length !== 0"
+                                     class="w-full h-full absolute bg-black hover:bg-opacity-50 bg-opacity-0 hover:opacity-100 opacity-0 transform duration-300">
+                                    <el-icon
+                                        style="width: 8vw;height: 8vw;font-size: 28px;color: #8c939d;text-align: center;"
+                                        @click="this.new_user_info.avatar = []">
+                                        <Delete/>
+                                    </el-icon>
+                                </div>
+                            </el-upload>
                         </div>
-                    </el-upload>
-                </div>
-                <div class="w-[16vw] m-[1vw]">
-                    <span>个人背景：</span>
-                    <el-upload
-                        ref=background
-                        v-model:file-list=this.new_user_info.background
-                        :action=this.background_data.upload_url
-                        :auto-upload=false
-                        :data=this.background_data.upload_data
-                        :show-file-list=false
-                        list-type="picture"
-                        style="width: 16vw; height: 8vw; border: 1px dashed var(--el-border-color);border-radius: 6px;cursor: pointer;position: relative;overflow: hidden;transition: var(--el-transition-duration-fast);"
-                    >
-                        <el-image v-if="this.new_user_info?.background?.length !== 0"
-                                  :src="this.new_user_info?.background[0]?.url || null"
-                                  alt="background"
-                                  class="w-[16vw] h-[8vw]"/>
-                        <el-icon v-else
-                                 style="width: 16vw;height: 8vw;font-size: 28px;color: #8c939d;text-align: center;">
-                            <Plus/>
-                        </el-icon>
-                        <div v-if="this.new_user_info.background.length !== 0"
-                             class="w-full h-full absolute bg-black hover:bg-opacity-50 bg-opacity-0 hover:opacity-100 opacity-0 transform duration-300">
-                            <el-icon
-                                style="width: 16vw;height: 8vw;font-size: 28px;color: #8c939d;text-align: center;"
-                                @click="this.new_user_info.background = []">
-                                <Delete/>
-                            </el-icon>
+                        <div class="w-[16vw] m-[1vw]">
+                            <span>个人背景：</span>
+                            <el-upload
+                                ref=background
+                                v-model:file-list=this.new_user_info.background
+                                :action=this.background_data.upload_url
+                                :auto-upload=false
+                                :data=this.background_data.upload_data
+                                :show-file-list=false
+                                list-type="picture"
+                                style="width: 16vw; height: 8vw; border: 1px dashed var(--el-border-color);border-radius: 6px;cursor: pointer;position: relative;overflow: hidden;transition: var(--el-transition-duration-fast);"
+                            >
+                                <el-image v-if="this.new_user_info?.background?.length !== 0"
+                                          :src="this.new_user_info?.background[0]?.url || null"
+                                          alt="background"
+                                          class="w-[16vw] h-[8vw]"/>
+                                <el-icon v-else
+                                         style="width: 16vw;height: 8vw;font-size: 28px;color: #8c939d;text-align: center;">
+                                    <Plus/>
+                                </el-icon>
+                                <div v-if="this.new_user_info.background.length !== 0"
+                                     class="w-full h-full absolute bg-black hover:bg-opacity-50 bg-opacity-0 hover:opacity-100 opacity-0 transform duration-300">
+                                    <el-icon
+                                        style="width: 16vw;height: 8vw;font-size: 28px;color: #8c939d;text-align: center;"
+                                        @click="this.new_user_info.background = []">
+                                        <Delete/>
+                                    </el-icon>
+                                </div>
+                            </el-upload>
                         </div>
-                    </el-upload>
+                    </div>
+                    <div class="w-[25vw] m-[1vw]">
+                        <span>邮箱：</span>
+                        <div class="w-full flex flex-row justify-between">
+                            <el-input v-model="new_user_info.email" class="mr-[20px]"/>
+                            <el-button :disabled="code.disabled" @click="get_email_code">
+                                {{ this.code.text }}
+                            </el-button>
+                        </div>
+                    </div>
                 </div>
-                <div class="w-[25vw] m-[1vw]">
+                <div class="w-[50%] m-[1vw]">
                     <div>默认头像：</div>
-                    <el-scrollbar style="width: 100%; height: 8vw">
+                    <el-scrollbar style="width: 100%; height: 14vw">
                         <div
-                            :class="['w-full h-full grid gap-x-4 gap-y-[20px] grid-cols-4 auto-rows-auto', this.new_user_info.avatar.length !== 0 ? 'pointer-events-none opacity-50' : 'pointer-events-auto opacity-100']">
+                            :class="['w-full h-full grid gap-x-4 gap-y-[20px] grid-cols-5 auto-rows-auto', this.new_user_info.avatar.length !== 0 ? 'pointer-events-none opacity-50' : 'pointer-events-auto opacity-100']">
                             <div v-for="(avatar,index) in avatar_list" :key="avatar"
                                  :class="{'border-[2px] border-[#08d9d6]':this.new_user_info.click_flag === index}"
                                  class="w-full shadow-md"
@@ -323,11 +379,7 @@ export default {
                     </el-scrollbar>
                 </div>
             </div>
-            <div class="flex flex-row">
-                <div class="w-[10vw] m-[1vw]">
-                    <span>邮箱：</span>
-                    <el-input v-model="new_user_info.email" class="w-full"/>
-                </div>
+            <div class="w-full flex flex-row justify-between">
                 <div class="w-[10vw] m-[1vw]">
                     <span>用户名：</span>
                     <el-input v-model="new_user_info.name" class="w-full"/>
@@ -337,13 +389,13 @@ export default {
                     <el-date-picker v-model="new_user_info.birthday" size="default" style="width: 100%" type="date"
                                     value-format="YYYY年MM月DD日"/>
                 </div>
-                <div class="w-[20vw] m-[1vw]">
+                <div class="w-[30vw] m-[1vw]">
                     <span>个性签名：</span>
                     <el-input v-model="new_user_info.personal_sign" class="w-full"/>
                 </div>
             </div>
         </div>
-        <div class="w-full flex flex-row justify-end items-center m-[1vw] pr-[1vw]">
+        <div class="w-full min-h-[1.5vw] flex flex-row justify-end items-center m-[1vw] pr-[1vw]">
             <el-button class="mx-[1vw]" @click="cancel_update_user_info()">取消</el-button>
             <el-button v-loading.fullscreen.lock="loading" class="mx-[1vw]" type="primary"
                        @click="update_user_info()">

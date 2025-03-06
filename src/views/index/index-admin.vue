@@ -1,6 +1,5 @@
 <script>
 import {ElMessageBox} from "element-plus";
-import {use_web_config_store} from "../../stores/webConfig";
 import ArticleAdminView from "../write/write-admin.vue";
 import {use_user_info_store} from "../../stores/userInfo";
 import {ArrowRight, CaretBottom, CaretTop, Warning} from "@element-plus/icons-vue";
@@ -28,10 +27,6 @@ export default {
         };
     },
     computed: {
-        web_config() {
-            const web_config_store = use_web_config_store();
-            return web_config_store.web_config;
-        },
         user_info() {
             const user_info_store = use_user_info_store();
             return user_info_store.user_info;

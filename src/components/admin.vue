@@ -37,13 +37,9 @@ export default {
             </div>
         </router-link>
         <router-link to="/">
-            <div class="flex flex-row items-center">
-                <img
-                    alt="首页"
-                    class="w-[3vh] m-[0.5vh] invert contrast-200"
-                    src="/static/svg/首页.svg"
-                />
-                <div class="md:block hidden hover:text-[#44cef6] text-[#FFFFFF] m-[0.5vh] font-['SYST'] duration-700">
+            <div class="flex flex-row items-center hover:text-[#44cef6] text-[#FFFFFF] duration-700">
+                <i class="ri-user-line ri-xl"/>
+                <div class="md:block hidden m-[0.5vh] font-['SYST']">
                     用户
                 </div>
             </div>
@@ -53,14 +49,11 @@ export default {
         <div class="bg-blue-100 shadow-md w-[150px] py-[10px]">
             <div class="w-full flex flex-col items-center">
                 <div v-for="page in pages" class="m-[1vh]">
-                    <router-link :to="page.link" class="flex flex-row items-center relative">
-                        <img
-                            :alt="page.name"
-                            :src="page.svg"
-                            class="w-[3vh] m-[0.5vh]"
-                        />
+                    <router-link :to="page.link"
+                                 class="flex flex-row items-center relative hover:text-[#44cef6] duration-700">
+                        <i :class="page.svg" class="ri-xl"/>
                         <span
-                            class="md:block hidden hover:text-[#44cef6] m-[0.5vh] font-['SYST'] font-semibold duration-700">{{
+                            class="md:block hidden  m-[0.5vh] font-['SYST'] font-semibold">{{
                                 page.name
                             }}</span>
                     </router-link>

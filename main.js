@@ -2,6 +2,7 @@ import App from './App';
 
 import "element-plus/dist/index.css";
 import "./tailwind-build.css";
+import 'remixicon/fonts/remixicon.css'
 
 import {createSSRApp} from 'vue';
 import {createPinia} from 'pinia';

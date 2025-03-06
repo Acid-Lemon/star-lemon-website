@@ -8,6 +8,7 @@ import {call_api} from "@/src/utils/cloud";
 import {date_format} from "@/src/utils/time";
 import {get_avatar} from "@/src/utils/get_avatar";
 import {emoji} from "@/src/utils/emoji";
+import typing_effect from "@/src/utils/typing_effect";
 
 export default {
     components: {Message},
@@ -19,14 +20,14 @@ export default {
             is_disabled: false,
             is_focus: false,
             pages: 0,
-            sentences: null,
+            sentence: null,
             loading_more: false,
             has_more: true,
             emoji_list: emoji,
         };
     },
     async mounted() {
-        await this.get_sentences();
+        await this.get_sentence();
         await this.get_message_list();
         this.avatar = await get_avatar(this.user_info?.avatar);
     },
@@ -48,17 +49,15 @@ export default {
     },
     watch: {},
     methods: {
-        async get_sentences() {
-            if (!window.sessionStorage.getItem("sentences")) {
-                axios.get(
-                    'https://v1.hitokoto.cn?c=j&encode=json'
-                ).then((res) => {
-                    this.sentences = res.data;
-                    window.sessionStorage.setItem("sentences", JSON.stringify(res.data))
-                });
+        async get_sentence() {
+            if (!window.sessionStorage.getItem("sentence")) {
+                let res = await axios.get('https://v1.hitokoto.cn?c=j&encode=json');
+                window.sessionStorage.setItem("sentence", JSON.stringify(res.data));
+                this.sentence = res.data;
             } else {
-                this.sentences = JSON.parse(window.sessionStorage.getItem("sentences"));
+                this.sentence = JSON.parse(window.sessionStorage.getItem("sentence"));
             }
+            typing_effect(this.$refs.sentence, this.sentence?.hitokoto, 100);
         },
         on_focus() {
             this.is_focus = true;
@@ -258,12 +257,11 @@ export default {
                         <p class="mx-[1vw] text-[3vh] font-['SYHT'] font-semibold">网易云音乐热评</p>
                     </div>
                     <div class="w-full h-full flex flex-col items-center justify-center">
-                        <p class="text-[2.4vh] mb-[1vh] font-['SYST']">
-                            {{ sentences?.hitokoto }}
+                        <p ref="sentence" class="text-[2.4vh] mb-[1vh] font-['SYST']">
                         </p>
                         <p class="text-[1.9vh] mb-[3vh] font-['SYST']">
-                            ——『{{ sentences?.from }}』{{
-                                sentences?.from_who === null ? '未知' : sentences?.from_who
+                            ——『{{ sentence?.from }}』{{
+                                sentence?.from_who === null ? '未知' : sentence?.from_who
                             }}</p>
                     </div>
                 </div>

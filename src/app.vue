@@ -47,7 +47,7 @@ export default {
         <AIAssistant v-if="user_info"/>
     </ElConfigProvider>
     <iframe class="fixed left-1 bottom-1" height=52
-            src="//music.163.com/outchain/player?type=0&id=13381784307&auto=1&height=32" width=298></iframe>
+            src="//music.163.com/outchain/player?type=0&id=13381784307&auto=0&height=32" width=298></iframe>
 </template>
 
 <style>

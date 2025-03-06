@@ -10,7 +10,7 @@ const router = createRouter({
                 title: "首页",
                 navigation_bar: {
                     name: "首页",
-                    svg: "/static/svg/首页.svg"
+                    svg: "ri-home-8-line"
                 },
                 show: {
                     side_navigation_bar: false,
@@ -25,7 +25,7 @@ const router = createRouter({
                 title: "文章",
                 navigation_bar: {
                     name: "文章",
-                    svg: "/static/svg/文章.svg"
+                    svg: "ri-article-line"
                 },
                 show: {
                     side_navigation_bar: false,
@@ -52,7 +52,7 @@ const router = createRouter({
                 title: "相册",
                 navigation_bar: {
                     name: "相册",
-                    svg: "/static/svg/相册.svg"
+                    svg: "ri-folder-image-line"
                 },
                 show: {
                     side_navigation_bar: false,
@@ -79,7 +79,7 @@ const router = createRouter({
                 title: "开发者",
                 navigation_bar: {
                     name: "开发者",
-                    svg: "/static/svg/开发者.svg"
+                    svg: "ri-id-card-line"
                 },
                 show: {
                     side_navigation_bar: false,
@@ -94,7 +94,7 @@ const router = createRouter({
                 title: "留言板",
                 navigation_bar: {
                     name: "留言板",
-                    svg: "/static/svg/留言板.svg"
+                    svg: "ri-message-line"
                 },
                 show: {
                     side_navigation_bar: false,
@@ -109,7 +109,7 @@ const router = createRouter({
                 title: "登录",
                 navigation_bar: {
                     name: "登录",
-                    svg: "/static/svg/用户.svg"
+                    svg: "ri-user-line"
                 },
                 show: {
                     side_navigation_bar: false,
@@ -125,7 +125,7 @@ const router = createRouter({
                 title: "个人",
                 navigation_bar: {
                     name: "个人",
-                    svg: "/static/svg/用户.svg"
+                    svg: "ri-user-line"
                 },
                 show: {
                     side_navigation_bar: false,
@@ -140,11 +140,11 @@ const router = createRouter({
                 title: "管理",
                 navigation_bar: {
                     name: "管理",
-                    svg: "/static/svg/管理.svg"
+                    svg: "ri-admin-line"
                 },
                 side_navigation_bar: {
                     name: "首页",
-                    svg: "/static/svg/首页.svg"
+                    svg: "ri-home-8-line"
                 },
                 show: {
                     navigation_bar: false
@@ -159,7 +159,7 @@ const router = createRouter({
                 title: "文章管理",
                 side_navigation_bar: {
                     name: "文章",
-                    svg: "/static/svg/文章.svg"
+                    svg: "ri-article-line"
                 },
                 show: {
                     navigation_bar: false,
@@ -186,7 +186,7 @@ const router = createRouter({
                 title: "相册管理",
                 side_navigation_bar: {
                     name: "相册",
-                    svg: "/static/svg/相册.svg"
+                    svg: "ri-folder-image-line"
                 },
                 show: {
                     navigation_bar: false,
@@ -213,7 +213,7 @@ const router = createRouter({
                 title: "留言管理",
                 side_navigation_bar: {
                     name: "留言",
-                    svg: "/static/svg/留言板.svg"
+                    svg: "ri-message-line"
                 },
                 show: {
                     navigation_bar: false,
@@ -228,7 +228,7 @@ const router = createRouter({
                 title: "在线工具管理",
                 side_navigation_bar: {
                     name: "工具",
-                    svg: "/static/svg/工具.svg"
+                    svg: "ri-tools-line"
                 },
                 show: {
                     navigation_bar: false,

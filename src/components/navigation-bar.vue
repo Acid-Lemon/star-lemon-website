@@ -136,14 +136,11 @@ export default {
             <div v-for="page in pages" class="m-[1vh] flex flex-col items-center"
                  @mouseenter="onMouseEnter(page)"
                  @mouseleave="onMouseLeave">
-                <router-link :to="page.link" class="flex flex-row items-center relative">
-                    <img
-                        :alt="page.name"
-                        :src="page.svg"
-                        class="w-[3vh] md:m-[0.5vh] mb-[0.5vh]"
-                    />
+                <router-link :to="page.link"
+                             class="flex flex-row items-center relative hover:text-[#44cef6] duration-700">
+                    <i :class="page.svg" class="ri-xl"/>
                     <span
-                        class="md:block hidden hover:text-[#44cef6] md:m-[0.5vh] mb-[0.5vh] font-['SYST'] font-semibold duration-700">
+                        class="md:block hidden md:m-[0.5vh] mb-[0.5vh] font-['SYST'] font-semibold">
                         {{ page.name }}
                     </span>
                 </router-link>

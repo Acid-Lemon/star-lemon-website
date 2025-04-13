@@ -186,6 +186,9 @@ module.exports = class Controller_User_Profile extends Controller {
                 this.throw(errors.codes.no_email_code, "email code not found");
             }
 
+            let code_record = await this.service.db.email_code.find_email_code(new_information.email);
+            await this.service.user.login.verify_email_code(new_information.code, code_record);
+
             await this.service.db.email_code.delete_email_code(new_information.email);
         }
 

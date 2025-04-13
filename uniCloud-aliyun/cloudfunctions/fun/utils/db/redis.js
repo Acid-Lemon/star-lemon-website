@@ -1,22 +1,22 @@
-if (!global.hasOwnProperty("fetch")) {
-	// for @vercel/kv -> @upstash/redis, it uses global fetch
-    import("node-fetch").then(({default : fetch}) => { global.fetch = fetch});
-}
-
-let { createClient } = require("@vercel/kv");
+const Redis = require("ioredis");
 
 const config = require("uni-config-center")({ pluginId: "fun" }).config();
 
-const kv = createClient({
-    url: config["VERCEL_STAR_LEMON_REDIS_URL"],
-    token: config["VERCEL_STAR_LEMON_REDIS_TOKEN"]
+const redis = new Redis({
+    port: config["REDIS_PORT"],
+    host: config["REDIS_HOST"],
+    password: config["REDIS_PASSWORD"],
+    db: 0
 });
 
 const fields = {
-    user_info: {key_prefix: "user:info:", ex: 60 * 60}
+    user_info: {key_prefix: "user:info:", ex: 60 * 60},
+    email_code: {key_prefix: "email_code:", ex: 60 * config["EMAIL_CODE_EXP_MINUTE"]},
+    email_send_limit_hour: {key_prefix: "email-send-limit:hour:", ex: 60 * 60},
+    email_send_limit_minute: {key_prefix: "email-send-limit:minute:", ex: 60}
 };
 
 module.exports = {
-    redis: kv,
+    redis,
     redis_fields: fields
 }

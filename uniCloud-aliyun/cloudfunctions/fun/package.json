@@ -1,11 +1,10 @@
 {
   "name": "fun",
   "dependencies": {
-    "@vercel/kv": "^2.0.0",
     "bcryptjs": "^2.4.3",
+    "ioredis": "^5.6.1",
     "jsonwebtoken": "^9.0.2",
     "lodash": "^4.17.21",
-    "node-fetch": "^3.3.2",
     "nodemailer": "^6.10.0",
     "openai": "^4.80.0",
     "uni-cloud-router": "file:../../../uni_modules/uni-cloud-router/uniCloud/cloudfunctions/common/uni-cloud-router",

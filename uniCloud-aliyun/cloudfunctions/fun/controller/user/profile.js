@@ -101,10 +101,30 @@ module.exports = class Controller_User_Profile extends Controller {
         };
     }
 
+    async send_email_code() {
+        let {
+            email,
+            mode
+        } = validate(this.ctx.event.args, {
+            email: {
+                type: "string",
+                regex: /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+            }
+        });
+
+        let code = this.service.user.login.create_code();
+        await this.service.db.email_code.update_code_with_limit(code, email);
+        await this.service.user.login.send_email_code(email, code, mode);
+
+        return {};
+    }
+
     async update_profile() {
         let new_information = validate(this.ctx.event.args, {
             name: {
+                null_able: true,
                 undefined_able: true,
+
                 type: "string",
                 length: {
                     max: 20,
@@ -112,7 +132,9 @@ module.exports = class Controller_User_Profile extends Controller {
                 }
             },
             birthday: {
+                null_able: true,
                 undefined_able: true,
+
                 type: "string",
                 regex: /^(\d{4})年(0[1-9]|1[0-2])月(0[1-9]|[12][0-9]|3[01])日$/,
                 customize: (args, name) => {
@@ -134,13 +156,18 @@ module.exports = class Controller_User_Profile extends Controller {
                 }
             },
             personal_sign: {
+                null_able: true,
                 undefined_able: true,
+
                 type: "string",
                 length: {
                     max: 100
                 }
             },
             email: {
+                null_able: true,
+                undefined_able: true,
+
                 type: "string",
                 regex: /^[^\s@]+@[^\s@]+\.[^\s@]+$/
             },
@@ -154,7 +181,12 @@ module.exports = class Controller_User_Profile extends Controller {
         }
 
         if (Object.hasOwn(new_information, "email")) {
-            await this.service.user.profile.remove_email_code(new_information.email);
+            let code = await this.service.db.email_code.find_email_code(new_information.email);
+            if (!code) {
+                this.throw(errors.codes.no_email_code, "email code not found");
+            }
+
+            await this.service.db.email_code.delete_email_code(new_information.email);
         }
 
         await this.service.db.user.update_user(this.ctx.auth.user_id, new_information);

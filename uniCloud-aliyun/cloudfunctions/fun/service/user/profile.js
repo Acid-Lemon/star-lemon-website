@@ -96,13 +96,4 @@ module.exports = class Service_User_Info extends Service {
             upload_options
         };
     }
-
-    async remove_email_code(email) {
-        let code_record = await this.service.db.email_code.find_code(email);
-        if (!code_record) {
-            this.throw(errors.codes.no_email_code, "email code not found");
-        }
-
-        await this.service.db.email_code.delete_code_by_id(code_record.id);
-    }
 }

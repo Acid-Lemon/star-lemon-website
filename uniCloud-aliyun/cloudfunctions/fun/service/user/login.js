@@ -78,13 +78,12 @@ module.exports = class Service_User_Login extends Service {
 	}
 
 	verify_email_code(code, code_record) {
-		if (Date.now() - code_record.create >= config["EMAIL_CODE_EXP_MINUTE"] * 1000 * 60) {
-			this.throw(error.codes.email_code_expire, "the code is invalid. send a new one again.");
+		if (!code_record) {
+			this.throw(error.codes.no_email_code, "code not found");
 		}
 
-
-		if (code !== code_record.code) {
-			this.throw(error.codes.invalid_email_code, "the code is invalid. send a new one again.");
+		if (code !== code_record) {
+			this.throw(error.codes.invalid_email_code, "the code is wrong");
 		}
 	}
 };

@@ -2,8 +2,6 @@
 
 let tables = {
     user: "user",
-    sms_code: "sms_code",
-    email_code: "email_code",
     message_board: "message_board",
     album: "album",
     article: "article",

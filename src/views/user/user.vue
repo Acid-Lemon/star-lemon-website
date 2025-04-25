@@ -23,6 +23,7 @@ export default {
                 background: [],
                 click_flag: -1,
                 email: "",
+                code: "",
                 name: "",
                 birthday: "",
                 personal_sign: "",
@@ -358,7 +359,8 @@ export default {
                         <span>邮箱：</span>
                         <div class="w-full flex flex-row justify-between">
                             <el-input v-model="new_user_info.email" class="mr-[20px]"/>
-                            <el-button :disabled="code.disabled" @click="get_email_code">
+                            <el-input v-model="new_user_info.code" class="ml-[20px]"/>
+                            <el-button :disabled="code.disabled" class="ml-[20px]" @click="get_email_code">
                                 {{ this.code.text }}
                             </el-button>
                         </div>

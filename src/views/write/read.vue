@@ -35,10 +35,10 @@ export default {
                 });
             }
 
-            this.article = await this.article_format(res.data);
+            this.article = this.article_format(res.data);
             console.log(this.article)
         },
-        async article_format(article) {
+        article_format(article) {
             article.create_at_format_str = date_format(new Date(article.create_at));
             return article
         },

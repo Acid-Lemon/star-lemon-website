@@ -7,8 +7,6 @@ const {
     id_name_format
 } = require("../utils/db/result_format");
 
-const obj_utils = require("../utils/common/object");
-
 const errors = require("../types/api_error");
 
 module.exports = () => {
@@ -28,10 +26,10 @@ module.exports = () => {
 
 async function find_user(user_id) {
     let user_redis_key = redis_fields.user_info.key_prefix + user_id;
-    let redis_val = await redis.hgetall(user_redis_key);
+    let redis_val = await redis.get(user_redis_key);
 
-    if (!obj_utils.is_empty(redis_val)) {
-        return redis_val;
+    if (redis_val) {
+        return JSON.parse(redis_val);
     }
 
     let db_val = await db.collection(tables.user).doc(user_id).get().then(({data}) => {
@@ -46,8 +44,7 @@ async function find_user(user_id) {
         return null;
     }
 
-    await redis.hset(user_redis_key, db_val);
-    await redis.expire(user_redis_key, redis_fields.user_info.ex);
+    await redis.set(user_redis_key, JSON.stringify(db_val), "EX", redis_fields.user_info.ex);
 
     return db_val;
 }

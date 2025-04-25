@@ -19,16 +19,15 @@ const { id_name_format } = require("../../utils/db/result_format");
 
 module.exports = class DBService_User extends Service {
     async find_user_by_id(id) {
-        let redis_val = await redis.hgetall(redis_fields.user_info.key_prefix + id);
+        let redis_val = await redis.get(redis_fields.user_info.key_prefix + id);
         if (redis_val) {
-            return redis_val;
+            return JSON.parse(redis_val);
         }
 
         let db_val = id_name_format((await this.db.collection(tables.user).doc(id).get()).data[0]);
         if (db_val) {
             let redis_key = redis_fields.user_info.key_prefix + id;
-            await redis.hset(redis_key, db_val);
-            await redis.expire(redis_key, redis_fields.user_info.ex);
+            await redis.set(redis_key, JSON.stringify(db_val), "EX", redis_fields.user_info.ex);
         }
 
         return db_val;
@@ -77,6 +76,46 @@ module.exports = class DBService_User extends Service {
         return await this.db.collection(tables.user).doc(id).update({
             ...info
         });
+    }
+
+    async get_user_roles_by_user_id(id){
+        let user = await this.find_user_by_id(id);
+        return user?.roles ?? [];
+    }
+
+    async get_role_info(role_name) {
+        let redis_val = await redis.get(redis_fields.user_roles.key_prefix + role_name);
+        if (redis_val) {
+            return redis_val;
+        }
+
+        let db_val = await this.db.collection(tables.user_roles).where({
+            role: role_name
+        }).get().then(({data}) => {
+            return data[0];
+        });
+
+        if (db_val) {
+            await redis.set(redis_fields.user_roles.key_prefix + role_name, db_val);
+        }
+
+        return db_val;
+    }
+
+    async check_user_has_permission(user_id, permission) {
+        let user_roles = await this.get_user_roles_by_user_id(user_id);
+        if (user_roles.include("admin")) {
+            return true;
+        }
+
+        for (let role of user_roles) {
+            let role_permissions = await this.get_role_info(role).permissions;
+            if (role_permissions.includes(permission)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }
 

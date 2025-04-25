@@ -35,6 +35,10 @@ async function load_user() {
         throw new Error(res.error_message);
     }
 
+    if (!Object.keys(res.data.profile).length) {
+        return;
+    }
+
     store_user(res.data.profile);
 }
 

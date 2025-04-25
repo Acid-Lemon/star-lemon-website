@@ -6,6 +6,8 @@ let tables = {
     album: "album",
     article: "article",
     online_tools: "online_tools",
+    user_roles: "user-roles",
+    user_permissions: "user-permissions"
 }
 
 module.exports = {

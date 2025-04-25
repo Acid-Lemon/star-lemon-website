@@ -11,6 +11,8 @@ const {
     redis_fields
 } = require("../../utils/db/redis");
 
+const obj_utils = require("../../utils/common/object");
+
 const {
     codes
 } = require("../../types/api_error");
@@ -20,7 +22,7 @@ const { id_name_format } = require("../../utils/db/result_format");
 module.exports = class DBService_User extends Service {
     async find_user_by_id(id) {
         let redis_val = await redis.hgetall(redis_fields.user_info.key_prefix + id);
-        if (redis_val) {
+        if (!obj_utils.is_empty(redis_val)) {
             return redis_val;
         }
 
@@ -77,6 +79,53 @@ module.exports = class DBService_User extends Service {
         return await this.db.collection(tables.user).doc(id).update({
             ...info
         });
+    }
+
+    async get_user_roles_by_user_id(id){
+        let redis_val = await redis.hget(redis_fields.user_info.key_prefix + id, "roles");
+        if (redis_val) {
+            return redis_val;
+        }
+
+        // 查找用户的所有信息，会自动将查到的信息放入redis方便下次查询
+        return await this.find_user_by_id(id).then(res => {
+            return res?.roles ?? [];
+        });
+    }
+
+    async get_role_info(role_name) {
+        let redis_val = await redis.get(redis_fields.user_roles.key_prefix + role_name);
+        if (redis_val) {
+            return redis_val;
+        }
+
+        let db_val = await this.db.collection(tables.user_roles).where({
+            role: role_name
+        }).get().then(({data}) => {
+            return data[0];
+        });
+
+        if (db_val) {
+            await redis.set(redis_fields.user_roles.key_prefix + role_name, db_val);
+        }
+
+        return db_val;
+    }
+
+    async check_user_has_permission(user_id, permission) {
+        let user_roles = await this.get_user_roles_by_user_id(user_id);
+        if (user_roles.include("admin")) {
+            return true;
+        }
+
+        for (let role of user_roles) {
+            let role_permissions = await this.get_role_info(role).permissions;
+            if (role_permissions.includes(permission)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }
 

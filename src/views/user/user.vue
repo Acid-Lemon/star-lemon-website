@@ -287,11 +287,11 @@ export default {
     <el-dialog v-model="this.dialog_visible.update_user_info" :before-close="handle_close_update_user_info"
                align-center width="60%">
         <div class="w-full min-h-[1.5vw] mb-[1vw] text-center text-[1.2vw] font-['SYST']">编辑个人信息</div>
-        <div class="w-full min-h-[16vw] flex flex-col items-center justify-center">
-            <div class="w-full flex flex-row justify-between">
-                <div class="w-[50%] flex flex-col">
-                    <div class="flex flex-row">
-                        <div class="w-[8vw] m-[1vw]">
+        <div class="p-[20px]">
+            <div class="w-full grid grid-cols-2 gap-x-2 mb-[20px]">
+                <div>
+                    <div class="w-full grid grid-cols-3 gap-x-2 mb-[20px]">
+                        <div class="col-span-1">
                             <span>头像：</span>
                             <el-upload
                                 ref=avatar
@@ -303,7 +303,7 @@ export default {
                                 :show-file-list=false
                                 list-type="picture"
                                 on-remove="handleRemove"
-                                style="width: 8vw;height: 8vw; border: 1px dashed var(--el-border-color); border-radius: 6px; cursor: pointer; position: relative;overflow: hidden; transition: var(--el-transition-duration-fast);"
+                                style="aspect-ratio: 1/1; border: 1px dashed var(--el-border-color); border-radius: 6px; cursor: pointer; position: relative;overflow: hidden; transition: var(--el-transition-duration-fast);"
                             >
                                 <el-image v-if="this.new_user_info?.avatar?.length !== 0"
                                           :src="this.new_user_info?.avatar[0]?.url || null"
@@ -324,7 +324,7 @@ export default {
                                 </div>
                             </el-upload>
                         </div>
-                        <div class="w-[16vw] m-[1vw]">
+                        <div class="col-span-2">
                             <span>个人背景：</span>
                             <el-upload
                                 ref=background
@@ -334,7 +334,7 @@ export default {
                                 :data=this.background_data.upload_data
                                 :show-file-list=false
                                 list-type="picture"
-                                style="width: 16vw; height: 8vw; border: 1px dashed var(--el-border-color);border-radius: 6px;cursor: pointer;position: relative;overflow: hidden;transition: var(--el-transition-duration-fast);"
+                                style="aspect-ratio: 2/1; border: 1px dashed var(--el-border-color);border-radius: 6px;cursor: pointer;position: relative;overflow: hidden;transition: var(--el-transition-duration-fast);"
                             >
                                 <el-image v-if="this.new_user_info?.background?.length !== 0"
                                           :src="this.new_user_info?.background[0]?.url || null"
@@ -355,22 +355,28 @@ export default {
                             </el-upload>
                         </div>
                     </div>
-                    <div class="w-[25vw] m-[1vw]">
-                        <span>邮箱：</span>
-                        <div class="w-full flex flex-row justify-between">
-                            <el-input v-model="new_user_info.email" class="mr-[20px]"/>
-                            <el-input v-model="new_user_info.code" class="ml-[20px]"/>
-                            <el-button :disabled="code.disabled" class="ml-[20px]" @click="get_email_code">
+                    <div class="grid grid-cols-4 gap-x-2 items-end">
+                        <div class="col-span-2">
+                            <span>邮箱：</span>
+                            <el-input v-model="new_user_info.email"/>
+                        </div>
+                        <div class="col-span-1">
+                            <el-button :disabled="code.disabled"
+                                       @click="get_email_code">
                                 {{ this.code.text }}
                             </el-button>
                         </div>
+                        <div class="col-span-1">
+                            <span>验证码：</span>
+                            <el-input v-model="new_user_info.code"/>
+                        </div>
                     </div>
                 </div>
-                <div class="w-[50%] m-[1vw]">
+                <div class="w-full grid grid-cols-1 gap-2">
                     <div>默认头像：</div>
-                    <el-scrollbar style="width: 100%; height: 14vw">
+                    <el-scrollbar style="aspect-ratio: 2/1">
                         <div
-                            :class="['w-full h-full grid gap-x-4 gap-y-[20px] grid-cols-5 auto-rows-auto', this.new_user_info.avatar.length !== 0 ? 'pointer-events-none opacity-50' : 'pointer-events-auto opacity-100']">
+                            :class="['w-full h-full grid gap-x-4 gap-y-4 grid-cols-5 auto-rows-auto', this.new_user_info.avatar.length !== 0 ? 'pointer-events-none opacity-50' : 'pointer-events-auto opacity-100']">
                             <div v-for="(avatar,index) in avatar_list" :key="avatar"
                                  :class="{'border-[2px] border-[#08d9d6]':this.new_user_info.click_flag === index}"
                                  class="w-full shadow-md"
@@ -381,17 +387,17 @@ export default {
                     </el-scrollbar>
                 </div>
             </div>
-            <div class="w-full flex flex-row justify-between">
-                <div class="w-[10vw] m-[1vw]">
+            <div class="w-full grid grid-cols-4 gap-2">
+                <div class="col-span-1">
                     <span>用户名：</span>
                     <el-input v-model="new_user_info.name" class="w-full"/>
                 </div>
-                <div class="w-[10vw] m-[1vw]">
+                <div class="col-span-1">
                     <span>生日：</span>
                     <el-date-picker v-model="new_user_info.birthday" size="default" style="width: 100%" type="date"
                                     value-format="YYYY年MM月DD日"/>
                 </div>
-                <div class="w-[30vw] m-[1vw]">
+                <div class="col-span-2">
                     <span>个性签名：</span>
                     <el-input v-model="new_user_info.personal_sign" class="w-full"/>
                 </div>

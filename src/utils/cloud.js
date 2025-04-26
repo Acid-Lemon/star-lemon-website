@@ -1,7 +1,7 @@
 import {get_token, store_token} from "@/src/utils/user_info";
 import {ElNotification} from "element-plus";
 import {handle_error} from "@/src/utils/handle_error";
-
+import router from "../../router"
 
 async function call_api(action, args = {}) {
     let token = get_token();
@@ -22,7 +22,7 @@ async function call_api(action, args = {}) {
             await store_token(api_res.token);
         }
         if (!api_res.success && api_res.code === "err_no_token") {
-            this.$router.push('/login')
+            router.push('/login');
         }
         if (!api_res.success) {
             ElNotification({

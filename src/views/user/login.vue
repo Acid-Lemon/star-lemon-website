@@ -171,8 +171,8 @@ export default {
                     message: "注册成功",
                 })
             }
-            // 登录/注册成功后跳转回原页面
-            this.$router.back();
+            // 登录/注册成功后跳转到首页
+            this.$router.push("/");
         },
         async get_email_code() {
             this.code.disabled = true;

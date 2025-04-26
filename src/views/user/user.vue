@@ -48,7 +48,7 @@ export default {
     },
     async mounted() {
         this.avatar_url = await get_avatar(this.user_info?.avatar);
-        this.background_url = await get_background();
+        this.background_url = await get_background(this.user_info?.profile_background_image);
 
         this.load_avatars();
 

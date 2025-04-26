@@ -36,9 +36,9 @@ export default {
         async process_all_videos() {
             if (this.file_list.length === 0) {
                 ElNotification({
-                    title: '警告',
+                    title: '错误',
                     message: '请先选择视频文件',
-                    type: 'warning'
+                    type: 'error'
                 });
                 return;
             }
@@ -104,8 +104,29 @@ export default {
                         } catch (decodeError) {
                             console.warn('Fast decoding failed, falling back to slower method', decodeError);
 
-                            // 回退方法的代码保持不变
-                            // ...
+                            // 回退方法：使用回调式解码
+                            try {
+                                const audio_buffer = await new Promise((innerResolve, innerReject) => {
+                                    audio_context.decodeAudioData(
+                                        e.target.result,
+                                        buffer => innerResolve(buffer),
+                                        error => innerReject(error)
+                                    );
+                                });
+
+                                // 音频解码完成，进度 70%
+                                progress_callback(0.7);
+
+                                const wav_blob = this.buffer_to_wave(audio_buffer, (wav_progress) => {
+                                    const progress = 0.7 + wav_progress * 0.3;
+                                    progress_callback(progress);
+                                });
+
+                                progress_callback(1);
+                                resolve(wav_blob);
+                            } catch (fallbackError) {
+                                reject(new Error(`回退方法解码失败: ${fallbackError.message}`));
+                            }
                         }
                     } catch (error) {
                         reject(error);

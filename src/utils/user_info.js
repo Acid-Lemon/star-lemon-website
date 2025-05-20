@@ -11,8 +11,8 @@ function get_token() {
 
 function store_user(user) {
     uni.setStorageSync("user", user);
-    const user_infoStore = use_user_info_store();
-    user_infoStore.user_info = user;
+    const user_info_store = use_user_info_store();
+    user_info_store.user_info = user;
 }
 
 function store_avatar_url(avatar_url) {

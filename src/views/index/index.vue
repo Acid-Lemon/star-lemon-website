@@ -56,7 +56,7 @@ export default {
 </script>
 
 <template>
-    <div class="bg-[url('/static/background/22.jpg')] bg-cover bg-center w-full h-full pt-[100px]">
+    <div class="bg-[url('/static/background/4.png')] bg-cover bg-center w-full h-full pt-[100px]">
         <el-scrollbar>
             <div class="flex flex-col mb-[80px] md:mb-[40px]">
                 <uni-notice-bar background-color="#FFFFFF" scrollable show-icon

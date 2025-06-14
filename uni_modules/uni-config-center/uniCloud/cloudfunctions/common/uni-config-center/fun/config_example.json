@@ -12,6 +12,13 @@
     "email": "email",
     "password": "pass"
   },
+  "ALI_OSS_CONFIG": {
+    "accessKeyId": "accessKeyId",
+    "accessKeySecret": "accessKeySecret",
+    "bucket": "star-lemon-website",
+    "region": "rg-china-mainland",
+    "authorizationV4": true
+  },
   "CLOUD_FUNCTION_PUBLIC_PATH_PREFIX": [
     "user/login/",
     "message_board/get_personal_and_public_messages",

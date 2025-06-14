@@ -2,38 +2,39 @@
 export default {
     data() {
         return {
-            star: {
-                name: "star",
-                contact: [
-                    {
-                        name: "github",
-                        svg: "/static/svg/github.svg",
-                        link: "https://github.com/star-starry-sea"
-                    },
-                    {
-                        name: "bilibili",
-                        svg: "/static/svg/哔哩哔哩.svg",
-                        link: "https://space.bilibili.com/25124707",
-                    }
-                ],
-                say: "诶嘿～"
-            },
-            lemon: {
-                name: "lemon",
-                contact: [
-                    {
-                        name: "github",
-                        svg: "/static/svg/github.svg",
-                        link: "https://github.com/Acid-Lemon"
-                    },
-                    {
-                        name: "bilibili",
-                        svg: "/static/svg/哔哩哔哩.svg",
-                        link: "https://space.bilibili.com/400932209",
-                    }
-                ],
-                say: "大家好！我是lemon，一位普普通通的少年。喜欢编程，喜欢摄影，喜欢音乐，喜欢记录生活。"
-            },
+            developers: [
+                {
+                    name: "star",
+                    avatar: "/static/developer/1.jpg",
+                    say: "诶嘿～",
+                    contact: [
+                        {
+                            name: "github",
+                            link: "https://github.com/star-starry-sea"
+                        },
+                        {
+                            name: "bilibili",
+                            link: "https://space.bilibili.com/25124707",
+                        }
+                    ]
+                }, {
+                    name: "lemon",
+                    avatar: "/static/developer/2.jpg",
+                    say: "大家好！我是lemon，一位普普通通的少年。喜欢编程，喜欢摄影，喜欢音乐，喜欢记录生活。",
+                    contact: [
+                        {
+                            name: "github",
+                            svg: "/static/svg/github.svg",
+                            link: "https://github.com/Acid-Lemon"
+                        },
+                        {
+                            name: "bilibili",
+                            svg: "/static/svg/哔哩哔哩.svg",
+                            link: "https://space.bilibili.com/400932209",
+                        }
+                    ]
+                }
+            ],
             power: [
                 {
                     name: "html",
@@ -79,16 +80,17 @@ export default {
                 <img alt="省略号" class="w-[5vh] h-[5vh] m-[5px]" src="/static/svg/省略号.svg"/>
             </div>
         </div>
-        <div class="w-full h-[35%] flex flex-row items-center content-center">
+        <div v-for="(developer, index) in developers" :class="[ index % 2 === 0 ? 'flex-row' : 'flex-row-reverse']"
+             class="w-full h-[35%] flex items-center content-center">
             <div class="w-[15%] h-full flex flex-col justify-center items-center">
-                <el-avatar :size=120 alt="头像"
-                           class="hover:rotate-[360deg] duration-700 border border-[#dedede]"
-                           src="/static/developer/1.jpg"/>
-                <div class="text-[20px] font-['SYST']">{{ star.name }}</div>
+                <el-avatar :size=120 :src="developer.avatar"
+                           alt="头像"
+                           class="hover:rotate-[360deg] duration-700 border border-[#dedede]"/>
+                <div class="text-[20px] font-['SYST']">{{ developer.name }}</div>
                 <div class="flex flex-row content-center items-center">
-                    <div v-for="i in star.contact" class="m-[1vh] flex flex-row content-center items-center">
+                    <div v-for="i in developer.contact" class="m-[1vh] flex flex-row content-center items-center">
                         <a :href="i.link" target="_blank">
-                            <img :src="i.svg" :title="i.name" alt="联系方式" class="w-[3vh] h-[3vh]"/>
+                            <i :class="'ri-' + i.name + '-fill'" class="ri-2x"></i>
                         </a>
                     </div>
                 </div>
@@ -96,28 +98,7 @@ export default {
             <div class="w-[85%] h-full p-[20px]">
                 <div
                     class="w-full h-full bg-[#FFFFFF] rounded-[25px] p-[20px] text-[20px] font-['SYST'] border border-[#dedede] shadow-md">
-                    {{ star.say }}
-                </div>
-            </div>
-        </div>
-        <div class="w-full h-[35%] flex flex-row items-center content-center">
-            <div class="w-[85%] h-full p-[20px]">
-                <div
-                    class="w-full h-full bg-[#FFFFFF] rounded-[25px] p-[20px] text-[20px] font-['SYST'] border border-[#dedede] shadow-md">
-                    {{ lemon.say }}
-                </div>
-            </div>
-            <div class="w-[15%] h-full flex flex-col justify-center items-center">
-                <el-avatar :size=120 alt="头像"
-                           class="hover:rotate-[360deg] duration-700 border border-[#dedede]"
-                           src="/static/developer/2.jpg"/>
-                <div class="text-[20px] font-['SYST']">{{ lemon.name }}</div>
-                <div class="flex flex-row content-center items-center">
-                    <div v-for="i in lemon.contact" class="m-[1vh] flex flex-row content-center items-center">
-                        <a :href="i.link" target="_blank">
-                            <img :src="i.svg" :title="i.name" alt="联系方式" class="w-[3vh] h-[3vh]"/>
-                        </a>
-                    </div>
+                    {{ developer.say }}
                 </div>
             </div>
         </div>

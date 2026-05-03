@@ -45,11 +45,53 @@ jobs:
           echo "${{ secrets.SERVER_SSH_KEY }}" > ~/.ssh/deploy_key
           chmod 600 ~/.ssh/deploy_key
 
-          # Use ssh command directly with options
           SSH_OPTS="-i ~/.ssh/deploy_key -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null"
 
-          # Upload archive
-          scp $SSH_OPTS deploy.tar.gz ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_IP }}:/www/wwwroot/star-lemon.top/
+          scp $SSH_OPTS deploy.tar.gz ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_IP }}:/tmp/
 
-          # Run remote deploy script
-          ssh $SSH_OPTS ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_IP }} "cd /www/wwwroot/star-lemon.top && bash scripts/remote-deploy.sh deploy.tar.gz"
+          ssh $SSH_OPTS ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_IP }} bash -s << 'ENDSSH'
+          set -e
+          DEPLOY_DIR=/www/wwwroot/star-lemon.top
+          PID_FILE=/www/server/nodejs/vhost/pids/star_lemon_top.pid
+          START_SCRIPT=/www/server/nodejs/vhost/scripts/star_lemon_top.sh
+          export PATH=/www/server/nodejs/v24.15.0/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/root/bin
+
+          echo "=== Star Lemon Remote Deploy ==="
+
+          echo "[1/4] Stopping service..."
+          if [ -f "$PID_FILE" ]; then
+            PID=$(cat "$PID_FILE")
+            if kill -0 "$PID" 2>/dev/null; then
+              echo "Stopping process $PID"
+              kill -9 "$PID"
+            fi
+            rm -f "$PID_FILE"
+          fi
+          ORPHAN=$(netstat -tlnp 2>/dev/null | grep ':3000' | awk '{print $7}' | cut -d'/' -f1 | head -1)
+          if [ -n "$ORPHAN" ] && [ "$ORPHAN" != '-' ]; then
+            echo "Killing orphaned $ORPHAN"
+            kill -9 "$ORPHAN" 2>/dev/null || true
+          fi
+          sleep 2
+
+          echo "[2/4] Cleaning old files..."
+          cd "$DEPLOY_DIR"
+          find . -mindepth 1 -not -name '.env.local' -delete
+
+          echo "[3/4] Extracting archive..."
+          mv /tmp/deploy.tar.gz .
+          tar -xzf deploy.tar.gz
+          rm -f deploy.tar.gz
+
+          echo "[4/4] Installing and starting..."
+          pnpm install --frozen-lockfile --prod
+          bash "$START_SCRIPT"
+          sleep 3
+
+          if netstat -tlnp 2>/dev/null | grep -q ':3000'; then
+            echo "=== Deploy completed ==="
+          else
+            echo "ERROR: Port 3000 not listening"
+            exit 1
+          fi
+          ENDSSH

@@ -54,7 +54,7 @@
 
 ## 环境变量
 
-创建 `.env.local` 文件：
+创建 `.env.local` 文件，仅存放数据库连接和 JWT 密钥：
 
 ```env
 # 数据库
@@ -66,38 +66,9 @@ DB_NAME=star_lemon
 
 # JWT
 JWT_SECRET=your_jwt_secret
-
-# QQ 登录
-QQ_APP_ID=your_qq_app_id
-QQ_APP_KEY=your_qq_app_key
-QQ_REDIRECT_URI=https://your-domain.com/api/auth/qq/callback
-
-# 邮件服务
-SMTP_HOST=smtp.example.com
-SMTP_PORT=465
-SMTP_USER=your_email@example.com
-SMTP_PASS=your_email_password
-SMTP_FROM_NAME=Star Lemon
-SMTP_FROM_EMAIL=noreply@example.com
-
-# 阿里云 OSS
-OSS_ENDPOINT=https://oss-cn-hangzhou.aliyuncs.com
-OSS_ACCESS_KEY_ID=your_access_key
-OSS_ACCESS_KEY_SECRET=your_secret
-OSS_BUCKET=your-bucket
-OSS_REGION=oss-cn-hangzhou
-
-# 阿里云 ESA
-ESA_DOMAIN=cdn.your-domain.com
-
-# 蓝兔支付
-LANTU_MCH_ID=your_mch_id
-LANTU_KEY=your_merchant_key
-
-# DeepSeek AI
-DEEPSEEK_API_URL=https://api.deepseek.com/v1/chat/completions
-DEEPSEEK_API_KEY=your_api_key
 ```
+
+其他所有配置（QQ 登录、邮件服务、OSS、支付、AI 等）均在管理后台的「系统设置」页面中进行配置，数据存储在数据库的 `settings` 表中。部分配置也支持通过环境变量覆盖（优先级：数据库设置 > 环境变量 > 默认值）。
 
 ## 开始使用
 

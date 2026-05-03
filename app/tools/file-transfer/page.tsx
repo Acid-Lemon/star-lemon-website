@@ -36,13 +36,14 @@ interface UserFile {
 
 interface UserOrder {
   id: number;
-  code: string;
-  file_name: string;
-  file_size: number;
-  max_downloads: number;
-  download_count: number;
-  retain_days: number;
-  price: string;
+  transfer_id: number | null;
+  code: string | null;
+  file_name: string | null;
+  file_size: number | null;
+  max_downloads: number | null;
+  download_count: number | null;
+  retain_days: number | null;
+  price: string | null;
   pay_order_no: string | null;
   status: string;
   refund_amount: string;
@@ -615,14 +616,14 @@ function MyOrdersPanel() {
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
                     <RiFileLine className="w-4 h-4 text-primary" />
-                    <span className="font-medium text-sm truncate max-w-[180px]">{order.file_name}</span>
+                    <span className="font-medium text-sm truncate max-w-[180px]">{order.file_name || '(已删除)'}</span>
                   </div>
                   {getStatusBadge(order)}
                 </div>
                 <div className="flex items-center gap-4 text-xs text-muted-foreground">
-                  <span>{formatFileSize(order.file_size)}</span>
-                  <span className="font-mono">{order.code}</span>
-                  <span>¥{parseFloat(order.price).toFixed(2)}</span>
+                  <span>{order.file_size ? formatFileSize(order.file_size) : '-'}</span>
+                  <span className="font-mono">{order.code || '-'}</span>
+                  <span>¥{order.price ? parseFloat(order.price).toFixed(2) : '0.00'}</span>
                   {parseFloat(order.refund_amount) > 0 && (
                     <span className="text-destructive">退 ¥{parseFloat(order.refund_amount).toFixed(2)}</span>
                   )}

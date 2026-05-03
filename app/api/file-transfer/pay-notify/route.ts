@@ -3,6 +3,7 @@ import db from '@/lib/db';
 import { verifyPayNotify } from '@/lib/lantu-pay';
 
 export async function POST(request: NextRequest) {
+  const client = await db.pool.connect();
   try {
     const text = await request.text();
     const searchParams = new URLSearchParams(text);
@@ -28,13 +29,20 @@ export async function POST(request: NextRequest) {
       return new NextResponse('SUCCESS', { status: 200 });
     }
 
+    await client.query('BEGIN');
+
     const transferId = parseInt(attach);
-    const transfer = await db.query(
-      'SELECT * FROM file_transfers WHERE id = $1 AND pay_status = $2',
+    const transfer = await client.query(
+      `SELECT ft.*, fto.price, fto.status as order_status
+       FROM file_transfers ft
+       JOIN file_transfer_orders fto ON fto.transfer_id = ft.id
+       WHERE ft.id = $1 AND fto.status = $2
+       FOR UPDATE OF fto`,
       [transferId, 'unpaid']
     );
 
     if (transfer.rows.length === 0) {
+      await client.query('COMMIT');
       return new NextResponse('SUCCESS', { status: 200 });
     }
 
@@ -43,41 +51,28 @@ export async function POST(request: NextRequest) {
 
     if (Math.abs(paidAmount - expectedAmount) > 0.01) {
       console.error('Amount mismatch:', paidAmount, expectedAmount);
+      await client.query('COMMIT');
       return new NextResponse('SUCCESS', { status: 200 });
     }
 
     const row = transfer.rows[0];
 
-    await db.query(
-      'UPDATE file_transfers SET pay_status = $1, updated_at = CURRENT_TIMESTAMP WHERE id = $2',
-      ['paid', transferId]
+    await client.query(
+      `UPDATE file_transfer_orders 
+       SET status = 'paid', 
+           pay_order_no = COALESCE($1, pay_order_no),
+           updated_at = CURRENT_TIMESTAMP
+       WHERE transfer_id = $2`,
+      [params.order_no || row.pay_order_no, transferId]
     );
 
-    const userResult = await db.query(
-      'SELECT nickname, email FROM users WHERE id = $1',
-      [row.user_id]
-    );
-    const user = userResult.rows[0] || {};
-
-    await db.query(`
-      INSERT INTO file_transfer_orders
-        (transfer_id, code, file_name, file_size, max_downloads, download_count, retain_days, price, pay_order_no, user_id, user_nickname, user_email, status, created_at)
-      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, 'paid', CURRENT_TIMESTAMP)
-      ON CONFLICT (transfer_id) DO UPDATE SET
-        pay_order_no = EXCLUDED.pay_order_no,
-        price = EXCLUDED.price,
-        status = 'paid',
-        refund_amount = 0,
-        deleted_at = NULL
-    `, [
-      row.id, row.code, row.file_name, row.file_size, row.max_downloads,
-      row.download_count, row.retain_days, row.price, params.order_no || row.pay_order_no,
-      row.user_id, user.nickname, user.email
-    ]);
-
+    await client.query('COMMIT');
     return new NextResponse('SUCCESS', { status: 200 });
   } catch (error) {
+    await client.query('ROLLBACK').catch(() => {});
     console.error('Pay notify error:', error);
     return new NextResponse('FAIL', { status: 200 });
+  } finally {
+    client.release();
   }
 }

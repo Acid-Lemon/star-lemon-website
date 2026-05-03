@@ -8,7 +8,10 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
     const { id } = await params;
 
     const result = await db.query(
-      'SELECT * FROM file_transfers WHERE id = $1 AND pay_status = $2',
+      `SELECT ft.*, fto.price, fto.status
+       FROM file_transfers ft
+       JOIN file_transfer_orders fto ON fto.transfer_id = ft.id
+       WHERE ft.id = $1 AND fto.status = $2`,
       [parseInt(id), 'unpaid']
     );
 
@@ -29,7 +32,7 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
     });
 
     await db.query(
-      'UPDATE file_transfers SET pay_order_no = $1, updated_at = CURRENT_TIMESTAMP WHERE id = $2',
+      'UPDATE file_transfer_orders SET pay_order_no = $1 WHERE transfer_id = $2',
       [payResult.orderNo, transfer.id]
     );
 

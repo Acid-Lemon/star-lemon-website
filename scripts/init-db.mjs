@@ -231,14 +231,10 @@ async function init() {
           file_name VARCHAR(500) NOT NULL,
           file_size BIGINT NOT NULL,
           file_key TEXT,
-          oss_bucket VARCHAR(100),
           max_downloads INTEGER NOT NULL DEFAULT 3,
           download_count INTEGER NOT NULL DEFAULT 0,
           retain_days INTEGER NOT NULL DEFAULT 7,
           expire_at TIMESTAMP NOT NULL,
-          price NUMERIC(10,2) NOT NULL DEFAULT 0,
-          pay_status VARCHAR(20) NOT NULL DEFAULT 'unpaid',
-          pay_order_no VARCHAR(100),
           created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
           updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         )
@@ -253,21 +249,12 @@ async function init() {
       await client.query(`
         CREATE TABLE file_transfer_orders (
           id SERIAL PRIMARY KEY,
-          transfer_id INTEGER UNIQUE,
-          code VARCHAR(6) NOT NULL,
-          file_name VARCHAR(500) NOT NULL,
-          file_size BIGINT NOT NULL,
-          max_downloads INTEGER NOT NULL,
-          download_count INTEGER NOT NULL DEFAULT 0,
-          retain_days INTEGER NOT NULL,
+          transfer_id INTEGER UNIQUE REFERENCES file_transfers(id) ON DELETE SET NULL,
+          user_id INTEGER REFERENCES users(id),
           price NUMERIC(10,2) NOT NULL DEFAULT 0,
           pay_order_no VARCHAR(100),
-          user_id INTEGER REFERENCES users(id),
-          user_nickname VARCHAR(255),
-          user_email VARCHAR(255),
-          status VARCHAR(20) NOT NULL DEFAULT 'paid',
+          status VARCHAR(20) NOT NULL DEFAULT 'unpaid',
           refund_amount NUMERIC(10,2) DEFAULT 0,
-          deleted_at TIMESTAMP,
           created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         )
       `);

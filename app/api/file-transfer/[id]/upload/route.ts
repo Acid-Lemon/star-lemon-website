@@ -12,7 +12,10 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
     }
 
     const result = await db.query(
-      'SELECT * FROM file_transfers WHERE id = $1 AND user_id = $2 AND pay_status = $3',
+      `SELECT ft.*, fto.status
+       FROM file_transfers ft
+       JOIN file_transfer_orders fto ON fto.transfer_id = ft.id
+       WHERE ft.id = $1 AND ft.user_id = $2 AND fto.status = $3`,
       [parseInt(id), session.user.id, 'paid']
     );
 
@@ -29,8 +32,8 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
     const uploadCreds = await generateUploadCredentials(transfer.file_name);
 
     await db.query(
-      'UPDATE file_transfers SET file_key = $1, oss_bucket = $2, updated_at = CURRENT_TIMESTAMP WHERE id = $3',
-      [uploadCreds.key, uploadCreds.bucket, transfer.id]
+      'UPDATE file_transfers SET file_key = $1, updated_at = CURRENT_TIMESTAMP WHERE id = $2',
+      [uploadCreds.key, transfer.id]
     );
 
     return NextResponse.json({

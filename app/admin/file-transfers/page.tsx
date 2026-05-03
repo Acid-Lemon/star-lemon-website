@@ -21,8 +21,6 @@ interface FileTransfer {
   retain_days: number;
   expire_at: string;
   price: string;
-  pay_status: string;
-  pay_order_no: string | null;
   created_at: string;
   updated_at: string;
   user_id: number | null;
@@ -33,20 +31,19 @@ interface FileTransfer {
 interface OrderRecord {
   id: number;
   transfer_id: number | null;
-  code: string;
-  file_name: string;
-  file_size: number;
-  max_downloads: number;
-  download_count: number;
-  retain_days: number;
-  price: string;
+  code: string | null;
+  file_name: string | null;
+  file_size: number | null;
+  max_downloads: number | null;
+  download_count: number | null;
+  retain_days: number | null;
+  price: string | null;
   pay_order_no: string | null;
   user_id: number | null;
   user_nickname: string | null;
   user_email: string | null;
   status: string;
   refund_amount: string;
-  deleted_at: string | null;
   created_at: string;
 }
 
@@ -277,15 +274,15 @@ function OrderRecordsTab() {
                     </TableCell>
                     <TableCell>
                       <div>
-                        <p className="font-medium text-sm truncate max-w-[120px]">{order.file_name}</p>
-                        <p className="text-xs text-muted-foreground">{formatFileSize(order.file_size)}</p>
+                        <p className="font-medium text-sm truncate max-w-[120px]">{order.file_name || '(已删除)'}</p>
+                        <p className="text-xs text-muted-foreground">{order.file_size ? formatFileSize(order.file_size) : '-'}</p>
                       </div>
                     </TableCell>
                     <TableCell>
-                      <span className="font-mono font-bold text-sm">{order.code}</span>
+                      <span className="font-mono font-bold text-sm">{order.code || '-'}</span>
                     </TableCell>
                     <TableCell>{getStatusBadge(order)}</TableCell>
-                    <TableCell className="text-sm font-medium">¥{parseFloat(order.price).toFixed(2)}</TableCell>
+                    <TableCell className="text-sm font-medium">¥{order.price ? parseFloat(order.price).toFixed(2) : '0.00'}</TableCell>
                     <TableCell className="text-sm">
                       {parseFloat(order.refund_amount) > 0 ? (
                         <span className="text-destructive font-medium">¥{parseFloat(order.refund_amount).toFixed(2)}</span>

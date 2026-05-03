@@ -49,8 +49,8 @@
 - `timeline` — 时间轴表
 - `hitokoto` — 一言语句表
 - `settings` — 系统配置表（键值对）
-- `file_transfers` — 文件快传订单表
-- `file_transfer_orders` — 文件快传支付订单记录表
+- `file_transfers` — 文件快传记录表（文件信息、支付状态）
+- `file_transfer_orders` — 文件快传支付订单表（订单状态、退款信息，通过 transfer_id 关联 file_transfers）
 
 ## 环境变量
 

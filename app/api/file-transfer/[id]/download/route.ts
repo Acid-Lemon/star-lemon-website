@@ -7,7 +7,10 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
     const { id } = await params;
 
     const result = await db.query(
-      'SELECT * FROM file_transfers WHERE id = $1',
+      `SELECT ft.*, fto.status
+       FROM file_transfers ft
+       JOIN file_transfer_orders fto ON fto.transfer_id = ft.id
+       WHERE ft.id = $1`,
       [parseInt(id)]
     );
 
@@ -17,7 +20,7 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
 
     const transfer = result.rows[0];
 
-    if (transfer.pay_status !== 'paid') {
+    if (transfer.status !== 'paid') {
       return NextResponse.json({ error: '该文件尚未完成支付' }, { status: 400 });
     }
 

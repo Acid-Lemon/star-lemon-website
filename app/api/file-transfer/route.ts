@@ -44,20 +44,38 @@ export async function POST(request: NextRequest) {
 
     const expireAt = new Date(Date.now() + retainDays * 24 * 60 * 60 * 1000);
 
-    const result = await db.query(
-      `INSERT INTO file_transfers (code, file_name, file_size, file_key, max_downloads, retain_days, expire_at, price, pay_status, user_id)
-       VALUES ($1, $2, $3, '', $4, $5, $6, $7, 'unpaid', $8)
-       RETURNING id, code`,
-      [code, fileName, fileSize, maxDownloads, retainDays, expireAt, price, session.user.id]
-    );
+    const client = await db.pool.connect();
+    try {
+      await client.query('BEGIN');
 
-    const transfer = result.rows[0];
+      const transferResult = await client.query(
+        `INSERT INTO file_transfers (code, file_name, file_size, file_key, max_downloads, retain_days, expire_at, user_id)
+         VALUES ($1, $2, $3, '', $4, $5, $6, $7)
+         RETURNING id, code`,
+        [code, fileName, fileSize, maxDownloads, retainDays, expireAt, session.user.id]
+      );
 
-    return NextResponse.json({
-      id: transfer.id,
-      code: transfer.code,
-      price,
-    });
+      const transfer = transferResult.rows[0];
+
+      await client.query(
+        `INSERT INTO file_transfer_orders (transfer_id, user_id, price, status)
+         VALUES ($1, $2, $3, 'unpaid')`,
+        [transfer.id, session.user.id, price]
+      );
+
+      await client.query('COMMIT');
+
+      return NextResponse.json({
+        id: transfer.id,
+        code: transfer.code,
+        price,
+      });
+    } catch (error) {
+      await client.query('ROLLBACK').catch(() => {});
+      throw error;
+    } finally {
+      client.release();
+    }
   } catch (error) {
     console.error('Create transfer error:', error);
     return NextResponse.json({ error: '创建失败' }, { status: 500 });
@@ -74,7 +92,10 @@ export async function GET(request: NextRequest) {
     }
 
     const result = await db.query(
-      'SELECT id, code, file_name, file_size, max_downloads, download_count, retain_days, expire_at, pay_status FROM file_transfers WHERE code = $1',
+      `SELECT ft.id, ft.code, ft.file_name, ft.file_size, ft.max_downloads, ft.download_count, ft.retain_days, ft.expire_at, fto.status
+       FROM file_transfers ft
+       LEFT JOIN file_transfer_orders fto ON fto.transfer_id = ft.id
+       WHERE ft.code = $1`,
       [code]
     );
 
@@ -84,7 +105,7 @@ export async function GET(request: NextRequest) {
 
     const transfer = result.rows[0];
 
-    if (transfer.pay_status !== 'paid') {
+    if (transfer.status !== 'paid') {
       return NextResponse.json({ error: '该文件尚未完成支付' }, { status: 400 });
     }
 

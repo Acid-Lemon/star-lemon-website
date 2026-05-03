@@ -17,7 +17,10 @@ export async function DELETE(
     const { id } = await params;
 
     const result = await db.query(
-      'SELECT * FROM file_transfers WHERE id = $1 AND pay_status = $2',
+      `SELECT ft.*, fto.price, fto.status
+       FROM file_transfers ft
+       JOIN file_transfer_orders fto ON fto.transfer_id = ft.id
+       WHERE ft.id = $1 AND fto.status = $2`,
       [parseInt(id), 'paid']
     );
 
@@ -73,8 +76,7 @@ export async function DELETE(
       await db.query(`
         UPDATE file_transfer_orders
         SET status = 'refunded',
-            refund_amount = $1,
-            deleted_at = CURRENT_TIMESTAMP
+            refund_amount = $1
         WHERE transfer_id = $2
       `, [refundAmount, transfer.id]);
 

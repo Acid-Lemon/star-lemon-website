@@ -11,14 +11,15 @@ export async function GET() {
 
     const result = await db.query(
       `SELECT 
-        id, code, file_name, file_size, file_key, max_downloads, download_count,
-        retain_days, expire_at, price, pay_status, created_at, updated_at
-      FROM file_transfers
-      WHERE user_id = $1
-        AND pay_status = 'paid'
-        AND download_count < max_downloads
-        AND expire_at > NOW()
-      ORDER BY created_at DESC`,
+        ft.id, ft.code, ft.file_name, ft.file_size, ft.file_key, ft.max_downloads, ft.download_count,
+        ft.retain_days, ft.expire_at, fto.price, fto.status, ft.created_at, ft.updated_at
+      FROM file_transfers ft
+      JOIN file_transfer_orders fto ON fto.transfer_id = ft.id
+      WHERE ft.user_id = $1
+        AND fto.status = 'paid'
+        AND ft.download_count < ft.max_downloads
+        AND ft.expire_at > NOW()
+      ORDER BY ft.created_at DESC`,
       [session.user.id]
     );
 

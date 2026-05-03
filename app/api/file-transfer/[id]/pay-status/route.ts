@@ -6,7 +6,7 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
     const { id } = await params;
 
     const result = await db.query(
-      'SELECT pay_status FROM file_transfers WHERE id = $1',
+      'SELECT status FROM file_transfer_orders WHERE transfer_id = $1',
       [parseInt(id)]
     );
 
@@ -14,7 +14,7 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
       return NextResponse.json({ error: '订单不存在' }, { status: 404 });
     }
 
-    return NextResponse.json({ paid: result.rows[0].pay_status === 'paid' });
+    return NextResponse.json({ paid: result.rows[0].status === 'paid' });
   } catch (error) {
     console.error('Check pay status error:', error);
     return NextResponse.json({ error: '查询失败' }, { status: 500 });

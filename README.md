@@ -1,87 +1,152 @@
 # Star & Lemon 博客 / 个人小站
 
-这是一个基于 [Next.js](https://nextjs.org/) App Router 构建的现代化全栈个人博客与小站系统。项目包含了博客文章管理、留言板互动、时间轴记录、数据统计以及完善的后台管理系统。
+基于 Next.js 16 App Router 构建的现代化全栈个人博客与小站系统，集成了博客文章、动态分享、留言互动、文件快传、支付系统以及完善的后台管理。
 
-## ✨ 核心特性
+## 核心特性
 
-- **博客文章系统**：支持文章发布、阅读以及漂亮的 16:9 卡片式排版。
-- **互动留言板**：拥有防垃圾评论和待审核机制的弹幕式留言墙，留言卡片支持随机多彩背景和图片上传。
-- **后台管理系统**：安全的管理员控制台，可进行文章管理、留言/评论审核和全局配置管理。
-- **发展时间轴**：以直观的时间线形式记录网站或个人的重要里程碑。
-- **美观现代的 UI**：采用了 Tailwind CSS 和 Radix UI (shadcn/ui)，全站响应式设计，卡片悬浮与玻璃态光晕效果。
-- **API 集成扩展**：已集成一言（Hitokoto）每日诗句，并支持第三方登录（如 QQ 互联）等。
+### 前台功能
+- **博客文章系统**：支持 Markdown 文章发布、阅读，卡片式排版，AI 辅助生成摘要
+- **动态分享（Moments）**：发布图文动态，支持图片上传，瀑布流展示
+- **互动留言板**：弹幕式留言墙，支持图片上传，留言审核机制
+- **文件快传**：上传文件生成取件码，支持微信扫码支付，按存储和流量计费
+- **一言（Hitokoto）**：每日随机展示精选语句
+- **发展时间轴**：记录网站或个人的重要里程碑
+- **用户系统**：邮箱注册/登录、邮箱验证码登录、QQ 互联登录、个人资料管理
 
-## 🚀 技术栈
+### 后台管理
+- **仪表盘**：数据统计概览
+- **内容管理**：文章管理、动态管理、一言管理
+- **互动审核**：留言审核、评论审核
+- **用户管理**：查看用户列表、编辑用户信息、重置密码、删除用户
+- **文件快传管理**：文件管理（查看/删除/退款）、订单记录查询
+- **系统设置**：站点配置、邮件服务、AI 接口、OAuth、OSS、支付、定价等全局配置
 
-- **框架**: Next.js 16 (App Router)
-- **UI / 样式**: Tailwind CSS, React, Lucide Icons, shadcn/ui 组件
-- **数据库 / 状态**: PostgreSQL (通过 `pg` 库驱动服务器端渲染)
-- **前端工具**: Sonner (吐司提示), Next/Font (字体优化)
+## 技术栈
 
-## 🛠️ 开始使用
+| 类别 | 技术 |
+|------|------|
+| 框架 | Next.js 16.2.2 (App Router) |
+| 前端 | React 19.2.4, TypeScript 5 |
+| 样式 | Tailwind CSS 4, shadcn/ui, @base-ui/react |
+| 图标 | @remixicon/react |
+| 数据库 | PostgreSQL (pg) |
+| 认证 | JWT (jose), bcryptjs |
+| 存储 | 阿里云 OSS |
+| 加速 | 阿里云 ESA (Edge Security Acceleration) |
+| 支付 | 蓝兔支付（微信 Native 扫码支付）|
+| 邮件 | Nodemailer |
+| AI | DeepSeek API |
+| 其他 | Sonner, react-markdown, recharts, embla-carousel |
 
-### 1. 环境准备
+## 数据库表
 
-确保你已经安装了以下环境：
-- Node.js (建议 18.x 或以上版本)
-- PostgreSQL 数据库
+- `users` — 用户表（支持邮箱/QQ登录）
+- `verification_codes` — 邮箱验证码表
+- `posts` — 博客文章表
+- `messages` — 留言表
+- `comments` — 评论表
+- `moments` — 动态表
+- `timeline` — 时间轴表
+- `hitokoto` — 一言语句表
+- `settings` — 系统配置表（键值对）
+- `file_transfers` — 文件快传订单表
+- `file_transfer_orders` — 文件快传支付订单记录表
 
-### 2. 获取代码与安装依赖
+## 环境变量
+
+创建 `.env.local` 文件：
+
+```env
+# 数据库
+DB_HOST=localhost
+DB_PORT=5432
+DB_USER=postgres
+DB_PASSWORD=your_password
+DB_NAME=star_lemon
+
+# JWT
+JWT_SECRET=your_jwt_secret
+
+# QQ 登录
+QQ_APP_ID=your_qq_app_id
+QQ_APP_KEY=your_qq_app_key
+QQ_REDIRECT_URI=https://your-domain.com/api/auth/qq/callback
+
+# 邮件服务
+SMTP_HOST=smtp.example.com
+SMTP_PORT=465
+SMTP_USER=your_email@example.com
+SMTP_PASS=your_email_password
+SMTP_FROM_NAME=Star Lemon
+SMTP_FROM_EMAIL=noreply@example.com
+
+# 阿里云 OSS
+OSS_ENDPOINT=https://oss-cn-hangzhou.aliyuncs.com
+OSS_ACCESS_KEY_ID=your_access_key
+OSS_ACCESS_KEY_SECRET=your_secret
+OSS_BUCKET=your-bucket
+OSS_REGION=oss-cn-hangzhou
+
+# 阿里云 ESA
+ESA_DOMAIN=cdn.your-domain.com
+
+# 蓝兔支付
+LANTU_MCH_ID=your_mch_id
+LANTU_KEY=your_merchant_key
+
+# DeepSeek AI
+DEEPSEEK_API_URL=https://api.deepseek.com/v1/chat/completions
+DEEPSEEK_API_KEY=your_api_key
+```
+
+## 开始使用
 
 ```bash
 # 安装依赖
-npm install
-# 或者
-yarn install
-# 或者
 pnpm install
+
+# 初始化数据库
+node scripts/init-db.mjs
+
+# 运行开发服务器
+pnpm dev
 ```
 
-### 3. 环境变量配置
+访问 [http://localhost:3000](http://localhost:3000)，管理后台路由为 `/admin`。
 
-复制 `.env.example` 文件（如果存在）或创建 `.env.local`，填入你的配置信息：
-
-```env
-# 数据库连接字符串
-DATABASE_URL="postgres://user:password@localhost:5432/your_database"
-
-# JWT Token 秘钥（用于用户登录认证）
-JWT_SECRET="your_secure_random_jwt_secret"
-
-# QQ 互联配置（可选）
-QQ_APP_ID="your_qq_app_id"
-QQ_APP_KEY="your_qq_app_key"
-QQ_REDIRECT_URI="http://localhost:3000/api/auth/qq/callback"
-```
-
-### 4. 运行开发服务器
-
-```bash
-npm run dev
-# 或 yarn dev / pnpm dev
-```
-
-打开 [http://localhost:3000](http://localhost:3000) 即可在浏览器中查看前台界面。
-管理后台路由位于 `/admin`。
-
-## 📂 项目结构
+## 项目结构
 
 ```text
 ├── app/
-│   ├── admin/       # 后台管理页面
-│   ├── api/         # 内部与外部交互的 API 路由 (RESTful)
-│   ├── components/  # 复用的前端 UI 组件
-│   ├── guestbook/   # 留言板前台页面
-│   ├── post/        # 文章列表与详情页
-│   ├── page.tsx     # 网站首页
-│   └── layout.tsx   # 全局根布局
-├── lib/             # 核心库集合 (如 db.ts, auth.ts, settings.ts)
-├── public/          # 静态资源 (图片、图标等)
-└── next.config.mjs  # Next.js 配置文件
+│   ├── admin/           # 后台管理页面
+│   ├── api/             # API 路由
+│   ├── components/      # 共享组件
+│   ├── guestbook/       # 留言板
+│   ├── login/           # 登录页
+│   ├── moments/         # 动态页
+│   ├── post/            # 文章列表/详情
+│   ├── register/        # 注册页
+│   ├── tools/           # 工具箱（文件快传）
+│   ├── about/           # 关于/联系
+│   ├── page.tsx         # 首页
+│   └── layout.tsx       # 根布局
+├── components/ui/       # shadcn/ui 组件
+├── lib/                 # 核心库（db, auth, oss, mail, ai, pay）
+├── scripts/             # 数据库迁移脚本
+└── next.config.ts       # Next.js 配置
 ```
 
-## 📝 了解更多
+## 第三方服务集成
 
-要了解关于框架的更多信息，请参考：
-- [Next.js 文档](https://nextjs.org/docs) 
+- **QQ 互联**：OAuth2 登录
+- **阿里云 OSS**：图片/文件存储
+- **阿里云 ESA**：CDN 加速下载
+- **蓝兔支付**：微信支付（Native 扫码）
+- **DeepSeek**：AI 文章摘要生成
+- **Hitokoto API**：每日语句
+
+## 更多文档
+
+- [Next.js 文档](https://nextjs.org/docs)
 - [Tailwind CSS 文档](https://tailwindcss.com/docs)
+- [shadcn/ui 文档](https://ui.shadcn.com)

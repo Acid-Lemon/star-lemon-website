@@ -36,7 +36,7 @@ jobs:
             --exclude=.next/cache \
             --exclude=.next/dev \
             package.json pnpm-lock.yaml next.config.ts \
-            public .next scripts/remote-deploy.sh
+            public .next
 
       - name: Upload to server and deploy
         run: |

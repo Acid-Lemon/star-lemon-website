@@ -1,0 +1,34 @@
+import { Pool } from 'pg';
+
+const poolConfig = {
+  host: process.env.DB_HOST,
+  port: parseInt(process.env.DB_PORT || '5432'),
+  user: process.env.DB_USER,
+  password: process.env.DB_PASSWORD,
+  database: process.env.DB_NAME,
+  connectionTimeoutMillis: 20000,
+};
+
+let pool: Pool;
+
+if (process.env.NODE_ENV === 'production') {
+  pool = new Pool(poolConfig);
+} else {
+  let globalWithPg = global as typeof globalThis & {
+    _pgPool?: Pool;
+  };
+  if (!globalWithPg._pgPool) {
+    globalWithPg._pgPool = new Pool(poolConfig);
+  }
+  pool = globalWithPg._pgPool;
+}
+
+const db = {
+  // 直接包装 pg 的 query，返回标准的 pg result 对象
+  query: async (text: string, params?: any[]) => {
+    return await pool.query(text, params);
+  },
+  pool,
+};
+
+export default db;

@@ -3,6 +3,7 @@ import db from '../../../lib/db';
 import { getSession } from '../../../lib/auth';
 import { getSetting } from '../../../lib/settings';
 import { deleteUploadedFile } from '../../../lib/file';
+import { getPublicUrl } from '../../../lib/oss';
 
 // 获取文章的评论（包含回复）
 export async function GET(request: NextRequest) {
@@ -23,7 +24,14 @@ export async function GET(request: NextRequest) {
       [postId]
     );
 
-    return NextResponse.json(result.rows);
+    const rows = await Promise.all(
+      result.rows.map(async (row: any) => ({
+        ...row,
+        image_url: await getPublicUrl(row.image_url),
+      }))
+    );
+
+    return NextResponse.json(rows);
   } catch (error) {
     console.error('Failed to fetch comments:', error);
     return NextResponse.json({ error: 'Failed to fetch comments' }, { status: 500 });

@@ -1,6 +1,7 @@
 import { notFound } from 'next/navigation';
 import db from '../../../lib/db';
 import { getSession } from '../../../lib/auth';
+import { getPublicUrl } from '../../../lib/oss';
 import PostClient from './PostClient';
 
 export const revalidate = 0; // 动态渲染
@@ -88,7 +89,7 @@ export default async function PostPage({ params }: { params: Promise<{ id: strin
             authorTextColor={authorTextColor}
             createdAt={createdAt}
             tags={tags}
-            cover={post.cover}
+            cover={(await getPublicUrl(post.cover)) || undefined}
             postId={post.id}
             user={user}
         />

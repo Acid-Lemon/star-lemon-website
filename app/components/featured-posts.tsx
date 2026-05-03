@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import db from '../../lib/db';
+import { getPublicUrl } from '../../lib/oss';
 
 interface Post {
   id: number;
@@ -22,7 +23,12 @@ export async function FeaturedPosts() {
       ORDER BY posts.created_at DESC
       LIMIT 3
     `);
-    posts = result.rows;
+    posts = await Promise.all(
+      result.rows.map(async (row: any) => ({
+        ...row,
+        cover: await getPublicUrl(row.cover),
+      }))
+    );
   } catch (e) {
     console.error('Failed to fetch featured posts', e);
   }

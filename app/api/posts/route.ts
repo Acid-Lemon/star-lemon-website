@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import db from '../../../lib/db';
+import { getPublicUrl } from '../../../lib/oss';
 
 export async function GET(request: Request) {
     const { searchParams } = new URL(request.url);
@@ -15,7 +16,14 @@ export async function GET(request: Request) {
             LIMIT $1 OFFSET $2
         `, [limit, offset]);
 
-        return NextResponse.json({ posts: result.rows });
+        const posts = await Promise.all(
+            result.rows.map(async (row: any) => ({
+                ...row,
+                cover: await getPublicUrl(row.cover),
+            }))
+        );
+
+        return NextResponse.json({ posts });
     } catch (e) {
         console.error('Failed to fetch posts', e);
         return NextResponse.json({ posts: [], error: 'Failed to fetch posts' }, { status: 500 });

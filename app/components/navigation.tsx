@@ -36,11 +36,11 @@ export function Navigation({user, handleLogout}: { user: any, handleLogout: (for
                         <span
                             className={`absolute inset-x-4 -bottom-0 h-px bg-gradient-to-r from-transparent via-rose-400 to-transparent transition-opacity ${pathname === '/moments' ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'}`}></span>
                     </Link>
-                    <Link href="/hitokoto"
-                          className={`relative px-4 py-2 text-sm sm:text-base rounded-full transition-all duration-300 group ${pathname === '/hitokoto' ? 'text-indigo-500 bg-gray-100/50' : 'hover:text-gray-900 hover:bg-gray-100/50'}`}>
+                    <Link href="/quotes"
+                          className={`relative px-4 py-2 text-sm sm:text-base rounded-full transition-all duration-300 group ${pathname === '/quotes' ? 'text-indigo-500 bg-gray-100/50' : 'hover:text-gray-900 hover:bg-gray-100/50'}`}>
                         一言
                         <span
-                            className={`absolute inset-x-4 -bottom-0 h-px bg-gradient-to-r from-transparent via-indigo-400 to-transparent transition-opacity ${pathname === '/hitokoto' ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'}`}></span>
+                            className={`absolute inset-x-4 -bottom-0 h-px bg-gradient-to-r from-transparent via-indigo-400 to-transparent transition-opacity ${pathname === '/quotes' ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'}`}></span>
                     </Link>
                     <Link href="/guestbook"
                           className={`relative px-4 py-2 text-sm sm:text-base rounded-full transition-all duration-300 group ${pathname === '/guestbook' ? 'text-yellow-500 bg-gray-100/50' : 'hover:text-gray-900 hover:bg-gray-100/50'}`}>

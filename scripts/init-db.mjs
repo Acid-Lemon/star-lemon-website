@@ -185,20 +185,22 @@ async function init() {
       console.log('⏭️ timeline 表已存在，跳过创建');
     }
 
-    // hitokoto
-    if (!await tableExists(client, 'hitokoto')) {
+    // quotes
+    if (!await tableExists(client, 'quotes')) {
       await client.query(`
-        CREATE TABLE hitokoto (
+        CREATE TABLE quotes (
           id SERIAL PRIMARY KEY,
           content TEXT NOT NULL,
           source VARCHAR(255),
           category VARCHAR(50) DEFAULT 'anime',
-          created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+          is_active BOOLEAN DEFAULT true,
+          created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+          updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         )
       `);
-      console.log('✅ hitokoto 表创建成功');
+      console.log('✅ quotes 表创建成功');
     } else {
-      console.log('⏭️ hitokoto 表已存在，跳过创建');
+      console.log('⏭️ quotes 表已存在，跳过创建');
     }
 
     // settings

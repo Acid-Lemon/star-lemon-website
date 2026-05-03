@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import db from '../../../../lib/db';
 import { getSession } from '../../../../lib/auth';
+import { getPublicUrl } from '../../../../lib/oss';
 
 export async function GET() {
   try {
@@ -13,7 +14,14 @@ export async function GET() {
       'SELECT id, nickname, email, role, avatar, bio, birthday, qq_identifier, created_at, updated_at FROM users ORDER BY created_at DESC'
     );
 
-    return NextResponse.json(result.rows);
+    const rows = await Promise.all(
+      result.rows.map(async (row: any) => ({
+        ...row,
+        avatar: await getPublicUrl(row.avatar),
+      }))
+    );
+
+    return NextResponse.json(rows);
   } catch (error) {
     console.error('Failed to fetch users:', error);
     return NextResponse.json({ error: '获取用户列表失败' }, { status: 500 });

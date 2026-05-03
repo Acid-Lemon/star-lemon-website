@@ -5,34 +5,41 @@ import { Timeline } from './components/timeline'
 import { StatsCards } from './components/stats-cards'
 import { FeaturedPosts } from './components/featured-posts'
 import { getSettings } from '../lib/settings'
+import db from '../lib/db'
 
 export const revalidate = 0;
 
+async function getRandomQuote() {
+  try {
+    const countResult = await db.query('SELECT COUNT(*) FROM quotes WHERE is_active = true');
+    const count = parseInt(countResult.rows[0].count);
+    if (count === 0) return null;
+    const offset = Math.floor(Math.random() * count);
+    const result = await db.query(
+      'SELECT content, source FROM quotes WHERE is_active = true OFFSET $1 LIMIT 1',
+      [offset]
+    );
+    return result.rows[0] || null;
+  } catch (e) {
+    console.error('Failed to fetch random quote', e);
+    return null;
+  }
+}
+
 export default async function Home() {
     const settings = await getSettings();
-    
+
     const siteTitle = settings.site_title || 'Star & Lemon 的小站';
     const siteDescription = settings.site_description || '两个开发者的代码世界';
-    const hitokotoEnabled = settings.hitokoto_enabled !== 'false';
-    const hitokotoApi = settings.hitokoto_api || 'https://v1.hitokoto.cn?c=d&c=i&c=j&c=k';
+    const quoteEnabled = settings.quote_enabled !== 'false';
 
-    let hitokoto = {hitokoto: '欢迎来到star和lemon的小站！', from_who: 'Star & Lemon', from: 'Our Space'};
+    let quote = { content: '欢迎来到star和lemon的小站！', source: 'Star & Lemon' };
 
-    if (hitokotoEnabled) {
-        try {
-            const res = await fetch(hitokotoApi, {
-                method: 'GET',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                cache: 'no-store'
-            });
-            if (res.ok) {
-                hitokoto = await res.json();
-            }
-        } catch (e) {
-            console.error("Failed to fetch hitokoto", e);
-        }
+    if (quoteEnabled) {
+      const randomQuote = await getRandomQuote();
+      if (randomQuote) {
+        quote = randomQuote;
+      }
     }
 
     return (
@@ -109,20 +116,20 @@ export default async function Home() {
             </section>
 
             {/* 一言/诗句卡片 */}
-            {hitokotoEnabled && (
+            {quoteEnabled && (
             <section className="w-full max-w-4xl mx-auto">
                 <Card className="border-0 bg-gradient-to-br from-white to-orange-50/30 shadow-lg hover:shadow-xl transition-shadow duration-500">
                     <CardContent className="p-8 md:p-12 text-center relative">
                         <div className="absolute top-6 left-8 text-6xl text-gray-200 font-serif opacity-30">&ldquo;</div>
                         <div className="absolute bottom-2 right-8 text-6xl text-gray-200 font-serif opacity-30 rotate-180">&rdquo;</div>
-                        
+
                         <div className="text-gray-700 text-xl md:text-2xl font-serif leading-loose relative z-10 px-8 min-h-[4rem] flex items-center justify-center">
-                            {hitokoto.hitokoto}
+                            {quote.content}
                         </div>
-                        
+
                         <div className="text-gray-400 text-sm font-mono mt-8 relative z-10 flex items-center justify-center gap-3">
                             <span className="w-8 h-px bg-gradient-to-r from-transparent to-gray-300"></span>
-                            {hitokoto.from_who || hitokoto.from || "未知"}
+                            {quote.source || "未知"}
                             <span className="w-8 h-px bg-gradient-to-l from-transparent to-gray-300"></span>
                         </div>
                     </CardContent>

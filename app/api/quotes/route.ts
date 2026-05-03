@@ -8,26 +8,26 @@ export async function GET(request: NextRequest) {
     const random = searchParams.get('random');
 
     if (random === '1') {
-      const countResult = await db.query('SELECT COUNT(*) FROM hitokoto WHERE is_active = true');
+      const countResult = await db.query('SELECT COUNT(*) FROM quotes WHERE is_active = true');
       const count = parseInt(countResult.rows[0].count);
       if (count === 0) {
         return NextResponse.json(null);
       }
       const offset = Math.floor(Math.random() * count);
       const result = await db.query(
-        'SELECT * FROM hitokoto WHERE is_active = true OFFSET $1 LIMIT 1',
+        'SELECT * FROM quotes WHERE is_active = true OFFSET $1 LIMIT 1',
         [offset]
       );
       return NextResponse.json(result.rows[0] || null);
     }
 
     const result = await db.query(
-      'SELECT * FROM hitokoto ORDER BY created_at DESC'
+      'SELECT * FROM quotes ORDER BY created_at DESC'
     );
     return NextResponse.json(result.rows);
   } catch (error) {
-    console.error('Failed to fetch hitokoto:', error);
-    return NextResponse.json({ error: 'Failed to fetch hitokoto' }, { status: 500 });
+    console.error('Failed to fetch quotes:', error);
+    return NextResponse.json({ error: 'Failed to fetch quotes' }, { status: 500 });
   }
 }
 
@@ -46,16 +46,16 @@ export async function POST(request: NextRequest) {
     }
 
     const result = await db.query(
-      `INSERT INTO hitokoto (content, source, category, is_active) 
-       VALUES ($1, $2, $3, $4) 
+      `INSERT INTO quotes (content, source, category, is_active)
+       VALUES ($1, $2, $3, $4)
        RETURNING *`,
       [content.trim(), source?.trim() || null, category || '其他', is_active !== false]
     );
 
     return NextResponse.json(result.rows[0], { status: 201 });
   } catch (error) {
-    console.error('Failed to create hitokoto:', error);
-    return NextResponse.json({ error: 'Failed to create hitokoto' }, { status: 500 });
+    console.error('Failed to create quote:', error);
+    return NextResponse.json({ error: 'Failed to create quote' }, { status: 500 });
   }
 }
 
@@ -74,9 +74,9 @@ export async function PUT(request: NextRequest) {
     }
 
     const result = await db.query(
-      `UPDATE hitokoto 
-       SET content = $1, source = $2, category = $3, is_active = $4, updated_at = NOW() 
-       WHERE id = $5 
+      `UPDATE quotes
+       SET content = $1, source = $2, category = $3, is_active = $4, updated_at = NOW()
+       WHERE id = $5
        RETURNING *`,
       [content.trim(), source?.trim() || null, category || '其他', is_active !== false, id]
     );
@@ -87,8 +87,8 @@ export async function PUT(request: NextRequest) {
 
     return NextResponse.json(result.rows[0]);
   } catch (error) {
-    console.error('Failed to update hitokoto:', error);
-    return NextResponse.json({ error: 'Failed to update hitokoto' }, { status: 500 });
+    console.error('Failed to update quote:', error);
+    return NextResponse.json({ error: 'Failed to update quote' }, { status: 500 });
   }
 }
 
@@ -106,11 +106,11 @@ export async function DELETE(request: NextRequest) {
       return NextResponse.json({ error: 'ID 不能为空' }, { status: 400 });
     }
 
-    await db.query('DELETE FROM hitokoto WHERE id = $1', [id]);
+    await db.query('DELETE FROM quotes WHERE id = $1', [id]);
 
     return NextResponse.json({ success: true });
   } catch (error) {
-    console.error('Failed to delete hitokoto:', error);
-    return NextResponse.json({ error: 'Failed to delete hitokoto' }, { status: 500 });
+    console.error('Failed to delete quote:', error);
+    return NextResponse.json({ error: 'Failed to delete quote' }, { status: 500 });
   }
 }

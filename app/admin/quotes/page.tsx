@@ -14,7 +14,7 @@ import { AlertDialog, AlertDialogContent, AlertDialogHeader, AlertDialogTitle, A
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { RiDeleteBinLine, RiAddCircleLine, RiEditLine } from '@remixicon/react';
 
-interface Hitokoto {
+interface Quote {
     id: number;
     content: string;
     source: string | null;
@@ -43,28 +43,28 @@ const categoryColors: Record<string, string> = {
     '其他': 'bg-gray-100 text-gray-700',
 };
 
-export default function AdminHitokotoPage() {
-    const [hitokotoList, setHitokotoList] = useState<Hitokoto[]>([]);
+export default function AdminQuotesPage() {
+    const [quoteList, setQuoteList] = useState<Quote[]>([]);
     const [loading, setLoading] = useState(true);
     const [content, setContent] = useState('');
     const [source, setSource] = useState('');
     const [category, setCategory] = useState('其他');
     const [isActive, setIsActive] = useState(true);
     const [submitting, setSubmitting] = useState(false);
-    const [editingItem, setEditingItem] = useState<Hitokoto | null>(null);
+    const [editingItem, setEditingItem] = useState<Quote | null>(null);
     const [editContent, setEditContent] = useState('');
     const [editSource, setEditSource] = useState('');
     const [editCategory, setEditCategory] = useState('其他');
     const [editIsActive, setEditIsActive] = useState(true);
     const [deleteTarget, setDeleteTarget] = useState<number | null>(null);
 
-    const fetchHitokoto = useCallback(async () => {
+    const fetchQuotes = useCallback(async () => {
         try {
-            const res = await fetch('/api/hitokoto');
+            const res = await fetch('/api/quotes');
             const data = await res.json();
-            setHitokotoList(Array.isArray(data) ? data : []);
+            setQuoteList(Array.isArray(data) ? data : []);
         } catch (error) {
-            console.error('Failed to fetch hitokoto:', error);
+            console.error('Failed to fetch quotes:', error);
             toast.error('获取一言列表失败');
         } finally {
             setLoading(false);
@@ -72,8 +72,8 @@ export default function AdminHitokotoPage() {
     }, []);
 
     useEffect(() => {
-        fetchHitokoto();
-    }, [fetchHitokoto]);
+        fetchQuotes();
+    }, [fetchQuotes]);
 
     const handleAdd = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -81,14 +81,14 @@ export default function AdminHitokotoPage() {
 
         setSubmitting(true);
         try {
-            const res = await fetch('/api/hitokoto', {
+            const res = await fetch('/api/quotes', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ content: content.trim(), source: source.trim() || null, category, is_active: isActive }),
             });
             if (res.ok) {
                 const newItem = await res.json();
-                setHitokotoList(prev => [newItem, ...prev]);
+                setQuoteList(prev => [newItem, ...prev]);
                 setContent('');
                 setSource('');
                 setCategory('其他');
@@ -105,7 +105,7 @@ export default function AdminHitokotoPage() {
         }
     };
 
-    const handleEdit = (item: Hitokoto) => {
+    const handleEdit = (item: Quote) => {
         setEditingItem(item);
         setEditContent(item.content);
         setEditSource(item.source || '');
@@ -118,7 +118,7 @@ export default function AdminHitokotoPage() {
         if (!editingItem || !editContent.trim()) return;
 
         try {
-            const res = await fetch('/api/hitokoto', {
+            const res = await fetch('/api/quotes', {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
@@ -131,7 +131,7 @@ export default function AdminHitokotoPage() {
             });
             if (res.ok) {
                 const updated = await res.json();
-                setHitokotoList(prev => prev.map(h => h.id === editingItem.id ? updated : h));
+                setQuoteList(prev => prev.map(q => q.id === editingItem.id ? updated : q));
                 setEditingItem(null);
                 toast.success('更新成功');
             } else {
@@ -145,9 +145,9 @@ export default function AdminHitokotoPage() {
 
     const handleDelete = async (id: number) => {
         try {
-            const res = await fetch(`/api/hitokoto?id=${id}`, { method: 'DELETE' });
+            const res = await fetch(`/api/quotes?id=${id}`, { method: 'DELETE' });
             if (res.ok) {
-                setHitokotoList(prev => prev.filter(h => h.id !== id));
+                setQuoteList(prev => prev.filter(q => q.id !== id));
                 toast.success('删除成功');
             } else {
                 toast.error('删除失败');
@@ -159,13 +159,13 @@ export default function AdminHitokotoPage() {
         }
     };
 
-    const activeCount = hitokotoList.filter(h => h.is_active).length;
+    const activeCount = quoteList.filter(q => q.is_active).length;
 
     return (
         <div className="space-y-8">
             <div>
                 <h1 className="text-3xl font-bold tracking-tight">一言管理</h1>
-                <p className="text-muted-foreground mt-2">添加和管理一言，在动态页随机展示</p>
+                <p className="text-muted-foreground mt-2">添加和管理一言</p>
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -175,7 +175,7 @@ export default function AdminHitokotoPage() {
                             <RiAddCircleLine className="w-5 h-5" />
                             添加一言
                         </CardTitle>
-                        <CardDescription>共 {hitokotoList.length} 条，启用 {activeCount} 条</CardDescription>
+                        <CardDescription>共 {quoteList.length} 条，启用 {activeCount} 条</CardDescription>
                     </CardHeader>
                     <CardContent>
                         <form onSubmit={handleAdd} className="flex flex-col gap-4">
@@ -225,19 +225,19 @@ export default function AdminHitokotoPage() {
                 <Card className="lg:col-span-2">
                     <CardHeader>
                         <CardTitle>全部一言</CardTitle>
-                        <CardDescription>共 {hitokotoList.length} 条记录</CardDescription>
+                        <CardDescription>共 {quoteList.length} 条记录</CardDescription>
                     </CardHeader>
                     <CardContent>
                         {loading ? (
                             <div className="text-center py-10 text-muted-foreground">加载中...</div>
-                        ) : hitokotoList.length === 0 ? (
+                        ) : quoteList.length === 0 ? (
                             <div className="text-center py-16 text-muted-foreground">
                                 <div className="text-5xl mb-3">💬</div>
                                 <p className="text-sm">还没有一言，快来添加第一条吧</p>
                             </div>
                         ) : (
                             <div className="space-y-3">
-                                {hitokotoList.map((item) => (
+                                {quoteList.map((item) => (
                                     <div key={item.id} className="p-4 rounded-lg border shadow-sm bg-background border-border group">
                                         <div className="flex items-start justify-between gap-3">
                                             <div className="flex-1 min-w-0">

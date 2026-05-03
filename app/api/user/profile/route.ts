@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import db from '../../../../lib/db';
 import { getSession, loginUser } from '../../../../lib/auth';
+import { getPublicUrl } from '../../../../lib/oss';
 
 // 获取当前用户信息
 export async function GET(request: NextRequest) {
@@ -19,7 +20,11 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: '用户不存在' }, { status: 404 });
     }
 
-    return NextResponse.json(result.rows[0]);
+    const row = result.rows[0];
+    return NextResponse.json({
+      ...row,
+      avatar: await getPublicUrl(row.avatar),
+    });
   } catch (error) {
     console.error('Failed to get user profile:', error);
     return NextResponse.json({ error: 'Failed to get user profile' }, { status: 500 });

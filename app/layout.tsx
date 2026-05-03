@@ -3,6 +3,7 @@ import {DM_Mono, Noto_Serif_SC} from 'next/font/google'
 import "./globals.css";
 import { getSession, logoutUser } from "../lib/auth";
 import { getSettings } from "../lib/settings";
+import { getPublicUrl } from "../lib/oss";
 import { Navigation, Footer } from "./components/navigation";
 import { MainWrapper } from "./components/main-wrapper";
 import { Toaster } from "@/components/ui/sonner";
@@ -43,7 +44,11 @@ export default async function RootLayout({children}: Readonly<{ children: React.
                 [user.id]
             );
             if (result.rows.length > 0) {
-                user = result.rows[0];
+                const row = result.rows[0];
+                user = {
+                    ...row,
+                    avatar: await getPublicUrl(row.avatar),
+                };
             }
         } catch (error) {
             console.error('Failed to fetch latest user info:', error);

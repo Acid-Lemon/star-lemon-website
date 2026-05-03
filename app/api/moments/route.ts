@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import db from '../../../lib/db';
 import { getSession } from '../../../lib/auth';
 import { deleteUploadedFile } from '../../../lib/file';
+import { getPublicUrl } from '../../../lib/oss';
 
 // 获取动态列表
 export async function GET(request: NextRequest) {
@@ -20,7 +21,19 @@ export async function GET(request: NextRequest) {
       [limit, offset]
     );
 
-    return NextResponse.json(result.rows);
+    const rows = await Promise.all(
+      result.rows.map(async (row: any) => ({
+        ...row,
+        image_url: row.image_url
+          ? (await Promise.all(
+              row.image_url.split(',').map((url: string) => getPublicUrl(url.trim()))
+            )).filter(Boolean).join(',')
+          : null,
+        avatar: await getPublicUrl(row.avatar),
+      }))
+    );
+
+    return NextResponse.json(rows);
   } catch (error) {
     console.error('Failed to fetch moments:', error);
     return NextResponse.json({ error: 'Failed to fetch moments' }, { status: 500 });

@@ -3,6 +3,7 @@ import Link from 'next/link';
 import {RiTimeLine, RiFileTextLine, RiHomeLine, RiLogoutBoxLine, RiChat3Line, RiChat4Line, RiSideBarLine, RiSettings3Line, RiFlashlightLine, RiDoubleQuotesL, RiUserLine, RiFolderTransferLine} from '@remixicon/react';
 import {getSession, logoutUser} from '../../lib/auth';
 import {redirect} from 'next/navigation';
+import { getPublicUrl } from '../../lib/oss';
 import db from '../../lib/db';
 
 export default async function AdminLayout({children}: { children: React.ReactNode }) {
@@ -19,7 +20,11 @@ export default async function AdminLayout({children}: { children: React.ReactNod
             [session.user.id]
         );
         if (result.rows.length > 0) {
-            admin = result.rows[0];
+            const row = result.rows[0];
+            admin = {
+                ...row,
+                avatar: await getPublicUrl(row.avatar),
+            };
         }
     } catch (error) {
         console.error('Failed to fetch admin info:', error);
@@ -55,7 +60,7 @@ export default async function AdminLayout({children}: { children: React.ReactNod
                         <RiFlashlightLine className="h-4 w-4"/>
                         动态管理
                     </Link>
-                    <Link href="/admin/hitokoto"
+                    <Link href="/admin/quotes"
                           className="flex items-center gap-3 px-3 py-2.5 rounded-md text-sm font-medium text-muted-foreground hover:bg-secondary hover:text-foreground transition-colors">
                         <RiDoubleQuotesL className="h-4 w-4"/>
                         一言管理

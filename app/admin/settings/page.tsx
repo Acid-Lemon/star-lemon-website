@@ -32,10 +32,10 @@ const categoryMeta: Record<string, { title: string; description: string; icon: s
 
 const secretKeys = ['smtp_pass', 'deepseek_api_key', 'qq_app_key', 'oss_access_key_secret', 'lantu_key'];
 
-const booleanKeys = ['smtp_secure', 'comment_review', 'guestbook_review', 'hitokoto_enabled'];
+const booleanKeys = ['smtp_secure', 'comment_review', 'guestbook_review', 'quote_enabled'];
 
 const fieldOrder: Record<string, string[]> = {
-  site: ['site_title', 'site_description', 'site_keywords', 'site_url', 'icp_number', 'comment_review', 'guestbook_review', 'hitokoto_enabled', 'hitokoto_api'],
+  site: ['site_title', 'site_description', 'site_keywords', 'site_url', 'icp_number', 'comment_review', 'guestbook_review', 'quote_enabled'],
   mail: ['smtp_host', 'smtp_port', 'smtp_user', 'smtp_pass', 'smtp_secure'],
   ai: ['deepseek_api_url', 'deepseek_api_key'],
   oauth: ['qq_app_id', 'qq_app_key'],

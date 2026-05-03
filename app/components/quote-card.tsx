@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 
-interface Hitokoto {
+interface Quote {
     id: number;
     content: string;
     source: string | null;
@@ -19,16 +19,16 @@ const categoryColors: Record<string, string> = {
     '其他': 'bg-gray-50 text-gray-600 border-gray-200',
 };
 
-export function HitokotoCard() {
-    const [hitokoto, setHitokoto] = useState<Hitokoto | null>(null);
+export function QuoteCard() {
+    const [quote, setQuote] = useState<Quote | null>(null);
     const [loading, setLoading] = useState(true);
 
     const fetchRandom = useCallback(async () => {
         try {
-            const res = await fetch('/api/hitokoto?random=1');
+            const res = await fetch('/api/quotes?random=1');
             if (res.ok) {
                 const data = await res.json();
-                setHitokoto(data);
+                setQuote(data);
             }
         } catch {
             // silent
@@ -53,7 +53,7 @@ export function HitokotoCard() {
         );
     }
 
-    if (!hitokoto) return null;
+    if (!quote) return null;
 
     return (
         <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5">
@@ -68,19 +68,19 @@ export function HitokotoCard() {
             </div>
 
             <div className="relative pl-4 border-l-2 border-blue-200">
-                <p className="text-sm text-gray-700 leading-relaxed break-words">
-                    {hitokoto.content}
+                <p className="text-sm text-gray-700 leading-relaxed break-words font-serif">
+                    {quote.content}
                 </p>
-                {hitokoto.source && (
+                {quote.source && (
                     <p className="text-xs text-gray-400 mt-2">
-                        —— {hitokoto.source}
+                        —— {quote.source}
                     </p>
                 )}
             </div>
 
             <div className="mt-3">
-                <span className={`inline-block px-2 py-0.5 rounded-full text-[10px] font-medium border ${categoryColors[hitokoto.category] || categoryColors['其他']}`}>
-                    {hitokoto.category}
+                <span className={`inline-block px-2 py-0.5 rounded-full text-[10px] font-medium border ${categoryColors[quote.category] || categoryColors['其他']}`}>
+                    {quote.category}
                 </span>
             </div>
         </div>

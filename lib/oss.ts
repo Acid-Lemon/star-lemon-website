@@ -37,8 +37,12 @@ export async function generateUploadCredentials(fileName: string) {
 export async function generateDownloadUrl(key: string, fileName: string): Promise<string> {
   const settings = await getSettings();
   const esaDomain = settings.esa_domain;
-  const client = await getOssClient();
 
+  if (esaDomain) {
+    return `https://${esaDomain}/${key}`;
+  }
+
+  const client = await getOssClient();
   const signedUrl = client.signatureUrl(key, {
     method: 'GET',
     expires: 300,
@@ -46,12 +50,6 @@ export async function generateDownloadUrl(key: string, fileName: string): Promis
       'content-disposition': `attachment; filename="${fileName}"`,
     },
   });
-
-  if (esaDomain) {
-    const urlObj = new URL(signedUrl);
-    const search = urlObj.search;
-    return `https://${esaDomain}/${key}${search}`;
-  }
 
   return signedUrl;
 }
@@ -69,4 +67,34 @@ export async function deleteFile(key: string): Promise<void> {
 
 export function resetOssClient() {
   ossClient = null;
+}
+
+export async function getPublicUrl(urlOrKey: string | null | undefined): Promise<string | null> {
+  if (!urlOrKey) return null;
+
+  const trimmed = urlOrKey.trim();
+  if (!trimmed) return null;
+
+  if (trimmed.startsWith('http://') || trimmed.startsWith('https://')) {
+    return trimmed;
+  }
+
+  const key = trimmed.startsWith('/') ? trimmed.slice(1) : trimmed;
+  const settings = await getSettings();
+  const esaDomain = settings.esa_domain;
+
+  // 配置了 ESA 时，直接返回 ESA 域名URL
+  // ESA 应开启"私有Bucket回源"功能，由ESA负责回源鉴权
+  if (esaDomain) {
+    return `https://${esaDomain}/${key}`;
+  }
+
+  // 未配置 ESA 时，使用 OSS 签名URL（私有Bucket场景）
+  const client = await getOssClient();
+  const signedUrl = client.signatureUrl(key, {
+    method: 'GET',
+    expires: 3600,
+  });
+
+  return signedUrl;
 }

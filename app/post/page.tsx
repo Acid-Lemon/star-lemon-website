@@ -1,5 +1,6 @@
 import React from 'react';
 import db from '../../lib/db';
+import { getPublicUrl } from '../../lib/oss';
 import {PostList} from '../components/post-list';
 
 export const revalidate = 0;
@@ -13,7 +14,12 @@ export default async function Post() {
                      LEFT JOIN users ON posts.author_id = users.id
             ORDER BY posts.created_at DESC LIMIT 6
         `);
-        posts = result.rows;
+        posts = await Promise.all(
+            result.rows.map(async (row: any) => ({
+                ...row,
+                cover: await getPublicUrl(row.cover),
+            }))
+        );
     } catch (e) {
         console.error('Failed to fetch posts', e);
     }

@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getSession } from '../../../lib/auth';
-import { getOssClient } from '../../../lib/oss';
+import { getOssClient, getPublicUrl } from '../../../lib/oss';
 
 export async function POST(request: NextRequest) {
   try {
@@ -34,11 +34,9 @@ export async function POST(request: NextRequest) {
     const key = `uploads/${fileName}`;
 
     const client = await getOssClient();
-    const result = await client.put(key, buffer);
+    await client.put(key, buffer);
 
-    const url = result.url;
-
-    return NextResponse.json({ url, fileName, key });
+    return NextResponse.json({ url: `/${key}`, fileName, key });
   } catch (error) {
     console.error('Upload failed:', error);
     return NextResponse.json({ error: 'Upload failed' }, { status: 500 });

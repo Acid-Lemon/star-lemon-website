@@ -39,22 +39,17 @@ jobs:
             public .next scripts/remote-deploy.sh
 
       - name: Upload to server and deploy
-        env:
-          SERVER_IP: ${{ secrets.SERVER_IP }}
-          SERVER_USER: ${{ secrets.SERVER_USER }}
-          SERVER_SSH_KEY: ${{ secrets.SERVER_SSH_KEY }}
-          REMOTE_DIR: /www/wwwroot/star-lemon.top
         run: |
           # Setup SSH key
           mkdir -p ~/.ssh
-          echo "$SERVER_SSH_KEY" > ~/.ssh/deploy_key
+          echo "${{ secrets.SERVER_SSH_KEY }}" > ~/.ssh/deploy_key
           chmod 600 ~/.ssh/deploy_key
 
           # Use ssh command directly with options
           SSH_OPTS="-i ~/.ssh/deploy_key -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null"
 
           # Upload archive
-          scp $SSH_OPTS deploy.tar.gz $SERVER_USER@$SERVER_IP:$REMOTE_DIR/
+          scp $SSH_OPTS deploy.tar.gz ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_IP }}:/www/wwwroot/star-lemon.top/
 
           # Run remote deploy script
-          ssh $SSH_OPTS $SERVER_USER@$SERVER_IP "cd $REMOTE_DIR && bash scripts/remote-deploy.sh deploy.tar.gz"
+          ssh $SSH_OPTS ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_IP }} "cd /www/wwwroot/star-lemon.top && bash scripts/remote-deploy.sh deploy.tar.gz"

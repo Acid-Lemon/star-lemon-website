@@ -11,7 +11,7 @@ export PATH=/www/server/nodejs/v24.15.0/bin:/usr/local/sbin:/usr/local/bin:/usr/
 echo "=== Star Lemon Remote Deploy ==="
 
 # Stop existing service
-echo "[1/3] Stopping service..."
+echo "[1/4] Stopping service..."
 if [ -f "$PID_FILE" ]; then
     PID=$(cat "$PID_FILE")
     if kill -0 "$PID" 2>/dev/null; then
@@ -32,14 +32,20 @@ fi
 
 sleep 2
 
-# Extract archive
-echo "[2/3] Extracting archive..."
+# Clean old files
+echo "[2/4] Cleaning old files..."
 cd "$REMOTE_DIR"
+mv "$ARCHIVE_NAME" /tmp/deploy.tar.gz
+find . -mindepth 1 -not -name '.env.local' -delete
+mv /tmp/deploy.tar.gz .
+
+# Extract archive
+echo "[3/4] Extracting archive..."
 tar -xzf "$ARCHIVE_NAME"
 rm -f "$ARCHIVE_NAME"
 
 # Install dependencies
-echo "[3/3] Installing dependencies and starting..."
+echo "[4/4] Installing dependencies and starting..."
 pnpm install --frozen-lockfile --prod
 
 # Start via BT script

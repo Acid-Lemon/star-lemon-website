@@ -3,7 +3,7 @@ import { getSettings } from './settings';
 
 let ossClient: InstanceType<typeof OSS> | null = null;
 
-async function getOssClient() {
+export async function getOssClient() {
   if (ossClient) return ossClient;
 
   const settings = await getSettings();

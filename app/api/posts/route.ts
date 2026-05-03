@@ -9,7 +9,7 @@ export async function GET(request: Request) {
 
     try {
         const result = await db.query(`
-            SELECT posts.id, posts.title, posts.summary, posts.cover, posts.created_at, posts.tags, users.nickname as author_name 
+            SELECT posts.id, posts.title, posts.summary, posts.cover, posts.created_at, posts.tags, users.nickname as author_name, users.avatar as author_avatar
             FROM posts 
             LEFT JOIN users ON posts.author_id = users.id 
             ORDER BY posts.created_at DESC
@@ -20,6 +20,7 @@ export async function GET(request: Request) {
             result.rows.map(async (row: any) => ({
                 ...row,
                 cover: await getPublicUrl(row.cover),
+                author_avatar: await getPublicUrl(row.author_avatar),
             }))
         );
 

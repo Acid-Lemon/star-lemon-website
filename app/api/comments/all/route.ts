@@ -11,10 +11,11 @@ export async function GET() {
     }
 
     const result = await db.query(
-      `SELECT comments.*, posts.title as post_title
-       FROM comments
-       LEFT JOIN posts ON comments.post_id = posts.id
-       ORDER BY comments.created_at DESC`
+      `SELECT c.*, u.nickname, p.title as post_title
+       FROM comments c
+       LEFT JOIN posts p ON c.post_id = p.id
+       LEFT JOIN users u ON c.user_id = u.id
+       ORDER BY c.created_at DESC`
     );
 
     return NextResponse.json(result.rows);

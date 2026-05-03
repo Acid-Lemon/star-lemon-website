@@ -17,10 +17,11 @@ export async function GET(request: NextRequest) {
 
     // 获取已审核的评论及其回复
     const result = await db.query(
-      `SELECT id, post_id, user_id, nickname, content, image_url, parent_id, status, created_at 
-       FROM comments 
-       WHERE post_id = $1 AND (status = 'approved' OR parent_id IS NOT NULL)
-       ORDER BY created_at ASC`,
+      `SELECT c.id, c.post_id, c.user_id, u.nickname, c.content, c.image_url, c.parent_id, c.status, c.created_at 
+       FROM comments c
+       LEFT JOIN users u ON c.user_id = u.id
+       WHERE c.post_id = $1 AND (c.status = 'approved' OR c.parent_id IS NOT NULL)
+       ORDER BY c.created_at ASC`,
       [postId]
     );
 
@@ -55,7 +56,6 @@ export async function POST(request: NextRequest) {
     }
 
     const userId = session.user.id;
-    const nickname = session.user.nickname || '用户';
     const isAdmin = session.user.role === 'admin';
 
     // 管理员不需要审核，或者根据配置决定
@@ -64,10 +64,10 @@ export async function POST(request: NextRequest) {
 
     // 插入评论
     const result = await db.query(
-      `INSERT INTO comments (post_id, user_id, nickname, content, image_url, parent_id, status, created_at) 
-       VALUES ($1, $2, $3, $4, $5, $6, $7, NOW()) 
-       RETURNING id, post_id, user_id, nickname, content, image_url, parent_id, status, created_at`,
-      [post_id, userId, nickname, content || null, image_url || null, parent_id || null, status]
+      `INSERT INTO comments (post_id, user_id, content, image_url, parent_id, status, created_at) 
+       VALUES ($1, $2, $3, $4, $5, $6, NOW()) 
+       RETURNING id, post_id, user_id, content, image_url, parent_id, status, created_at`,
+      [post_id, userId, content || null, image_url || null, parent_id || null, status]
     );
 
     return NextResponse.json(result.rows[0], { status: 201 });

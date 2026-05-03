@@ -11,6 +11,7 @@ interface Post {
     created_at: string;
     tags: string[];
     author_name: string;
+    author_avatar?: string | null;
 }
 
 interface PostListProps {
@@ -145,14 +146,18 @@ export function PostList({ initialPosts }: PostListProps) {
 
                                 {/* 底部信息 */}
                                 <div className="flex items-center justify-between mt-4 pt-4 border-t border-gray-100">
-                                    <div className="flex items-center gap-2">
+                                <div className="flex items-center gap-2">
+                                    {post.author_avatar ? (
+                                        <img src={post.author_avatar} alt={post.author_name} className="w-7 h-7 rounded-full object-cover" />
+                                    ) : (
                                         <div className={`w-7 h-7 rounded-full bg-gradient-to-br ${color.gradient} flex items-center justify-center`}>
                                             <span className="text-white text-xs font-bold">
                                                 {post.author_name?.[0]?.toUpperCase() || 'A'}
                                             </span>
                                         </div>
-                                        <span className="text-sm text-gray-600">{post.author_name || '佚名'}</span>
-                                    </div>
+                                    )}
+                                    <span className="text-sm text-gray-600">{post.author_name || '佚名'}</span>
+                                </div>
                                     <div className="flex items-center gap-3">
                                         <span className="text-xs text-gray-400">{getRelativeTime(post.created_at)}</span>
                                         <div className={`w-8 h-8 rounded-full ${color.bg} flex items-center justify-center opacity-0 group-hover:opacity-100 transform translate-x-2 group-hover:translate-x-0 transition-all duration-300`}>

@@ -6,7 +6,7 @@ import { getSession } from '../../../lib/auth';
 export async function GET() {
   try {
     const result = await db.query(
-      'SELECT * FROM timeline ORDER BY sort_order ASC'
+      'SELECT * FROM timeline ORDER BY date ASC'
     );
     return NextResponse.json(result.rows);
   } catch (error) {
@@ -24,13 +24,13 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json();
-    const { date, title, description, type, sort_order, is_active } = body;
+    const { date, title, description, type, is_active } = body;
 
     const result = await db.query(
-      `INSERT INTO timeline (date, title, description, type, sort_order, is_active) 
-       VALUES ($1, $2, $3, $4, $5, $6) 
+      `INSERT INTO timeline (date, title, description, type, is_active) 
+       VALUES ($1, $2, $3, $4, $5) 
        RETURNING *`,
-      [date, title, description, type || 'milestone', sort_order || 0, is_active !== false]
+      [date, title, description, type || 'milestone', is_active !== false]
     );
 
     return NextResponse.json(result.rows[0], { status: 201 });

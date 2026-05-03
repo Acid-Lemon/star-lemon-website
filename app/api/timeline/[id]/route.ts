@@ -35,14 +35,14 @@ export async function PUT(
 
     const { id } = await params;
     const body = await request.json();
-    const { date, title, description, type, sort_order, is_active } = body;
+    const { date, title, description, type, is_active } = body;
 
     const result = await db.query(
       `UPDATE timeline 
-       SET date = $1, title = $2, description = $3, type = $4, sort_order = $5, is_active = $6, updated_at = CURRENT_TIMESTAMP
-       WHERE id = $7 
+       SET date = $1, title = $2, description = $3, type = $4, is_active = $5, updated_at = CURRENT_TIMESTAMP
+       WHERE id = $6 
        RETURNING *`,
-      [date, title, description, type, sort_order, is_active, id]
+      [date, title, description, type, is_active, id]
     );
 
     if (result.rows.length === 0) {

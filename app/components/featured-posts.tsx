@@ -10,6 +10,7 @@ interface Post {
   created_at: string;
   tags: string;
   author_name: string;
+  author_avatar: string | null;
 }
 
 export async function FeaturedPosts() {
@@ -17,7 +18,7 @@ export async function FeaturedPosts() {
   
   try {
     const result = await db.query(`
-      SELECT posts.id, posts.title, posts.summary, posts.cover, posts.created_at, posts.tags, users.nickname as author_name
+      SELECT posts.id, posts.title, posts.summary, posts.cover, posts.created_at, posts.tags, users.nickname as author_name, users.avatar as author_avatar
       FROM posts
       LEFT JOIN users ON posts.author_id = users.id
       ORDER BY posts.created_at DESC
@@ -27,6 +28,7 @@ export async function FeaturedPosts() {
       result.rows.map(async (row: any) => ({
         ...row,
         cover: await getPublicUrl(row.cover),
+        author_avatar: await getPublicUrl(row.author_avatar),
       }))
     );
   } catch (e) {
@@ -112,9 +114,13 @@ export async function FeaturedPosts() {
             {/* 文章内容 */}
             <div className="p-6">
               <div className="flex items-center gap-3 mb-3">
-                <div className="w-8 h-8 rounded-full bg-gradient-to-br from-orange-400 to-orange-500 flex items-center justify-center text-white text-xs font-bold">
-                  {post.author_name?.charAt(0) || 'A'}
-                </div>
+                {post.author_avatar ? (
+                  <img src={post.author_avatar} alt={post.author_name} className="w-8 h-8 rounded-full object-cover" />
+                ) : (
+                  <div className="w-8 h-8 rounded-full bg-gradient-to-br from-orange-400 to-orange-500 flex items-center justify-center text-white text-xs font-bold">
+                    {post.author_name?.charAt(0) || 'A'}
+                  </div>
+                )}
                 <div>
                   <p className="text-sm font-medium text-gray-700">{post.author_name || '匿名'}</p>
                   <p className="text-xs text-gray-400">{formatDate(post.created_at)}</p>

@@ -81,7 +81,7 @@ export default async function AdminPosts() {
     let posts: any[] = [];
     try {
         const result = await db.query(`
-            SELECT posts.id, posts.title, posts.created_at, posts.tags, users.nickname as author_name 
+            SELECT posts.id, posts.title, posts.created_at, posts.tags, users.nickname as author_name, users.avatar as author_avatar
             FROM posts 
             LEFT JOIN users ON posts.author_id = users.id
             ORDER BY posts.created_at DESC

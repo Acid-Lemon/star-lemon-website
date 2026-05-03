@@ -1,0 +1,65 @@
+name: Deploy to Server
+
+on:
+  push:
+    branches:
+      - main
+      - master
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v3
+        with:
+          version: 9
+
+      - name: Install dependencies
+        run: pnpm install
+
+      - name: Build
+        run: pnpm build
+
+      - name: Create deploy archive
+        run: |
+          tar -czf deploy.tar.gz \
+            --exclude=.next/cache \
+            --exclude=.next/dev \
+            package.json pnpm-lock.yaml next.config.ts \
+            .env.local public .next scripts/remote-deploy.sh
+
+      - name: Upload to server and deploy
+        env:
+          SERVER_IP: ${{ secrets.SERVER_IP }}
+          SERVER_USER: ${{ secrets.SERVER_USER }}
+          SERVER_SSH_KEY: ${{ secrets.SERVER_SSH_KEY }}
+          REMOTE_DIR: /www/wwwroot/star-lemon.top
+        run: |
+          # Setup SSH
+          mkdir -p ~/.ssh
+          echo "$SERVER_SSH_KEY" > ~/.ssh/deploy_key
+          chmod 600 ~/.ssh/deploy_key
+          cat >> ~/.ssh/config <<EOF
+          Host server
+            HostName $SERVER_IP
+            User $SERVER_USER
+            IdentityFile ~/.ssh/deploy_key
+            StrictHostKeyChecking no
+            UserKnownHostsFile /dev/null
+          EOF
+
+          # Upload archive
+          scp -F ~/.ssh/config deploy.tar.gz server:$REMOTE_DIR/
+
+          # Run remote deploy script
+          ssh -F ~/.ssh/config server "cd $REMOTE_DIR && bash scripts/remote-deploy.sh deploy.tar.gz"

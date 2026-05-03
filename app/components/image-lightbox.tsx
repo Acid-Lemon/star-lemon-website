@@ -105,7 +105,7 @@ function GalleryLightbox({ images, initialIndex, onClose }: GalleryLightboxProps
                     onClick={onClose}
                     className="w-10 h-10 bg-black/50 hover:bg-black/70 text-white rounded-full flex items-center justify-center transition-colors"
                 >
-                    <X className="w-5 h-5" />
+                    <RiCloseLine className="w-5 h-5" />
                 </button>
             </div>
             {images.length > 1 && (
@@ -122,7 +122,7 @@ function GalleryLightbox({ images, initialIndex, onClose }: GalleryLightboxProps
                     >
                         <RiArrowRightSLine className="w-5 h-5" />
                     </button>
-                    <div className="absolute bottom-6 z-10 text-white/80 text-sm font-medium">
+                    <div className="absolute bottom-4 z-10 text-white/80 text-sm font-medium">
                         {index + 1} / {images.length}
                     </div>
                 </>

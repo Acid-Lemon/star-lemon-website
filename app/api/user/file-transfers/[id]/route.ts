@@ -11,8 +11,8 @@ export async function DELETE(
 ) {
   try {
     const session = await getSession();
-    if (!session?.user || session.user.role !== 'admin') {
-      return NextResponse.json({ error: '无权限' }, { status: 403 });
+    if (!session?.user) {
+      return NextResponse.json({ error: '请先登录' }, { status: 401 });
     }
 
     const { id } = await params;
@@ -21,12 +21,12 @@ export async function DELETE(
       `SELECT ft.*, fto.price, fto.status, fto.pay_order_no
        FROM file_transfers ft
        JOIN file_transfer_orders fto ON fto.transfer_id = ft.id
-       WHERE ft.id = $1 AND fto.status = $2`,
-      [parseInt(id), 'paid']
+       WHERE ft.id = $1 AND ft.user_id = $2 AND fto.status = $3`,
+      [parseInt(id), session.user.id, 'paid']
     );
 
     if (result.rows.length === 0) {
-      return NextResponse.json({ error: '文件不存在' }, { status: 404 });
+      return NextResponse.json({ error: '文件不存在或不属于您' }, { status: 404 });
     }
 
     const transfer = result.rows[0];
@@ -42,7 +42,6 @@ export async function DELETE(
     const remainingDownloads = transfer.max_downloads - transfer.download_count;
     const totalDays = transfer.retain_days;
     const createdAt = new Date(transfer.created_at);
-    const expireAt = new Date(transfer.expire_at);
     const now = new Date();
     const usedDays = Math.max(0, Math.ceil((now.getTime() - createdAt.getTime()) / (24 * 60 * 60 * 1000)));
     const remainingDays = Math.max(0, totalDays - usedDays);

@@ -135,3 +135,57 @@ export async function verifyPayNotify(params: Record<string, string>): Promise<b
   console.log('Verify sign - params:', JSON.stringify(filtered), 'expected:', expectedSign, 'actual:', sign);
   return sign === expectedSign;
 }
+
+export async function refundPayOrder(params: {
+  orderNo: string;
+  totalFee: string;
+  refundFee: string;
+  outRefundNo: string;
+}): Promise<{ success: boolean }> {
+  const settings = await getSettings();
+  const mchId = settings.lantu_mch_id;
+  const key = settings.lantu_key;
+
+  if (!mchId || !key) {
+    throw new Error('蓝兔支付未配置');
+  }
+
+  const timestamp = Math.floor(Date.now() / 1000).toString();
+
+  const signParams: Record<string, string> = {
+    mch_id: mchId as string,
+    order_no: params.orderNo,
+    out_refund_no: params.outRefundNo,
+    refund_fee: params.refundFee,
+    total_fee: params.totalFee,
+    timestamp,
+  };
+
+  const sign = createSign(signParams, key);
+
+  const formData = new URLSearchParams();
+  formData.append('mch_id', mchId as string);
+  formData.append('order_no', params.orderNo);
+  formData.append('out_refund_no', params.outRefundNo);
+  formData.append('refund_fee', params.refundFee);
+  formData.append('total_fee', params.totalFee);
+  formData.append('timestamp', timestamp);
+  formData.append('sign', sign);
+
+  console.log('Lantu refund request:', formData.toString());
+
+  const response = await fetch('https://api.ltzf.cn/api/wxpay/refund_order', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+    body: formData.toString(),
+  });
+
+  const result = await response.json();
+  console.log('Lantu refund response:', JSON.stringify(result));
+
+  if (result.code !== 0) {
+    throw new Error(`退款失败: ${result.msg || '未知错误'} (code: ${result.code})`);
+  }
+
+  return { success: true };
+}

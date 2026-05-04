@@ -10,7 +10,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
 import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from '@/components/ui/table';
 import { toast } from 'sonner';
-import { RiUploadCloudLine, RiDownloadLine, RiFileLine, RiCloseLine, RiArrowRightLine, RiArrowLeftLine, RiWechatPayLine, RiCheckLine, RiFolderLine, RiBillLine, RiTimeLine } from '@remixicon/react';
+import { RiUploadCloudLine, RiDownloadLine, RiFileLine, RiCloseLine, RiArrowRightLine, RiArrowLeftLine, RiWechatPayLine, RiCheckLine, RiFolderLine, RiBillLine, RiTimeLine, RiDeleteBinLine } from '@remixicon/react';
+import { AlertDialog, AlertDialogContent, AlertDialogHeader, AlertDialogMedia, AlertDialogTitle, AlertDialogDescription, AlertDialogFooter, AlertDialogCancel, AlertDialogAction } from '@/components/ui/alert-dialog';
 
 function formatFileSize(bytes: number): string {
   if (bytes < 1024) return bytes + ' B';
@@ -486,6 +487,8 @@ function DownloadPanel() {
 function MyFilesPanel() {
   const [files, setFiles] = useState<UserFile[]>([]);
   const [loading, setLoading] = useState(true);
+  const [deleteTarget, setDeleteTarget] = useState<UserFile | null>(null);
+  const [deleting, setDeleting] = useState(false);
 
   useEffect(() => {
     fetchFiles();
@@ -506,6 +509,26 @@ function MyFilesPanel() {
       toast.error('获取文件列表失败');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleDelete = async () => {
+    if (!deleteTarget) return;
+    setDeleting(true);
+    try {
+      const res = await fetch(`/api/user/file-transfers/${deleteTarget.id}`, { method: 'DELETE' });
+      const data = await res.json();
+      if (res.ok) {
+        toast.success(data.message || '已删除');
+        setFiles(prev => prev.filter(f => f.id !== deleteTarget.id));
+      } else {
+        toast.error(data.error || '删除失败');
+      }
+    } catch {
+      toast.error('删除失败');
+    } finally {
+      setDeleting(false);
+      setDeleteTarget(null);
     }
   };
 
@@ -538,22 +561,51 @@ function MyFilesPanel() {
                   </div>
                   <span className="font-mono font-bold text-primary">{file.code}</span>
                 </div>
-                <div className="flex items-center gap-4 text-xs text-muted-foreground">
-                  <span>{formatFileSize(file.file_size)}</span>
-                  <span className="flex items-center gap-1">
-                    <RiDownloadLine className="w-3 h-3" />
-                    {file.download_count} / {file.max_downloads}
-                  </span>
-                  <span className="flex items-center gap-1">
-                    <RiTimeLine className="w-3 h-3" />
-                    {new Date(file.expire_at).toLocaleDateString('zh-CN')}
-                  </span>
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-4 text-xs text-muted-foreground">
+                    <span>{formatFileSize(file.file_size)}</span>
+                    <span className="flex items-center gap-1">
+                      <RiDownloadLine className="w-3 h-3" />
+                      {file.download_count} / {file.max_downloads}
+                    </span>
+                    <span className="flex items-center gap-1">
+                      <RiTimeLine className="w-3 h-3" />
+                      {new Date(file.expire_at).toLocaleDateString('zh-CN')}
+                    </span>
+                  </div>
+                  <button
+                    onClick={() => setDeleteTarget(file)}
+                    className="p-1 rounded hover:bg-destructive/10 text-muted-foreground hover:text-destructive transition-colors"
+                    title="删除并退款"
+                  >
+                    <RiDeleteBinLine className="w-4 h-4" />
+                  </button>
                 </div>
               </div>
             ))}
           </div>
-        )}
+          )}
       </CardContent>
+
+      <AlertDialog open={!!deleteTarget} onOpenChange={(open) => { if (!open) setDeleteTarget(null); }}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogMedia>
+              <RiDeleteBinLine className="text-destructive" />
+            </AlertDialogMedia>
+            <AlertDialogTitle>确认删除并退款</AlertDialogTitle>
+            <AlertDialogDescription>
+              确定要删除文件「{deleteTarget?.file_name}」吗？系统将根据剩余下载次数和存储天数计算应退金额。
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>取消</AlertDialogCancel>
+            <AlertDialogAction variant="destructive" onClick={handleDelete} disabled={deleting}>
+              {deleting ? '处理中...' : '确认删除'}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </Card>
   );
 }

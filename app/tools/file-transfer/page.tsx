@@ -61,6 +61,8 @@ function UploadPanel() {
   const [orderId, setOrderId] = useState<number | null>(null);
   const [code, setCode] = useState('');
   const [qrCodeUrl, setQrCodeUrl] = useState('');
+  const [uploadProgress, setUploadProgress] = useState(0);
+  const [autoUploading, setAutoUploading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const pollingRef = useRef<NodeJS.Timeout | null>(null);
 
@@ -83,11 +85,50 @@ function UploadPanel() {
         const data = await res.json();
         if (data.paid) {
           stopPolling();
-          toast.success('支付成功！');
+          setAutoUploading(true);
+          toast.success('支付成功，正在上传文件...');
+          handleUploadAfterPayInternal(id);
         }
       } catch {}
     }, 3000);
   }, [stopPolling]);
+
+  const handleUploadAfterPayInternal = (oid: number) => {
+    if (!file) return;
+    setStep('uploading');
+    const xhr = new XMLHttpRequest();
+    xhr.open('POST', `/api/file-transfer/${oid}/upload`);
+
+    xhr.upload.onprogress = (e) => {
+      if (e.lengthComputable) {
+        setUploadProgress(Math.round((e.loaded / e.total) * 100));
+      }
+    };
+
+    xhr.onload = () => {
+      setAutoUploading(false);
+      if (xhr.status >= 200 && xhr.status < 300) {
+        setStep('done');
+        toast.success('文件上传成功！');
+      } else {
+        try {
+          const err = JSON.parse(xhr.responseText);
+          toast.error(err.error || '上传失败');
+        } catch {
+          toast.error('文件上传失败');
+        }
+      }
+    };
+
+    xhr.onerror = () => {
+      setAutoUploading(false);
+      toast.error('上传失败');
+    };
+
+    const formData = new FormData();
+    formData.append('file', file);
+    xhr.send(formData);
+  };
 
   const handleCalcPrice = async () => {
     if (!file) return;
@@ -165,46 +206,12 @@ function UploadPanel() {
       if (data.paid) {
         stopPolling();
         toast.success('支付成功！');
-        handleUploadAfterPay();
+        handleUploadAfterPayInternal(orderId);
       } else {
         toast.info('尚未检测到支付，请完成扫码支付后重试');
       }
     } catch {
       toast.error('查询支付状态失败');
-    }
-  };
-
-  const handleUploadAfterPay = async () => {
-    if (!orderId || !file) return;
-    setLoading(true);
-    try {
-      const credsRes = await fetch(`/api/file-transfer/${orderId}/upload`, { method: 'POST' });
-      const credsData = await credsRes.json();
-
-      if (!credsRes.ok) {
-        toast.error(credsData.error || '获取上传凭证失败');
-        return;
-      }
-
-      setStep('uploading');
-
-      const uploadRes = await fetch(credsData.uploadUrl, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/octet-stream' },
-        body: file,
-      });
-
-      if (!uploadRes.ok) {
-        toast.error('文件上传失败');
-        return;
-      }
-
-      setStep('done');
-      toast.success('文件上传成功！');
-    } catch {
-      toast.error('上传失败');
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -216,6 +223,8 @@ function UploadPanel() {
     setOrderId(null);
     setCode('');
     setQrCodeUrl('');
+    setUploadProgress(0);
+    setAutoUploading(false);
   };
 
   if (step === 'done') {
@@ -264,12 +273,43 @@ function UploadPanel() {
               <p className="text-xs text-muted-foreground">取件码: {code}</p>
             </div>
           </div>
-          <Button className="w-full" size="lg" onClick={handleCheckPaid} disabled={loading}>
-            {loading ? '上传中...' : '我已支付，上传文件'}
+          <Button className="w-full" size="lg" onClick={handleCheckPaid} disabled={autoUploading}>
+            {autoUploading ? '正在上传...' : '我已支付，上传文件'}
           </Button>
           <Button variant="outline" className="w-full" onClick={handleReset}>
             取消
           </Button>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  if (step === 'uploading') {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <RiUploadCloudLine className="w-5 h-5 text-primary" />
+            正在上传文件
+          </CardTitle>
+          <CardDescription>{file?.name}</CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="space-y-2">
+            <div className="flex justify-between text-sm">
+              <span className="text-muted-foreground">上传进度</span>
+              <span className="font-mono">{uploadProgress}%</span>
+            </div>
+            <div className="w-full bg-muted rounded-full h-3 overflow-hidden">
+              <div
+                className="bg-primary h-full rounded-full transition-all duration-300"
+                style={{ width: `${uploadProgress}%` }}
+              />
+            </div>
+            <p className="text-xs text-muted-foreground text-center">
+              {file ? `${formatFileSize(file.size)}` : ''}
+            </p>
+          </div>
         </CardContent>
       </Card>
     );

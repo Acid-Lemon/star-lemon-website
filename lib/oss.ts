@@ -1,5 +1,9 @@
 import OSS from 'ali-oss';
 import { getSettings } from './settings';
+import { writeFileSync, unlinkSync } from 'fs';
+import { tmpdir } from 'os';
+import { join } from 'path';
+import { randomBytes } from 'crypto';
 
 let ossClient: InstanceType<typeof OSS> | null = null;
 
@@ -32,6 +36,34 @@ export async function generateUploadCredentials(fileName: string) {
   });
 
   return { key, uploadUrl: credentials, bucket: settings.oss_bucket || '' };
+}
+
+export async function multipartUpload(
+  fileName: string,
+  fileBuffer: Buffer,
+  onProgress?: (pct: number) => void
+): Promise<string> {
+  const client = await getOssClient();
+  const key = `file-transfer/${Date.now()}-${Math.random().toString(36).substring(2, 8)}/${fileName}`;
+  const tmpPath = join(tmpdir(), `${randomBytes(8).toString('hex')}-${fileName}`);
+
+  writeFileSync(tmpPath, fileBuffer);
+
+  try {
+    let lastPct = 0;
+    const result = await client.multipartUpload(key, tmpPath, {
+      progress: async (pct: number) => {
+        const rounded = Math.round(pct * 100);
+        if (rounded !== lastPct) {
+          lastPct = rounded;
+          onProgress?.(rounded);
+        }
+      },
+    });
+    return result.name || key;
+  } finally {
+    unlinkSync(tmpPath);
+  }
 }
 
 export async function generateDownloadUrl(key: string, fileName: string): Promise<string> {

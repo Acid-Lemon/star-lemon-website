@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import db from '@/lib/db';
 import { getSession } from '@/lib/auth';
-import { generateUploadCredentials } from '@/lib/oss';
+import { multipartUpload } from '@/lib/oss';
 
 export async function POST(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
@@ -29,19 +29,27 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
       return NextResponse.json({ error: '文件已上传' }, { status: 400 });
     }
 
-    const uploadCreds = await generateUploadCredentials(transfer.file_name);
+    const formData = await request.formData();
+    const file = formData.get('file') as File;
+    if (!file) {
+      return NextResponse.json({ error: '未收到文件' }, { status: 400 });
+    }
+
+    const fileBuffer = Buffer.from(await file.arrayBuffer());
+
+    let lastPct = 0;
+    const key = await multipartUpload(transfer.file_name, fileBuffer, (pct) => {
+      lastPct = pct;
+    });
 
     await db.query(
       'UPDATE file_transfers SET file_key = $1, updated_at = CURRENT_TIMESTAMP WHERE id = $2',
-      [uploadCreds.key, transfer.id]
+      [key, transfer.id]
     );
 
-    return NextResponse.json({
-      uploadUrl: uploadCreds.uploadUrl,
-      fileKey: uploadCreds.key,
-    });
+    return NextResponse.json({ success: true, fileKey: key });
   } catch (error) {
-    console.error('Get upload credentials error:', error);
-    return NextResponse.json({ error: '获取上传凭证失败' }, { status: 500 });
+    console.error('Upload error:', error);
+    return NextResponse.json({ error: '上传失败' }, { status: 500 });
   }
 }

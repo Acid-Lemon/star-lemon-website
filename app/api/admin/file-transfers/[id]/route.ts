@@ -68,10 +68,9 @@ export async function DELETE(
 
     await db.query('BEGIN');
     try {
-      if (transfer.pay_order_no && transfer.out_trade_no && refundAmount > 0) {
+      if (transfer.out_trade_no && refundAmount > 0) {
         try {
           await refundPayOrder({
-            orderNo: transfer.pay_order_no,
             outTradeNo: transfer.out_trade_no,
             totalFee: parseFloat(transfer.price).toFixed(2),
             refundFee: refundAmount.toFixed(2),

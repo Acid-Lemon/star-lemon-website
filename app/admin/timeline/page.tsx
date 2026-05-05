@@ -312,7 +312,7 @@ export default function TimelinePage() {
       </div>
 
       <Dialog open={showDialog} onOpenChange={setShowDialog}>
-        <DialogContent className="sm:max-w-lg" onCloseAutoFocus={() => setEditingItem(null)}>
+        <DialogContent className="sm:max-w-lg">
           <DialogHeader>
             <DialogTitle>编辑时间轴项目</DialogTitle>
           </DialogHeader>

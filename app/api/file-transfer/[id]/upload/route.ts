@@ -3,6 +3,8 @@ import db from '@/lib/db';
 import { getSession } from '@/lib/auth';
 import { multipartUpload } from '@/lib/oss';
 
+// (no size limit)
+
 export async function POST(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     const { id } = await params;
@@ -35,7 +37,15 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
       return NextResponse.json({ error: '未收到文件' }, { status: 400 });
     }
 
-    const fileBuffer = Buffer.from(await file.arrayBuffer());
+    // size check removed to allow any file size
+
+    let fileBuffer: Buffer;
+    try {
+      fileBuffer = Buffer.from(await file.arrayBuffer());
+    } catch (err) {
+      console.error('Failed to read uploaded file buffer', err);
+      return NextResponse.json({ error: '读取文件失败' }, { status: 500 });
+    }
 
     let lastPct = 0;
     const key = await multipartUpload(transfer.file_name, fileBuffer, (pct) => {

@@ -3,9 +3,13 @@ import { getSettings } from './settings';
 
 function createSign(params: Record<string, string>, key: string): string {
   const sortedKeys = Object.keys(params).filter(k => params[k] !== '' && params[k] !== undefined).sort();
-  const stringArr = sortedKeys.map(k => `${k}=${params[k]}`);
-  stringArr.push(`key=${key}`);
-  const string = stringArr.join('&');
+  const sortedParams: Record<string, string> = {};
+  sortedKeys.forEach(k => {
+    sortedParams[k] = params[k];
+  });
+  const formData = new URLSearchParams(sortedParams);
+  const string = formData.toString() + '&key=' + key;
+  console.log('Sign string for MD5:', string);
   return crypto.createHash('md5').update(string).digest('hex').toUpperCase();
 }
 

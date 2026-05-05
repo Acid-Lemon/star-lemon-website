@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Button } from '@/components/ui/button';
@@ -11,10 +11,12 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { toast } from 'sonner';
 import { RiQqFill, RiMailLine, RiLockLine } from '@remixicon/react';
 
-export default function LoginClientPage({ qqAuthUrl, errorMsg, returnUrl }: {
+export default function LoginClientPage({ qqAuthUrl, errorMsg, returnUrl, qqCode, qqState }: {
     qqAuthUrl: string | null;
     errorMsg?: string;
     returnUrl: string;
+    qqCode?: string;
+    qqState?: string;
 }) {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
@@ -22,6 +24,7 @@ export default function LoginClientPage({ qqAuthUrl, errorMsg, returnUrl }: {
     const [loginLoading, setLoginLoading] = useState(false);
     const [codeSending, setCodeSending] = useState(false);
     const [countdown, setCountdown] = useState(0);
+    const [qqLoading, setQqLoading] = useState(false);
     const router = useRouter();
 
     const handlePasswordLogin = async (e: React.FormEvent) => {
@@ -116,6 +119,30 @@ export default function LoginClientPage({ qqAuthUrl, errorMsg, returnUrl }: {
             setLoginLoading(false);
         }
     };
+
+    useEffect(() => {
+        if (qqCode) {
+            setQqLoading(true);
+            fetch('/api/auth/qq/callback', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ code: qqCode, state: qqState || '/' }),
+            })
+                .then(async (res) => {
+                    const data = await res.json();
+                    if (res.ok && data.success) {
+                        window.location.href = qqState || returnUrl;
+                    } else {
+                        toast.error(data.error || 'QQ登录失败');
+                        setQqLoading(false);
+                    }
+                })
+                .catch(() => {
+                    toast.error('QQ登录失败');
+                    setQqLoading(false);
+                });
+        }
+    }, [qqCode, qqState, returnUrl]);
 
     return (
         <div className="flex-1 flex flex-col items-center justify-center py-10 px-4">
@@ -215,8 +242,12 @@ export default function LoginClientPage({ qqAuthUrl, errorMsg, returnUrl }: {
                     {qqAuthUrl && (
                         <div className="mt-6 flex justify-center">
                             <a href={qqAuthUrl}
-                                className="w-10 h-10 flex items-center justify-center bg-[#12B7F5] hover:bg-[#0aa3e8] text-white rounded-full transition-colors">
-                                <RiQqFill className="w-5 h-5" />
+                                className={`w-10 h-10 flex items-center justify-center bg-[#12B7F5] hover:bg-[#0aa3e8] text-white rounded-full transition-colors ${qqLoading ? 'opacity-50 pointer-events-none' : ''}`}>
+                                {qqLoading ? (
+                                    <span className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                                ) : (
+                                    <RiQqFill className="w-5 h-5" />
+                                )}
                             </a>
                         </div>
                     )}

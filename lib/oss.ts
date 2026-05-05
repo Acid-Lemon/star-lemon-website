@@ -51,7 +51,7 @@ export async function multipartUpload(
 
   try {
     let lastPct = 0;
-    const result = await client.multipartUpload(key, tmpPath, {
+    const result = await (client as any).multipartUpload(key, tmpPath, {
       progress: async (pct: number) => {
         const rounded = Math.round(pct * 100);
         if (rounded !== lastPct) {

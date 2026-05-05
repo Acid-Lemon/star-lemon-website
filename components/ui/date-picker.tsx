@@ -46,7 +46,7 @@ export function DatePicker({ value, onChange, placeholder = '选择日期', clas
 
     return (
         <Popover>
-            <PopoverTrigger asChild>
+            <PopoverTrigger render={
                 <Button
                     variant="outline"
                     className={cn(
@@ -54,10 +54,10 @@ export function DatePicker({ value, onChange, placeholder = '选择日期', clas
                         !date && 'text-muted-foreground',
                         className,
                     )}
-                >
-                    <CalendarIcon className="mr-2 h-4 w-4" />
-                    {date ? format(date, 'yyyy年MM月dd日', { locale: zhCN }) : placeholder}
-                </Button>
+                />
+            }>
+                <CalendarIcon className="mr-2 h-4 w-4" />
+                {date ? format(date, 'yyyy年MM月dd日', { locale: zhCN }) : placeholder}
             </PopoverTrigger>
             <PopoverContent className="w-auto p-0" align="start">
                 <Calendar

@@ -60,9 +60,10 @@ export async function POST(request: NextRequest) {
     await client.query(
       `UPDATE file_transfer_orders 
        SET status = 'paid', 
-           pay_order_no = COALESCE($1, pay_order_no)
-       WHERE transfer_id = $2`,
-      [params.order_no || row.pay_order_no, transferId]
+           pay_order_no = COALESCE($1, pay_order_no),
+           out_trade_no = COALESCE($2, out_trade_no)
+       WHERE transfer_id = $3`,
+      [params.order_no || row.pay_order_no, params.out_trade_no, transferId]
     );
 
     await client.query('COMMIT');

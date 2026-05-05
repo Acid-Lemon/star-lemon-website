@@ -18,7 +18,7 @@ export async function DELETE(
     const { id } = await params;
 
     const result = await db.query(
-      `SELECT ft.*, fto.price, fto.status, fto.pay_order_no
+      `SELECT ft.*, fto.price, fto.status, fto.pay_order_no, fto.out_trade_no
        FROM file_transfers ft
        JOIN file_transfer_orders fto ON fto.transfer_id = ft.id
        WHERE ft.id = $1 AND fto.status = $2`,
@@ -68,10 +68,11 @@ export async function DELETE(
 
     await db.query('BEGIN');
     try {
-      if (transfer.pay_order_no && refundAmount > 0) {
+      if (transfer.pay_order_no && transfer.out_trade_no && refundAmount > 0) {
         try {
           await refundPayOrder({
             orderNo: transfer.pay_order_no,
+            outTradeNo: transfer.out_trade_no,
             totalFee: parseFloat(transfer.price).toFixed(2),
             refundFee: refundAmount.toFixed(2),
             outRefundNo: `RF${transfer.id}${Date.now()}`,

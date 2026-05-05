@@ -253,6 +253,7 @@ async function init() {
           user_id INTEGER REFERENCES users(id),
           price NUMERIC(10,2) NOT NULL DEFAULT 0,
           pay_order_no VARCHAR(100),
+          out_trade_no VARCHAR(100),
           status VARCHAR(20) NOT NULL DEFAULT 'unpaid',
           refund_amount NUMERIC(10,2) DEFAULT 0,
           created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP

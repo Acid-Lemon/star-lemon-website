@@ -23,8 +23,9 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
     const siteUrl = await getSetting('site_url') || process.env.NEXT_PUBLIC_URL || 'http://localhost:3000';
     const notifyUrl = `${siteUrl}/api/file-transfer/pay-notify`;
 
+    const outTradeNo = `FT${transfer.id}${Date.now()}`;
     const payResult = await createNativePayOrder({
-      outTradeNo: `FT${transfer.id}${Date.now()}`,
+      outTradeNo,
       totalFee: transfer.price.toString(),
       body: `文件快传 - ${transfer.file_name}`,
       notifyUrl,
@@ -32,8 +33,8 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
     });
 
     await db.query(
-      'UPDATE file_transfer_orders SET pay_order_no = $1 WHERE transfer_id = $2',
-      [payResult.orderNo, transfer.id]
+      'UPDATE file_transfer_orders SET pay_order_no = $1, out_trade_no = $2 WHERE transfer_id = $3',
+      [payResult.orderNo, outTradeNo, transfer.id]
     );
 
     return NextResponse.json({

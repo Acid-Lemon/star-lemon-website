@@ -113,6 +113,8 @@ export default async function PostPage({ params }: { params: Promise<{ id: strin
     const tags = post.tags || [];
     const tocItems = extractToc(post.content || '');
     const createdAt = formatDateTime(post.created_at);
+    const settings = await getSettings();
+    const siteTitle = settings.site_title || 'star和lemon的小站';
 
     return (
         <PostClient
@@ -127,6 +129,7 @@ export default async function PostPage({ params }: { params: Promise<{ id: strin
             cover={(await getPublicUrl(post.cover)) || undefined}
             postId={post.id}
             user={user}
+            siteTitle={siteTitle}
         />
     );
 }

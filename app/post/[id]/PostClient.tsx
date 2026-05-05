@@ -142,6 +142,7 @@ interface PostClientProps {
     cover?: string;
     postId: number;
     user?: any;
+    siteTitle: string;
 }
 
 export default function PostClient({
@@ -156,6 +157,7 @@ export default function PostClient({
     cover,
     postId,
     user,
+    siteTitle,
 }: PostClientProps) {
     const [activeId, setActiveId] = useState('');
     const [readPercent, setReadPercent] = useState(0);
@@ -228,7 +230,7 @@ export default function PostClient({
 
     const handleShare = useCallback(() => {
         const url = window.location.href;
-        const shareText = `${title}\n${url}`;
+        const shareText = `【${title}】- ${siteTitle}\n${url}`;
         navigator.clipboard
             .writeText(shareText)
             .then(() => toast.success('已复制到剪贴板'))
@@ -242,7 +244,7 @@ export default function PostClient({
                 document.body.removeChild(textarea);
                 toast.success('已复制到剪贴板');
             });
-    }, [title]);
+    }, [title, siteTitle]);
 
     return (
         <div className="flex-1 flex flex-col pt-12 pb-20 gap-8">

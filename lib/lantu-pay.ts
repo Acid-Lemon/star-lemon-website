@@ -138,7 +138,6 @@ export async function verifyPayNotify(params: Record<string, string>): Promise<b
 
 export async function refundPayOrder(params: {
   outTradeNo: string;
-  totalFee: string;
   refundFee: string;
   outRefundNo: string;
 }): Promise<{ success: boolean }> {
@@ -157,7 +156,6 @@ export async function refundPayOrder(params: {
     out_trade_no: params.outTradeNo,
     out_refund_no: params.outRefundNo,
     refund_fee: params.refundFee,
-    total_fee: params.totalFee,
     timestamp,
   };
 
@@ -168,7 +166,6 @@ export async function refundPayOrder(params: {
   formData.append('out_trade_no', params.outTradeNo);
   formData.append('out_refund_no', params.outRefundNo);
   formData.append('refund_fee', params.refundFee);
-  formData.append('total_fee', params.totalFee);
   formData.append('timestamp', timestamp);
   formData.append('sign', sign);
 

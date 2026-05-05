@@ -72,7 +72,6 @@ export async function DELETE(
         try {
           await refundPayOrder({
             outTradeNo: transfer.out_trade_no,
-            totalFee: parseFloat(transfer.price).toFixed(2),
             refundFee: refundAmount.toFixed(2),
             outRefundNo: `RF${transfer.id}${Date.now()}`,
           });

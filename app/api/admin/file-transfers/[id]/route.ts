@@ -66,8 +66,23 @@ export async function DELETE(
       refundAmount = Math.ceil(refundAmount * 100) / 100;
     }
 
-    await db.query('BEGIN');
+    const client = await db.pool.connect();
     try {
+      await client.query('BEGIN');
+
+      // Must UPDATE orders BEFORE DELETE (ON DELETE SET NULL would nullify transfer_id)
+      await client.query(
+        'UPDATE file_transfer_orders SET status = $1, refund_amount = $2 WHERE transfer_id = $3',
+        ['refunded', refundAmount, transfer.id]
+      );
+
+      await client.query('DELETE FROM file_transfers WHERE id = $1', [transfer.id]);
+
+      if (transfer.file_key) {
+        await deleteFile(transfer.file_key);
+      }
+
+      // Call refund API after DB operations succeed
       if (transfer.out_trade_no && refundAmount > 0) {
         try {
           await refundPayOrder({
@@ -80,23 +95,12 @@ export async function DELETE(
         }
       }
 
-      await db.query('DELETE FROM file_transfers WHERE id = $1', [transfer.id]);
-
-      if (transfer.file_key) {
-        await deleteFile(transfer.file_key);
-      }
-
-      await db.query(`
-        UPDATE file_transfer_orders
-        SET status = 'refunded',
-            refund_amount = $1
-        WHERE transfer_id = $2
-      `, [refundAmount, transfer.id]);
-
-      await db.query('COMMIT');
+      await client.query('COMMIT');
     } catch (err) {
-      await db.query('ROLLBACK');
+      await client.query('ROLLBACK');
       throw err;
+    } finally {
+      client.release();
     }
 
     return NextResponse.json({

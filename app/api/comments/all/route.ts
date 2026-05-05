@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import db from '../../../../lib/db';
 import { getSession } from '../../../../lib/auth';
+import { getPublicUrl } from '../../../../lib/oss';
 
 // 获取所有评论（管理员）
 export async function GET() {
@@ -11,14 +12,21 @@ export async function GET() {
     }
 
     const result = await db.query(
-      `SELECT c.*, u.nickname, p.title as post_title
+      `SELECT c.*, u.nickname, u.avatar, p.title as post_title
        FROM comments c
        LEFT JOIN posts p ON c.post_id = p.id
        LEFT JOIN users u ON c.user_id = u.id
        ORDER BY c.created_at DESC`
     );
 
-    return NextResponse.json(result.rows);
+    const rows = await Promise.all(
+      result.rows.map(async (row: any) => ({
+        ...row,
+        avatar: await getPublicUrl(row.avatar),
+      }))
+    );
+
+    return NextResponse.json(rows);
   } catch (error) {
     console.error('Failed to fetch comments:', error);
     return NextResponse.json({ error: 'Failed to fetch comments' }, { status: 500 });

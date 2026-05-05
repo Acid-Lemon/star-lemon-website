@@ -446,9 +446,13 @@ function CommentSection({ postId, user }: { postId: number; user: any }) {
     // 渲染单条评论内容
     const renderCommentContent = (comment: any) => (
         <div key={comment.id} className="flex gap-3 group">
-            <div className="w-8 h-8 rounded-full bg-gradient-to-br from-gray-400 to-gray-500 flex items-center justify-center text-white font-bold text-xs shrink-0">
-                {comment.nickname?.[0]?.toUpperCase() || '匿'}
-            </div>
+            {comment.avatar ? (
+                <img src={comment.avatar} alt={comment.nickname} className="w-8 h-8 rounded-full object-cover shrink-0" />
+            ) : (
+                <div className="w-8 h-8 rounded-full bg-gradient-to-br from-gray-400 to-gray-500 flex items-center justify-center text-white font-bold text-xs shrink-0">
+                    {comment.nickname?.[0]?.toUpperCase() || '匿'}
+                </div>
+            )}
             <div className="flex-1">
                 <div className="flex items-center gap-2 mb-1">
                     <span className="font-medium text-sm text-gray-900">{comment.nickname}</span>

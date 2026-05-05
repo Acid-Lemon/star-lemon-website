@@ -17,7 +17,7 @@ export async function GET(request: NextRequest) {
 
     // 获取已审核的评论及其回复
     const result = await db.query(
-      `SELECT c.id, c.post_id, c.user_id, u.nickname, c.content, c.image_url, c.parent_id, c.status, c.created_at 
+      `SELECT c.id, c.post_id, c.user_id, u.nickname, u.avatar, c.content, c.image_url, c.parent_id, c.status, c.created_at 
        FROM comments c
        LEFT JOIN users u ON c.user_id = u.id
        WHERE c.post_id = $1 AND (c.status = 'approved' OR c.parent_id IS NOT NULL)
@@ -29,6 +29,7 @@ export async function GET(request: NextRequest) {
       result.rows.map(async (row: any) => ({
         ...row,
         image_url: await getPublicUrl(row.image_url),
+        avatar: await getPublicUrl(row.avatar),
       }))
     );
 

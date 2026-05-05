@@ -71,7 +71,8 @@ export default async function PostPage({ params }: { params: Promise<{ id: strin
     }
 
     const session = await getSession();
-    const user = session?.user || null;
+    const rawUser = session?.user;
+    let user = rawUser ? { ...rawUser, avatar: await getPublicUrl(rawUser.avatar) } : null;
 
     const authorColor = post.author_name === 'Star' ? 'bg-blue-500' : 'bg-yellow-500';
     const authorTextColor = post.author_name === 'Star' ? 'text-blue-500' : 'text-yellow-500';

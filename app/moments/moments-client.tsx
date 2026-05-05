@@ -93,19 +93,17 @@ export default function MomentsClient() {
 
     return (
         <div className="max-w-2xl mx-auto">
-            {/* 动态列表 */}
             {loading ? (
-                <div className="text-center py-8 text-gray-400 text-sm">加载中...</div>
+                <div className="text-center py-8 text-gray-400 dark:text-gray-500 text-sm">加载中...</div>
             ) : moments.length === 0 ? (
-                <div className="text-center py-16 text-gray-400">
+                <div className="text-center py-16 text-gray-400 dark:text-gray-500">
                     <div className="text-5xl mb-3">&#x1f4ad;</div>
                     <p className="text-sm">还没有动态</p>
                 </div>
             ) : (
                 <div className="space-y-3">
                     {moments.map((moment) => (
-                        <div key={moment.id} className="bg-white rounded-2xl border border-gray-100 shadow-sm p-4">
-                            {/* 头部 */}
+                        <div key={moment.id} className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-800 shadow-sm p-4">
                             <div className="flex items-center gap-2.5 mb-2.5">
                                 <Avatar size="default">
                                     {moment.avatar ? (
@@ -117,24 +115,21 @@ export default function MomentsClient() {
                                     )}
                                 </Avatar>
                                 <div className="flex-1">
-                                    <span className="font-medium text-sm text-gray-900">{moment.nickname}</span>
-                                    <span className="text-xs text-gray-400 ml-2">{getRelativeTime(moment.created_at)}</span>
+                                    <span className="font-medium text-sm text-gray-900 dark:text-gray-100">{moment.nickname}</span>
+                                    <span className="text-xs text-gray-400 dark:text-gray-500 ml-2">{getRelativeTime(moment.created_at)}</span>
                                 </div>
                             </div>
 
-                            {/* 内容 */}
-                            <div className="text-gray-800 text-sm leading-relaxed whitespace-pre-wrap break-words">
+                            <div className="text-gray-800 dark:text-gray-200 text-sm leading-relaxed whitespace-pre-wrap break-words">
                                 {moment.content}
                             </div>
 
-                            {/* 图片 */}
                             {moment.image_url && <MomentImages imageUrl={moment.image_url} onImageClick={handleImageClick} />}
                         </div>
                     ))}
                 </div>
             )}
 
-            {/* 图片预览 */}
             {lightbox && (
                 <GalleryLightbox
                     images={lightbox.images}

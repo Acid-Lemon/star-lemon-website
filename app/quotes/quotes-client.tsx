@@ -15,13 +15,13 @@ interface Quote {
 }
 
 const categoryColors: Record<string, string> = {
-    '动画': 'bg-pink-50 text-pink-600 border-pink-200',
-    '漫画': 'bg-purple-50 text-purple-600 border-purple-200',
-    '游戏': 'bg-green-50 text-green-600 border-green-200',
-    '文学': 'bg-amber-50 text-amber-600 border-amber-200',
-    '原创': 'bg-blue-50 text-blue-600 border-blue-200',
-    '网络': 'bg-cyan-50 text-cyan-600 border-cyan-200',
-    '其他': 'bg-gray-50 text-gray-600 border-gray-200',
+    '动画': 'bg-pink-50 text-pink-600 border-pink-200 dark:bg-pink-950/40 dark:text-pink-300 dark:border-pink-800',
+    '漫画': 'bg-purple-50 text-purple-600 border-purple-200 dark:bg-purple-950/40 dark:text-purple-300 dark:border-purple-800',
+    '游戏': 'bg-green-50 text-green-600 border-green-200 dark:bg-green-950/40 dark:text-green-300 dark:border-green-800',
+    '文学': 'bg-amber-50 text-amber-600 border-amber-200 dark:bg-amber-950/40 dark:text-amber-300 dark:border-amber-800',
+    '原创': 'bg-blue-50 text-blue-600 border-blue-200 dark:bg-blue-950/40 dark:text-blue-300 dark:border-blue-800',
+    '网络': 'bg-cyan-50 text-cyan-600 border-cyan-200 dark:bg-cyan-950/40 dark:text-cyan-300 dark:border-cyan-800',
+    '其他': 'bg-gray-50 text-gray-600 border-gray-200 dark:bg-gray-800 dark:text-gray-300 dark:border-gray-700',
 };
 
 const categoryIcons: Record<string, string> = {
@@ -77,19 +77,20 @@ export default function QuotesClient() {
                     {quoteList.map((item) => (
                         <Card
                             key={item.id}
-                            className="transition-all hover:shadow-md"
+                            className="transition-all hover:shadow-md bg-white dark:bg-gray-900 border-gray-100 dark:border-gray-800"
                         >
                             <CardContent className="p-5 flex flex-col h-full">
                                 <div className="flex items-center gap-2 mb-3">
                                     <Badge variant="outline" className={`text-[10px] ${categoryColors[item.category] || categoryColors['其他']}`}>
+                                        {categoryIcons[item.category] && <span className="mr-1">{categoryIcons[item.category]}</span>}
                                         {item.category}
                                     </Badge>
                                 </div>
-                                <p className="text-sm text-foreground leading-relaxed break-words flex-1 font-serif">
+                                <p className="text-sm text-foreground dark:text-gray-200 leading-relaxed break-words flex-1 font-serif">
                                     {item.content}
                                 </p>
                                 {item.source && (
-                                    <p className="text-xs text-muted-foreground mt-3">
+                                    <p className="text-xs text-muted-foreground dark:text-gray-500 mt-3">
                                         —— {item.source}
                                     </p>
                                 )}
@@ -98,9 +99,9 @@ export default function QuotesClient() {
                     ))}
                 </div>
             ) : (
-                <Card className="max-w-md mx-auto">
+                <Card className="max-w-md mx-auto bg-white dark:bg-gray-900 border-gray-100 dark:border-gray-800">
                     <CardContent className="p-8 text-center">
-                        <p className="text-muted-foreground text-sm">暂无一言</p>
+                        <p className="text-muted-foreground dark:text-gray-500 text-sm">暂无一言</p>
                     </CardContent>
                 </Card>
             )}

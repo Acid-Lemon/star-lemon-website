@@ -23,12 +23,10 @@ export function Timeline() {
     try {
       const res = await fetch('/api/timeline');
       const data = await res.json();
-      // 按日期正序排列
       data.sort((a: TimelineItem, b: TimelineItem) => a.date.localeCompare(b.date));
       setTimelineData(data.filter((item: TimelineItem & { is_active: boolean }) => item.is_active));
     } catch (error) {
       console.error('Failed to fetch timeline:', error);
-      // 使用默认数据
       setTimelineData([
         {
           id: 1,
@@ -50,7 +48,6 @@ export function Timeline() {
     }
   };
 
-  // 格式化日期显示
   const formatDate = (dateStr: string) => {
     if (!dateStr) return '';
     const [year, month] = dateStr.split('-');
@@ -109,11 +106,11 @@ export function Timeline() {
       <div className="space-y-8">
         {[1, 2, 3].map((i) => (
           <div key={i} className="flex gap-6 animate-pulse">
-            <div className="w-16 h-16 rounded-full bg-gray-200" />
-            <div className="flex-1 p-6 rounded-2xl bg-gray-100">
-              <div className="h-4 bg-gray-200 rounded w-1/4 mb-2" />
-              <div className="h-6 bg-gray-200 rounded w-1/2 mb-2" />
-              <div className="h-4 bg-gray-200 rounded w-3/4" />
+            <div className="w-16 h-16 rounded-full bg-gray-200 dark:bg-gray-700" />
+            <div className="flex-1 p-6 rounded-2xl bg-gray-100 dark:bg-gray-800">
+              <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-1/4 mb-2" />
+              <div className="h-6 bg-gray-200 dark:bg-gray-700 rounded w-1/2 mb-2" />
+              <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-3/4" />
             </div>
           </div>
         ))}
@@ -127,9 +124,8 @@ export function Timeline() {
 
   return (
     <div className="relative">
-      {/* 时间轴线条 */}
-      <div className="absolute left-8 top-10 bottom-2 w-0.5 bg-gradient-to-b from-orange-200 via-orange-300 to-orange-200" />
-      
+      <div className="absolute left-8 top-10 bottom-2 w-0.5 bg-gradient-to-b from-orange-200 via-orange-300 to-orange-200 dark:from-orange-800 dark:via-orange-700 dark:to-orange-800" />
+
       <div className="space-y-6">
         {timelineData.map((item, index) => (
           <div
@@ -137,33 +133,31 @@ export function Timeline() {
             className="relative flex gap-6 cursor-pointer group"
             onClick={() => setActiveIndex(index === activeIndex ? -1 : index)}
           >
-            {/* 时间轴节点 */}
             <div className={`relative z-10 flex items-center justify-center w-16 h-16 rounded-full ${getTypeColor(item.type)} shadow-lg transition-all duration-300 shrink-0 mt-2 ${
-              index === activeIndex ? 'ring-4 ring-orange-200 scale-110' : 'group-hover:scale-105'
+              index === activeIndex ? 'ring-4 ring-orange-200 dark:ring-orange-800 scale-110' : 'group-hover:scale-105'
             }`}>
               <div className="text-white">
                 {getTypeIcon(item.type)}
               </div>
             </div>
 
-            {/* 内容卡片 */}
             <div className={`flex-1 p-6 rounded-2xl transition-all duration-300 ${
               index === activeIndex
-                ? 'bg-white shadow-xl border border-orange-100'
-                : 'bg-white/50 hover:bg-white hover:shadow-md'
+                ? 'bg-white dark:bg-gray-900 shadow-xl border border-orange-100 dark:border-orange-900/30'
+                : 'bg-white/50 dark:bg-gray-900/50 hover:bg-white dark:hover:bg-gray-900 hover:shadow-md'
             }`}>
               <div className="flex items-center gap-3 mb-2">
-                <span className="text-sm font-mono text-gray-500">{formatDate(item.date)}</span>
+                <span className="text-sm font-mono text-gray-500 dark:text-gray-400">{formatDate(item.date)}</span>
                 <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${
-                  item.type === 'post' ? 'bg-blue-100 text-blue-700' :
-                  item.type === 'milestone' ? 'bg-orange-100 text-orange-700' :
-                  'bg-green-100 text-green-700'
+                  item.type === 'post' ? 'bg-blue-100 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300' :
+                  item.type === 'milestone' ? 'bg-orange-100 dark:bg-orange-900/40 text-orange-700 dark:text-orange-300' :
+                  'bg-green-100 dark:bg-green-900/40 text-green-700 dark:text-green-300'
                 }`}>
                   {getTypeLabel(item.type)}
                 </span>
               </div>
-              <h3 className="text-lg font-bold text-gray-800 mb-2">{item.title}</h3>
-              <p className="text-gray-600 text-sm leading-relaxed">{item.description}</p>
+              <h3 className="text-lg font-bold text-gray-800 dark:text-gray-100 mb-2">{item.title}</h3>
+              <p className="text-gray-600 dark:text-gray-400 text-sm leading-relaxed">{item.description}</p>
             </div>
           </div>
         ))}

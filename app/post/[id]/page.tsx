@@ -4,7 +4,7 @@ import { getSession } from '../../../lib/auth';
 import { getPublicUrl } from '../../../lib/oss';
 import PostClient from './PostClient';
 
-export const revalidate = 0; // 动态渲染
+export const revalidate = 60;
 
 function extractToc(content: string) {
     const tocItems: Array<{ level: number; text: string; id: string }> = [];

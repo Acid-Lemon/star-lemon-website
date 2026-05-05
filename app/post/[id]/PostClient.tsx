@@ -274,7 +274,7 @@ function CommentForm({
                     </div>
                 )}
                 <div>
-                    <p className="font-medium text-gray-900">{user.nickname || '用户'}</p>
+                    <p className="font-medium text-gray-900 dark:text-gray-100">{user.nickname || '用户'}</p>
                     {replyTo && (
                         <p className="text-xs text-blue-500">
                             回复 {replyTo.nickname}
@@ -295,7 +295,7 @@ function CommentForm({
                     onChange={(e) => setContent(e.target.value)}
                     placeholder={replyTo ? `回复 ${replyTo.nickname}...` : "写下你的评论..."}
                     rows={3}
-                    className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 resize-none"
+                    className="w-full px-4 py-2 border border-gray-200 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 resize-none"
                 />
             </div>
             
@@ -318,7 +318,7 @@ function CommentForm({
                         <button
                             type="button"
                             onClick={() => setShowEmoji(!showEmoji)}
-                            className="w-8 h-8 flex items-center justify-center hover:bg-gray-200 rounded-lg transition-colors"
+                            className="w-8 h-8 flex items-center justify-center hover:bg-gray-200 dark:hover:bg-gray-700 rounded-lg transition-colors"
                         >
                             😊
                         </button>
@@ -332,7 +332,7 @@ function CommentForm({
                     <button
                         type="button"
                         onClick={() => fileInputRef.current?.click()}
-                        className="w-8 h-8 flex items-center justify-center hover:bg-gray-200 rounded-lg transition-colors"
+                        className="w-8 h-8 flex items-center justify-center hover:bg-gray-200 dark:hover:bg-gray-700 rounded-lg transition-colors"
                     >
                         📷
                     </button>
@@ -455,7 +455,7 @@ function CommentSection({ postId, user }: { postId: number; user: any }) {
             )}
             <div className="flex-1">
                 <div className="flex items-center gap-2 mb-1">
-                    <span className="font-medium text-sm text-gray-900">{comment.nickname}</span>
+                    <span className="font-medium text-sm text-gray-900 dark:text-gray-100">{comment.nickname}</span>
                     {comment._level > 2 && comment._parentName && (
                         <span className="text-xs text-gray-400">
                             回复 <span className="text-blue-500">{comment._parentName}</span>
@@ -546,8 +546,8 @@ function CommentSection({ postId, user }: { postId: number; user: any }) {
     const commentTree = buildCommentTree(comments);
 
     return (
-        <div className="mt-16 pt-8 border-t border-gray-100">
-            <h3 className="text-2xl font-bold text-gray-900 mb-8">评论</h3>
+        <div className="mt-16 pt-8 border-t border-gray-100 dark:border-gray-800">
+            <h3 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-8">评论</h3>
 
             {/* 顶层评论表单 */}
             {user ? (
@@ -557,8 +557,8 @@ function CommentSection({ postId, user }: { postId: number; user: any }) {
                     onSuccess={handleCommentSuccess}
                 />
             ) : (
-                <div className="mb-10 p-6 bg-gray-50 rounded-xl text-center">
-                    <p className="text-gray-500 mb-3">登录后即可评论</p>
+                <div className="mb-10 p-6 bg-gray-50 dark:bg-gray-800 rounded-xl text-center">
+                    <p className="text-gray-500 dark:text-gray-400 mb-3">登录后即可评论</p>
                     <a
                         href="/login"
                         className="inline-block px-6 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
@@ -582,9 +582,9 @@ function CommentSection({ postId, user }: { postId: number; user: any }) {
             {/* 删除确认对话框 */}
             {deleteTarget !== null && (
                 <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-                    <div className="bg-white rounded-xl p-6 max-w-sm w-full mx-4 shadow-xl">
-                        <h4 className="text-lg font-semibold text-gray-900 mb-2">确认删除</h4>
-                        <p className="text-gray-600 mb-6">确定要删除这条评论吗？此操作不可撤销。</p>
+                    <div className="bg-white dark:bg-gray-900 rounded-xl p-6 max-w-sm w-full mx-4 shadow-xl">
+                        <h4 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-2">确认删除</h4>
+                        <p className="text-gray-600 dark:text-gray-400 mb-6">确定要删除这条评论吗？此操作不可撤销。</p>
                         <div className="flex gap-3 justify-end">
                             <button
                                 onClick={() => setDeleteTarget(null)}
@@ -755,14 +755,14 @@ export default function PostClient({
                                 {authorName || '佚名'}
                             </span>
                         </div>
-                        <h1 className="text-4xl sm:text-5xl font-bold text-gray-900 leading-tight">
+                        <h1 className="text-4xl sm:text-5xl font-bold text-gray-900 dark:text-gray-100 leading-tight">
                             {title}
                         </h1>
                         <div className="flex gap-2">
                             {tags.map((tag: string) => (
                                 <span
                                     key={tag}
-                                    className="px-3 py-1 bg-gray-50 text-gray-500 text-xs rounded-full border border-gray-100 font-mono"
+                                    className="px-3 py-1 bg-gray-50 dark:bg-gray-800 text-gray-500 dark:text-gray-400 text-xs rounded-full border border-gray-100 dark:border-gray-700 font-mono"
                                 >
                                     #{tag.trim()}
                                 </span>
@@ -774,12 +774,12 @@ export default function PostClient({
 
                     <PostContent content={content}/>
 
-                    <div className="mt-16 pt-8 border-t border-gray-100 flex justify-between items-center">
-                        <p className="text-gray-400 font-serif italic">Thanks for reading.</p>
+                    <div className="mt-16 pt-8 border-t border-gray-100 dark:border-gray-800 flex justify-between items-center">
+                        <p className="text-gray-400 dark:text-gray-500 font-serif italic">Thanks for reading.</p>
                         <div className="flex items-center gap-3">
                             <button
                                 onClick={handleShare}
-                                className="w-12 h-12 rounded-full bg-gray-50 text-gray-500 flex items-center justify-center hover:bg-blue-50 hover:text-blue-500 transition-colors shadow-sm"
+                                className="w-12 h-12 rounded-full bg-gray-50 dark:bg-gray-800 text-gray-500 dark:text-gray-400 flex items-center justify-center hover:bg-blue-50 dark:hover:bg-blue-950/30 hover:text-blue-500 dark:hover:text-blue-400 transition-colors shadow-sm"
                                 aria-label="分享"
                                 title="分享"
                             >
@@ -800,7 +800,7 @@ export default function PostClient({
                             </button>
                             <button
                                 onClick={scrollToTop}
-                                className="w-12 h-12 rounded-full bg-blue-50 text-blue-500 flex items-center justify-center hover:bg-blue-500 hover:text-white transition-colors shadow-sm"
+                                className="w-12 h-12 rounded-full bg-blue-50 dark:bg-blue-950/30 text-blue-500 dark:text-blue-400 flex items-center justify-center hover:bg-blue-500 hover:text-white transition-colors shadow-sm"
                                 aria-label="回到顶部"
                             >
                                 <svg
@@ -827,7 +827,7 @@ export default function PostClient({
 
                 {/* 右侧：大纲 + 阅读进度 */}
                 <aside
-                    className="hidden lg:block w-64 flex-shrink-0 border border-gray-200 rounded-lg bg-white p-4 shadow-sm"
+                    className="hidden lg:block w-64 flex-shrink-0 border border-gray-200 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-900 p-4 shadow-sm"
                 >
                     <div className="sticky top-24 space-y-6">
                         <div className="space-y-2">
@@ -845,7 +845,7 @@ export default function PostClient({
 
                         {finalToc.length > 0 && (
                             <div>
-                                <h3 className="text-sm font-semibold text-gray-900 mb-3 font-mono">目录</h3>
+                                <h3 className="text-sm font-semibold text-gray-900 dark:text-gray-100 mb-3 font-mono">目录</h3>
                                 <nav className="space-y-1">
                                     {finalToc.map((item) => (
                                         <button
@@ -854,7 +854,7 @@ export default function PostClient({
                                             className={`block w-full text-left text-sm transition-colors py-1 pr-2 border-l-2 ${
                                                 activeId === item.id
                                                     ? 'border-blue-500 text-blue-600 font-medium'
-                                                    : 'border-transparent text-gray-500 hover:text-gray-900'
+                                                    : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100'
                                             }`}
                                             style={{paddingLeft: `${(item.level - 2) * 12 + 12}px`}}
                                         >
@@ -872,7 +872,7 @@ export default function PostClient({
             {showBackToTop && (
                 <button
                     onClick={scrollToTop}
-                    className="fixed bottom-8 right-8 w-10 h-10 rounded-full bg-white text-gray-600 border border-gray-200 flex items-center justify-center hover:bg-gray-50 hover:text-blue-500 transition-all shadow-md z-50"
+                    className="fixed bottom-8 right-8 w-10 h-10 rounded-full bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-400 border border-gray-200 dark:border-gray-700 flex items-center justify-center hover:bg-gray-50 dark:hover:bg-gray-700 hover:text-blue-500 dark:hover:text-blue-400 transition-all shadow-md z-50"
                     aria-label="回到顶部"
                 >
                     <svg

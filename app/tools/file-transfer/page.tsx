@@ -51,7 +51,7 @@ interface UserOrder {
   created_at: string;
 }
 
-function UploadPanel() {
+function UploadPanel({ onUploadSuccess }: { onUploadSuccess?: () => void }) {
   const [file, setFile] = useState<File | null>(null);
   const [maxDownloads, setMaxDownloads] = useState(3);
   const [retainDays, setRetainDays] = useState(7);
@@ -62,11 +62,15 @@ function UploadPanel() {
   const [code, setCode] = useState('');
   const [qrCodeUrl, setQrCodeUrl] = useState('');
   const [uploadProgress, setUploadProgress] = useState(0);
+  const [uploadedBytes, setUploadedBytes] = useState(0);
+  const [uploadSpeed, setUploadSpeed] = useState(0);
+  const [merging, setMerging] = useState(false);
   const [autoUploading, setAutoUploading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const pollingRef = useRef<NodeJS.Timeout | null>(null);
   const fileRef = useRef<File | null>(null);
   const orderIdRef = useRef<number | null>(null);
+  const lastProgressRef = useRef<{ time: number; loaded: number } | null>(null);
 
   // Keep refs in sync with state
   useEffect(() => { fileRef.current = file; }, [file]);
@@ -103,20 +107,38 @@ function UploadPanel() {
     const currentFile = fileRef.current;
     if (!currentFile) return;
     setStep('uploading');
+    setMerging(false);
+    setUploadedBytes(0);
+    setUploadSpeed(0);
+    lastProgressRef.current = null;
     const xhr = new XMLHttpRequest();
     xhr.open('POST', `/api/file-transfer/${oid}/upload`);
 
     xhr.upload.onprogress = (e) => {
       if (e.lengthComputable) {
-        setUploadProgress(Math.round((e.loaded / e.total) * 100));
+        const now = Date.now();
+        const prev = lastProgressRef.current;
+        if (prev && now - prev.time > 0) {
+          const speedBps = (e.loaded - prev.loaded) / ((now - prev.time) / 1000);
+          setUploadSpeed(speedBps);
+        }
+        lastProgressRef.current = { time: now, loaded: e.loaded };
+        setUploadedBytes(e.loaded);
+        const pct = Math.round((e.loaded / e.total) * 100);
+        setUploadProgress(pct);
+        if (pct >= 100) {
+          setMerging(true);
+        }
       }
     };
 
     xhr.onload = () => {
       setAutoUploading(false);
+      setMerging(false);
       if (xhr.status >= 200 && xhr.status < 300) {
         setStep('done');
         toast.success('文件上传成功！');
+        onUploadSuccess?.();
       } else {
         try {
           const err = JSON.parse(xhr.responseText);
@@ -129,13 +151,14 @@ function UploadPanel() {
 
     xhr.onerror = () => {
       setAutoUploading(false);
+      setMerging(false);
       toast.error('上传失败');
     };
 
     const formData = new FormData();
     formData.append('file', currentFile);
     xhr.send(formData);
-  }, []);
+  }, [onUploadSuccess]);
 
   const handleCalcPrice = async () => {
     if (!file) return;
@@ -232,6 +255,9 @@ function UploadPanel() {
     setCode('');
     setQrCodeUrl('');
     setUploadProgress(0);
+    setUploadedBytes(0);
+    setUploadSpeed(0);
+    setMerging(false);
     setAutoUploading(false);
   };
 
@@ -298,14 +324,14 @@ function UploadPanel() {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <RiUploadCloudLine className="w-5 h-5 text-primary" />
-            正在上传文件
+            {merging ? '正在合并分片' : '正在上传文件'}
           </CardTitle>
           <CardDescription>{file?.name}</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="space-y-2">
             <div className="flex justify-between text-sm">
-              <span className="text-muted-foreground">上传进度</span>
+              <span className="text-muted-foreground">{merging ? '合并进度' : '上传进度'}</span>
               <span className="font-mono">{uploadProgress}%</span>
             </div>
             <div className="w-full bg-muted rounded-full h-3 overflow-hidden">
@@ -314,9 +340,17 @@ function UploadPanel() {
                 style={{ width: `${uploadProgress}%` }}
               />
             </div>
-            <p className="text-xs text-muted-foreground text-center">
-              {file ? `${formatFileSize(file.size)}` : ''}
-            </p>
+            <div className="flex justify-between text-xs text-muted-foreground">
+              <span>
+                {merging
+                  ? '文件上传完成，正在服务器端合并分片...'
+                  : `${formatFileSize(uploadedBytes)} / ${file ? formatFileSize(file.size) : ''}`
+                }
+              </span>
+              {!merging && uploadSpeed > 0 && (
+                <span>{formatFileSize(uploadSpeed)}/s</span>
+              )}
+            </div>
           </div>
         </CardContent>
       </Card>
@@ -532,7 +566,7 @@ function DownloadPanel() {
   );
 }
 
-function MyFilesPanel() {
+function MyFilesPanel({ refreshKey }: { refreshKey?: number }) {
   const [files, setFiles] = useState<UserFile[]>([]);
   const [loading, setLoading] = useState(true);
   const [deleteTarget, setDeleteTarget] = useState<UserFile | null>(null);
@@ -540,7 +574,7 @@ function MyFilesPanel() {
 
   useEffect(() => {
     fetchFiles();
-  }, []);
+  }, [refreshKey]);
 
   const fetchFiles = async () => {
     try {
@@ -658,13 +692,13 @@ function MyFilesPanel() {
   );
 }
 
-function MyOrdersPanel() {
+function MyOrdersPanel({ refreshKey }: { refreshKey?: number }) {
   const [orders, setOrders] = useState<UserOrder[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     fetchOrders();
-  }, []);
+  }, [refreshKey]);
 
   const fetchOrders = async () => {
     try {
@@ -744,6 +778,12 @@ function MyOrdersPanel() {
 }
 
 export default function FileTransferPage() {
+  const [refreshKey, setRefreshKey] = useState(0);
+
+  const handleUploadSuccess = useCallback(() => {
+    setRefreshKey(prev => prev + 1);
+  }, []);
+
   return (
     <div className="flex-1 flex flex-col items-center pt-16 pb-10 gap-8 px-4 w-full">
       <div className="w-full max-w-5xl">
@@ -767,7 +807,7 @@ export default function FileTransferPage() {
                 <DownloadPanel />
               </TabsContent>
               <TabsContent value="upload" className="mt-4">
-                <UploadPanel />
+                <UploadPanel onUploadSuccess={handleUploadSuccess} />
               </TabsContent>
             </Tabs>
             <div className="text-xs text-muted-foreground text-center space-y-1 mt-6">
@@ -777,8 +817,8 @@ export default function FileTransferPage() {
           </div>
 
           <div className="lg:col-span-1 space-y-4">
-            <MyFilesPanel />
-            <MyOrdersPanel />
+            <MyFilesPanel refreshKey={refreshKey} />
+            <MyOrdersPanel refreshKey={refreshKey} />
           </div>
         </div>
       </div>

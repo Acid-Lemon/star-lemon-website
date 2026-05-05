@@ -14,7 +14,7 @@ export function MainWrapper({ children }: { children: React.ReactNode }) {
     }
 
     return (
-        <main className="flex-1 flex mt-4">
+        <main className="flex-1 flex mt-2 sm:mt-4">
             {children}
         </main>
     );

@@ -67,7 +67,7 @@ export function MyMessages({ message, bgColor, isOwner, onDeleted, onImageClick 
     return (
         <>
             <div
-                className="group relative rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 border border-black/5"
+                className="group relative rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 border border-black/5 dark:border-white/10"
                 style={{ backgroundColor: bgColor || '#fcd34d' }}
             >
                 <div
@@ -97,7 +97,7 @@ export function MyMessages({ message, bgColor, isOwner, onDeleted, onImageClick 
                             variant="ghost"
                             onClick={() => setShowDeleteDialog(true)}
                             disabled={isPending}
-                            className="w-7 h-7 bg-white/90 hover:bg-red-500 text-gray-400 hover:text-white shadow-sm backdrop-blur-sm"
+                            className="w-7 h-7 bg-white/90 dark:bg-gray-800/90 hover:bg-red-500 text-gray-400 hover:text-white shadow-sm backdrop-blur-sm"
                         >
                             <RiDeleteBinLine className="w-3.5 h-3.5" />
                         </Button>
@@ -114,7 +114,7 @@ export function MyMessages({ message, bgColor, isOwner, onDeleted, onImageClick 
                     )}
 
                     {message.content && (
-                        <p className="text-gray-800 text-sm leading-relaxed mb-3">
+                        <p className={`text-sm leading-relaxed mb-3 ${isLightBg ? 'text-gray-800' : 'text-gray-100'}`}>
                             {message.content}
                         </p>
                     )}
@@ -153,18 +153,18 @@ export function MyMessages({ message, bgColor, isOwner, onDeleted, onImageClick 
                         );
                     })()}
 
-                    <div className="flex items-center justify-between pt-4 border-t border-black/10">
+                    <div className="flex items-center justify-between pt-4 border-t border-black/10 dark:border-white/10">
                         <div className="flex items-center gap-2.5">
-                            <div className="w-8 h-8 rounded-full bg-white/60 flex items-center justify-center shadow-sm">
-                                <span className="text-xs font-bold text-gray-700">
+                            <div className={`w-8 h-8 rounded-full flex items-center justify-center shadow-sm ${isLightBg ? 'bg-white/60' : 'bg-black/20'}`}>
+                                <span className={`text-xs font-bold ${isLightBg ? 'text-gray-700' : 'text-white'}`}>
                                     {message.author_name?.[0]?.toUpperCase() || '匿'}
                                 </span>
                             </div>
-                            <span className="font-medium text-xs text-gray-700">
+                            <span className={`font-medium text-xs ${isLightBg ? 'text-gray-700' : 'text-gray-200'}`}>
                                 {message.author_name || '佚名'}
                             </span>
                         </div>
-                        <span className="text-xs text-gray-600">
+                        <span className={`text-xs ${isLightBg ? 'text-gray-600' : 'text-gray-300'}`}>
                             {getRelativeTime(message.created_at)}
                         </span>
                     </div>

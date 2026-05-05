@@ -3,12 +3,7 @@ import { getSettings } from './settings';
 
 function createSign(params: Record<string, string>, key: string): string {
   const sortedKeys = Object.keys(params).filter(k => params[k] !== '' && params[k] !== undefined).sort();
-  const sortedParams: Record<string, string> = {};
-  sortedKeys.forEach(k => {
-    sortedParams[k] = params[k];
-  });
-  const formData = new URLSearchParams(sortedParams);
-  const string = formData.toString() + '&key=' + key;
+  const string = sortedKeys.map(k => `${k}=${params[k]}`).join('&') + '&key=' + key;
   console.log('Sign string for MD5:', string);
   return crypto.createHash('md5').update(string).digest('hex').toUpperCase();
 }
@@ -140,6 +135,27 @@ export async function verifyPayNotify(params: Record<string, string>): Promise<b
   return sign === expectedSign;
 }
 
+export async function verifyRefundNotify(params: Record<string, string>): Promise<boolean> {
+  const settings = await getSettings();
+  const key = settings.lantu_key;
+  if (!key) return false;
+
+  const sign = params.sign;
+  if (!sign) return false;
+
+  const signFields = ['code', 'timestamp', 'mch_id', 'order_no', 'out_trade_no', 'pay_no', 'refund_no', 'out_refund_no', 'pay_channel', 'refund_fee'];
+  const filtered: Record<string, string> = {};
+  for (const field of signFields) {
+    if (params[field] !== undefined && params[field] !== '') {
+      filtered[field] = params[field];
+    }
+  }
+
+  const expectedSign = createSign(filtered, key as string);
+  console.log('Verify refund notify sign - params:', JSON.stringify(filtered), 'expected:', expectedSign, 'actual:', sign);
+  return sign === expectedSign;
+}
+
 export async function refundPayOrder(params: {
   outTradeNo: string;
   refundFee: string;
@@ -161,7 +177,6 @@ export async function refundPayOrder(params: {
     out_trade_no: params.outTradeNo,
     out_refund_no: params.outRefundNo,
     refund_fee: params.refundFee,
-    notify_url: params.notifyUrl,
     timestamp,
   };
 

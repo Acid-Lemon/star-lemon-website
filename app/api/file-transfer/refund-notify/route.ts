@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import db from '@/lib/db';
-import { verifyPayNotify } from '@/lib/lantu-pay';
+import { verifyRefundNotify } from '@/lib/lantu-pay';
 
 export async function POST(request: NextRequest) {
   try {
@@ -13,7 +13,7 @@ export async function POST(request: NextRequest) {
 
     console.log('Refund notify received:', JSON.stringify(params));
 
-    const isValid = await verifyPayNotify(params);
+    const isValid = await verifyRefundNotify(params);
     if (!isValid) {
       console.error('Refund notify signature verification failed');
       return new NextResponse('FAIL', { status: 200 });

@@ -10,10 +10,10 @@ const MAX_IMAGES = 9;
 
 function SubmitButton() {
     const { pending } = useFormStatus();
-    
+
     return (
-        <button 
-            type="submit" 
+        <button
+            type="submit"
             disabled={pending}
             className="px-6 py-2.5 bg-gradient-to-r from-orange-500 to-orange-600 text-white rounded-xl font-medium hover:from-orange-600 hover:to-orange-700 disabled:from-orange-300 disabled:to-orange-400 transition-all duration-300 shadow-md hover:shadow-lg disabled:shadow-none flex items-center gap-1.5"
         >
@@ -53,7 +53,7 @@ export function SubmitMessageForm({ onSuccess }: { onSuccess?: (message: any) =>
 
         const filesToUpload = Array.from(files).slice(0, remaining);
         setUploading(true);
-        
+
         const uploaded: string[] = [];
         for (const file of filesToUpload) {
             try {
@@ -70,13 +70,13 @@ export function SubmitMessageForm({ onSuccess }: { onSuccess?: (message: any) =>
                 toast.error(`${file.name} 上传失败`);
             }
         }
-        
+
         if (uploaded.length > 0) {
             setImageUrls(prev => [...prev, ...uploaded]);
             toast.success(`已上传${uploaded.length}张图片`);
         }
         setUploading(false);
-        
+
         if (fileInputRef.current) {
             fileInputRef.current.value = '';
         }
@@ -102,7 +102,7 @@ export function SubmitMessageForm({ onSuccess }: { onSuccess?: (message: any) =>
                 if (imageUrls.length > 0) {
                     formData.append('image_url', imageUrls.join(','));
                 }
-                
+
                 const res = await fetch('/api/guestbook', {
                     method: 'POST',
                     body: formData,
@@ -129,26 +129,25 @@ export function SubmitMessageForm({ onSuccess }: { onSuccess?: (message: any) =>
         <form ref={formRef} onSubmit={handleSubmit} className="w-full max-w-3xl mx-auto">
             <div className="space-y-3">
                 <div className="relative">
-                    <textarea 
+                    <textarea
                         name="content"
                         value={content}
                         onChange={(e) => setContent(e.target.value)}
                         rows={3}
-                        placeholder="有什么想对我们说的..." 
+                        placeholder="有什么想对我们说的..."
                         required
-                        className="w-full px-4 py-2.5 bg-white border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 resize-none text-gray-700 placeholder:text-gray-400 transition-all shadow-sm"
+                        className="w-full px-4 py-2.5 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 resize-none text-gray-700 dark:text-gray-200 placeholder:text-gray-400 dark:placeholder:text-gray-500 transition-all shadow-sm"
                     ></textarea>
                 </div>
-                
-                {/* 图片九宫格预览 */}
+
                 {imageUrls.length > 0 && (
                     <div>
                         <div className="grid grid-cols-3 gap-2">
                             {imageUrls.map((url, i) => (
                                 <div key={url + i} className="relative group aspect-square rounded-lg overflow-hidden">
-                                    <img 
-                                        src={url} 
-                                        alt={`图片${i + 1}`} 
+                                    <img
+                                        src={url}
+                                        alt={`图片${i + 1}`}
                                         className="w-full h-full object-cover"
                                     />
                                     <button
@@ -161,24 +160,24 @@ export function SubmitMessageForm({ onSuccess }: { onSuccess?: (message: any) =>
                                 </div>
                             ))}
                         </div>
-                        <p className="text-xs text-gray-400 mt-1.5">{imageUrls.length}/{MAX_IMAGES}</p>
+                        <p className="text-xs text-gray-400 dark:text-gray-500 mt-1.5">{imageUrls.length}/{MAX_IMAGES}</p>
                     </div>
                 )}
-                
+
                 <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
                         <div className="relative">
                             <button
                                 type="button"
                                 onClick={() => setShowEmoji(!showEmoji)}
-                                className="w-9 h-9 flex items-center justify-center hover:bg-gray-100 rounded-lg transition-colors text-lg"
+                                className="w-9 h-9 flex items-center justify-center hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors text-lg"
                             >
                                 😊
                             </button>
                             {showEmoji && (
-                                <EmojiPicker 
-                                    onSelect={handleEmojiSelect} 
-                                    onClose={() => setShowEmoji(false)} 
+                                <EmojiPicker
+                                    onSelect={handleEmojiSelect}
+                                    onClose={() => setShowEmoji(false)}
                                 />
                             )}
                         </div>
@@ -186,7 +185,7 @@ export function SubmitMessageForm({ onSuccess }: { onSuccess?: (message: any) =>
                             type="button"
                             onClick={() => fileInputRef.current?.click()}
                             disabled={imageUrls.length >= MAX_IMAGES}
-                            className="w-9 h-9 flex items-center justify-center hover:bg-gray-100 disabled:opacity-40 disabled:cursor-not-allowed rounded-lg transition-colors text-lg relative"
+                            className="w-9 h-9 flex items-center justify-center hover:bg-gray-100 dark:hover:bg-gray-700 disabled:opacity-40 disabled:cursor-not-allowed rounded-lg transition-colors text-lg relative"
                         >
                             📷
                             {imageUrls.length > 0 && (
@@ -204,7 +203,7 @@ export function SubmitMessageForm({ onSuccess }: { onSuccess?: (message: any) =>
                             className="hidden"
                             key={imageUrls.length}
                         />
-                        {uploading && <span className="text-xs text-gray-400">上传中...</span>}
+                        {uploading && <span className="text-xs text-gray-400 dark:text-gray-500">上传中...</span>}
                     </div>
                     <SubmitButton />
                 </div>

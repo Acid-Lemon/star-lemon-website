@@ -6,15 +6,40 @@ export async function GET(request: Request) {
     const { searchParams } = new URL(request.url);
     const offset = parseInt(searchParams.get('offset') || '0');
     const limit = parseInt(searchParams.get('limit') || '6');
+    const search = searchParams.get('search') || '';
+    const tag = searchParams.get('tag') || '';
 
     try {
-        const result = await db.query(`
+        let query = `
             SELECT posts.id, posts.title, posts.summary, posts.cover, posts.created_at, posts.tags, users.nickname as author_name, users.avatar as author_avatar
             FROM posts 
             LEFT JOIN users ON posts.author_id = users.id 
-            ORDER BY posts.created_at DESC
-            LIMIT $1 OFFSET $2
-        `, [limit, offset]);
+        `;
+        const conditions: string[] = [];
+        const params: any[] = [];
+        let paramIndex = 1;
+
+        if (search) {
+            conditions.push(`(posts.title ILIKE $${paramIndex} OR posts.summary ILIKE $${paramIndex})`);
+            params.push(`%${search}%`);
+            paramIndex++;
+        }
+
+        if (tag) {
+            conditions.push(`($${paramIndex} = ANY(posts.tags) OR posts.tags::text LIKE $${paramIndex + 1})`);
+            params.push(tag);
+            params.push(`%"${tag}"%`);
+            paramIndex += 2;
+        }
+
+        if (conditions.length > 0) {
+            query += ` WHERE ` + conditions.join(' AND ');
+        }
+
+        query += ` ORDER BY posts.created_at DESC LIMIT $${paramIndex} OFFSET $${paramIndex + 1}`;
+        params.push(limit, offset);
+
+        const result = await db.query(query, params);
 
         const posts = await Promise.all(
             result.rows.map(async (row: any) => ({

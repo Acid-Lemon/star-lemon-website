@@ -1,5 +1,5 @@
 import type {Metadata} from "next";
-import {DM_Mono, Noto_Serif_SC} from 'next/font/google'
+import {DM_Mono, Inter, Noto_Serif_SC, Playfair_Display} from 'next/font/google'
 import "./globals.css";
 import { getSession, logoutUser } from "../lib/auth";
 import { getSettings } from "../lib/settings";
@@ -7,7 +7,24 @@ import { getPublicUrl } from "../lib/oss";
 import { Navigation, Footer } from "./components/navigation";
 import { MainWrapper } from "./components/main-wrapper";
 import { Toaster } from "@/components/ui/sonner";
+import { ThemeProvider } from "./components/theme-provider";
+import { ThemeToggle } from "./components/theme-toggle";
+import { UserProvider } from "./components/user-context";
 import db from "../lib/db";
+
+const inter = Inter({
+    subsets: ['latin'],
+    display: 'swap',
+    variable: '--font-sans',
+})
+
+const playfair = Playfair_Display({
+    subsets: ['latin'],
+    weight: ['400', '700', '900'],
+    style: ['normal', 'italic'],
+    display: 'swap',
+    variable: '--font-display',
+})
 
 const notoSerifSC = Noto_Serif_SC({
     weight: ['300', '400'],
@@ -26,22 +43,35 @@ const dmMono = DM_Mono({
 export async function generateMetadata(): Promise<Metadata> {
     const settings = await getSettings();
     return {
-        title: settings.site_title || "star和lemon的小站",
+        title: {
+            default: settings.site_title || "star和lemon的小站",
+            template: `%s | ${settings.site_title || "star和lemon的小站"}`,
+        },
         description: settings.site_description || "欢迎访问我们的小站~！",
         keywords: settings.site_keywords ? settings.site_keywords.split(',') : undefined,
+        openGraph: {
+            title: settings.site_title || "star和lemon的小站",
+            description: settings.site_description || "欢迎访问我们的小站~！",
+            type: 'website',
+            locale: 'zh_CN',
+            siteName: settings.site_title || "star和lemon的小站",
+        },
+        robots: {
+            index: true,
+            follow: true,
+        },
     };
 }
 
 export default async function RootLayout({children}: Readonly<{ children: React.ReactNode }>) {
     const session = await getSession();
-    let user = session?.user;
-    
-    // 如果用户已登录，从数据库获取最新信息（包含 avatar）
-    if (user?.id) {
+    let user = null;
+
+    if (session?.user?.id) {
         try {
             const result = await db.query(
                 'SELECT id, nickname, email, role, avatar, bio, birthday FROM users WHERE id = $1',
-                [user.id]
+                [session.user.id]
             );
             if (result.rows.length > 0) {
                 const row = result.rows[0];
@@ -54,7 +84,7 @@ export default async function RootLayout({children}: Readonly<{ children: React.
             console.error('Failed to fetch latest user info:', error);
         }
     }
-    
+
     const settings = await getSettings();
 
     async function handleLogout() {
@@ -63,14 +93,19 @@ export default async function RootLayout({children}: Readonly<{ children: React.
     }
 
     return (
-        <html lang="zh-CN" className="h-full antialiased " suppressHydrationWarning>
-        <body className={`min-h-full flex flex-col bg-[#fdfcfb] text-gray-800 selection:bg-orange-100 ${notoSerifSC.variable} ${dmMono.variable}`}
+        <html lang="zh-CN" className="h-full antialiased" suppressHydrationWarning>
+        <body className={`min-h-full flex flex-col bg-background text-foreground selection:bg-orange-100 dark:selection:bg-orange-900/30 ${inter.variable} ${playfair.variable} ${notoSerifSC.variable} ${dmMono.variable}`}
               suppressHydrationWarning>
-            <Navigation user={user} handleLogout={handleLogout} />
-            <MainWrapper>
-                {children}
-            </MainWrapper>
-            <Footer icpNumber={settings.icp_number} />
+            <ThemeProvider>
+                <UserProvider user={user}>
+                    <Navigation user={user} handleLogout={handleLogout} />
+                    <MainWrapper>
+                        {children}
+                    </MainWrapper>
+                    <Footer icpNumber={settings.icp_number} />
+                    <ThemeToggle />
+                </UserProvider>
+            </ThemeProvider>
             <Toaster position="top-center" />
         </body>
         </html>

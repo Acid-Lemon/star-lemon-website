@@ -12,8 +12,10 @@ import {Tabs, TabsList, TabsTrigger, TabsContent} from '@/components/ui/tabs';
 import {Avatar, AvatarImage, AvatarFallback} from '@/components/ui/avatar';
 import {RiLockLine, RiMailLine, RiArrowRightSLine} from '@remixicon/react';
 
+import {UserInfo} from './user-context';
+
 interface UserProfileModalProps {
-    user: any;
+    user: UserInfo | null;
     onClose: () => void;
     onUpdate?: (updatedUser: any) => void;
 }

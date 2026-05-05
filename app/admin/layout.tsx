@@ -1,6 +1,6 @@
 import React from 'react';
 import Link from 'next/link';
-import {RiTimeLine, RiFileTextLine, RiHomeLine, RiLogoutBoxLine, RiChat3Line, RiChat4Line, RiSideBarLine, RiSettings3Line, RiFlashlightLine, RiDoubleQuotesL, RiUserLine, RiFolderTransferLine} from '@remixicon/react';
+import {RiTimeLine, RiFileTextLine, RiHomeLine, RiLogoutBoxLine, RiChat3Line, RiChat4Line, RiSideBarLine, RiSettings3Line, RiFlashlightLine, RiDoubleQuotesL, RiUserLine, RiFolderTransferLine, RiLinksLine} from '@remixicon/react';
 import {getSession, logoutUser} from '../../lib/auth';
 import {redirect} from 'next/navigation';
 import { getPublicUrl } from '../../lib/oss';
@@ -65,6 +65,21 @@ export default async function AdminLayout({children}: { children: React.ReactNod
                         <RiDoubleQuotesL className="h-4 w-4"/>
                         一言管理
                     </Link>
+                    <Link href="/admin/timeline"
+                          className="flex items-center gap-3 px-3 py-2.5 rounded-md text-sm font-medium text-muted-foreground hover:bg-secondary hover:text-foreground transition-colors">
+                        <RiTimeLine className="h-4 w-4"/>
+                        时间轴管理
+                    </Link>
+                    <Link href="/admin/friends"
+                          className="flex items-center gap-3 px-3 py-2.5 rounded-md text-sm font-medium text-muted-foreground hover:bg-secondary hover:text-foreground transition-colors">
+                        <RiLinksLine className="h-4 w-4"/>
+                        友链管理
+                    </Link>
+
+                    <div
+                        className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2 mt-6 px-2">
+                        互动审核
+                    </div>
                     <Link href="/admin/messages"
                           className="flex items-center gap-3 px-3 py-2.5 rounded-md text-sm font-medium text-muted-foreground hover:bg-secondary hover:text-foreground transition-colors">
                         <RiChat4Line className="h-4 w-4"/>
@@ -78,17 +93,7 @@ export default async function AdminLayout({children}: { children: React.ReactNod
 
                     <div
                         className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2 mt-6 px-2">
-                        首页管理
-                    </div>
-                    <Link href="/admin/timeline"
-                          className="flex items-center gap-3 px-3 py-2.5 rounded-md text-sm font-medium text-muted-foreground hover:bg-secondary hover:text-foreground transition-colors">
-                        <RiTimeLine className="h-4 w-4"/>
-                        时间轴管理
-                    </Link>
-
-                    <div
-                        className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2 mt-6 px-2">
-                        系统设置
+                        系统管理
                     </div>
                     <Link href="/admin/users"
                           className="flex items-center gap-3 px-3 py-2.5 rounded-md text-sm font-medium text-muted-foreground hover:bg-secondary hover:text-foreground transition-colors">

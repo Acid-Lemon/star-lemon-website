@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useRef, useCallback } from 'react';
+import { RiImageLine } from '@remixicon/react';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
 
@@ -172,9 +173,7 @@ export function CoverUpload({ defaultValue, onChange }: CoverUploadProps) {
             <span className="text-sm text-muted-foreground">上传中...</span>
           ) : (
             <>
-              <svg className="w-10 h-10 text-muted-foreground mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-              </svg>
+              <RiImageLine className="w-10 h-10 text-muted-foreground mb-2" />
               <span className="text-sm text-muted-foreground">点击上传封面图片</span>
               <span className="text-xs text-muted-foreground mt-1">支持 JPG、PNG、GIF、WebP，最大 5MB</span>
               <span className="text-xs text-orange-500 mt-1">将自动裁剪为 16:9 比例</span>

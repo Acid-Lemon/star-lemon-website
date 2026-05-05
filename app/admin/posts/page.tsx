@@ -19,6 +19,8 @@ export const revalidate = 0;
 // 删除文章 Server Action
 async function deletePost(formData: FormData) {
     'use server';
+    const session = await getSession();
+    if (!session || session.user?.role !== 'admin') return;
     const id = formData.get('id');
     if (!id) return;
     try {

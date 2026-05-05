@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
+import { RiFilmLine, RiBook2Line, RiGamepadLine, RiQuillPenLine, RiLightbulbLine, RiGlobalLine, RiMoreLine } from '@remixicon/react';
 
 interface Quote {
     id: number;
@@ -17,6 +18,16 @@ const categoryColors: Record<string, string> = {
     '原创': 'bg-blue-50 text-blue-600 border-blue-200 dark:bg-blue-950/40 dark:text-blue-300 dark:border-blue-800',
     '网络': 'bg-cyan-50 text-cyan-600 border-cyan-200 dark:bg-cyan-950/40 dark:text-cyan-300 dark:border-cyan-800',
     '其他': 'bg-gray-50 text-gray-600 border-gray-200 dark:bg-gray-800 dark:text-gray-300 dark:border-gray-700',
+};
+
+const categoryIcons: Record<string, React.ReactNode> = {
+    '动画': <RiFilmLine className="w-3 h-3 mr-1" />,
+    '漫画': <RiBook2Line className="w-3 h-3 mr-1" />,
+    '游戏': <RiGamepadLine className="w-3 h-3 mr-1" />,
+    '文学': <RiQuillPenLine className="w-3 h-3 mr-1" />,
+    '原创': <RiLightbulbLine className="w-3 h-3 mr-1" />,
+    '网络': <RiGlobalLine className="w-3 h-3 mr-1" />,
+    '其他': <RiMoreLine className="w-3 h-3 mr-1" />,
 };
 
 export function QuoteCard() {
@@ -79,7 +90,8 @@ export function QuoteCard() {
             </div>
 
             <div className="mt-3">
-                <span className={`inline-block px-2 py-0.5 rounded-full text-[10px] font-medium border ${categoryColors[quote.category] || categoryColors['其他']}`}>
+                <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-medium border ${categoryColors[quote.category] || categoryColors['其他']}`}>
+                    {categoryIcons[quote.category] || categoryIcons['其他']}
                     {quote.category}
                 </span>
             </div>

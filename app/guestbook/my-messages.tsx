@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useTransition } from 'react';
-import { RiDeleteBinLine } from '@remixicon/react';
+import { RiDeleteBinLine, RiDoubleQuotesL } from '@remixicon/react';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -40,9 +40,30 @@ function getRelativeTime(dateStr: any) {
     }
 }
 
+function hexToLuminance(hex: string): number {
+    if (!hex || !hex.startsWith('#') || hex.length < 7) return 0.5;
+    const r = parseInt(hex.slice(1, 3), 16) / 255;
+    const g = parseInt(hex.slice(3, 5), 16) / 255;
+    const b = parseInt(hex.slice(5, 7), 16) / 255;
+    const toLinear = (c: number) => c <= 0.03928 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4);
+    return 0.2126 * toLinear(r) + 0.7152 * toLinear(g) + 0.0722 * toLinear(b);
+}
+
+function isLightColor(color: string): boolean {
+    if (!color) return true;
+    const hexMatch = color.match(/#[0-9a-fA-F]{6}/);
+    if (hexMatch) {
+        return hexToLuminance(hexMatch[0]) > 0.4;
+    }
+    const lightKeywords = ['#fcd34d', '#bfdbfe', '#bbf7d0', '#fef08a', '#67e8f9', '#e9d5ff', '#fecaca', '#fed7aa', '#d9f99d', '#a5f3fc', '#c7d2fe', '#fbcfe8'];
+    return lightKeywords.some(c => color.toLowerCase().includes(c.toLowerCase()));
+}
+
 export function MyMessages({ message, bgColor, isOwner, onDeleted, onImageClick }: { message: any, bgColor: string, isOwner?: boolean, onDeleted?: (id: number) => void, onImageClick?: (urls: string[], index: number) => void }) {
     const [isPending, startTransition] = useTransition();
     const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+
+    const isLight = isLightColor(bgColor);
 
     function handleDelete() {
         startTransition(async () => {
@@ -61,8 +82,14 @@ export function MyMessages({ message, bgColor, isOwner, onDeleted, onImageClick 
         });
     }
 
-    const lightColors = ['#fcd34d', '#bfdbfe', '#bbf7d0', '#fef08a', '#67e8f9', '#e9d5ff'];
-    const isLightBg = lightColors.some(c => bgColor?.includes(c));
+    const textPrimary = isLight ? 'text-gray-900' : 'text-white';
+    const textSecondary = isLight ? 'text-gray-700' : 'text-gray-200';
+    const textMuted = isLight ? 'text-gray-600' : 'text-gray-300';
+    const avatarBg = isLight ? 'bg-white/70' : 'bg-black/25';
+    const borderColor = isLight ? 'border-black/10' : 'border-white/15';
+    const topBar = isLight
+        ? 'linear-gradient(90deg, rgba(0,0,0,0.12), rgba(0,0,0,0.06))'
+        : 'linear-gradient(90deg, rgba(255,255,255,0.2), rgba(255,255,255,0.1))';
 
     return (
         <>
@@ -70,14 +97,7 @@ export function MyMessages({ message, bgColor, isOwner, onDeleted, onImageClick 
                 className="group relative rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 border border-black/5 dark:border-white/10"
                 style={{ backgroundColor: bgColor || '#fcd34d' }}
             >
-                <div
-                    className="h-1 w-full"
-                    style={{
-                        background: isLightBg
-                            ? 'linear-gradient(90deg, rgba(0,0,0,0.1), rgba(0,0,0,0.05))'
-                            : 'linear-gradient(90deg, rgba(255,255,255,0.2), rgba(255,255,255,0.1))'
-                    }}
-                />
+                <div className="h-1 w-full" style={{ background: topBar }} />
 
                 {message.status === 'pending' && (
                     <div className="absolute top-3 right-3">
@@ -97,7 +117,7 @@ export function MyMessages({ message, bgColor, isOwner, onDeleted, onImageClick 
                             variant="ghost"
                             onClick={() => setShowDeleteDialog(true)}
                             disabled={isPending}
-                            className="w-7 h-7 bg-white/90 dark:bg-gray-800/90 hover:bg-red-500 text-gray-400 hover:text-white shadow-sm backdrop-blur-sm"
+                            className={`w-7 h-7 shadow-sm backdrop-blur-sm ${isLight ? 'bg-white/90 hover:bg-red-500 text-gray-500 hover:text-white' : 'bg-black/30 hover:bg-red-500 text-gray-300 hover:text-white'}`}
                         >
                             <RiDeleteBinLine className="w-3.5 h-3.5" />
                         </Button>
@@ -106,15 +126,13 @@ export function MyMessages({ message, bgColor, isOwner, onDeleted, onImageClick 
 
                 <div className="p-5 pt-4">
                     {message.content && (
-                        <div className="mb-3">
-                            <svg className="w-6 h-6 opacity-20" fill="currentColor" viewBox="0 0 24 24">
-                                <path d="M14.017 21v-7.391c0-5.704 3.731-9.57 8.983-10.609l.995 2.151c-2.432.917-3.995 3.638-3.995 5.849h4v10H14.017zM0 21v-7.391c0-5.704 3.731-9.57 8.983-10.609l.995 2.151C7.546 6.068 5.983 8.789 5.983 11H10v10H0z"/>
-                            </svg>
+                        <div className={`mb-3 ${isLight ? 'text-gray-400' : 'text-gray-500'}`}>
+                            <RiDoubleQuotesL className="w-6 h-6 opacity-30" />
                         </div>
                     )}
 
                     {message.content && (
-                        <p className={`text-sm leading-relaxed mb-3 ${isLightBg ? 'text-gray-800' : 'text-gray-100'}`}>
+                        <p className={`text-sm leading-relaxed mb-3 font-medium ${textPrimary}`}>
                             {message.content}
                         </p>
                     )}
@@ -153,18 +171,18 @@ export function MyMessages({ message, bgColor, isOwner, onDeleted, onImageClick 
                         );
                     })()}
 
-                    <div className="flex items-center justify-between pt-4 border-t border-black/10 dark:border-white/10">
+                    <div className={`flex items-center justify-between pt-4 border-t ${borderColor}`}>
                         <div className="flex items-center gap-2.5">
-                            <div className={`w-8 h-8 rounded-full flex items-center justify-center shadow-sm ${isLightBg ? 'bg-white/60' : 'bg-black/20'}`}>
-                                <span className={`text-xs font-bold ${isLightBg ? 'text-gray-700' : 'text-white'}`}>
+                            <div className={`w-8 h-8 rounded-full flex items-center justify-center shadow-sm ${avatarBg}`}>
+                                <span className={`text-xs font-bold ${textSecondary}`}>
                                     {message.author_name?.[0]?.toUpperCase() || '匿'}
                                 </span>
                             </div>
-                            <span className={`font-medium text-xs ${isLightBg ? 'text-gray-700' : 'text-gray-200'}`}>
+                            <span className={`font-medium text-xs ${textSecondary}`}>
                                 {message.author_name || '佚名'}
                             </span>
                         </div>
-                        <span className={`text-xs ${isLightBg ? 'text-gray-600' : 'text-gray-300'}`}>
+                        <span className={`text-xs ${textMuted}`}>
                             {getRelativeTime(message.created_at)}
                         </span>
                     </div>

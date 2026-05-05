@@ -1,9 +1,16 @@
 import React from 'react';
+import type { Metadata } from 'next';
+import { RiArticleLine } from '@remixicon/react';
 import db from '../../lib/db';
 import { getPublicUrl } from '../../lib/oss';
 import {PostList} from '../components/post-list';
 
 export const revalidate = 60;
+
+export const metadata: Metadata = {
+    title: '文章',
+    description: '记录技术探索与生活感悟，分享我们的点点滴滴。',
+};
 
 async function getAllTags(): Promise<string[]> {
     try {
@@ -53,9 +60,7 @@ export default async function Post() {
             <div className="relative flex-1 flex flex-col pt-10 pb-20 max-w-4xl mx-auto px-4">
                 <div className="text-center mb-12">
                     <div className="inline-flex items-center gap-2 px-4 py-2 bg-blue-50 dark:bg-blue-950/30 text-blue-600 dark:text-blue-400 rounded-full text-sm font-medium mb-4">
-                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z" />
-                        </svg>
+                        <RiArticleLine className="w-4 h-4" />
                         共 {posts.length} 篇文章
                     </div>
                     <h1 className="text-4xl font-serif text-gray-800 dark:text-gray-100 mb-4">文章</h1>

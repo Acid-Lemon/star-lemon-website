@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import { RiArrowRightSLine } from '@remixicon/react';
 import db from '../../lib/db';
 import { getPublicUrl } from '../../lib/oss';
 
@@ -131,9 +132,7 @@ export async function FeaturedPosts() {
 
               <div className="flex items-center text-sm text-orange-500 dark:text-orange-400 font-medium opacity-0 group-hover:opacity-100 transform translate-y-2 group-hover:translate-y-0 transition-all duration-300">
                 阅读全文
-                <svg className="w-4 h-4 ml-1 transform group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                </svg>
+                <RiArrowRightSLine className="w-4 h-4 ml-1 transform group-hover:translate-x-1 transition-transform" />
               </div>
             </div>
           </article>

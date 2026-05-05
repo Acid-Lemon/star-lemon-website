@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
+import { RiFilmLine, RiBook2Line, RiGamepadLine, RiQuillPenLine, RiLightbulbLine, RiGlobalLine, RiMoreLine } from '@remixicon/react';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -24,14 +25,14 @@ const categoryColors: Record<string, string> = {
     '其他': 'bg-gray-50 text-gray-600 border-gray-200 dark:bg-gray-800 dark:text-gray-300 dark:border-gray-700',
 };
 
-const categoryIcons: Record<string, string> = {
-    '动画': '🎬',
-    '漫画': '📖',
-    '游戏': '🎮',
-    '文学': '✒️',
-    '原创': '💡',
-    '网络': '🌐',
-    '其他': '💬',
+const categoryIcons: Record<string, React.ReactNode> = {
+    '动画': <RiFilmLine className="w-3 h-3 mr-1" />,
+    '漫画': <RiBook2Line className="w-3 h-3 mr-1" />,
+    '游戏': <RiGamepadLine className="w-3 h-3 mr-1" />,
+    '文学': <RiQuillPenLine className="w-3 h-3 mr-1" />,
+    '原创': <RiLightbulbLine className="w-3 h-3 mr-1" />,
+    '网络': <RiGlobalLine className="w-3 h-3 mr-1" />,
+    '其他': <RiMoreLine className="w-3 h-3 mr-1" />,
 };
 
 export default function QuotesClient() {
@@ -81,8 +82,8 @@ export default function QuotesClient() {
                         >
                             <CardContent className="p-5 flex flex-col h-full">
                                 <div className="flex items-center gap-2 mb-3">
-                                    <Badge variant="outline" className={`text-[10px] ${categoryColors[item.category] || categoryColors['其他']}`}>
-                                        {categoryIcons[item.category] && <span className="mr-1">{categoryIcons[item.category]}</span>}
+                                    <Badge variant="outline" className={`text-[10px] flex items-center ${categoryColors[item.category] || categoryColors['其他']}`}>
+                                        {categoryIcons[item.category] || categoryIcons['其他']}
                                         {item.category}
                                     </Badge>
                                 </div>

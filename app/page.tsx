@@ -1,6 +1,6 @@
 import Image from 'next/image'
 import Link from 'next/link'
-import { RiDoubleQuotesL, RiDoubleQuotesR } from '@remixicon/react'
+import { RiDoubleQuotesL, RiDoubleQuotesR, RiArrowRightSLine, RiBookOpenLine, RiArticleLine, RiUserAddLine, RiChat3Line, RiTeamLine, RiSettings3Line } from '@remixicon/react'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { FeaturedPosts } from './components/featured-posts'
 import { JsonLd } from './components/json-ld'
@@ -164,9 +164,7 @@ export default async function Home() {
                         className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-orange-500 to-orange-600 text-white rounded-full font-medium hover:from-orange-600 hover:to-orange-700 transition-all duration-300 hover:scale-105 shadow-lg hover:shadow-xl"
                     >
                         查看所有文章
-                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                        </svg>
+                        <RiArrowRightSLine className="w-4 h-4" />
                     </Link>
                 </div>
             </section>
@@ -180,9 +178,7 @@ export default async function Home() {
                 {stats.posts === 0 && stats.users === 0 && stats.comments === 0 ? (
                     <div className="text-center py-12">
                         <div className="w-20 h-20 mx-auto mb-4 rounded-full bg-orange-50 dark:bg-orange-950/30 flex items-center justify-center">
-                            <svg className="w-10 h-10 text-orange-300 dark:text-orange-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
-                            </svg>
+                            <RiBookOpenLine className="w-10 h-10 text-orange-300 dark:text-orange-700" />
                         </div>
                         <p className="text-gray-400 dark:text-gray-500 text-lg mb-2">小站刚刚起步</p>
                         <p className="text-gray-400 dark:text-gray-600 text-sm">精彩内容正在路上，敬请期待！</p>
@@ -190,9 +186,9 @@ export default async function Home() {
                 ) : (
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                         {[
-                            { label: '文章数量', value: stats.posts, color: 'from-blue-500 to-blue-600', bgColor: 'bg-blue-50 dark:bg-blue-950/30', icon: 'M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z' },
-                            { label: '注册用户', value: stats.users, color: 'from-green-500 to-green-600', bgColor: 'bg-green-50 dark:bg-green-950/30', icon: 'M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z' },
-                            { label: '留言数量', value: stats.comments, color: 'from-orange-500 to-orange-600', bgColor: 'bg-orange-50 dark:bg-orange-950/30', icon: 'M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z' },
+                            { label: '文章数量', value: stats.posts, color: 'from-blue-500 to-blue-600', bgColor: 'bg-blue-50 dark:bg-blue-950/30', Icon: RiArticleLine },
+                            { label: '注册用户', value: stats.users, color: 'from-green-500 to-green-600', bgColor: 'bg-green-50 dark:bg-green-950/30', Icon: RiUserAddLine },
+                            { label: '留言数量', value: stats.comments, color: 'from-orange-500 to-orange-600', bgColor: 'bg-orange-50 dark:bg-orange-950/30', Icon: RiChat3Line },
                         ].map((item, index) => (
                             <div
                                 key={index}
@@ -200,9 +196,7 @@ export default async function Home() {
                             >
                                 <div className="relative flex items-center gap-4">
                                     <div className={`flex items-center justify-center w-12 h-12 rounded-xl ${item.bgColor} text-gray-600 dark:text-gray-400 group-hover:scale-110 transition-transform duration-300`}>
-                                        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={item.icon} />
-                                        </svg>
+                                        <item.Icon className="w-6 h-6" />
                                     </div>
                                     <div>
                                         <p className="text-sm font-medium text-gray-500 dark:text-gray-400">{item.label}</p>
@@ -226,18 +220,16 @@ export default async function Home() {
 
                 <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 max-w-4xl mx-auto">
                     {[
-                        { href: '/post', title: '文章', desc: '阅读技术文章', bg: 'from-white to-blue-50/30 dark:from-gray-900 dark:to-blue-950/20', iconBg: 'bg-blue-100 dark:bg-blue-900/40', iconColor: 'text-blue-600 dark:text-blue-400', hoverColor: 'group-hover:text-blue-600 dark:group-hover:text-blue-400', icon: 'M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z' },
-                        { href: '/guestbook', title: '留言板', desc: '与我们互动', bg: 'from-white to-yellow-50/30 dark:from-gray-900 dark:to-yellow-950/20', iconBg: 'bg-yellow-100 dark:bg-yellow-900/40', iconColor: 'text-yellow-600 dark:text-yellow-400', hoverColor: 'group-hover:text-yellow-600 dark:group-hover:text-yellow-400', icon: 'M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z' },
-                        { href: '/about', title: '关于', desc: '了解我们', bg: 'from-white to-green-50/30 dark:from-gray-900 dark:to-green-950/20', iconBg: 'bg-green-100 dark:bg-green-900/40', iconColor: 'text-green-600 dark:text-green-400', hoverColor: 'group-hover:text-green-600 dark:group-hover:text-green-400', icon: 'M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z' },
-                        { href: '/tools', title: '工具', desc: '实用小工具', bg: 'from-white to-purple-50/30 dark:from-gray-900 dark:to-purple-950/20', iconBg: 'bg-purple-100 dark:bg-purple-900/40', iconColor: 'text-purple-600 dark:text-purple-400', hoverColor: 'group-hover:text-purple-600 dark:group-hover:text-purple-400', icon: 'M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.066 2.573c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.573 1.066c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.066-2.573c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z' },
+                        { href: '/post', title: '文章', desc: '阅读技术文章', bg: 'from-white to-blue-50/30 dark:from-gray-900 dark:to-blue-950/20', iconBg: 'bg-blue-100 dark:bg-blue-900/40', iconColor: 'text-blue-600 dark:text-blue-400', hoverColor: 'group-hover:text-blue-600 dark:group-hover:text-blue-400', Icon: RiArticleLine },
+                        { href: '/guestbook', title: '留言板', desc: '与我们互动', bg: 'from-white to-yellow-50/30 dark:from-gray-900 dark:to-yellow-950/20', iconBg: 'bg-yellow-100 dark:bg-yellow-900/40', iconColor: 'text-yellow-600 dark:text-yellow-400', hoverColor: 'group-hover:text-yellow-600 dark:group-hover:text-yellow-400', Icon: RiChat3Line },
+                        { href: '/about', title: '关于', desc: '了解我们', bg: 'from-white to-green-50/30 dark:from-gray-900 dark:to-green-950/20', iconBg: 'bg-green-100 dark:bg-green-900/40', iconColor: 'text-green-600 dark:text-green-400', hoverColor: 'group-hover:text-green-600 dark:group-hover:text-green-400', Icon: RiTeamLine },
+                        { href: '/tools', title: '工具', desc: '实用小工具', bg: 'from-white to-purple-50/30 dark:from-gray-900 dark:to-purple-950/20', iconBg: 'bg-purple-100 dark:bg-purple-900/40', iconColor: 'text-purple-600 dark:text-purple-400', hoverColor: 'group-hover:text-purple-600 dark:group-hover:text-purple-400', Icon: RiSettings3Line },
                     ].map((item) => (
                         <Link key={item.href} href={item.href}>
                             <Card className={`group hover:shadow-lg transition-all duration-300 hover:-translate-y-1 cursor-pointer h-full border-0 bg-gradient-to-br ${item.bg}`}>
                                 <CardHeader className="text-center">
                                     <div className={`w-12 h-12 mx-auto mb-3 rounded-full ${item.iconBg} flex items-center justify-center group-hover:scale-110 transition-transform duration-300`}>
-                                        <svg className={`w-6 h-6 ${item.iconColor}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={item.icon} />
-                                        </svg>
+                                        <item.Icon className={`w-6 h-6 ${item.iconColor}`} />
                                     </div>
                                     <CardTitle className={`text-lg font-bold text-gray-800 dark:text-gray-100 ${item.hoverColor} transition-colors`}>
                                         {item.title}

@@ -2,9 +2,82 @@ import { NextRequest, NextResponse } from 'next/server';
 import db from '@/lib/db';
 import { getSession } from '@/lib/auth';
 import { getSetting } from '@/lib/settings';
+import { sendReviewNotification } from '@/lib/mail';
+import { getPublicUrl } from '@/lib/oss';
 import { revalidatePath } from 'next/cache';
 
 const COLORS = ['#fcd34d', '#bfdbfe', '#bbf7d0', '#fbcfe8', '#ddd6fe', '#fef08a', '#fda4af', '#67e8f9'];
+
+export async function GET(req: NextRequest) {
+    try {
+        const { searchParams } = new URL(req.url);
+        const all = searchParams.get('all');
+
+        if (all === 'true') {
+            const session = await getSession();
+            if (!session || session.user?.role !== 'admin') {
+                return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+            }
+
+            const result = await db.query(
+                `SELECT m.*, u.nickname as author_name
+                 FROM messages m
+                 LEFT JOIN users u ON m.user_id = u.id
+                 ORDER BY m.created_at DESC`
+            );
+
+            const rows = await Promise.all(
+                result.rows.map(async (row: any) => ({
+                    ...row,
+                    image_url: row.image_url
+                        ? (await Promise.all(
+                            row.image_url.split(',').map((url: string) => getPublicUrl(url.trim()))
+                          )).filter(Boolean).join(',')
+                        : null,
+                }))
+            );
+
+            return NextResponse.json(rows);
+        }
+
+        const session = await getSession();
+        let result;
+        if (session?.user?.id) {
+            result = await db.query(
+                `SELECT m.*, u.nickname as author_name
+                 FROM messages m
+                 JOIN users u ON m.user_id = u.id
+                 WHERE m.status = 'approved' OR m.user_id = $1
+                 ORDER BY m.created_at DESC`,
+                [session.user.id]
+            );
+        } else {
+            result = await db.query(
+                `SELECT m.*, u.nickname as author_name
+                 FROM messages m
+                 JOIN users u ON m.user_id = u.id
+                 WHERE m.status = 'approved'
+                 ORDER BY m.created_at DESC`
+            );
+        }
+
+        const rows = await Promise.all(
+            result.rows.map(async (row: any) => ({
+                ...row,
+                image_url: row.image_url
+                    ? (await Promise.all(
+                        row.image_url.split(',').map((url: string) => getPublicUrl(url.trim()))
+                      )).filter(Boolean).join(',')
+                    : null,
+            }))
+        );
+
+        return NextResponse.json(rows);
+    } catch (e: any) {
+        console.error('Failed to fetch messages:', e);
+        return NextResponse.json({ error: 'Failed to fetch messages' }, { status: 500 });
+    }
+}
 
 export async function POST(req: NextRequest) {
     const session = await getSession();
@@ -46,11 +119,20 @@ export async function POST(req: NextRequest) {
         
         const newMessage = result.rows[0];
         revalidatePath('/guestbook');
+
+        if (status === 'pending') {
+            const authorName = session.user.nickname || '用户';
+            sendReviewNotification('message', content || '[图片]', authorName).catch(() => {});
+        }
+
+        const avatarUrl = await getPublicUrl(session.user.avatar);
+
         return NextResponse.json({ 
             success: true, 
             message: { 
                 ...newMessage, 
-                author_name: session.user.nickname || session.user.username,
+                author_name: session.user.nickname || '用户',
+                avatar: avatarUrl,
                 status: status
             } 
         });

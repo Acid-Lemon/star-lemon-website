@@ -4,6 +4,7 @@ import { getSession } from '../../../lib/auth';
 import { getSetting } from '../../../lib/settings';
 import { deleteUploadedFile } from '../../../lib/file';
 import { getPublicUrl } from '../../../lib/oss';
+import { sendCommentNotification } from '../../../lib/mail';
 
 // 获取文章的评论（包含回复）
 export async function GET(request: NextRequest) {
@@ -71,7 +72,28 @@ export async function POST(request: NextRequest) {
       [post_id, userId, content || null, image_url || null, parent_id || null, status]
     );
 
-    return NextResponse.json(result.rows[0], { status: 201 });
+    const userResult = await db.query('SELECT nickname, avatar FROM users WHERE id = $1', [userId]);
+    const commentAuthor = userResult.rows[0];
+
+    const newComment = {
+      ...result.rows[0],
+      nickname: commentAuthor?.nickname || '用户',
+      avatar: await getPublicUrl(commentAuthor?.avatar),
+    };
+
+    if (status === 'pending') {
+      const authorName = commentAuthor?.nickname || '用户';
+      const postResult = await db.query(
+        `SELECT p.title, u.email FROM posts p JOIN users u ON p.author_id = u.id WHERE p.id = $1`,
+        [post_id]
+      );
+      const postAuthor = postResult.rows[0];
+      if (postAuthor?.email) {
+        sendCommentNotification(postAuthor.title, content || '[图片]', authorName, postAuthor.email).catch(() => {});
+      }
+    }
+
+    return NextResponse.json(newComment, { status: 201 });
   } catch (error) {
     console.error('Failed to create comment:', error);
     return NextResponse.json({ error: 'Failed to create comment' }, { status: 500 });

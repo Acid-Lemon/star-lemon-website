@@ -221,6 +221,26 @@ async function init() {
       console.log('⏭️ settings 表已存在，跳过创建');
     }
 
+    // friend_links
+    if (!await tableExists(client, 'friend_links')) {
+      await client.query(`
+        CREATE TABLE friend_links (
+          id SERIAL PRIMARY KEY,
+          name VARCHAR(255) NOT NULL,
+          url VARCHAR(500) NOT NULL,
+          avatar TEXT,
+          description TEXT,
+          status VARCHAR(50) DEFAULT 'approved',
+          sort_order INTEGER DEFAULT 0,
+          created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+          updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )
+      `);
+      console.log('✅ friend_links 表创建成功');
+    } else {
+      console.log('⏭️ friend_links 表已存在，跳过创建');
+    }
+
     // file_transfers
     if (!await tableExists(client, 'file_transfers')) {
       await client.query(`

@@ -1,23 +1,10 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { GalleryLightbox } from '../components/image-lightbox';
-
-function getRelativeTime(dateStr: string) {
-    try {
-        const date = new Date(dateStr.endsWith('Z') ? dateStr : dateStr + 'Z');
-        const now = new Date();
-        const diff = now.getTime() - date.getTime();
-        if (diff < 60000) return '刚刚';
-        if (diff < 3600000) return `${Math.floor(diff / 60000)}分钟前`;
-        if (diff < 86400000) return `${Math.floor(diff / 3600000)}小时前`;
-        if (diff < 604800000) return `${Math.floor(diff / 86400000)}天前`;
-        return date.toLocaleDateString('zh-CN');
-    } catch {
-        return '';
-    }
-}
+import { getRelativeTime } from '@/lib/utils';
+import { RiLoader4Line } from '@remixicon/react';
 
 interface Moment {
     id: number;
@@ -41,6 +28,7 @@ function MomentImages({ imageUrl, onImageClick }: { imageUrl: string; onImageCli
                 <img
                     src={urls[0]}
                     alt="动态图片"
+                    loading="lazy"
                     className="max-w-full rounded-xl cursor-pointer hover:opacity-90 transition-opacity"
                     onClick={() => onImageClick(urls, 0)}
                 />
@@ -56,6 +44,7 @@ function MomentImages({ imageUrl, onImageClick }: { imageUrl: string; onImageCli
                     <img
                         src={url}
                         alt={`图片${i + 1}`}
+                        loading="lazy"
                         className="w-full h-full object-cover"
                         onClick={() => onImageClick(urls, i)}
                     />
@@ -68,24 +57,64 @@ function MomentImages({ imageUrl, onImageClick }: { imageUrl: string; onImageCli
 export default function MomentsClient() {
     const [moments, setMoments] = useState<Moment[]>([]);
     const [loading, setLoading] = useState(true);
+    const [loadingMore, setLoadingMore] = useState(false);
+    const [hasMore, setHasMore] = useState(true);
     const [lightbox, setLightbox] = useState<{ images: string[]; index: number } | null>(null);
+    const observerRef = useRef<IntersectionObserver | null>(null);
+    const sentinelRef = useRef<HTMLDivElement>(null);
+    const offsetRef = useRef(0);
+    const PAGE_SIZE = 20;
 
-    useEffect(() => {
-        fetchMoments();
-    }, []);
-
-    const fetchMoments = async () => {
+    const fetchMoments = useCallback(async (offset: number) => {
         try {
-            const res = await fetch('/api/moments');
+            const res = await fetch(`/api/moments?limit=${PAGE_SIZE}&offset=${offset}`);
             const data = await res.json();
-            setMoments(Array.isArray(data) ? data : []);
+            const items = Array.isArray(data) ? data : [];
+            return items;
         } catch (error) {
             console.error('Failed to fetch moments:', error);
-            setMoments([]);
-        } finally {
-            setLoading(false);
+            return [];
         }
-    };
+    }, []);
+
+    useEffect(() => {
+        (async () => {
+            const data = await fetchMoments(0);
+            setMoments(data);
+            offsetRef.current = data.length;
+            setHasMore(data.length >= PAGE_SIZE);
+            setLoading(false);
+        })();
+    }, [fetchMoments]);
+
+    const loadMore = useCallback(async () => {
+        if (loadingMore || !hasMore) return;
+        setLoadingMore(true);
+        const data = await fetchMoments(offsetRef.current);
+        setMoments(prev => [...prev, ...data]);
+        offsetRef.current += data.length;
+        setHasMore(data.length >= PAGE_SIZE);
+        setLoadingMore(false);
+    }, [loadingMore, hasMore, fetchMoments]);
+
+    useEffect(() => {
+        if (observerRef.current) observerRef.current.disconnect();
+
+        observerRef.current = new IntersectionObserver(
+            (entries) => {
+                if (entries[0].isIntersecting && hasMore && !loadingMore) {
+                    loadMore();
+                }
+            },
+            { rootMargin: '200px' }
+        );
+
+        if (sentinelRef.current) {
+            observerRef.current.observe(sentinelRef.current);
+        }
+
+        return () => observerRef.current?.disconnect();
+    }, [loadMore, hasMore, loadingMore]);
 
     const handleImageClick = useCallback((urls: string[], index: number) => {
         setLightbox({ images: urls, index });
@@ -97,7 +126,7 @@ export default function MomentsClient() {
                 <div className="text-center py-8 text-gray-400 dark:text-gray-500 text-sm">加载中...</div>
             ) : moments.length === 0 ? (
                 <div className="text-center py-16 text-gray-400 dark:text-gray-500">
-                    <div className="text-5xl mb-3">&#x1f4ad;</div>
+                    <div className="text-5xl mb-3">💭</div>
                     <p className="text-sm">还没有动态</p>
                 </div>
             ) : (
@@ -127,6 +156,18 @@ export default function MomentsClient() {
                             {moment.image_url && <MomentImages imageUrl={moment.image_url} onImageClick={handleImageClick} />}
                         </div>
                     ))}
+
+                    <div ref={sentinelRef} className="h-10 flex items-center justify-center">
+                        {loadingMore && (
+                            <div className="flex items-center gap-2 text-gray-400 text-sm">
+                                <RiLoader4Line className="w-4 h-4 animate-spin" />
+                                加载中...
+                            </div>
+                        )}
+                        {!hasMore && moments.length > 0 && (
+                            <p className="text-gray-400 dark:text-gray-500 text-xs">没有更多了</p>
+                        )}
+                    </div>
                 </div>
             )}
 

@@ -1,4 +1,10 @@
+import type { Metadata } from 'next';
 import QuotesClient from './quotes-client';
+
+export const metadata: Metadata = {
+    title: '一言',
+    description: '那些触动心弦的句子',
+};
 
 export default async function QuotesPage() {
     return (

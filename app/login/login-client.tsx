@@ -9,7 +9,7 @@ import { Label } from '@/components/ui/label';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { toast } from 'sonner';
-import { RiQqFill, RiMailLine, RiLockLine } from '@remixicon/react';
+import { RiQqFill, RiMailLine, RiLockLine, RiEyeLine, RiEyeOffLine } from '@remixicon/react';
 
 export default function LoginClientPage({ qqAuthUrl, errorMsg, returnUrl, qqCode, qqState }: {
     qqAuthUrl: string | null;
@@ -20,6 +20,7 @@ export default function LoginClientPage({ qqAuthUrl, errorMsg, returnUrl, qqCode
 }) {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
+    const [showPassword, setShowPassword] = useState(false);
     const [code, setCode] = useState('');
     const [loginLoading, setLoginLoading] = useState(false);
     const [codeSending, setCodeSending] = useState(false);
@@ -184,13 +185,22 @@ export default function LoginClientPage({ qqAuthUrl, errorMsg, returnUrl, qqCode
                                 </div>
                                 <div className="space-y-2">
                                     <Label>密码</Label>
-                                    <Input
-                                        type="password"
-                                        value={password}
-                                        onChange={(e) => setPassword(e.target.value)}
-                                        placeholder="••••••••"
-                                        required
-                                    />
+                                    <div className="relative">
+                                        <Input
+                                            type={showPassword ? 'text' : 'password'}
+                                            value={password}
+                                            onChange={(e) => setPassword(e.target.value)}
+                                            placeholder="••••••••"
+                                            required
+                                        />
+                                        <button
+                                            type="button"
+                                            onClick={() => setShowPassword(!showPassword)}
+                                            className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+                                        >
+                                            {showPassword ? <RiEyeOffLine className="w-4 h-4" /> : <RiEyeLine className="w-4 h-4" />}
+                                        </button>
+                                    </div>
                                 </div>
                                 <Button type="submit" className="w-full" disabled={loginLoading}>
                                     {loginLoading ? '登录中...' : '登 录'}

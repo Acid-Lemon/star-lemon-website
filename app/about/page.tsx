@@ -1,9 +1,16 @@
 import React from 'react';
+import type { Metadata } from 'next';
 import Image from 'next/image';
+import { RiComputerLine, RiServerLine, RiSettings3Line, RiFlashlightLine } from '@remixicon/react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { ContactLinks } from './contact-links';
 import { Timeline } from '../components/timeline';
 import { StatsCards } from '../components/stats-cards';
+
+export const metadata: Metadata = {
+    title: '关于',
+    description: '了解 Star & Lemon 小站的故事与团队',
+};
 
 export default function About() {
     return (
@@ -113,9 +120,7 @@ export default function About() {
                     <Card className="border-0 bg-gradient-to-br from-white to-blue-50/30 dark:from-gray-900 dark:to-blue-950/20 hover:shadow-lg transition-shadow">
                         <CardHeader>
                             <div className="w-12 h-12 rounded-xl bg-blue-100 dark:bg-blue-900/40 flex items-center justify-center mb-3">
-                                <svg className="w-6 h-6 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                                </svg>
+                                <RiComputerLine className="w-6 h-6 text-blue-600 dark:text-blue-400" />
                             </div>
                             <CardTitle className="text-lg text-gray-800 dark:text-gray-100">前端</CardTitle>
                         </CardHeader>
@@ -133,9 +138,7 @@ export default function About() {
                     <Card className="border-0 bg-gradient-to-br from-white to-green-50/30 dark:from-gray-900 dark:to-green-950/20 hover:shadow-lg transition-shadow">
                         <CardHeader>
                             <div className="w-12 h-12 rounded-xl bg-green-100 dark:bg-green-900/40 flex items-center justify-center mb-3">
-                                <svg className="w-6 h-6 text-green-600 dark:text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 12h14M5 12a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v4a2 2 0 01-2 2M5 12a2 2 0 00-2 2v4a2 2 0 002 2h14a2 2 0 002-2v-4a2 2 0 00-2-2m-2-4h.01M17 16h.01" />
-                                </svg>
+                                <RiServerLine className="w-6 h-6 text-green-600 dark:text-green-400" />
                             </div>
                             <CardTitle className="text-lg text-gray-800 dark:text-gray-100">后端</CardTitle>
                         </CardHeader>
@@ -152,10 +155,7 @@ export default function About() {
                     <Card className="border-0 bg-gradient-to-br from-white to-orange-50/30 dark:from-gray-900 dark:to-orange-950/20 hover:shadow-lg transition-shadow">
                         <CardHeader>
                             <div className="w-12 h-12 rounded-xl bg-orange-100 dark:bg-orange-900/40 flex items-center justify-center mb-3">
-                                <svg className="w-6 h-6 text-orange-600 dark:text-orange-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.066 2.573c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.573 1.066c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.066-2.573c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                                </svg>
+                                <RiSettings3Line className="w-6 h-6 text-orange-600 dark:text-orange-400" />
                             </div>
                             <CardTitle className="text-lg text-gray-800 dark:text-gray-100">开发工具</CardTitle>
                         </CardHeader>
@@ -172,9 +172,7 @@ export default function About() {
                     <Card className="border-0 bg-gradient-to-br from-white to-purple-50/30 dark:from-gray-900 dark:to-purple-950/20 hover:shadow-lg transition-shadow">
                         <CardHeader>
                             <div className="w-12 h-12 rounded-xl bg-purple-100 dark:bg-purple-900/40 flex items-center justify-center mb-3">
-                                <svg className="w-6 h-6 text-purple-600 dark:text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
-                                </svg>
+                                <RiFlashlightLine className="w-6 h-6 text-purple-600 dark:text-purple-400" />
                             </div>
                             <CardTitle className="text-lg text-gray-800 dark:text-gray-100">主要功能</CardTitle>
                         </CardHeader>

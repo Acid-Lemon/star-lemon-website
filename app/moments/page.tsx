@@ -1,4 +1,10 @@
+import type { Metadata } from 'next';
 import MomentsClient from './moments-client';
+
+export const metadata: Metadata = {
+    title: '动态',
+    description: '记录生活里的点滴星光',
+};
 
 export default async function MomentsPage() {
     return (

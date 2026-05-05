@@ -1,8 +1,14 @@
 import React from 'react';
+import type { Metadata } from 'next';
 import db from '@/lib/db';
 import { getSession } from '@/lib/auth';
 import { getPublicUrl } from '@/lib/oss';
 import GuestbookClient from './guestbook-client';
+
+export const metadata: Metadata = {
+    title: '留言',
+    description: '在这里留下你的足迹，与我们交流互动',
+};
 
 export default async function Guestbook() {
     const session = await getSession();

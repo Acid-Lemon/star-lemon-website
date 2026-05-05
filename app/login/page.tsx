@@ -1,5 +1,11 @@
+import type { Metadata } from 'next';
 import { getSettings } from '@/lib/settings';
 import LoginClientPage from './login-client';
+
+export const metadata: Metadata = {
+    title: '登录',
+    description: '登录你的账号',
+};
 
 export default async function LoginPage({searchParams}: {
     searchParams: Promise<{ error?: string, returnUrl?: string, code?: string, state?: string }>

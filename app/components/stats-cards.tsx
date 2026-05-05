@@ -1,4 +1,5 @@
 import db from '../../lib/db';
+import { RiArticleLine, RiUserAddLine, RiChat3Line } from '@remixicon/react';
 
 export async function StatsCards() {
   let stats = {
@@ -27,33 +28,21 @@ export async function StatsCards() {
     {
       label: '文章数量',
       value: stats.posts,
-      icon: (
-        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z" />
-        </svg>
-      ),
+      Icon: RiArticleLine,
       color: 'from-blue-500 to-blue-600',
       bgColor: 'bg-blue-50 dark:bg-blue-950/30'
     },
     {
       label: '注册用户',
       value: stats.users,
-      icon: (
-        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z" />
-        </svg>
-      ),
+      Icon: RiUserAddLine,
       color: 'from-green-500 to-green-600',
       bgColor: 'bg-green-50 dark:bg-green-950/30'
     },
     {
       label: '留言数量',
       value: stats.comments,
-      icon: (
-        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
-        </svg>
-      ),
+      Icon: RiChat3Line,
       color: 'from-orange-500 to-orange-600',
       bgColor: 'bg-orange-50 dark:bg-orange-950/30'
     }
@@ -74,7 +63,7 @@ export async function StatsCards() {
 
           <div className="relative flex items-center gap-4">
             <div className={`flex items-center justify-center w-12 h-12 rounded-xl ${item.bgColor} text-gray-600 dark:text-gray-400 group-hover:scale-110 transition-transform duration-300`}>
-              {item.icon}
+              <item.Icon className="w-6 h-6" />
             </div>
             <div>
               <p className="text-sm font-medium text-gray-500 dark:text-gray-400">{item.label}</p>

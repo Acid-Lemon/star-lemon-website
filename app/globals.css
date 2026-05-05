@@ -136,6 +136,13 @@ body {
   }
 }
 
+@media (prefers-reduced-motion: reduce) {
+  .animate-blob,
+  .animate-pulse {
+    animation: none;
+  }
+}
+
 .text-outline {
     color: transparent;
     -webkit-text-stroke: 1px #1a1a1a;

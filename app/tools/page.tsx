@@ -1,6 +1,12 @@
+import type { Metadata } from 'next';
 import Link from 'next/link';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { RiUploadCloudLine, RiArrowRightSLine } from '@remixicon/react';
+
+export const metadata: Metadata = {
+    title: '工具',
+    description: '实用小工具集合',
+};
 
 const tools = [
   {

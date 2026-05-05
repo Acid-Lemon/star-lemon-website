@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef, useCallback } from 'react';
 import Link from 'next/link';
+import { RiArrowRightLine, RiArticleLine, RiLoader4Line } from '@remixicon/react';
 
 interface Post {
     id: number;
@@ -208,9 +209,7 @@ export function PostList({ initialPosts, allTags }: PostListProps) {
                                         <div className="flex items-center gap-3">
                                             <span className="text-xs text-gray-400 dark:text-gray-500">{getRelativeTime(post.created_at)}</span>
                                             <div className={`w-8 h-8 rounded-full ${color.bg} flex items-center justify-center opacity-0 group-hover:opacity-100 transform translate-x-2 group-hover:translate-x-0 transition-all duration-300`}>
-                                                <svg className={`w-4 h-4 ${color.text}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
-                                                </svg>
+                                                <RiArrowRightLine className={`w-4 h-4 ${color.text}`} />
                                             </div>
                                         </div>
                                     </div>
@@ -223,9 +222,7 @@ export function PostList({ initialPosts, allTags }: PostListProps) {
                 {posts.length === 0 && !loading && (
                     <div className="text-center py-20">
                         <div className="w-20 h-20 mx-auto mb-4 rounded-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center">
-                            <svg className="w-10 h-10 text-gray-400 dark:text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z" />
-                            </svg>
+                            <RiArticleLine className="w-10 h-10 text-gray-400 dark:text-gray-600" />
                         </div>
                         <p className="text-gray-400 dark:text-gray-500 text-lg">
                             {selectedTag ? `没有找到标签为"${selectedTag}"的文章` : '还没有发布任何文章哦～'}
@@ -236,10 +233,7 @@ export function PostList({ initialPosts, allTags }: PostListProps) {
                 <div ref={loaderRef} className="flex justify-center py-8">
                     {loading && (
                         <div className="flex items-center gap-2 text-gray-400 dark:text-gray-500 font-mono text-sm">
-                            <svg className="animate-spin h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                            </svg>
+                            <RiLoader4Line className="animate-spin h-4 w-4" />
                             加载中...
                         </div>
                     )}

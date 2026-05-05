@@ -1,6 +1,13 @@
 import React from 'react';
+import type { Metadata } from 'next';
 import Image from 'next/image';
+import { RiMailLine } from '@remixicon/react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+
+export const metadata: Metadata = {
+    title: '联系我们',
+    description: '与我们取得联系',
+};
 
 export default function About() {
     return (
@@ -153,9 +160,7 @@ export default function About() {
                         <Card className="h-full border-0 bg-gradient-to-br from-white to-blue-50/30 hover:shadow-lg transition-all duration-300 hover:-translate-y-1">
                             <CardContent className="p-6 flex items-center gap-4">
                                 <div className="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center group-hover:bg-blue-200 transition-colors">
-                                    <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                                    </svg>
+                                    <RiMailLine className="w-6 h-6 text-blue-600" />
                                 </div>
                                 <div>
                                     <p className="font-medium text-gray-800 group-hover:text-blue-600 transition-colors">Star</p>
@@ -169,9 +174,7 @@ export default function About() {
                         <Card className="h-full border-0 bg-gradient-to-br from-white to-yellow-50/30 hover:shadow-lg transition-all duration-300 hover:-translate-y-1">
                             <CardContent className="p-6 flex items-center gap-4">
                                 <div className="w-12 h-12 rounded-full bg-yellow-100 flex items-center justify-center group-hover:bg-yellow-200 transition-colors">
-                                    <svg className="w-6 h-6 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                                    </svg>
+                                    <RiMailLine className="w-6 h-6 text-yellow-600" />
                                 </div>
                                 <div>
                                     <p className="font-medium text-gray-800 group-hover:text-yellow-600 transition-colors">Lemon</p>

@@ -65,7 +65,7 @@ export async function POST(request: NextRequest) {
     const moment = {
       ...result.rows[0],
       nickname: session.user.nickname,
-      avatar: session.user.avatar,
+      avatar: await getPublicUrl(session.user.avatar),
     };
 
     return NextResponse.json(moment, { status: 201 });

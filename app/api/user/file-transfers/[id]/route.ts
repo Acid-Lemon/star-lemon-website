@@ -4,6 +4,7 @@ import { getSession } from '@/lib/auth';
 import { deleteFile } from '@/lib/oss';
 import { calculatePrice } from '@/lib/price-calc';
 import { refundPayOrder } from '@/lib/lantu-pay';
+import { getSetting } from '@/lib/settings';
 
 export async function DELETE(
   request: NextRequest,
@@ -65,33 +66,37 @@ export async function DELETE(
       refundAmount = Math.ceil(refundAmount * 100) / 100;
     }
 
+    // Call refund API first
+    if (transfer.out_trade_no && refundAmount > 0) {
+      const siteUrl = await getSetting('site_url') || 'http://localhost:3000';
+      try {
+        await refundPayOrder({
+          outTradeNo: transfer.out_trade_no,
+          refundFee: refundAmount.toFixed(2),
+          outRefundNo: `RF${transfer.id}${Date.now()}`,
+          notifyUrl: `${siteUrl}/api/file-transfer/refund-notify`,
+        });
+      } catch (refundErr: any) {
+        console.error('Refund API call failed:', refundErr.message);
+        return NextResponse.json({ error: `退款失败: ${refundErr.message}` }, { status: 500 });
+      }
+    }
+
     const client = await db.pool.connect();
     try {
       await client.query('BEGIN');
 
-      // Must UPDATE orders BEFORE DELETE (ON DELETE SET NULL would nullify transfer_id)
-      await client.query(
-        'UPDATE file_transfer_orders SET status = $1, refund_amount = $2 WHERE transfer_id = $3',
-        ['refunded', refundAmount, transfer.id]
-      );
+      if (refundAmount > 0) {
+        await client.query(
+          'UPDATE file_transfer_orders SET status = $1, refund_amount = $2 WHERE transfer_id = $3',
+          ['refunding', refundAmount, transfer.id]
+        );
+      }
 
       await client.query('DELETE FROM file_transfers WHERE id = $1', [transfer.id]);
 
       if (transfer.file_key) {
         await deleteFile(transfer.file_key);
-      }
-
-      // Call refund API after DB operations succeed
-      if (transfer.out_trade_no && refundAmount > 0) {
-        try {
-          await refundPayOrder({
-            outTradeNo: transfer.out_trade_no,
-            refundFee: refundAmount.toFixed(2),
-            outRefundNo: `RF${transfer.id}${Date.now()}`,
-          });
-        } catch (refundErr: any) {
-          console.error('Refund API call failed:', refundErr.message);
-        }
       }
 
       await client.query('COMMIT');

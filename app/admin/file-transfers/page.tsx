@@ -233,6 +233,9 @@ function OrderRecordsTab() {
     if (order.status === 'refunded') {
       return <Badge variant="destructive">已退款</Badge>;
     }
+    if (order.status === 'refunding') {
+      return <Badge variant="outline" className="text-orange-600 border-orange-300">待退款</Badge>;
+    }
     return <Badge variant="default">已完成</Badge>;
   };
 

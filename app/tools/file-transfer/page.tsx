@@ -65,6 +65,12 @@ function UploadPanel() {
   const [autoUploading, setAutoUploading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const pollingRef = useRef<NodeJS.Timeout | null>(null);
+  const fileRef = useRef<File | null>(null);
+  const orderIdRef = useRef<number | null>(null);
+
+  // Keep refs in sync with state
+  useEffect(() => { fileRef.current = file; }, [file]);
+  useEffect(() => { orderIdRef.current = orderId; }, [orderId]);
 
   const stopPolling = useCallback(() => {
     if (pollingRef.current) {
@@ -87,14 +93,15 @@ function UploadPanel() {
           stopPolling();
           setAutoUploading(true);
           toast.success('支付成功，正在上传文件...');
-          handleUploadAfterPayInternal(id);
+          startUpload(id);
         }
       } catch {}
     }, 3000);
   }, [stopPolling]);
 
-  const handleUploadAfterPayInternal = (oid: number) => {
-    if (!file) return;
+  const startUpload = useCallback((oid: number) => {
+    const currentFile = fileRef.current;
+    if (!currentFile) return;
     setStep('uploading');
     const xhr = new XMLHttpRequest();
     xhr.open('POST', `/api/file-transfer/${oid}/upload`);
@@ -126,9 +133,9 @@ function UploadPanel() {
     };
 
     const formData = new FormData();
-    formData.append('file', file);
+    formData.append('file', currentFile);
     xhr.send(formData);
-  };
+  }, []);
 
   const handleCalcPrice = async () => {
     if (!file) return;
@@ -199,14 +206,15 @@ function UploadPanel() {
   };
 
   const handleCheckPaid = async () => {
-    if (!orderId) return;
+    const oid = orderIdRef.current;
+    if (!oid) return;
     try {
-      const res = await fetch(`/api/file-transfer/${orderId}/pay-status`);
+      const res = await fetch(`/api/file-transfer/${oid}/pay-status`);
       const data = await res.json();
       if (data.paid) {
         stopPolling();
         toast.success('支付成功！');
-        handleUploadAfterPayInternal(orderId);
+        startUpload(oid);
       } else {
         toast.info('尚未检测到支付，请完成扫码支付后重试');
       }
@@ -679,6 +687,9 @@ function MyOrdersPanel() {
   const getStatusBadge = (order: UserOrder) => {
     if (order.status === 'refunded') {
       return <Badge variant="destructive">已退款</Badge>;
+    }
+    if (order.status === 'refunding') {
+      return <Badge variant="outline" className="text-orange-600 border-orange-300">待退款</Badge>;
     }
     return <Badge variant="default">已完成</Badge>;
   };

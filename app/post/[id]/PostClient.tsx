@@ -9,6 +9,7 @@ import rehypeHighlight from 'rehype-highlight';
 import 'highlight.js/styles/github-dark.css';
 import {toast} from "sonner";
 import { CommentSection } from './CommentSection';
+import { usePresence, ArticleReaders } from '../../components/presence';
 
 function getTextFromChildren(node: any): string {
     if (typeof node === 'string') return node;
@@ -160,6 +161,7 @@ export default function PostClient({
     const [readPercent, setReadPercent] = useState(0);
     const [showBackToTop, setShowBackToTop] = useState(false);
     const [dynamicToc, setDynamicToc] = useState<TocItem[]>(tocItems);
+    const { readers } = usePresence(`/post/${postId}`);
 
     const wordsPerMinute = 200;
     const textLength = content.replace(/[#`*\[\]]/g, '').length;
@@ -269,6 +271,7 @@ export default function PostClient({
                                 <span className={`w-2 h-2 rounded-full ${authorColor}`}/>
                                 {authorName || '佚名'}
                             </span>
+                            <ArticleReaders readers={readers} />
                         </div>
                         <h1 className="text-4xl sm:text-5xl font-bold text-gray-900 dark:text-gray-100 leading-tight">
                             {title}

@@ -18,9 +18,17 @@ export async function POST(req: NextRequest) {
             return NextResponse.json({ error: 'QQ登录未配置或缺少授权码', success: false }, { status: 400 });
         }
 
-        const tokenUrl = `https://graph.qq.com/oauth2.0/token?grant_type=authorization_code&client_id=${qqAppId}&client_secret=${qqAppKey}&code=${code}&redirect_uri=${encodeURIComponent(baseUrl + '/login')}`;
-
-        const tokenRes = await fetch(tokenUrl, { method: 'POST' });
+        const tokenRes = await fetch('https://graph.qq.com/oauth2.0/token', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: new URLSearchParams({
+                grant_type: 'authorization_code',
+                client_id: qqAppId,
+                client_secret: qqAppKey,
+                code: code,
+                redirect_uri: baseUrl + '/login',
+            }).toString(),
+        });
         const tokenText = await tokenRes.text();
 
         const params = new URLSearchParams(tokenText);
@@ -43,8 +51,9 @@ export async function POST(req: NextRequest) {
         const openIdUrl = `https://graph.qq.com/oauth2.0/me?access_token=${accessToken}`;
         const openIdRes = await fetch(openIdUrl);
         const openIdText = await openIdRes.text();
-        const openIdParams = new URLSearchParams(openIdText.split('(')[1]?.split(')')[0] || '');
-        const openId = openIdParams.get('openid');
+        const jsonMatch = openIdText.match(/\{.*\}/);
+        const openData = jsonMatch ? JSON.parse(jsonMatch[0]) : {};
+        const openId = openData.openid;
 
         if (!openId) {
             console.error('QQ openid error:', openIdText);

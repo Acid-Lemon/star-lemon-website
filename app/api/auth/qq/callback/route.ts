@@ -39,15 +39,6 @@ export async function POST(req: NextRequest) {
             return NextResponse.json({ error: 'QQ授权失败', success: false }, { status: 400 });
         }
 
-        const userInfoUrl = `https://graph.qq.com/user/get_user_info?access_token=${accessToken}&oauth_consumer_key=${qqAppId}`;
-        const userInfoRes = await fetch(userInfoUrl);
-        const userInfo = await userInfoRes.json();
-
-        if (userInfo.ret !== 0) {
-            console.error('QQ user info error:', userInfo);
-            return NextResponse.json({ error: '获取QQ用户信息失败', success: false }, { status: 400 });
-        }
-
         const openIdUrl = `https://graph.qq.com/oauth2.0/me?access_token=${accessToken}`;
         const openIdRes = await fetch(openIdUrl);
         const openIdText = await openIdRes.text();
@@ -58,6 +49,15 @@ export async function POST(req: NextRequest) {
         if (!openId) {
             console.error('QQ openid error:', openIdText);
             return NextResponse.json({ error: '获取OpenID失败', success: false }, { status: 400 });
+        }
+
+        const userInfoUrl = `https://graph.qq.com/user/get_user_info?access_token=${accessToken}&oauth_consumer_key=${qqAppId}&openid=${openId}`;
+        const userInfoRes = await fetch(userInfoUrl);
+        const userInfo = await userInfoRes.json();
+
+        if (userInfo.ret !== 0) {
+            console.error('QQ user info error:', userInfo);
+            return NextResponse.json({ error: '获取QQ用户信息失败', success: false }, { status: 400 });
         }
 
         const qqIdentifier = `qq_${openId}`;

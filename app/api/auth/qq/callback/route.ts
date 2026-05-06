@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import db from '@/lib/db';
-import { loginUser } from '@/lib/auth';
+import { loginUser, getSession } from '@/lib/auth';
 import { getSettings } from '@/lib/settings';
+import { storeBindData } from '@/lib/qq-bind-store';
 import { revalidatePath } from 'next/cache';
 
 export async function POST(req: NextRequest) {
@@ -61,23 +62,42 @@ export async function POST(req: NextRequest) {
         }
 
         const qqIdentifier = `qq_${openId}`;
-        let user = await db.query('SELECT * FROM users WHERE qq_identifier = $1', [qqIdentifier]).then(r => r.rows[0]);
+        const action = body.action;
 
-        if (!user) {
-            const nickname = `QQ_${userInfo.nickname?.slice(0, 20) || '用户'}`;
-            const avatar = userInfo.figureurl_qq_2 || userInfo.figureurl || '';
+        if (action === 'bind') {
+            const session = await getSession();
+            if (!session?.user) {
+                return NextResponse.json({ error: '请先登录', success: false }, { status: 401 });
+            }
 
-            user = await db.query(
-                `INSERT INTO users (email, nickname, password, role, qq_identifier, avatar)
-                 VALUES ($1, $2, $3, $4, $5, $6) RETURNING *`,
-                [`${qqIdentifier}@qq.local`, nickname, '', 'user', qqIdentifier, avatar]
-            ).then(r => r.rows[0]);
+            const checkQq = await db.query('SELECT id FROM users WHERE qq_identifier = $1', [qqIdentifier]);
+            if (checkQq.rows.length > 0) {
+                const bound = checkQq.rows[0];
+                if (bound.id === session.user.id) {
+                    return NextResponse.json({ error: '该QQ已绑定当前账号', success: false }, { status: 400 });
+                }
+                return NextResponse.json({ error: '该QQ已绑定其他账号', success: false }, { status: 400 });
+            }
+
+            await db.query('UPDATE users SET qq_identifier = $1, updated_at = NOW() WHERE id = $2', [qqIdentifier, session.user.id]);
+            return NextResponse.json({ success: true, redirectUrl: state });
         }
 
-        await loginUser({ id: user.id, nickname: user.nickname, email: user.email, role: user.role, avatar: user.avatar });
-        revalidatePath('/');
+        const existingUser = await db.query('SELECT * FROM users WHERE qq_identifier = $1', [qqIdentifier]).then(r => r.rows[0]);
 
-        return NextResponse.json({ success: true, redirectUrl: state });
+        if (existingUser) {
+            await loginUser({ id: existingUser.id, nickname: existingUser.nickname, email: existingUser.email, role: existingUser.role, avatar: existingUser.avatar });
+            revalidatePath('/');
+            return NextResponse.json({ success: true, redirectUrl: state });
+        }
+
+        const bindToken = storeBindData({
+            openid: openId,
+            nickname: userInfo.nickname?.slice(0, 20) || 'QQ用户',
+            avatar: userInfo.figureurl_qq_2 || userInfo.figureurl || '',
+        });
+
+        return NextResponse.json({ success: true, needs_bind: true, bind_token: bindToken, qq_nickname: userInfo.nickname?.slice(0, 20) || 'QQ用户', qq_avatar: userInfo.figureurl_qq_2 || userInfo.figureurl || '' });
     } catch (error) {
         console.error('QQ login error:', error);
         return NextResponse.json({ error: 'QQ登录失败', success: false }, { status: 500 });

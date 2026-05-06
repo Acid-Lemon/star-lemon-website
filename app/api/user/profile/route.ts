@@ -12,7 +12,7 @@ export async function GET(request: NextRequest) {
     }
 
     const result = await db.query(
-      'SELECT id, nickname, email, role, avatar, bio, birthday, created_at FROM users WHERE id = $1',
+      'SELECT id, nickname, email, role, avatar, bio, birthday, qq_identifier, created_at FROM users WHERE id = $1',
       [session.user.id]
     );
 
@@ -61,7 +61,7 @@ export async function PUT(request: NextRequest) {
       `UPDATE users 
        SET nickname = $1, avatar = $2, bio = $3, birthday = $4, updated_at = NOW() 
        WHERE id = $5 
-       RETURNING id, nickname, email, role, avatar, bio, birthday, created_at`,
+        RETURNING id, nickname, email, role, avatar, bio, birthday, qq_identifier, created_at`,
       [trimmedNickname, avatar || null, trimmedBio, birthday || null, session.user.id]
     );
 

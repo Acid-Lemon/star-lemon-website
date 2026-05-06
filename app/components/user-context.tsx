@@ -10,6 +10,7 @@ export interface UserInfo {
     avatar: string | null;
     bio: string | null;
     birthday: string | null;
+    qq_identifier: string | null;
 }
 
 const UserContext = createContext<UserInfo | null>(null);

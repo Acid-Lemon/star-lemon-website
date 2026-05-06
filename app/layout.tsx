@@ -70,7 +70,7 @@ export default async function RootLayout({children}: Readonly<{ children: React.
     if (session?.user?.id) {
         try {
             const result = await db.query(
-                'SELECT id, nickname, email, role, avatar, bio, birthday FROM users WHERE id = $1',
+                'SELECT id, nickname, email, role, avatar, bio, birthday, qq_identifier FROM users WHERE id = $1',
                 [session.user.id]
             );
             if (result.rows.length > 0) {

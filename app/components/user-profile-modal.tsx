@@ -10,7 +10,7 @@ import {DatePicker} from '@/components/ui/date-picker';
 import {Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter, DialogClose} from '@/components/ui/dialog';
 import {Tabs, TabsList, TabsTrigger, TabsContent} from '@/components/ui/tabs';
 import {Avatar, AvatarImage, AvatarFallback} from '@/components/ui/avatar';
-import {RiLockLine, RiMailLine, RiArrowRightSLine} from '@remixicon/react';
+import {RiLockLine, RiMailLine, RiArrowRightSLine, RiQqFill, RiLinksLine} from '@remixicon/react';
 
 import {UserInfo} from './user-context';
 
@@ -44,6 +44,7 @@ export function UserProfileModal({user, onClose, onUpdate}: UserProfileModalProp
     const [sendingCode, setSendingCode] = useState(false);
     const [countdown, setCountdown] = useState(0);
     const [securityAction, setSecurityAction] = useState<'password' | 'email' | null>(null);
+    const [qqUnbinding, setQqUnbinding] = useState(false);
 
     const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
@@ -216,6 +217,25 @@ export function UserProfileModal({user, onClose, onUpdate}: UserProfileModalProp
         }
     };
 
+    const handleQqUnbind = async () => {
+        setQqUnbinding(true);
+        try {
+            const res = await fetch('/api/user/qq/unbind', { method: 'DELETE' });
+            const data = await res.json();
+            if (res.ok) {
+                toast.success('QQ已解绑');
+                onUpdate?.({ ...user, qq_identifier: null });
+                setTimeout(() => window.location.reload(), 500);
+            } else {
+                toast.error(data.error || '解绑失败');
+            }
+        } catch {
+            toast.error('解绑失败，请重试');
+        } finally {
+            setQqUnbinding(false);
+        }
+    };
+
     return (
         <Dialog open onOpenChange={(open) => { if (!open) onClose(); }}>
             <DialogContent className="sm:max-w-md max-h-[90vh] overflow-y-auto" showCloseButton>
@@ -374,6 +394,45 @@ export function UserProfileModal({user, onClose, onUpdate}: UserProfileModalProp
                                         </div>
                                         <RiArrowRightSLine className="w-5 h-5 text-muted-foreground" />
                                     </Button>
+
+                                    {user?.qq_identifier ? (
+                                        <div className="p-4 bg-muted/50 rounded-xl">
+                                            <div className="flex items-center gap-3 mb-3">
+                                                <div className="w-10 h-10 rounded-full bg-[#e6f7ff] flex items-center justify-center">
+                                                    <RiQqFill className="w-5 h-5 text-[#12B7F5]" />
+                                                </div>
+                                                <div className="text-left flex-1">
+                                                    <p className="text-sm font-medium">已绑定 QQ</p>
+                                                    <p className="text-xs text-muted-foreground">可通过QQ快捷登录</p>
+                                                </div>
+                                            </div>
+                                            <Button
+                                                variant="outline"
+                                                size="sm"
+                                                className="w-full text-destructive hover:bg-destructive/10"
+                                                onClick={handleQqUnbind}
+                                                disabled={qqUnbinding}
+                                            >
+                                                {qqUnbinding ? '解绑中...' : '解除绑定'}
+                                            </Button>
+                                        </div>
+                                    ) : (
+                                        <a
+                                            href="/api/auth/qq/bind"
+                                            className="w-full flex items-center justify-between p-4 h-auto bg-muted/50 hover:bg-muted rounded-xl no-underline cursor-pointer"
+                                        >
+                                            <div className="flex items-center gap-3">
+                                                <div className="w-10 h-10 rounded-full bg-[#e6f7ff] flex items-center justify-center">
+                                                    <RiQqFill className="w-5 h-5 text-[#12B7F5]" />
+                                                </div>
+                                                <div className="text-left">
+                                                    <p className="text-sm font-medium text-foreground">绑定 QQ 账号</p>
+                                                    <p className="text-xs text-muted-foreground">绑定后可通过QQ快捷登录</p>
+                                                </div>
+                                            </div>
+                                            <RiLinksLine className="w-5 h-5 text-muted-foreground" />
+                                        </a>
+                                    )}
                                 </div>
                             )}
                         </div>

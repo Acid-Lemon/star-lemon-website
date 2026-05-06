@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Button } from '@/components/ui/button';
@@ -10,6 +10,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { toast } from 'sonner';
 import { RiQqFill, RiMailLine, RiLockLine, RiEyeLine, RiEyeOffLine } from '@remixicon/react';
+import { QqBindDialog } from '@/app/components/qq-bind-dialog';
 
 export default function LoginClientPage({ qqAuthUrl, errorMsg, returnUrl, qqCode, qqState }: {
     qqAuthUrl: string | null;
@@ -26,6 +27,10 @@ export default function LoginClientPage({ qqAuthUrl, errorMsg, returnUrl, qqCode
     const [codeSending, setCodeSending] = useState(false);
     const [countdown, setCountdown] = useState(0);
     const [qqLoading, setQqLoading] = useState(false);
+    const [showBindDialog, setShowBindDialog] = useState(false);
+    const [bindToken, setBindToken] = useState('');
+    const [qqNickname, setQqNickname] = useState('');
+    const [qqAvatar, setQqAvatar] = useState('');
     const router = useRouter();
 
     const handlePasswordLogin = async (e: React.FormEvent) => {
@@ -121,29 +126,44 @@ export default function LoginClientPage({ qqAuthUrl, errorMsg, returnUrl, qqCode
         }
     };
 
-    useEffect(() => {
-        if (qqCode) {
-            setQqLoading(true);
-            fetch('/api/auth/qq/callback', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ code: qqCode, state: qqState || '/' }),
-            })
-                .then(async (res) => {
-                    const data = await res.json();
-                    if (res.ok && data.success) {
-                        window.location.href = qqState || returnUrl;
-                    } else {
-                        toast.error(data.error || 'QQ登录失败');
+    const handleQqCallback = useCallback((code: string, state: string | undefined) => {
+        if (!code) return;
+        setQqLoading(true);
+
+        const isBind = state?.startsWith('bind:');
+        const actualState = isBind ? state!.replace(/^bind:/, '') : (state || returnUrl);
+
+        fetch('/api/auth/qq/callback', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ code, state: actualState, action: isBind ? 'bind' : 'login' }),
+        })
+            .then(async (res) => {
+                const data = await res.json();
+                if (res.ok && data.success) {
+                    if (data.needs_bind) {
+                        setBindToken(data.bind_token);
+                        setQqNickname(data.qq_nickname);
+                        setQqAvatar(data.qq_avatar);
+                        setShowBindDialog(true);
                         setQqLoading(false);
+                    } else {
+                        window.location.href = data.redirectUrl || state || returnUrl;
                     }
-                })
-                .catch(() => {
-                    toast.error('QQ登录失败');
+                } else {
+                    toast.error(data.error || 'QQ登录失败');
                     setQqLoading(false);
-                });
-        }
-    }, [qqCode, qqState, returnUrl]);
+                }
+            })
+            .catch(() => {
+                toast.error('QQ登录失败');
+                setQqLoading(false);
+            });
+    }, [returnUrl]);
+
+    useEffect(() => {
+        handleQqCallback(qqCode || '', qqState);
+    }, [qqCode, qqState, handleQqCallback]);
 
     return (
         <div className="flex-1 flex flex-col items-center justify-center py-10 px-4">
@@ -268,6 +288,17 @@ export default function LoginClientPage({ qqAuthUrl, errorMsg, returnUrl, qqCode
                     </div>
                 </CardContent>
             </Card>
+
+            {showBindDialog && (
+                <QqBindDialog
+                    open={showBindDialog}
+                    onClose={() => setShowBindDialog(false)}
+                    bindToken={bindToken}
+                    qqNickname={qqNickname}
+                    qqAvatar={qqAvatar}
+                    redirectUrl={qqState?.startsWith('bind:') ? qqState.replace(/^bind:/, '') : returnUrl}
+                />
+            )}
         </div>
     );
 }

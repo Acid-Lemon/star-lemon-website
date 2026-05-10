@@ -66,8 +66,10 @@ export async function DELETE(
       refundAmount = Math.ceil(refundAmount * 100) / 100;
     }
 
-    // Call refund API first
-    if (transfer.out_trade_no && refundAmount > 0) {
+    const isCoinPay = transfer.pay_order_no === 'COIN';
+
+    // 微信支付才调用退款API
+    if (!isCoinPay && transfer.out_trade_no && refundAmount > 0) {
       const siteUrl = await getSetting('site_url') || 'http://localhost:3000';
       try {
         await refundPayOrder({
@@ -86,7 +88,18 @@ export async function DELETE(
     try {
       await client.query('BEGIN');
 
-      if (refundAmount > 0) {
+      // 星柠币支付：退还星柠币到用户账户
+      if (isCoinPay && refundAmount > 0) {
+        const refundCoin = Math.floor(refundAmount * 100);
+        await client.query(
+          'UPDATE users SET sl_coin = COALESCE(sl_coin, 0) + $1 WHERE id = $2',
+          [refundCoin, session.user.id]
+        );
+        await client.query(
+          'UPDATE file_transfer_orders SET status = $1, refund_amount = $2 WHERE transfer_id = $3',
+          ['refunded', refundAmount, transfer.id]
+        );
+      } else if (refundAmount > 0) {
         await client.query(
           'UPDATE file_transfer_orders SET status = $1, refund_amount = $2 WHERE transfer_id = $3',
           ['refunding', refundAmount, transfer.id]

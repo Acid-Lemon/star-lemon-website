@@ -2,6 +2,7 @@
 
 import { useState, useRef, useEffect, useCallback } from 'react';
 import Link from 'next/link';
+import { useUser } from '@/app/components/user-context';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -52,6 +53,7 @@ interface UserOrder {
 }
 
 function UploadPanel({ onUploadSuccess }: { onUploadSuccess?: () => void }) {
+  const user = useUser();
   const [file, setFile] = useState<File | null>(null);
   const [maxDownloads, setMaxDownloads] = useState(3);
   const [retainDays, setRetainDays] = useState(7);
@@ -214,7 +216,11 @@ function UploadPanel({ onUploadSuccess }: { onUploadSuccess?: () => void }) {
         return;
       }
 
-      if (payData.qrCodeUrl) {
+      if (payData.paid) {
+        // 星柠币抵扣成功，直接上传
+        toast.success(`已使用 ${payData.coinUsed} 星柠币抵扣，正在上传文件...`);
+        startUpload(createData.id);
+      } else if (payData.qrCodeUrl) {
         setQrCodeUrl(payData.qrCodeUrl);
         setStep('paying');
         startPolling(createData.id);
@@ -449,11 +455,19 @@ function UploadPanel({ onUploadSuccess }: { onUploadSuccess?: () => void }) {
               <span>需支付</span>
               <span className="text-primary text-lg">¥{price.toFixed(2)}</span>
             </div>
+            {user && (
+              <div className="flex justify-between text-xs pt-1">
+                <span className="text-muted-foreground">我的星柠币</span>
+                <span className={user.sl_coin >= Math.ceil(price * 100) ? 'text-green-600' : 'text-orange-500'}>
+                  {user.sl_coin} 枚 {user.sl_coin >= Math.ceil(price * 100) ? '（可抵扣）' : '（不足抵扣）'}
+                </span>
+              </div>
+            )}
           </div>
         )}
 
         <Button className="w-full" onClick={handleSubmit} disabled={!file || !price || loading}>
-          {loading ? '处理中...' : '微信扫码支付'}
+          {loading ? '处理中...' : '支付并上传'}
         </Button>
       </CardContent>
     </Card>

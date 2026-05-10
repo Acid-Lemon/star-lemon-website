@@ -11,6 +11,7 @@ import {
   InputGroupButton,
   InputGroupInput,
 } from "@/components/ui/input-group"
+import { ScrollArea } from "@/components/ui/scroll-area"
 import { RiArrowDownSLine, RiCloseLine, RiCheckLine } from "@remixicon/react"
 
 const Combobox = ComboboxPrimitive.Root
@@ -118,16 +119,20 @@ function ComboboxContent({
   )
 }
 
-function ComboboxList({ className, ...props }: ComboboxPrimitive.List.Props) {
+function ComboboxList({ className, children, ...props }: ComboboxPrimitive.List.Props) {
   return (
-    <ComboboxPrimitive.List
-      data-slot="combobox-list"
-      className={cn(
-        "no-scrollbar max-h-[min(calc(--spacing(72)---spacing(9)),calc(var(--available-height)---spacing(9)))] scroll-py-1 overflow-y-auto overscroll-contain p-1 data-empty:p-0",
-        className
-      )}
-      {...props}
-    />
+    <ScrollArea className={cn(
+      "max-h-[min(calc(--spacing(72)---spacing(9)),calc(var(--available-height)---spacing(9)))]",
+      className
+    )}>
+      <ComboboxPrimitive.List
+        data-slot="combobox-list"
+        className="scroll-py-1 p-1 data-empty:p-0"
+        {...props}
+      >
+        {children}
+      </ComboboxPrimitive.List>
+    </ScrollArea>
   )
 }
 

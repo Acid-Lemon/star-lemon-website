@@ -11,7 +11,7 @@ export async function GET() {
     }
 
     const result = await db.query(
-      'SELECT id, nickname, email, role, avatar, bio, birthday, qq_identifier, created_at, updated_at FROM users ORDER BY created_at DESC'
+      'SELECT id, nickname, email, role, avatar, bio, birthday, qq_identifier, sl_coin, created_at, updated_at FROM users ORDER BY created_at DESC'
     );
 
     const rows = await Promise.all(

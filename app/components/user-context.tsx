@@ -11,6 +11,7 @@ export interface UserInfo {
     bio: string | null;
     birthday: string | null;
     qq_identifier: string | null;
+    sl_coin: number;
 }
 
 const UserContext = createContext<UserInfo | null>(null);

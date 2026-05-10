@@ -54,7 +54,7 @@ export async function PUT(
     values.push(id);
 
     const result = await db.query(
-      `UPDATE users SET ${updates.join(', ')} WHERE id = $${paramIndex} RETURNING id, nickname, email, role, avatar, bio, birthday, qq_identifier, created_at, updated_at`,
+      `UPDATE users SET ${updates.join(', ')} WHERE id = $${paramIndex} RETURNING id, nickname, email, role, avatar, bio, birthday, qq_identifier, sl_coin, created_at, updated_at`,
       values
     );
 

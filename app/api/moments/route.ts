@@ -10,16 +10,23 @@ export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url);
     const limit = Math.min(parseInt(searchParams.get('limit') || '20'), 50);
     const offset = parseInt(searchParams.get('offset') || '0');
+    const date = searchParams.get('date');
 
-    const result = await db.query(
-      `SELECT moments.*, users.nickname, users.avatar
+    let query = `SELECT moments.*, users.nickname, users.avatar
        FROM moments
        LEFT JOIN users ON moments.user_id = users.id
-       WHERE moments.status = 'approved'
-       ORDER BY moments.created_at DESC
-       LIMIT $1 OFFSET $2`,
-      [limit, offset]
-    );
+       WHERE moments.status = 'approved'`;
+    const params: any[] = [];
+
+    if (date) {
+      query += ` AND DATE(moments.created_at AT TIME ZONE 'UTC' AT TIME ZONE 'Asia/Shanghai') = $${params.length + 1}`;
+      params.push(date);
+    }
+
+    query += ` ORDER BY moments.created_at DESC LIMIT $${params.length + 1} OFFSET $${params.length + 2}`;
+    params.push(limit, offset);
+
+    const result = await db.query(query, params);
 
     const rows = await Promise.all(
       result.rows.map(async (row: any) => ({

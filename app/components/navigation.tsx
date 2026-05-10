@@ -3,9 +3,10 @@
 import {useState, useEffect} from 'react';
 import {usePathname} from 'next/navigation';
 import Link from 'next/link';
-import { RiSearchLine, RiArrowDownSLine, RiSettings3Line, RiUserLine, RiLogoutBoxRLine, RiCloseLine, RiMenuLine } from '@remixicon/react';
+import { RiSearchLine, RiArrowDownSLine, RiSettings3Line, RiUserLine, RiLogoutBoxRLine, RiCloseLine, RiMenuLine, RiCoinLine } from '@remixicon/react';
 import {UserProfileModal} from './user-profile-modal';
 import {type UserInfo} from './user-context';
+import { ScrollArea } from '@/components/ui/scroll-area';
 
 interface NavigationProps {
     user: UserInfo | null;
@@ -133,6 +134,10 @@ export function Navigation({user, handleLogout}: NavigationProps) {
                                                     管理后台
                                                 </Link>
                                             )}
+                                            <Link href="/recharge" className="flex items-center gap-2 px-4 py-2.5 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors" onClick={() => setShowDropdown(false)}>
+                                                <RiCoinLine className="w-4 h-4 text-yellow-500" />
+                                                星柠币充值
+                                            </Link>
                                             <button onClick={() => { setShowDropdown(false); setShowProfile(true); }} className="flex items-center gap-2 px-4 py-2.5 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors w-full text-left">
                                                 <RiUserLine className="w-4 h-4" />
                                                 个人设置
@@ -208,6 +213,10 @@ export function Navigation({user, handleLogout}: NavigationProps) {
                                         管理后台
                                     </Link>
                                 )}
+                                <Link href="/recharge" className="px-4 py-3 rounded-xl text-sm text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors flex items-center gap-2">
+                                    <RiCoinLine className="w-4 h-4 text-yellow-500" />
+                                    星柠币充值
+                                </Link>
                                 <button onClick={() => { setMobileMenuOpen(false); setShowProfile(true); }} className="px-4 py-3 rounded-xl text-sm text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors text-left">
                                     个人设置
                                 </button>
@@ -246,7 +255,7 @@ export function Navigation({user, handleLogout}: NavigationProps) {
                         </div>
 
                         {searchQuery.trim() && (
-                            <div className="max-h-80 overflow-y-auto">
+                            <ScrollArea className="max-h-80">
                                 {searchLoading ? (
                                     <div className="px-4 py-8 text-center text-gray-400 dark:text-gray-500 text-sm">
                                         搜索中...
@@ -269,7 +278,7 @@ export function Navigation({user, handleLogout}: NavigationProps) {
                                         未找到相关文章
                                     </div>
                                 )}
-                            </div>
+                            </ScrollArea>
                         )}
 
                         {!searchQuery.trim() && (

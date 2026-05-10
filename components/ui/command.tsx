@@ -15,6 +15,7 @@ import {
   InputGroup,
   InputGroupAddon,
 } from "@/components/ui/input-group"
+import { ScrollArea } from "@/components/ui/scroll-area"
 import { RiSearchLine, RiCheckLine } from "@remixicon/react"
 
 function Command({
@@ -91,17 +92,19 @@ function CommandInput({
 
 function CommandList({
   className,
+  children,
   ...props
 }: React.ComponentProps<typeof CommandPrimitive.List>) {
   return (
-    <CommandPrimitive.List
-      data-slot="command-list"
-      className={cn(
-        "no-scrollbar max-h-72 scroll-py-1 overflow-x-hidden overflow-y-auto outline-none",
-        className
-      )}
-      {...props}
-    />
+    <ScrollArea className={cn("max-h-72", className)}>
+      <CommandPrimitive.List
+        data-slot="command-list"
+        className="scroll-py-1 outline-none"
+        {...props}
+      >
+        {children}
+      </CommandPrimitive.List>
+    </ScrollArea>
   )
 }
 

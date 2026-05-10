@@ -10,6 +10,7 @@ import {DatePicker} from '@/components/ui/date-picker';
 import {Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter, DialogClose} from '@/components/ui/dialog';
 import {Tabs, TabsList, TabsTrigger, TabsContent} from '@/components/ui/tabs';
 import {Avatar, AvatarImage, AvatarFallback} from '@/components/ui/avatar';
+import { ScrollArea } from '@/components/ui/scroll-area';
 import {RiLockLine, RiMailLine, RiArrowRightSLine, RiQqFill, RiLinksLine} from '@remixicon/react';
 
 import {UserInfo} from './user-context';
@@ -238,12 +239,13 @@ export function UserProfileModal({user, onClose, onUpdate}: UserProfileModalProp
 
     return (
         <Dialog open onOpenChange={(open) => { if (!open) onClose(); }}>
-            <DialogContent className="sm:max-w-md max-h-[90vh] overflow-y-auto" showCloseButton>
+            <DialogContent className="sm:max-w-md max-h-[90vh] overflow-hidden flex flex-col" showCloseButton>
                 <DialogHeader>
                     <DialogTitle>个人设置</DialogTitle>
                     <DialogDescription>管理你的个人资料和账号安全</DialogDescription>
                 </DialogHeader>
 
+                <ScrollArea className="flex-1 min-h-0">
                 <Tabs defaultValue="profile" onValueChange={(v) => { if (v === 'security') setSecurityAction(null); }}>
                     <TabsList variant="line" className="w-full">
                         <TabsTrigger value="profile" className="flex-1">个人资料</TabsTrigger>
@@ -438,6 +440,7 @@ export function UserProfileModal({user, onClose, onUpdate}: UserProfileModalProp
                         </div>
                     </TabsContent>
                 </Tabs>
+                </ScrollArea>
             </DialogContent>
         </Dialog>
     );

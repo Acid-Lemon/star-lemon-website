@@ -5,6 +5,7 @@ import {getSession, logoutUser} from '../../lib/auth';
 import {redirect} from 'next/navigation';
 import { getPublicUrl } from '../../lib/oss';
 import db from '../../lib/db';
+import { ScrollArea } from '@/components/ui/scroll-area';
 
 export default async function AdminLayout({children}: { children: React.ReactNode }) {
     const session: any = await getSession();
@@ -157,11 +158,13 @@ export default async function AdminLayout({children}: { children: React.ReactNod
                 </header>
 
                 {/* Page Content */}
-                <main className="flex-1 overflow-y-auto p-6 md:p-8">
-                    <div className="mx-auto max-w-6xl">
-                        {children}
-                    </div>
-                </main>
+                <ScrollArea className="flex-1">
+                    <main className="p-6 md:p-8">
+                        <div className="mx-auto max-w-6xl">
+                            {children}
+                        </div>
+                    </main>
+                </ScrollArea>
             </div>
         </div>
     );

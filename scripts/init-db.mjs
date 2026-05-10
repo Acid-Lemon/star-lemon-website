@@ -65,6 +65,7 @@ async function init() {
       { name: 'bio', type: 'TEXT' },
       { name: 'birthday', type: 'DATE' },
       { name: 'qq_identifier', type: 'TEXT' },
+      { name: 'sl_coin', type: 'INTEGER DEFAULT 0' },
     ];
     for (const col of userColumns) {
       if (!await columnExists(client, 'users', col.name)) {
@@ -284,6 +285,30 @@ async function init() {
       console.log('✅ file_transfer_orders 表创建成功');
     } else {
       console.log('⏭️ file_transfer_orders 表已存在，跳过创建');
+    }
+
+    // coin_recharge_orders
+    if (!await tableExists(client, 'coin_recharge_orders')) {
+      await client.query(`
+        CREATE TABLE coin_recharge_orders (
+          id SERIAL PRIMARY KEY,
+          user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
+          tier_id VARCHAR(50) NOT NULL,
+          price_yuan NUMERIC(10,2) NOT NULL,
+          coin_amount INTEGER NOT NULL DEFAULT 0,
+          bonus_coin INTEGER NOT NULL DEFAULT 0,
+          out_trade_no VARCHAR(100) UNIQUE NOT NULL,
+          pay_order_no VARCHAR(100),
+          status VARCHAR(20) NOT NULL DEFAULT 'unpaid',
+          paid_at TIMESTAMP,
+          created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )
+      `);
+      await client.query(`CREATE INDEX idx_cro_user_id ON coin_recharge_orders(user_id)`);
+      await client.query(`CREATE INDEX idx_cro_status ON coin_recharge_orders(status)`);
+      console.log('✅ coin_recharge_orders 表创建成功');
+    } else {
+      console.log('⏭️ coin_recharge_orders 表已存在，跳过创建');
     }
 
     console.log('\n🎉 数据库初始化完成，已有数据安全无影响');

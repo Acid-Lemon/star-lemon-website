@@ -360,6 +360,29 @@ async function init() {
     }
 
     console.log('\n🎉 数据库初始化完成，已有数据安全无影响');
+
+    // 插入文件转换服务默认配置
+    const convertSettings = [
+      { key: 'convert_api_url', value: 'https://gg.goldenglow.top:50006', category: 'convert', label: '转换服务地址' },
+      { key: 'convert_api_key', value: '', category: 'convert', label: '转换服务 API Key' },
+      { key: 'fc_price_per_page', value: '0.1', category: 'convert', label: '每页价格（元）' },
+      { key: 'fc_payment_fee', value: '0.6', category: 'convert', label: '支付手续费率(%)' },
+      { key: 'fc_service_fee', value: '0.7', category: 'convert', label: '服务费率(%)' },
+      { key: 'fc_profit_rate', value: '5', category: 'convert', label: '利润率(%)' },
+    ];
+    for (const s of convertSettings) {
+      const exists = await client.query('SELECT 1 FROM settings WHERE key = $1', [s.key]);
+      if (exists.rows.length === 0) {
+        await client.query(
+          `INSERT INTO settings (key, value, category, label) VALUES ($1, $2, $3, $4)`,
+          [s.key, s.value, s.category, s.label]
+        );
+        console.log(`✅ 设置 ${s.key} 添加成功`);
+      } else {
+        console.log(`⏭️ 设置 ${s.key} 已存在，跳过`);
+      }
+    }
+
     process.exit(0);
   } catch (err) {
     console.error('❌ 初始化失败:', err.message);

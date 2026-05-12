@@ -27,10 +27,11 @@ const categoryMeta: Record<string, { title: string; description: string; icon: s
   oauth: { title: '第三方登录', description: 'QQ 等第三方登录配置', icon: '🔑' },
   oss: { title: '对象存储', description: '阿里云 OSS / ESA 配置', icon: '☁️' },
   pay: { title: '支付服务', description: '蓝兔支付配置', icon: '💳' },
-  pricing: { title: '费用配置', description: '文件快传费用计算参数', icon: '💰' },
+  pricing: { title: '文件快传费用', description: '文件快传费用计算参数', icon: '💰' },
+  convert: { title: '文件转换服务', description: '转换 API 及费用计算参数', icon: '📄' },
 };
 
-const secretKeys = ['smtp_pass', 'deepseek_api_key', 'qq_app_key', 'oss_access_key_secret', 'lantu_key'];
+const secretKeys = ['smtp_pass', 'deepseek_api_key', 'qq_app_key', 'oss_access_key_secret', 'lantu_key', 'convert_api_key'];
 
 const booleanKeys = ['smtp_secure', 'comment_review', 'guestbook_review', 'quote_enabled'];
 
@@ -42,6 +43,7 @@ const fieldOrder: Record<string, string[]> = {
   oss: ['oss_endpoint', 'oss_region', 'oss_bucket', 'oss_access_key_id', 'oss_access_key_secret', 'esa_domain'],
   pay: ['lantu_mch_id', 'lantu_key'],
   pricing: ['ft_storage_price', 'ft_traffic_price', 'ft_payment_fee', 'ft_service_fee', 'ft_profit_rate'],
+  convert: ['convert_api_url', 'convert_api_key', 'fc_price_per_page', 'fc_payment_fee', 'fc_service_fee', 'fc_profit_rate'],
 };
 
 export default function SettingsPage() {
@@ -115,7 +117,7 @@ export default function SettingsPage() {
   }
 
   const sortedCategories = Object.keys(settings).sort((a, b) => {
-    const order = ['site', 'mail', 'ai', 'oauth', 'oss', 'pay', 'pricing'];
+    const order = ['site', 'mail', 'ai', 'oauth', 'oss', 'pay', 'pricing', 'convert'];
     return order.indexOf(a) - order.indexOf(b);
   });
 

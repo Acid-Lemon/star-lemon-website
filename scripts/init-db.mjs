@@ -287,6 +287,54 @@ async function init() {
       console.log('⏭️ file_transfer_orders 表已存在，跳过创建');
     }
 
+    // file_conversions
+    if (!await tableExists(client, 'file_conversions')) {
+      await client.query(`
+        CREATE TABLE file_conversions (
+          id SERIAL PRIMARY KEY,
+          user_id INTEGER REFERENCES users(id) ON DELETE SET NULL,
+          file_name VARCHAR(500) NOT NULL,
+          file_size BIGINT NOT NULL,
+          src_format VARCHAR(20) NOT NULL,
+          src_oss_key TEXT,
+          pdf_oss_key TEXT,
+          task_id VARCHAR(100),
+          page_count INTEGER,
+          status VARCHAR(20) NOT NULL DEFAULT 'uploading',
+          created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+          updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )
+      `);
+      await client.query(`CREATE INDEX idx_fc_user_id ON file_conversions(user_id)`);
+      await client.query(`CREATE INDEX idx_fc_status ON file_conversions(status)`);
+      console.log('✅ file_conversions 表创建成功');
+    } else {
+      console.log('⏭️ file_conversions 表已存在，跳过创建');
+    }
+
+    // file_conversion_orders
+    if (!await tableExists(client, 'file_conversion_orders')) {
+      await client.query(`
+        CREATE TABLE file_conversion_orders (
+          id SERIAL PRIMARY KEY,
+          conversion_id INTEGER UNIQUE REFERENCES file_conversions(id) ON DELETE SET NULL,
+          user_id INTEGER REFERENCES users(id),
+          price NUMERIC(10,2) NOT NULL DEFAULT 0,
+          pay_order_no VARCHAR(100),
+          out_trade_no VARCHAR(100),
+          status VARCHAR(20) NOT NULL DEFAULT 'unpaid',
+          refund_amount NUMERIC(10,2) DEFAULT 0,
+          paid_at TIMESTAMP,
+          created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )
+      `);
+      await client.query(`CREATE INDEX idx_fco_conversion_id ON file_conversion_orders(conversion_id)`);
+      await client.query(`CREATE INDEX idx_fco_status ON file_conversion_orders(status)`);
+      console.log('✅ file_conversion_orders 表创建成功');
+    } else {
+      console.log('⏭️ file_conversion_orders 表已存在，跳过创建');
+    }
+
     // coin_recharge_orders
     if (!await tableExists(client, 'coin_recharge_orders')) {
       await client.query(`

@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { RiUploadCloudLine, RiArrowRightSLine } from '@remixicon/react';
+import { RiUploadCloudLine, RiArrowRightSLine, RiFilePdf2Line } from '@remixicon/react';
 
 export const metadata: Metadata = {
     title: '工具',
@@ -16,6 +16,14 @@ const tools = [
     href: '/tools/file-transfer',
     color: 'text-blue-500 dark:text-blue-400',
     bg: 'bg-blue-50 dark:bg-blue-950/30',
+  },
+  {
+    name: '文件转换',
+    description: '将各种格式文件转换为 PDF，按页数收费',
+    icon: RiFilePdf2Line,
+    href: '/tools/file-conversion',
+    color: 'text-emerald-500 dark:text-emerald-400',
+    bg: 'bg-emerald-50 dark:bg-emerald-950/30',
   },
 ];
 

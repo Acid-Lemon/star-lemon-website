@@ -312,6 +312,36 @@ async function init() {
       console.log('⏭️ file_conversions 表已存在，跳过创建');
     }
 
+    // dev_tasks
+    if (!await tableExists(client, 'dev_tasks')) {
+      await client.query(`
+        CREATE TABLE dev_tasks (
+          id SERIAL PRIMARY KEY,
+          content TEXT NOT NULL,
+          assignee_ids INTEGER[] DEFAULT '{}',
+          status VARCHAR(50) DEFAULT '待处理',
+          type VARCHAR(50) DEFAULT '新功能',
+          priority VARCHAR(50) DEFAULT '中',
+          created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+          updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )
+      `);
+      console.log('✅ dev_tasks 表创建成功');
+    } else {
+      console.log('⏭️ dev_tasks 表已存在，跳过创建');
+    }
+
+    const devTaskColumns = [
+      { name: 'type', type: "VARCHAR(50) DEFAULT '新功能'" },
+      { name: 'priority', type: "VARCHAR(50) DEFAULT '中'" },
+    ];
+    for (const col of devTaskColumns) {
+      if (!await columnExists(client, 'dev_tasks', col.name)) {
+        await client.query(`ALTER TABLE dev_tasks ADD COLUMN ${col.name} ${col.type}`);
+        console.log(`✅ dev_tasks.${col.name} 字段添加成功`);
+      }
+    }
+
     // file_conversion_orders
     if (!await tableExists(client, 'file_conversion_orders')) {
       await client.query(`

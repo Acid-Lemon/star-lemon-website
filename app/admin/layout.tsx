@@ -1,6 +1,6 @@
 import React from 'react';
 import Link from 'next/link';
-import {RiTimeLine, RiFileTextLine, RiHomeLine, RiLogoutBoxLine, RiChat3Line, RiChat4Line, RiSideBarLine, RiSettings3Line, RiFlashlightLine, RiDoubleQuotesL, RiUserLine, RiFolderTransferLine, RiLinksLine, RiFilePdf2Line} from '@remixicon/react';
+import {RiTimeLine, RiFileTextLine, RiHomeLine, RiLogoutBoxLine, RiChat3Line, RiChat4Line, RiSideBarLine, RiSettings3Line, RiFlashlightLine, RiDoubleQuotesL, RiUserLine, RiFolderTransferLine, RiLinksLine, RiFilePdf2Line, RiTaskLine} from '@remixicon/react';
 import {getSession, logoutUser} from '../../lib/auth';
 import {redirect} from 'next/navigation';
 import { getPublicUrl } from '../../lib/oss';
@@ -100,6 +100,11 @@ export default async function AdminLayout({children}: { children: React.ReactNod
                           className="flex items-center gap-3 px-3 py-2.5 rounded-md text-sm font-medium text-muted-foreground hover:bg-secondary hover:text-foreground transition-colors">
                         <RiUserLine className="h-4 w-4"/>
                         用户管理
+                    </Link>
+                    <Link href="/admin/dev-tasks"
+                          className="flex items-center gap-3 px-3 py-2.5 rounded-md text-sm font-medium text-muted-foreground hover:bg-secondary hover:text-foreground transition-colors">
+                        <RiTaskLine className="h-4 w-4"/>
+                        开发任务清单
                     </Link>
                     <Link href="/admin/file-transfers"
                           className="flex items-center gap-3 px-3 py-2.5 rounded-md text-sm font-medium text-muted-foreground hover:bg-secondary hover:text-foreground transition-colors">

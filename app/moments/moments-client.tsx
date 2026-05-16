@@ -371,7 +371,7 @@ export default function MomentsClient() {
             {/* 桌面端：侧边栏布局 */}
             <div className="hidden lg:flex gap-6 items-start">
                 {/* 左侧动态列表 */}
-                <div className="max-w-xl w-full">
+                <div className="max-w-xl flex-1 min-w-0">
                     {MomentList}
                 </div>
 

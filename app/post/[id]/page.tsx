@@ -8,6 +8,18 @@ import PostClient from './PostClient';
 
 export const revalidate = 60;
 
+interface Post {
+    id: number;
+    title: string;
+    summary: string;
+    cover: string;
+    tags: string[];
+    content: string;
+    author_id: number;
+    created_at: string;
+    author_name: string;
+}
+
 export async function generateMetadata({ params }: { params: Promise<{ id: string }> }): Promise<Metadata> {
     const { id } = await params;
     try {
@@ -17,7 +29,7 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
         );
         if (result.rows.length === 0) return { title: '文章未找到' };
 
-        const post = result.rows[0];
+        const post: { title: string; summary: string; cover: string; tags: string[]; created_at: string } = result.rows[0];
         const settings = await getSettings();
         const siteTitle = settings.site_title || 'star和lemon的小站';
         const coverUrl = post.cover ? await getPublicUrl(post.cover) : undefined;
@@ -40,34 +52,45 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
     }
 }
 
+function stripMarkdownInline(text: string) {
+    return text
+        .replace(/`([^`]+)`/g, '$1')
+        .replace(/\*\*([^*]+)\*\*/g, '$1')
+        .replace(/__([^_]+)__/g, '$1')
+        .replace(/\*([^*]+)\*/g, '$1')
+        .replace(/_([^_]+)_/g, '$1')
+        .replace(/~~([^~]+)~~/g, '$1')
+        .replace(/\[([^\]]+)\]\([^)]+\)/g, '$1')
+        .replace(/!\[([^\]]*)\]\([^)]+\)/g, '$1');
+}
+
 function extractToc(content: string) {
     const tocItems: Array<{ level: number; text: string; id: string }> = [];
     const lines = content.split('\n');
-    
+
     for (let i = 0; i < lines.length; i++) {
         const line = lines[i].trim();
-        
-        // Markdown ATX 标题: ## 标题
+
         const atxMatch = line.match(/^(#{2,6})\s+(.+)$/);
         if (atxMatch) {
             const level = atxMatch[1].length;
-            const text = atxMatch[2].trim().replace(/\s*#+\s*$/, ''); // 去掉尾部 #
-            const id = text.toLowerCase().replace(/[^\w\s-]/g, '').replace(/\s+/g, '-');
+            const rawText = atxMatch[2].trim().replace(/\s*#+\s*$/, '');
+            const text = stripMarkdownInline(rawText);
+            const id = (text.replace(/\s+/g, '-').toLowerCase() || 'heading') + `-${level}`;
             tocItems.push({ level, text, id });
             continue;
         }
-        
-        // HTML 标题: <h2>标题</h2> 或 <h2 class="...">标题</h2>
+
         const htmlMatch = line.match(/^<h([2-6])(?:\s[^>]*)?>(.+?)<\/h\1>$/i);
         if (htmlMatch) {
             const level = parseInt(htmlMatch[1], 10);
-            const text = htmlMatch[2].replace(/<[^>]+>/g, '').trim(); // 去掉内部 HTML 标签
-            const id = text.toLowerCase().replace(/[^\w\s-]/g, '').replace(/\s+/g, '-');
+            const text = htmlMatch[2].replace(/<[^>]+>/g, '').trim();
+            const id = (text.replace(/\s+/g, '-').toLowerCase() || 'heading') + `-${level}`;
             tocItems.push({ level, text, id });
             continue;
         }
     }
-    
+
     return tocItems;
 }
 
@@ -85,7 +108,7 @@ function formatDateTime(dateStr: string) {
 export default async function PostPage({ params }: { params: Promise<{ id: string }> }) {
     const { id } = await params;
 
-    let post: any = null;
+    let post: Post | null = null;
     try {
         const result = await db.query(`
             SELECT posts.*, users.nickname as author_name

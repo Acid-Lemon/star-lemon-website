@@ -16,6 +16,14 @@ const securityHeaders = [
 ];
 
 const nextConfig: NextConfig = {
+    images: {
+        remotePatterns: [
+            {
+                protocol: 'https',
+                hostname: 'cdn.star-lemon.top',
+            },
+        ],
+    },
     serverExternalPackages: ['ali-oss', 'urllib', 'proxy-agent'],
     async headers() {
         return [

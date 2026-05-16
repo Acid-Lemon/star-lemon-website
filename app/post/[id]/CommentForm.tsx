@@ -3,6 +3,18 @@
 import { useState, useRef } from 'react';
 import { toast } from 'sonner';
 import { EmojiPicker } from '../../components/emoji-picker';
+import type { UserInfo } from '../../components/user-context';
+
+interface CommentItem {
+    id: number;
+    user_id: number;
+    nickname: string;
+    avatar: string | null;
+    content: string;
+    image_url: string | null;
+    parent_id: number | null;
+    created_at: string;
+}
 
 export function CommentForm({
     user,
@@ -11,10 +23,10 @@ export function CommentForm({
     onSuccess,
     onCancel
 }: {
-    user: any;
+    user: UserInfo | null;
     postId: number;
-    replyTo?: any;
-    onSuccess: (comment: any) => void;
+    replyTo?: CommentItem | null;
+    onSuccess: (comment: CommentItem) => void;
     onCancel?: () => void;
 }) {
     const [content, setContent] = useState('');
@@ -97,7 +109,7 @@ export function CommentForm({
     return (
         <form onSubmit={handleSubmit} className="p-6 bg-gray-50 dark:bg-gray-800/50 rounded-xl mb-6">
             <div className="flex items-center gap-3 mb-4">
-                {user.avatar ? (
+                {user?.avatar ? (
                     <img
                         src={user.avatar}
                         alt={user.nickname}
@@ -105,11 +117,11 @@ export function CommentForm({
                     />
                 ) : (
                     <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-400 to-blue-500 flex items-center justify-center text-white font-bold text-sm">
-                        {user.nickname?.[0]?.toUpperCase() || 'U'}
+                        {user?.nickname?.[0]?.toUpperCase() || 'U'}
                     </div>
                 )}
                 <div>
-                    <p className="font-medium text-gray-900 dark:text-gray-100">{user.nickname || '用户'}</p>
+                    <p className="font-medium text-gray-900 dark:text-gray-100">{user?.nickname || '用户'}</p>
                     {replyTo && (
                         <p className="text-xs text-blue-500">
                             回复 {replyTo.nickname}

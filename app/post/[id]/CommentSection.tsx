@@ -8,11 +8,26 @@ import {
     AlertDialog, AlertDialogContent, AlertDialogHeader, AlertDialogTitle,
     AlertDialogDescription, AlertDialogFooter, AlertDialogCancel, AlertDialogAction
 } from '@/components/ui/alert-dialog';
+import type { UserInfo } from '../../components/user-context';
 
-export function CommentSection({ postId, user }: { postId: number; user: any }) {
-    const [comments, setComments] = useState<any[]>([]);
+interface CommentItem {
+    id: number;
+    user_id: number;
+    nickname: string;
+    avatar: string | null;
+    content: string;
+    image_url: string | null;
+    parent_id: number | null;
+    created_at: string;
+    children?: CommentItem[];
+    _level?: number;
+    _parentName?: string;
+}
+
+export function CommentSection({ postId, user }: { postId: number; user: UserInfo | null }) {
+    const [comments, setComments] = useState<CommentItem[]>([]);
     const [loading, setLoading] = useState(true);
-    const [replyTo, setReplyTo] = useState<any>(null);
+    const [replyTo, setReplyTo] = useState<CommentItem | null>(null);
     const [deleteTarget, setDeleteTarget] = useState<number | null>(null);
 
     useEffect(() => {
@@ -31,9 +46,9 @@ export function CommentSection({ postId, user }: { postId: number; user: any }) 
         }
     };
 
-    const buildCommentTree = (comments: any[]) => {
-        const map: any = {};
-        const roots: any[] = [];
+    const buildCommentTree = (comments: CommentItem[]) => {
+        const map: Record<number, CommentItem> = {};
+        const roots: CommentItem[] = [];
 
         comments.forEach(comment => {
             map[comment.id] = { ...comment, children: [] };
@@ -41,7 +56,7 @@ export function CommentSection({ postId, user }: { postId: number; user: any }) 
 
         comments.forEach(comment => {
             if (comment.parent_id && map[comment.parent_id]) {
-                map[comment.parent_id].children.push(map[comment.id]);
+                map[comment.parent_id].children!.push(map[comment.id]);
             } else {
                 roots.push(map[comment.id]);
             }
@@ -68,12 +83,12 @@ export function CommentSection({ postId, user }: { postId: number; user: any }) 
         }
     };
 
-    const handleCommentSuccess = (newComment: any) => {
+    const handleCommentSuccess = (newComment: CommentItem) => {
         setComments(prev => [...prev, newComment]);
         setReplyTo(null);
     };
 
-    const renderCommentContent = (comment: any) => (
+    const renderCommentContent = (comment: CommentItem) => (
         <div key={comment.id} className="flex gap-3 group">
             {comment.avatar ? (
                 <img src={comment.avatar} alt={comment.nickname} className="w-8 h-8 rounded-full object-cover shrink-0" />
@@ -85,7 +100,7 @@ export function CommentSection({ postId, user }: { postId: number; user: any }) 
             <div className="flex-1">
                 <div className="flex items-center gap-2 mb-1">
                     <span className="font-medium text-sm text-gray-900 dark:text-gray-100">{comment.nickname}</span>
-                    {comment._level > 2 && comment._parentName && (
+                    {comment._level! > 2 && comment._parentName && (
                         <span className="text-xs text-gray-400">
                             回复 <span className="text-blue-500">{comment._parentName}</span>
                         </span>
@@ -101,7 +116,7 @@ export function CommentSection({ postId, user }: { postId: number; user: any }) 
                             src={comment.image_url}
                             alt="评论图片"
                             className="max-w-xs rounded-lg cursor-pointer hover:opacity-90 transition-opacity"
-                            onClick={() => window.open(comment.image_url, '_blank', 'noopener,noreferrer')}
+                            onClick={() => window.open(comment.image_url!, '_blank', 'noopener,noreferrer')}
                         />
                     </div>
                 )}
@@ -139,9 +154,9 @@ export function CommentSection({ postId, user }: { postId: number; user: any }) 
         </div>
     );
 
-    const flattenReplies = (comment: any): any[] => {
-        const result: any[] = [];
-        const walk = (node: any, level: number) => {
+    const flattenReplies = (comment: CommentItem): CommentItem[] => {
+        const result: CommentItem[] = [];
+        const walk = (node: CommentItem, level: number) => {
             if (node.children) {
                 for (const child of node.children) {
                     result.push({ ...child, _level: level, _parentName: node.nickname });
@@ -153,7 +168,7 @@ export function CommentSection({ postId, user }: { postId: number; user: any }) 
         return result;
     };
 
-    const renderCommentThread = (comment: any) => {
+    const renderCommentThread = (comment: CommentItem) => {
         const allReplies = flattenReplies(comment);
         return (
             <div key={comment.id} className="space-y-3">

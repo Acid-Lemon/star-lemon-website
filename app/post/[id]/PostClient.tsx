@@ -1,28 +1,33 @@
 'use client';
 
+import Image from 'next/image'
 import React, {useCallback, useEffect, useMemo, useState} from 'react';
 import Link from 'next/link';
-import { RiArrowLeftLine, RiArrowUpSLine, RiShareForwardLine } from '@remixicon/react';
-import ReactMarkdown from 'react-markdown';
+import {RiArrowLeftLine, RiArrowUpSLine, RiShareForwardLine} from '@remixicon/react';
+import ReactMarkdown, {type Components} from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import rehypeHighlight from 'rehype-highlight';
 import 'highlight.js/styles/github-dark.css';
 import {toast} from "sonner";
-import { CommentSection } from './CommentSection';
-import { usePresence, ArticleReaders } from '../../components/presence';
+import {CommentSection} from './CommentSection';
+import {ArticleReaders, usePresence} from '../../components/presence';
+import type {UserInfo} from '../../components/user-context';
 
-function getTextFromChildren(node: any): string {
+function getTextFromChildren(node: React.ReactNode): string {
     if (typeof node === 'string') return node;
     if (typeof node === 'number') return String(node);
     if (Array.isArray(node)) return node.map(getTextFromChildren).join('');
-    if (node?.props?.children) return getTextFromChildren(node.props.children);
+    if (typeof node === 'object' && node !== null && 'props' in node) {
+        const element = node as React.ReactElement<{ children?: React.ReactNode }>;
+        if (element.props?.children) return getTextFromChildren(element.props.children);
+    }
     return '';
 }
 
 const BilibiliPlayer = React.memo(function BilibiliPlayer({
-    bvid,
-    time,
-}: {
+                                                              bvid,
+                                                              time,
+                                                          }: {
     bvid: string;
     time?: string;
 }) {
@@ -49,9 +54,18 @@ const BilibiliPlayer = React.memo(function BilibiliPlayer({
 });
 
 function PostContent({content}: { content: string }) {
-    const components = useMemo(
+    function createHeading(Tag: 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6') {
+        const level = parseInt(Tag[1], 10);
+        return function Heading({children, ...props}: React.HTMLAttributes<HTMLHeadingElement>) {
+            const text = getTextFromChildren(children);
+            const id = (text.replace(/\s+/g, '-').toLowerCase() || 'heading') + `-${level}`;
+            return <Tag id={id} {...props} className="scroll-mt-24">{children}</Tag>;
+        };
+    }
+
+    const components = useMemo<Components>(
         () => ({
-            p: ({children, ...props}: any) => {
+            p: ({children, ...props}: React.HTMLAttributes<HTMLParagraphElement>) => {
                 const text = getTextFromChildren(children);
                 if (!text || text.trim() === '') return <p {...props} className="my-2"/>;
 
@@ -77,36 +91,12 @@ function PostContent({content}: { content: string }) {
                 }
                 return <p {...props}>{nodes}</p>;
             },
-            h1: ({children, ...props}: any) => {
-                const text = React.Children.toArray(children).join('');
-                const id = text.toLowerCase().replace(/[^\w\s-]/g, '').replace(/\s+/g, '-');
-                return <h1 id={id} {...props} className="scroll-mt-24">{children}</h1>;
-            },
-            h2: ({children, ...props}: any) => {
-                const text = React.Children.toArray(children).join('');
-                const id = text.toLowerCase().replace(/[^\w\s-]/g, '').replace(/\s+/g, '-');
-                return <h2 id={id} {...props} className="scroll-mt-24">{children}</h2>;
-            },
-            h3: ({children, ...props}: any) => {
-                const text = React.Children.toArray(children).join('');
-                const id = text.toLowerCase().replace(/[^\w\s-]/g, '').replace(/\s+/g, '-');
-                return <h3 id={id} {...props} className="scroll-mt-24">{children}</h3>;
-            },
-            h4: ({children, ...props}: any) => {
-                const text = React.Children.toArray(children).join('');
-                const id = text.toLowerCase().replace(/[^\w\s-]/g, '').replace(/\s+/g, '-');
-                return <h4 id={id} {...props} className="scroll-mt-24">{children}</h4>;
-            },
-            h5: ({children, ...props}: any) => {
-                const text = React.Children.toArray(children).join('');
-                const id = text.toLowerCase().replace(/[^\w\s-]/g, '').replace(/\s+/g, '-');
-                return <h5 id={id} {...props} className="scroll-mt-24">{children}</h5>;
-            },
-            h6: ({children, ...props}: any) => {
-                const text = React.Children.toArray(children).join('');
-                const id = text.toLowerCase().replace(/[^\w\s-]/g, '').replace(/\s+/g, '-');
-                return <h6 id={id} {...props} className="scroll-mt-24">{children}</h6>;
-            },
+            h1: createHeading('h1'),
+            h2: createHeading('h2'),
+            h3: createHeading('h3'),
+            h4: createHeading('h4'),
+            h5: createHeading('h5'),
+            h6: createHeading('h6'),
         }),
         []
     );
@@ -141,29 +131,29 @@ interface PostClientProps {
     tags: string[];
     cover?: string;
     postId: number;
-    user?: any;
+    user?: UserInfo | null;
     siteTitle: string;
 }
 
 export default function PostClient({
-    content,
-    tocItems,
-    title,
-    authorName,
-    authorColor,
-    authorTextColor,
-    createdAt,
-    tags,
-    cover,
-    postId,
-    user,
-    siteTitle,
-}: PostClientProps) {
+                                       content,
+                                       tocItems,
+                                       title,
+                                       authorName,
+                                       authorColor,
+                                       authorTextColor,
+                                       createdAt,
+                                       tags,
+                                       cover,
+                                       postId,
+                                       user,
+                                       siteTitle,
+                                   }: PostClientProps) {
     const [activeId, setActiveId] = useState('');
     const [readPercent, setReadPercent] = useState(0);
     const [showBackToTop, setShowBackToTop] = useState(false);
     const [dynamicToc, setDynamicToc] = useState<TocItem[]>(tocItems);
-    const { readers } = usePresence(`/post/${postId}`);
+    const {readers} = usePresence(`/post/${postId}`);
 
     const wordsPerMinute = 200;
     const textLength = content.replace(/[#`*\[\]]/g, '').length;
@@ -187,19 +177,30 @@ export default function PostClient({
     const finalToc = dynamicToc.length > 0 ? dynamicToc : tocItems;
 
     useEffect(() => {
-        const observer = new IntersectionObserver(
-            (entries) => {
-                entries.forEach((entry) => {
-                    if (entry.isIntersecting) setActiveId(entry.target.id);
-                });
-            },
-            {rootMargin: '-20% 0px -60% 0px'}
-        );
-        finalToc.forEach((item) => {
-            const el = document.getElementById(item.id);
-            if (el) observer.observe(el);
-        });
-        return () => observer.disconnect();
+        const headingEls = finalToc
+            .map((item) => document.getElementById(item.id))
+            .filter((el): el is HTMLElement => el !== null);
+
+        if (headingEls.length === 0) return;
+
+        const handleScroll = () => {
+            let currentId = '';
+            for (let i = headingEls.length - 1; i >= 0; i--) {
+                const rect = headingEls[i].getBoundingClientRect();
+                if (rect.top <= 120) {
+                    currentId = headingEls[i].id;
+                    break;
+                }
+            }
+            if (window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 2) {
+                currentId = headingEls[headingEls.length - 1].id;
+            }
+            setActiveId(currentId);
+        };
+
+        window.addEventListener('scroll', handleScroll, { passive: true });
+        handleScroll();
+        return () => window.removeEventListener('scroll', handleScroll);
     }, [finalToc]);
 
     useEffect(() => {
@@ -254,14 +255,14 @@ export default function PostClient({
                         href="/post"
                         className="inline-flex items-center text-gray-400 hover:text-blue-500 transition-colors font-mono text-sm w-fit group"
                     >
-                        <RiArrowLeftLine className="w-4 h-4 mr-2 group-hover:-translate-x-1 transition-transform" />
+                        <RiArrowLeftLine className="w-4 h-4 mr-2 group-hover:-translate-x-1 transition-transform"/>
                         返回文章列表
                     </Link>
 
                     <header className="space-y-6 mt-6">
                         {cover && (
-                            <div className="w-full aspect-video rounded-xl overflow-hidden">
-                                <img src={cover} alt={title} className="w-full h-full object-cover" />
+                            <div className="relative w-full aspect-video rounded-xl overflow-hidden">
+                                <Image src={cover} alt={title} fill className="object-cover"/>
                             </div>
                         )}
                         <div className="flex items-center gap-3 text-sm text-gray-500 font-mono">
@@ -273,9 +274,9 @@ export default function PostClient({
                                 <span className={`w-2 h-2 rounded-full ${authorColor}`}/>
                                 {authorName || '佚名'}
                             </span>
-                            <ArticleReaders readers={readers} />
+                            <ArticleReaders readers={readers}/>
                         </div>
-                        <h1 className="text-4xl sm:text-5xl font-bold text-gray-900 dark:text-gray-100 leading-tight">
+                        <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-gray-100 leading-tight">
                             {title}
                         </h1>
                         <div className="flex gap-2">
@@ -294,7 +295,8 @@ export default function PostClient({
 
                     <PostContent content={content}/>
 
-                    <div className="mt-16 pt-8 border-t border-gray-100 dark:border-gray-800 flex justify-between items-center">
+                    <div
+                        className="mt-16 pt-8 border-t border-gray-100 dark:border-gray-800 flex justify-between items-center">
                         <p className="text-gray-400 dark:text-gray-500 font-serif italic">Thanks for reading.</p>
                         <div className="flex items-center gap-3">
                             <button
@@ -303,22 +305,23 @@ export default function PostClient({
                                 aria-label="分享"
                                 title="分享"
                             >
-                                <RiShareForwardLine className="w-5 h-5" />
+                                <RiShareForwardLine className="w-5 h-5"/>
                             </button>
                             <button
                                 onClick={scrollToTop}
                                 className="w-12 h-12 rounded-full bg-blue-50 dark:bg-blue-950/30 text-blue-500 dark:text-blue-400 flex items-center justify-center hover:bg-blue-500 hover:text-white transition-colors shadow-sm"
                                 aria-label="回到顶部"
                             >
-                                <RiArrowUpSLine className="w-6 h-6" />
+                                <RiArrowUpSLine className="w-6 h-6"/>
                             </button>
                         </div>
                     </div>
 
-                    <CommentSection postId={postId} user={user} />
+                    <CommentSection postId={postId} user={user ?? null}/>
                 </div>
 
-                <aside className="hidden lg:block w-64 flex-shrink-0 border border-gray-200 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-900 p-4 shadow-sm">
+                <aside
+                    className="hidden lg:block w-64 flex-shrink-0 border border-gray-200 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-900 p-4 shadow-sm">
                     <div className="sticky top-24 space-y-6">
                         <div className="space-y-2">
                             <div className="flex justify-between items-center text-xs font-mono text-gray-400">
@@ -337,9 +340,9 @@ export default function PostClient({
                             <div>
                                 <h3 className="text-sm font-semibold text-gray-900 dark:text-gray-100 mb-3 font-mono">目录</h3>
                                 <nav className="space-y-1">
-                                    {finalToc.map((item) => (
+                                    {finalToc.map((item, i) => (
                                         <button
-                                            key={item.id}
+                                            key={`${item.id}-${i}`}
                                             onClick={() => scrollToHeading(item.id)}
                                             className={`block w-full text-left text-sm transition-colors py-1 pr-2 border-l-2 ${
                                                 activeId === item.id
@@ -364,7 +367,7 @@ export default function PostClient({
                     className="fixed bottom-8 right-8 w-10 h-10 rounded-full bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-400 border border-gray-200 dark:border-gray-700 flex items-center justify-center hover:bg-gray-50 dark:hover:bg-gray-700 hover:text-blue-500 dark:hover:text-blue-400 transition-all shadow-md z-50"
                     aria-label="回到顶部"
                 >
-                    <RiArrowUpSLine className="w-5 h-5" />
+                    <RiArrowUpSLine className="w-5 h-5"/>
                 </button>
             )}
         </div>

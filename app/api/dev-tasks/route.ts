@@ -52,12 +52,13 @@ export async function POST(request: NextRequest) {
     const assigneeIds = Array.isArray(assignee_ids)
       ? assignee_ids.filter((id: any) => Number.isInteger(id))
       : [];
+    const pgAssignees = assigneeIds.length > 0 ? `{${assigneeIds.join(',')}}` : '{}';
 
     const { rows } = await db.query(
       `INSERT INTO dev_tasks (content, assignee_ids, status, type, priority)
        VALUES ($1, $2, $3, $4, $5)
        RETURNING *`,
-      [content.trim(), assigneeIds.length > 0 ? assigneeIds : null, status || '待处理', type || '新功能', priority || '中']
+      [content.trim(), pgAssignees, status || '待处理', type || '新功能', priority || '中']
     );
 
     return NextResponse.json(rows[0], { status: 201 });

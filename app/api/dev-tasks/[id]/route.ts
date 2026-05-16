@@ -33,7 +33,7 @@ export async function PUT(
         ? assignee_ids.filter((id: any) => Number.isInteger(id))
         : [];
       updates.push(`assignee_ids = $${paramIndex++}`);
-      values.push(assigneeIds.length > 0 ? assigneeIds : null);
+      values.push(assigneeIds.length > 0 ? `{${assigneeIds.join(',')}}` : '{}');
     }
 
     if (status !== undefined) {

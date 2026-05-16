@@ -1,9 +1,7 @@
 'use client';
 
-import { useState, useRef, useEffect } from 'react';
-import { ScrollArea } from '@/components/ui/scroll-area';
+import { useRef, useEffect } from 'react';
 
-// 常用表情列表
 const EMOJIS = [
   '😀', '😃', '😄', '😁', '😆', '😅', '🤣', '😂',
   '🙂', '🙃', '😉', '😊', '😇', '🥰', '😍', '🤩',
@@ -41,24 +39,22 @@ export function EmojiPicker({ onSelect, onClose }: EmojiPickerProps) {
   }, [onClose]);
 
   return (
-    <div 
+    <div
       ref={pickerRef}
       className="absolute bottom-full left-0 mb-2 bg-white rounded-xl shadow-xl border border-gray-100 p-3 z-50 w-[320px]"
     >
-      <ScrollArea className="max-h-[200px]">
-        <div className="grid grid-cols-8 gap-1">
-          {EMOJIS.map((emoji, index) => (
-            <button
-              key={index}
-              type="button"
-              onClick={() => onSelect(emoji)}
-              className="w-8 h-8 flex items-center justify-center hover:bg-gray-100 rounded-lg transition-colors text-lg"
-            >
-              {emoji}
-            </button>
-          ))}
-        </div>
-      </ScrollArea>
+      <div className="max-h-[200px] overflow-y-auto overflow-x-hidden grid grid-cols-8 gap-1">
+        {EMOJIS.map((emoji, index) => (
+          <button
+            key={index}
+            type="button"
+            onClick={() => onSelect(emoji)}
+            className="w-8 h-8 flex items-center justify-center hover:bg-gray-100 rounded-lg transition-colors text-lg leading-none"
+          >
+            {emoji}
+          </button>
+        ))}
+      </div>
     </div>
   );
 }

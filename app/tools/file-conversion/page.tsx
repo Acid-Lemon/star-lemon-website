@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { toast } from 'sonner';
-import { RiArrowLeftLine, RiFileLine, RiCloseLine, RiUploadCloudLine, RiWechatPayLine, RiCheckLine, RiDownloadLine, RiFolderLine, RiBillLine, RiRefreshLine } from '@remixicon/react';
+import { RiArrowLeftLine, RiFileLine, RiCloseLine, RiUploadCloudLine, RiWechatPayLine, RiCheckLine, RiDownloadLine, RiFolderLine, RiBillLine, RiRefreshLine, RiDeleteBinLine } from '@remixicon/react';
 import { AlertDialog, AlertDialogContent, AlertDialogHeader, AlertDialogMedia, AlertDialogTitle, AlertDialogDescription, AlertDialogFooter, AlertDialogCancel, AlertDialogAction } from '@/components/ui/alert-dialog';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { getOutputFormats, getOutputFormatLabel, getSrcFormat } from '@/lib/convert-formats';
@@ -539,6 +539,7 @@ setStep('form');
 function MyConversionsPanel({ refreshKey }: { refreshKey?: number }) {
   const [conversions, setConversions] = useState<UserConversion[]>([]);
   const [loading, setLoading] = useState(true);
+  const [deleteTarget, setDeleteTarget] = useState<number | null>(null);
 
   useEffect(() => {
     fetchConversions();
@@ -593,6 +594,24 @@ function MyConversionsPanel({ refreshKey }: { refreshKey?: number }) {
     }
   };
 
+  const handleDelete = async () => {
+    if (!deleteTarget) return;
+    const id = deleteTarget;
+    setDeleteTarget(null);
+    try {
+      const res = await fetch(`/api/file-conversion/${id}`, { method: 'DELETE' });
+      if (res.ok) {
+        toast.success('已删除');
+        fetchConversions();
+      } else {
+        const data = await res.json().catch(() => ({}));
+        toast.error(data.error || '删除失败');
+      }
+    } catch {
+      toast.error('删除失败');
+    }
+  };
+
   if (loading) {
     return <div className="flex items-center justify-center h-48">加载中...</div>;
   }
@@ -641,17 +660,39 @@ function MyConversionsPanel({ refreshKey }: { refreshKey?: number }) {
                       </button>
                     );
                   })()}
+                  {conv.status === 'failed' && (
+                    <button
+                      onClick={() => setDeleteTarget(conv.id)}
+                      className="p-1 rounded hover:bg-destructive/10 text-destructive transition-colors"
+                      title="删除记录"
+                    >
+                      <RiDeleteBinLine className="w-4 h-4" />
+                    </button>
+                  )}
                 </div>
               </div>
             ))}
           </div>
         )}
       </CardContent>
-    </Card>
-  );
-}
 
-function MyOrdersPanel({ refreshKey }: { refreshKey?: number }) {
+        <AlertDialog open={deleteTarget !== null} onOpenChange={(v) => { if (!v) setDeleteTarget(null); }}>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>确认删除</AlertDialogTitle>
+              <AlertDialogDescription>确定要删除这条转换记录吗？删除后无法恢复。</AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel onClick={() => setDeleteTarget(null)}>取消</AlertDialogCancel>
+              <AlertDialogAction onClick={handleDelete}>确认删除</AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
+      </Card>
+    );
+  }
+
+  function MyOrdersPanel({ refreshKey }: { refreshKey?: number }) {
   const [orders, setOrders] = useState<UserOrder[]>([]);
   const [loading, setLoading] = useState(true);
 

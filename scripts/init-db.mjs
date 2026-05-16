@@ -342,6 +342,15 @@ async function init() {
       }
     }
 
+    if (await columnExists(client, 'dev_tasks', 'assignee_id')) {
+      await client.query(`ALTER TABLE dev_tasks DROP COLUMN assignee_id`);
+      console.log('✅ dev_tasks.assignee_id (单值) 已移除');
+    }
+    if (!await columnExists(client, 'dev_tasks', 'assignee_ids')) {
+      await client.query(`ALTER TABLE dev_tasks ADD COLUMN assignee_ids INTEGER[] DEFAULT '{}'`);
+      console.log('✅ dev_tasks.assignee_ids (数组) 字段添加成功');
+    }
+
     // file_conversion_orders
     if (!await tableExists(client, 'file_conversion_orders')) {
       await client.query(`

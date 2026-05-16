@@ -50,7 +50,7 @@ export async function PUT(
       if (!validTypes.includes(type)) {
         return NextResponse.json({ error: '无效的类型' }, { status: 400 });
       }
-      updates.push(`type = $${paramIndex++}`);
+      updates.push(`"type" = $${paramIndex++}`);
       values.push(type);
     }
 

@@ -55,8 +55,8 @@ export async function POST(request: NextRequest) {
     const pgAssignees = assigneeIds.length > 0 ? `{${assigneeIds.join(',')}}` : '{}';
 
     const { rows } = await db.query(
-      `INSERT INTO dev_tasks (content, assignee_ids, status, type, priority)
-       VALUES ($1, $2, $3, $4, $5)
+      `INSERT INTO dev_tasks (content, assignee_ids, status, "type", priority)
+       VALUES ($1, $2::integer[], $3, $4, $5)
        RETURNING *`,
       [content.trim(), pgAssignees, status || '待处理', type || '新功能', priority || '中']
     );
@@ -64,6 +64,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json(rows[0], { status: 201 });
   } catch (error) {
     console.error('Failed to create dev task:', error);
-    return NextResponse.json({ error: '创建任务失败' }, { status: 500 });
+    const message = error instanceof Error ? error.message : '创建任务失败';
+    return NextResponse.json({ error: `创建任务失败: ${message}` }, { status: 500 });
   }
 }

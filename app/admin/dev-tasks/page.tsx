@@ -447,8 +447,8 @@ export default function DevTasksPage() {
                 <TableBody>
                   {tasks.map((task) => (
                     <TableRow key={task.id}>
-                      <TableCell className="max-w-60">
-                        <p className="truncate" title={task.content}>
+                      <TableCell className="max-w-[320px]">
+                        <p className="line-clamp-3 whitespace-normal text-sm leading-relaxed" title={task.content}>
                           {task.content}
                         </p>
                       </TableCell>

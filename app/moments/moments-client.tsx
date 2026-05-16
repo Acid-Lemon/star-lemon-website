@@ -113,7 +113,7 @@ function CalendarCard({
                             <button
                                 {...props}
                                 className={cn(
-                                    "relative isolate z-10 flex aspect-square size-auto w-full min-w-8 flex-col gap-0.5 border-0 leading-none font-normal rounded-lg transition-colors",
+                                    "relative isolate z-10 flex aspect-square size-auto w-full min-w-8 flex-col items-center justify-center gap-0.5 border-0 leading-none font-normal rounded-lg transition-colors",
                                     isSelected
                                         ? "bg-primary text-primary-foreground"
                                         : "hover:bg-gray-100 dark:hover:bg-gray-800",
@@ -305,7 +305,7 @@ export default function MomentsClient() {
     );
 
     return (
-        <div className="max-w-6xl mx-auto">
+        <div className="max-w-6xl w-full mx-auto">
             {/* 移动端：折叠日历 + 动态列表 */}
             <div className="lg:hidden">
                 <div className="mb-4">
@@ -343,7 +343,7 @@ export default function MomentsClient() {
                                                 <button
                                                     {...props}
                                                     className={cn(
-                                                        "relative isolate z-10 flex aspect-square size-auto w-full min-w-8 flex-col gap-0.5 border-0 leading-none font-normal rounded-lg transition-colors",
+                                                        "relative isolate z-10 flex aspect-square size-auto w-full min-w-8 flex-col items-center justify-center gap-0.5 border-0 leading-none font-normal rounded-lg transition-colors",
                                                         isSelected
                                                             ? "bg-primary text-primary-foreground"
                                                             : "hover:bg-gray-100 dark:hover:bg-gray-800",
@@ -369,7 +369,7 @@ export default function MomentsClient() {
             </div>
 
             {/* 桌面端：侧边栏布局 */}
-            <div className="hidden lg:flex gap-6 items-start">
+            <div className="hidden lg:flex gap-6 items-start justify-center">
                 {/* 左侧动态列表 */}
                 <div className="max-w-xl flex-1 min-w-0">
                     {MomentList}

@@ -103,6 +103,10 @@
   --ring: #d4d4d8;
 }
 
+html {
+  scrollbar-gutter: stable;
+}
+
 body {
   color: var(--foreground);
   background: var(--background);

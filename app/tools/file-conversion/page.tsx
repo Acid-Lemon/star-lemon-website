@@ -7,15 +7,16 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { toast } from 'sonner';
-import { RiArrowLeftLine, RiFileLine, RiCloseLine, RiUploadCloudLine, RiWechatPayLine, RiCheckLine, RiDownloadLine, RiFolderLine, RiBillLine, RiRefreshLine, RiFilePdf2Line } from '@remixicon/react';
+import { RiArrowLeftLine, RiFileLine, RiCloseLine, RiUploadCloudLine, RiWechatPayLine, RiCheckLine, RiDownloadLine, RiFolderLine, RiBillLine, RiRefreshLine } from '@remixicon/react';
 import { AlertDialog, AlertDialogContent, AlertDialogHeader, AlertDialogMedia, AlertDialogTitle, AlertDialogDescription, AlertDialogFooter, AlertDialogCancel, AlertDialogAction } from '@/components/ui/alert-dialog';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { getOutputFormats, getOutputFormatLabel, getSrcFormat } from '@/lib/convert-formats';
 
 const SUPPORTED_FORMATS: { category: string; exts: string }[] = [
   { category: '图片', exts: '.jpg .jpeg .png .gif .bmp .tiff .webp' },
-  { category: 'Word 文档', exts: '.doc .docx .dot .dotx .rtf .odt .txt .wps' },
-  { category: 'Excel 表格', exts: '.xls .xlsx .xlsm .ods .csv .et' },
-  { category: 'PPT 演示', exts: '.ppt .pptx .pps .ppsx .odp .dps' },
-  { category: '其他', exts: '.pdf .html .htm' },
+  { category: '文档', exts: '.doc .docx .dot .dotx .rtf .odt .txt .wps .fodt .epub .xml .md .pdf .html .htm' },
+  { category: '表格', exts: '.xls .xlsx .xlsm .xlt .xltx .xltm .ods .csv .et .fods .dbf' },
+  { category: '演示', exts: '.ppt .pptx .pps .ppsx .pot .potx .odp .dps .fodp' },
 ];
 
 const ACCEPT_STRING = SUPPORTED_FORMATS.flatMap(f => f.exts.split(' ')).join(',');
@@ -56,20 +57,23 @@ interface UserOrder {
 function ConvertPanel() {
   const user = useUser();
   const [file, setFile] = useState<File | null>(null);
+  const [dstFormat, setDstFormat] = useState('pdf');
+  const [availableFormats, setAvailableFormats] = useState<string[]>([]);
   const [loading, setLoading] = useState(false);
   const [step, setStep] = useState<Step>('form');
   const [conversionId, setConversionId] = useState<number | null>(null);
   const [uploadProgress, setUploadProgress] = useState(0);
   const [convertProgress, setConvertProgress] = useState(0);
-  const [pageCount, setPageCount] = useState(0);
   const [price, setPrice] = useState<number | null>(null);
   const [qrCodeUrl, setQrCodeUrl] = useState('');
   const [autoPaying, setAutoPaying] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const pollingRef = useRef<NodeJS.Timeout | null>(null);
   const conversionIdRef = useRef<number | null>(null);
+  const dstFormatRef = useRef<string>('pdf');
 
   useEffect(() => { conversionIdRef.current = conversionId; }, [conversionId]);
+  useEffect(() => { dstFormatRef.current = dstFormat; }, [dstFormat]);
 
   const stopPolling = useCallback(() => {
     if (pollingRef.current) {
@@ -90,7 +94,6 @@ function ConvertPanel() {
         const data = await res.json();
         if (data.status === 'completed') {
           stopPolling();
-          setPageCount(data.pageCount);
           setPrice(data.price);
           if (data.paid) {
             setStep('done');
@@ -127,11 +130,12 @@ function ConvertPanel() {
   const handleSubmit = async () => {
     if (!file) return;
     setLoading(true);
+    const currentDst = dstFormatRef.current;
     try {
       const createRes = await fetch('/api/file-conversion', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ fileName: file.name, fileSize: file.size }),
+        body: JSON.stringify({ fileName: file.name, fileSize: file.size, dstFormat: currentDst }),
       });
       const createData = await createRes.json();
 
@@ -158,7 +162,6 @@ function ConvertPanel() {
         if (xhr.status >= 200 && xhr.status < 300) {
           const result = JSON.parse(xhr.responseText);
           if (result.status === 'completed') {
-            setPageCount(result.pageCount);
             setStep('paying');
             fetchPrice(createData.id);
           } else if (result.status === 'converting') {
@@ -259,13 +262,21 @@ function ConvertPanel() {
     if (!cid) return;
     try {
       const res = await fetch(`/api/file-conversion/${cid}/download`, { method: 'POST' });
-      const data = await res.json();
-      if (data.downloadUrl) {
-        window.open(data.downloadUrl, '_blank');
-        toast.success('开始下载');
-      } else {
-        toast.error(data.error || '下载失败');
+      if (!res.ok) {
+        const errData = await res.json().catch(() => ({}));
+        toast.error(errData.error || '下载失败');
+        return;
       }
+      const blob = await res.blob();
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = '';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      toast.success('开始下载');
     } catch {
       toast.error('下载失败');
     }
@@ -274,17 +285,18 @@ function ConvertPanel() {
   const handleReset = () => {
     stopPolling();
     setFile(null);
-    setStep('form');
+    setDstFormat('pdf');
+    setAvailableFormats([]);
+setStep('form');
     setConversionId(null);
     setUploadProgress(0);
-    setConvertProgress(0);
-    setPageCount(0);
     setPrice(null);
     setQrCodeUrl('');
     setAutoPaying(false);
   };
 
   if (step === 'done') {
+    const outLabel = getOutputFormatLabel(dstFormat);
     return (
       <Card>
         <CardHeader>
@@ -292,17 +304,13 @@ function ConvertPanel() {
             <RiCheckLine className="w-5 h-5 text-green-500" />
             转换完成
           </CardTitle>
-          <CardDescription>文件已成功转换为 PDF</CardDescription>
+          <CardDescription>文件已成功转换为 {outLabel}</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="bg-muted/50 rounded-lg p-4 space-y-1 text-sm">
             <div className="flex justify-between">
               <span className="text-muted-foreground">文件名</span>
               <span className="font-medium truncate max-w-[240px]">{file?.name}</span>
-            </div>
-            <div className="flex justify-between">
-              <span className="text-muted-foreground">PDF 页数</span>
-              <span>{pageCount} 页</span>
             </div>
             {price !== null && (
               <div className="flex justify-between">
@@ -313,8 +321,9 @@ function ConvertPanel() {
           </div>
           <Button className="w-full" size="lg" onClick={handleDownload}>
             <RiDownloadLine className="w-4 h-4 mr-2" />
-            下载 PDF
+            下载 {outLabel}
           </Button>
+          <p className="text-xs text-muted-foreground text-center">转换文件仅保留 24 小时，请及时下载</p>
           <Button variant="outline" className="w-full" onClick={handleReset}>
             继续转换
           </Button>
@@ -331,17 +340,13 @@ function ConvertPanel() {
             <RiWechatPayLine className="w-5 h-5 text-green-500" />
             支付下载
           </CardTitle>
-          <CardDescription>转换完成，支付后即可下载 PDF</CardDescription>
+          <CardDescription>转换完成，支付后即可下载文件，文件仅保留 24 小时</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="bg-muted/50 rounded-lg p-4 space-y-1 text-sm">
             <div className="flex justify-between">
               <span className="text-muted-foreground">文件名</span>
               <span className="font-medium truncate max-w-[200px]">{file?.name}</span>
-            </div>
-            <div className="flex justify-between">
-              <span className="text-muted-foreground">PDF 页数</span>
-              <span>{pageCount} 页</span>
             </div>
             <div className="flex justify-between font-medium pt-1 border-t mt-1">
               <span>需支付</span>
@@ -446,11 +451,8 @@ function ConvertPanel() {
   return (
     <Card>
       <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          <RiFilePdf2Line className="w-5 h-5" />
-          转换为 PDF
-        </CardTitle>
-        <CardDescription>选择文件上传并转换为 PDF，按转换出的页数收费</CardDescription>
+        <CardTitle>文件转换</CardTitle>
+        <CardDescription>选择文件并选择输出格式，按次收费，文件仅保留 24 小时</CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
         <div
@@ -464,7 +466,13 @@ function ConvertPanel() {
             accept={ACCEPT_STRING}
             onChange={(e) => {
               const f = e.target.files?.[0];
-              if (f) { setFile(f); }
+              if (f) {
+                setFile(f);
+                const fmt = getSrcFormat(f.name);
+                const formats = fmt ? getOutputFormats(fmt) : [];
+                setAvailableFormats(formats);
+                setDstFormat('pdf');
+              }
             }}
           />
           {file ? (
@@ -475,7 +483,7 @@ function ConvertPanel() {
                 <p className="text-sm text-muted-foreground">{formatFileSize(file.size)}</p>
               </div>
               <button
-                onClick={(e) => { e.stopPropagation(); setFile(null); }}
+                onClick={(e) => { e.stopPropagation(); setFile(null); setAvailableFormats([]); setDstFormat('pdf'); }}
                 className="ml-2 p-1 rounded-full hover:bg-muted"
               >
                 <RiCloseLine className="w-4 h-4" />
@@ -485,10 +493,28 @@ function ConvertPanel() {
             <>
               <RiUploadCloudLine className="w-10 h-10 mx-auto text-muted-foreground mb-3" />
               <p className="text-sm text-muted-foreground">点击选择文件或拖拽到此处</p>
-              <p className="text-xs text-muted-foreground mt-1">支持图片、Word、Excel、PPT、PDF、HTML 等格式</p>
+              <p className="text-xs text-muted-foreground mt-1">支持图片、文档、表格、演示等格式</p>
             </>
           )}
         </div>
+
+        {file && availableFormats.length > 0 && (
+          <div className="space-y-2">
+            <label className="text-sm font-medium">输出格式</label>
+            <Select value={dstFormat} onValueChange={(v) => { if (v) setDstFormat(v); }}>
+              <SelectTrigger className="w-full">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {availableFormats.map(f => (
+                  <SelectItem key={f} value={f}>
+                    {getOutputFormatLabel(f)}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+        )}
 
         <div className="bg-muted/50 rounded-lg p-3">
           <p className="text-xs font-medium text-muted-foreground mb-2">支持格式</p>
@@ -548,12 +574,20 @@ function MyConversionsPanel({ refreshKey }: { refreshKey?: number }) {
   const handleDownload = async (id: number) => {
     try {
       const res = await fetch(`/api/file-conversion/${id}/download`, { method: 'POST' });
-      const data = await res.json();
-      if (data.downloadUrl) {
-        window.open(data.downloadUrl, '_blank');
-      } else {
-        toast.error(data.error || '下载失败');
+      if (!res.ok) {
+        const errData = await res.json().catch(() => ({}));
+        toast.error(errData.error || '下载失败');
+        return;
       }
+      const blob = await res.blob();
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = '';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
     } catch {
       toast.error('下载失败');
     }
@@ -583,7 +617,7 @@ function MyConversionsPanel({ refreshKey }: { refreshKey?: number }) {
               <div key={conv.id} className="border rounded-lg p-3 space-y-2">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
-                    <RiFilePdf2Line className="w-4 h-4 text-primary" />
+                    <RiFileLine className="w-4 h-4 text-primary" />
                     <span className="font-medium text-sm truncate max-w-[180px]">{conv.file_name}</span>
                   </div>
                   {getStatusBadge(conv)}
@@ -591,18 +625,22 @@ function MyConversionsPanel({ refreshKey }: { refreshKey?: number }) {
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-4 text-xs text-muted-foreground">
                     <span>{formatFileSize(conv.file_size)}</span>
-                    {conv.page_count && <span>{conv.page_count} 页</span>}
+                    {conv.page_count != null && conv.page_count > 0 && <span>{conv.page_count} 页</span>}
                     <span>{new Date(conv.created_at).toLocaleDateString('zh-CN')}</span>
                   </div>
-                  {conv.order_status === 'paid' && (
-                    <button
-                      onClick={() => handleDownload(conv.id)}
-                      className="p-1 rounded hover:bg-primary/10 text-primary transition-colors"
-                      title="下载 PDF"
-                    >
-                      <RiDownloadLine className="w-4 h-4" />
-                    </button>
-                  )}
+                  {conv.order_status === 'paid' && (() => {
+                    const hoursSince = (Date.now() - new Date(conv.created_at).getTime()) / 3600000;
+                    if (hoursSince > 24) return null;
+                    return (
+                      <button
+                        onClick={() => handleDownload(conv.id)}
+                        className="p-1 rounded hover:bg-primary/10 text-primary transition-colors"
+                        title="下载文件"
+                      >
+                        <RiDownloadLine className="w-4 h-4" />
+                      </button>
+                    );
+                  })()}
                 </div>
               </div>
             ))}
@@ -669,7 +707,7 @@ function MyOrdersPanel({ refreshKey }: { refreshKey?: number }) {
               <div key={order.id} className="border rounded-lg p-3 space-y-2">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
-                    <RiFilePdf2Line className="w-4 h-4 text-primary" />
+                    <RiFileLine className="w-4 h-4 text-primary" />
                     <span className="font-medium text-sm truncate max-w-[180px]">{order.file_name || '(已删除)'}</span>
                   </div>
                   {getStatusBadge(order)}
@@ -712,11 +750,11 @@ export default function FileConversionPage() {
           <div className="lg:col-span-2">
             <div className="text-center space-y-3 mb-6">
               <h1 className="text-3xl font-bold tracking-tight">文件转换</h1>
-              <p className="text-muted-foreground">将各种格式文件转换为 PDF，按页数收费</p>
+              <p className="text-muted-foreground">将各种格式文件互相转换，按转换结果收费</p>
             </div>
             <ConvertPanel />
             <div className="text-xs text-muted-foreground text-center space-y-1 mt-6">
-              <p>文件转换由服务器端处理，转换完成后按 PDF 页数计费</p>
+              <p>文件转换由服务器端处理，转换完成后请及时下载，文件仅保留 24 小时</p>
               <p>1 星柠币 = 0.01 元，可抵扣转换费用</p>
             </div>
           </div>

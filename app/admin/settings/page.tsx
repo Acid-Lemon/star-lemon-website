@@ -43,7 +43,7 @@ const fieldOrder: Record<string, string[]> = {
   oss: ['oss_endpoint', 'oss_region', 'oss_bucket', 'oss_access_key_id', 'oss_access_key_secret', 'esa_domain'],
   pay: ['lantu_mch_id', 'lantu_key'],
   pricing: ['ft_storage_price', 'ft_traffic_price', 'ft_payment_fee', 'ft_service_fee', 'ft_profit_rate'],
-  convert: ['convert_api_url', 'convert_api_key', 'fc_price_per_page', 'fc_payment_fee', 'fc_service_fee', 'fc_profit_rate'],
+  convert: ['convert_api_url', 'convert_api_key', 'fc_price_per_file', 'fc_payment_fee', 'fc_service_fee', 'fc_profit_rate'],
 };
 
 export default function SettingsPage() {

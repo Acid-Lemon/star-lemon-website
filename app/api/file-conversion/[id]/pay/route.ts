@@ -37,7 +37,7 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
       return NextResponse.json({ paid: true });
     }
 
-    const price = await calculateConversionPrice({ pageCount: conversion.page_count });
+    const price = await calculateConversionPrice({ pageCount: conversion.page_count, srcFormat: conversion.src_format, dstFormat: conversion.dst_format });
 
     if (conversion.order_id && conversion.order_status === 'unpaid') {
       // order exists, proceed to payment

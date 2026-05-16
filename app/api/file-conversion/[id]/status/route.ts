@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import db from '@/lib/db';
-import { getConversionTaskStatus, downloadConvertedFile, countPdfPages } from '@/lib/convert-service';
-import { multipartUpload } from '@/lib/oss';
+import { getConversionTaskStatus } from '@/lib/convert-service';
 import { calculateConversionPrice } from '@/lib/convert-price-calc';
 
 export async function GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
@@ -21,13 +20,16 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
     }
 
     const conversion = result.rows[0];
+    const dstFormat = conversion.dst_format || 'pdf';
 
     if (conversion.status === 'completed') {
-      const price = conversion.page_count > 0 ? await calculateConversionPrice({ pageCount: conversion.page_count }) : 0;
+      const pageCount = conversion.page_count || 0;
+      const price = await calculateConversionPrice({ pageCount, srcFormat: conversion.src_format, dstFormat });
       return NextResponse.json({
         status: 'completed',
-        pageCount: conversion.page_count,
+        pageCount,
         price,
+        dstFormat,
         paid: conversion.order_status === 'paid',
       });
     }
@@ -41,33 +43,20 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
         const taskStatus = await getConversionTaskStatus(conversion.task_id);
 
         if (taskStatus.status === 'completed') {
-          try {
-            const pdfBuffer = await downloadConvertedFile(conversion.task_id);
-            const pageCount = countPdfPages(pdfBuffer);
-            const pdfFileName = conversion.file_name.replace(/\.[^.]+$/, '.pdf');
-            const pdfKey = await multipartUpload(pdfFileName, pdfBuffer);
+          await db.query(
+            `UPDATE file_conversions SET status = 'completed', updated_at = CURRENT_TIMESTAMP WHERE id = $1`,
+            [conversion.id]
+          );
 
-            await db.query(
-              `UPDATE file_conversions SET pdf_oss_key = $1, page_count = $2, status = 'completed', updated_at = CURRENT_TIMESTAMP WHERE id = $3`,
-              [pdfKey, pageCount, conversion.id]
-            );
+          const price = await calculateConversionPrice({ pageCount: 0, srcFormat: conversion.src_format, dstFormat });
 
-            const price = await calculateConversionPrice({ pageCount });
-
-            return NextResponse.json({
-              status: 'completed',
-              pageCount,
-              price,
-              paid: false,
-            });
-          } catch (err) {
-            console.error('Download/process converted file error:', err);
-            await db.query(
-              `UPDATE file_conversions SET status = 'failed', updated_at = CURRENT_TIMESTAMP WHERE id = $1`,
-              [conversion.id]
-            );
-            return NextResponse.json({ status: 'failed' });
-          }
+          return NextResponse.json({
+            status: 'completed',
+            pageCount: 0,
+            price,
+            dstFormat,
+            paid: false,
+          });
         }
 
         if (taskStatus.status === 'failed') {

@@ -296,8 +296,7 @@ async function init() {
           file_name VARCHAR(500) NOT NULL,
           file_size BIGINT NOT NULL,
           src_format VARCHAR(20) NOT NULL,
-          src_oss_key TEXT,
-          pdf_oss_key TEXT,
+          dst_format VARCHAR(20) NOT NULL DEFAULT 'pdf',
           task_id VARCHAR(100),
           page_count INTEGER,
           status VARCHAR(20) NOT NULL DEFAULT 'uploading',
@@ -310,6 +309,20 @@ async function init() {
       console.log('✅ file_conversions 表创建成功');
     } else {
       console.log('⏭️ file_conversions 表已存在，跳过创建');
+
+      // 迁移：添加 dst_format 列
+      if (!await columnExists(client, 'file_conversions', 'dst_format')) {
+        await client.query(`ALTER TABLE file_conversions ADD COLUMN dst_format VARCHAR(20) NOT NULL DEFAULT 'pdf'`);
+        console.log('✅ 已添加 file_conversions.dst_format 列');
+      }
+
+      // 迁移：移除不需要的 OSS 列
+      for (const col of ['src_oss_key', 'output_oss_key', 'pdf_oss_key']) {
+        if (await columnExists(client, 'file_conversions', col)) {
+          await client.query(`ALTER TABLE file_conversions DROP COLUMN ${col}`);
+          console.log(`✅ 已移除 file_conversions.${col} 列`);
+        }
+      }
     }
 
     // dev_tasks
@@ -404,7 +417,7 @@ async function init() {
     const convertSettings = [
       { key: 'convert_api_url', value: 'https://gg.goldenglow.top:50006', category: 'convert', label: '转换服务地址' },
       { key: 'convert_api_key', value: '', category: 'convert', label: '转换服务 API Key' },
-      { key: 'fc_price_per_page', value: '0.1', category: 'convert', label: '每页价格（元）' },
+      { key: 'fc_price_per_file', value: '0.01', category: 'convert', label: '文件单价（元）' },
       { key: 'fc_payment_fee', value: '0.6', category: 'convert', label: '支付手续费率(%)' },
       { key: 'fc_service_fee', value: '0.7', category: 'convert', label: '服务费率(%)' },
       { key: 'fc_profit_rate', value: '5', category: 'convert', label: '利润率(%)' },
@@ -421,6 +434,19 @@ async function init() {
         console.log(`⏭️ 设置 ${s.key} 已存在，跳过`);
       }
     }
+
+    // 迁移：清理旧的按页/按类别计费配置项
+    const oldKeys = ['fc_price_per_page', 'fc_price_per_image', 'fc_price_page_image', 'fc_price_page_document', 'fc_price_page_spreadsheet', 'fc_price_page_presentation'];
+    for (const oldKey of oldKeys) {
+      const exists = await client.query('SELECT 1 FROM settings WHERE key = $1', [oldKey]);
+      if (exists.rows.length > 0) {
+        await client.query('DELETE FROM settings WHERE key = $1', [oldKey]);
+        console.log(`✅ 已迁移：移除旧键 ${oldKey}`);
+      }
+    }
+
+    // 迁移：更新 fc_price_per_file 标签
+    await client.query("UPDATE settings SET label = '文件单价（元）' WHERE key = 'fc_price_per_file' AND label != '文件单价（元）'");
 
     process.exit(0);
   } catch (err) {

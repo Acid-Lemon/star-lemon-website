@@ -19,7 +19,7 @@ const tools = [
   },
   {
     name: '文件转换',
-    description: '将各种格式文件转换为 PDF，按页数收费',
+    description: '将各种格式文件互相转换，按转换结果收费',
     icon: RiFilePdf2Line,
     href: '/tools/file-conversion',
     color: 'text-emerald-500 dark:text-emerald-400',

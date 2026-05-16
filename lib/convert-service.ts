@@ -1,37 +1,17 @@
 import { getSettings } from './settings';
 
-const FORMAT_MAP: Record<string, string> = {
-  '.jpg': 'jpg', '.jpeg': 'jpg', '.png': 'png', '.gif': 'gif',
-  '.bmp': 'bmp', '.tiff': 'tiff', '.tif': 'tiff', '.webp': 'webp',
-  '.doc': 'doc', '.docx': 'docx', '.dot': 'dot', '.dotx': 'dotx',
-  '.rtf': 'rtf', '.odt': 'odt', '.txt': 'txt', '.wps': 'wps',
-  '.xls': 'xls', '.xlsx': 'xlsx', '.xlsm': 'xlsm', '.ods': 'ods',
-  '.csv': 'csv', '.et': 'et',
-  '.ppt': 'ppt', '.pptx': 'pptx', '.pps': 'pps', '.ppsx': 'ppsx',
-  '.odp': 'odp', '.dps': 'dps',
-  '.pdf': 'pdf', '.html': 'html', '.htm': 'html',
-};
-
-export const SUPPORTED_EXTENSIONS = Object.keys(FORMAT_MAP);
-
-export function getSrcFormat(fileName: string): string | null {
-  const ext = '.' + fileName.split('.').pop()?.toLowerCase();
-  return FORMAT_MAP[ext] || null;
-}
-
-export function isFormatSupported(fileName: string): boolean {
-  return getSrcFormat(fileName) !== null;
-}
-
-export function countPdfPages(buffer: Buffer): number {
-  const text = buffer.toString('latin1');
-  const countMatch = text.match(/\/Count\s+(\d+)/);
-  if (countMatch) {
-    return parseInt(countMatch[1]);
-  }
-  const pageMatches = text.match(/\/Type\s*\/Page(?!s)/g);
-  return pageMatches ? pageMatches.length : 1;
-}
+export {
+  SUPPORTED_EXTENSIONS,
+  getSrcFormat,
+  isFormatSupported,
+  getFormatCategory,
+  getOutputFormats,
+  getOutputFormatLabel,
+  isValidOutputFormat,
+  isPdfOutput,
+  countPdfPages,
+} from './convert-formats';
+export type { FormatCategory } from './convert-formats';
 
 async function getApiConfig() {
   const settings = await getSettings();

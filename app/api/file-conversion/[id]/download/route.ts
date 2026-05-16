@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import db from '@/lib/db';
-import { generateDownloadUrl } from '@/lib/oss';
+import { downloadConvertedFile } from '@/lib/convert-service';
 
 export async function POST(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
@@ -28,16 +28,19 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
       return NextResponse.json({ error: '尚未完成支付' }, { status: 400 });
     }
 
-    if (!conversion.pdf_oss_key) {
-      return NextResponse.json({ error: '转换文件不存在' }, { status: 400 });
+    if (!conversion.task_id) {
+      return NextResponse.json({ error: '转换任务不存在' }, { status: 400 });
     }
 
-    const pdfFileName = conversion.file_name.replace(/\.[^.]+$/, '.pdf');
-    const downloadUrl = await generateDownloadUrl(conversion.pdf_oss_key, pdfFileName);
+    const dstFormat = conversion.dst_format || 'pdf';
+    const outputFileName = conversion.file_name.replace(/\.[^.]+$/, `.${dstFormat.toLowerCase()}`);
+    const fileBuffer = await downloadConvertedFile(conversion.task_id);
 
-    return NextResponse.json({
-      downloadUrl,
-      fileName: pdfFileName,
+    return new NextResponse(new Uint8Array(fileBuffer), {
+      headers: {
+        'Content-Type': 'application/octet-stream',
+        'Content-Disposition': `attachment; filename="${encodeURIComponent(outputFileName)}"`,
+      },
     });
   } catch (error) {
     console.error('Download error:', error);

@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import db from '@/lib/db';
 import { getSession } from '@/lib/auth';
-import { isFormatSupported, getSrcFormat } from '@/lib/convert-service';
+import { isFormatSupported, getSrcFormat, isValidOutputFormat } from '@/lib/convert-service';
 
 export async function POST(request: NextRequest) {
   try {
@@ -11,7 +11,7 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json();
-    const { fileName, fileSize } = body;
+    const { fileName, fileSize, dstFormat } = body;
 
     if (!fileName || !fileSize) {
       return NextResponse.json({ error: '参数不完整' }, { status: 400 });
@@ -22,12 +22,17 @@ export async function POST(request: NextRequest) {
     }
 
     const srcFormat = getSrcFormat(fileName)!;
+    const resolvedDst = dstFormat || 'pdf';
+
+    if (!isValidOutputFormat(srcFormat, resolvedDst)) {
+      return NextResponse.json({ error: `不支持转换为 ${resolvedDst} 格式` }, { status: 400 });
+    }
 
     const result = await db.query(
-      `INSERT INTO file_conversions (user_id, file_name, file_size, src_format, status)
-       VALUES ($1, $2, $3, $4, 'uploading')
+      `INSERT INTO file_conversions (user_id, file_name, file_size, src_format, dst_format, status)
+       VALUES ($1, $2, $3, $4, $5, 'uploading')
        RETURNING id`,
-      [session.user.id, fileName, fileSize, srcFormat]
+      [session.user.id, fileName, fileSize, srcFormat, resolvedDst]
     );
 
     return NextResponse.json({ id: result.rows[0].id });

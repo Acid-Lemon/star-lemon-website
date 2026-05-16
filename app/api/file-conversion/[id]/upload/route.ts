@@ -1,8 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import db from '@/lib/db';
 import { getSession } from '@/lib/auth';
-import { multipartUpload } from '@/lib/oss';
-import { getSrcFormat, uploadAndConvert, countPdfPages } from '@/lib/convert-service';
+import { getSrcFormat, uploadAndConvert } from '@/lib/convert-service';
 
 export async function POST(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
@@ -38,29 +37,14 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
     }
 
     const srcFormat = getSrcFormat(conversion.file_name) || conversion.src_format;
-
-    if (srcFormat === 'pdf') {
-      const pageCount = countPdfPages(fileBuffer);
-      const key = await multipartUpload(conversion.file_name, fileBuffer);
-      await db.query(
-        `UPDATE file_conversions SET src_oss_key = $1, pdf_oss_key = $1, page_count = $2, status = 'completed', updated_at = CURRENT_TIMESTAMP WHERE id = $3`,
-        [key, pageCount, conversion.id]
-      );
-      return NextResponse.json({ status: 'completed', pageCount });
-    }
-
-    const key = await multipartUpload(conversion.file_name, fileBuffer);
-    await db.query(
-      `UPDATE file_conversions SET src_oss_key = $1, status = 'converting', updated_at = CURRENT_TIMESTAMP WHERE id = $2`,
-      [key, conversion.id]
-    );
+    const dstFormat = conversion.dst_format || 'pdf';
 
     try {
       const task = await uploadAndConvert({
         fileBuffer,
         fileName: conversion.file_name,
         srcFormat,
-        dstFormat: 'pdf',
+        dstFormat,
       });
 
       await db.query(

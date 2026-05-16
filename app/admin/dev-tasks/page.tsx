@@ -14,11 +14,20 @@ import { Badge } from '@/components/ui/badge';
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '@/components/ui/select';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { RiAddLine, RiEditLine, RiDeleteBinLine, RiTaskLine, RiArrowDownSLine } from '@remixicon/react';
+import { RiAddLine, RiEditLine, RiDeleteBinLine, RiTaskLine, RiArrowDownSLine, RiArrowRightLine } from '@remixicon/react';
 
 const STATUS_OPTIONS = ['待处理', '待开发', '开发中', '待讨论', '已完成', '暂不开发'] as const;
 const TYPE_OPTIONS = ['bug', '新功能', '优化', '重构', '文档'] as const;
 const PRIORITY_OPTIONS = ['高', '中', '低'] as const;
+
+const NEXT_STATUS: Record<string, string | null> = {
+  '待处理': '待开发',
+  '待开发': '开发中',
+  '开发中': '已完成',
+  '待讨论': null,
+  '已完成': null,
+  '暂不开发': null,
+};
 
 interface AdminUser {
   id: number;
@@ -232,6 +241,27 @@ export default function DevTasksPage() {
     }
   };
 
+  const handleAdvance = async (task: DevTask) => {
+    const nextStatus = NEXT_STATUS[task.status];
+    if (!nextStatus) return;
+    try {
+      const res = await fetch(`/api/dev-tasks/${task.id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status: nextStatus }),
+      });
+      if (res.ok) {
+        toast.success(`状态已变更为「${nextStatus}」`);
+        fetchData();
+      } else {
+        const data = await res.json();
+        toast.error(data.error || '更新失败');
+      }
+    } catch {
+      toast.error('更新失败');
+    }
+  };
+
   const getAssigneeNames = (ids: number[] | null) => {
     if (!ids || ids.length === 0) return '—';
     return ids
@@ -433,6 +463,16 @@ export default function DevTasksPage() {
                       </TableCell>
                       <TableCell className="text-right">
                         <div className="flex items-center justify-end gap-1">
+                          {NEXT_STATUS[task.status] && (
+                            <Button
+                              size="sm"
+                              variant="ghost"
+                              onClick={() => handleAdvance(task)}
+                              title={`下一状态: ${NEXT_STATUS[task.status]}`}
+                            >
+                              <RiArrowRightLine className="w-4 h-4" />
+                            </Button>
+                          )}
                           <Button size="sm" variant="ghost" onClick={() => openEdit(task)}>
                             <RiEditLine className="w-4 h-4" />
                           </Button>

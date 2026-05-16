@@ -1,53 +1,38 @@
+'use client';
+
 import React from 'react';
 import Link from 'next/link';
-import {RiTimeLine, RiFileTextLine, RiHomeLine, RiLogoutBoxLine, RiChat3Line, RiChat4Line, RiSideBarLine, RiSettings3Line, RiFlashlightLine, RiDoubleQuotesL, RiUserLine, RiFolderTransferLine, RiLinksLine, RiFilePdf2Line, RiTaskLine} from '@remixicon/react';
-import {getSession, logoutUser} from '../../lib/auth';
-import {redirect} from 'next/navigation';
-import { getPublicUrl } from '../../lib/oss';
-import db from '../../lib/db';
-import { ScrollArea } from '@/components/ui/scroll-area';
-import { MobileSidebar } from './_components/mobile-sidebar';
+import {usePathname} from 'next/navigation';
+import {RiTimeLine, RiFileTextLine, RiHomeLine, RiLogoutBoxLine, RiChat3Line, RiChat4Line, RiSideBarLine, RiSettings3Line, RiFlashlightLine, RiDoubleQuotesL, RiUserLine, RiFolderTransferLine, RiLinksLine, RiFilePdf2Line, RiTaskLine, RiMenuLine} from '@remixicon/react';
+import {Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger} from '@/components/ui/sheet';
+import {Button} from '@/components/ui/button';
+import {ScrollArea} from '@/components/ui/scroll-area';
 
-export default async function AdminLayout({children}: { children: React.ReactNode }) {
-    const session: any = await getSession();
-    if (!session || session.user?.role !== 'admin') {
-        redirect('/');
-    }
+interface MobileSidebarProps {
+    adminName: string;
+    handleLogout: () => Promise<void>;
+}
 
-    // 从数据库获取最新的管理员信息
-    let admin = session.user;
-    try {
-        const result = await db.query(
-            'SELECT id, nickname, email, role, avatar FROM users WHERE id = $1',
-            [session.user.id]
-        );
-        if (result.rows.length > 0) {
-            const row = result.rows[0];
-            admin = {
-                ...row,
-                avatar: await getPublicUrl(row.avatar),
-            };
-        }
-    } catch (error) {
-        console.error('Failed to fetch admin info:', error);
-    }
+export function MobileSidebar({adminName, handleLogout}: MobileSidebarProps) {
+    const [open, setOpen] = React.useState(false);
+    const pathname = usePathname();
 
-    async function handleLogout() {
-        'use server';
-        await logoutUser();
-        redirect('/');
-    }
-
+    React.useEffect(() => {
+        setOpen(false);
+    }, [pathname]);
     return (
-        <div className="flex w-full min-h-screen bg-muted/40">
-            {/* Sidebar */}
-            <aside className="hidden w-64 flex-col border-r bg-background sm:flex shrink-0 shadow-sm z-10 h-screen">
-                <div className="h-16 flex items-center px-6 border-b shrink-0">
-                    <span className="font-bold text-lg flex items-center gap-2 text-foreground">
+        <Sheet open={open} onOpenChange={setOpen}>
+            <SheetTrigger render={<Button variant="ghost" size="icon" className="sm:hidden" />}>
+                <RiMenuLine className="h-5 w-5" />
+                <span className="sr-only">打开菜单</span>
+            </SheetTrigger>
+            <SheetContent side="left" className="w-64 p-0">
+                <SheetHeader className="h-16 flex flex-row items-center px-6 border-b shrink-0">
+                    <SheetTitle className="flex items-center gap-2">
                         <RiSideBarLine className="h-5 w-5 text-primary"/>
                         后台管理系统
-                    </span>
-                </div>
+                    </SheetTitle>
+                </SheetHeader>
                 <ScrollArea className="flex-1 min-h-0">
                     <nav className="flex flex-col gap-1 p-4">
                         <div className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2 px-2">
@@ -131,54 +116,15 @@ export default async function AdminLayout({children}: { children: React.ReactNod
                         <RiHomeLine className="h-4 w-4"/>
                         返回前台
                     </Link>
-                    <form action={handleLogout}>
+                    <form action={handleLogout} className="mt-1">
                         <button type="submit"
-                                className="w-full mt-1 flex items-center gap-3 px-3 py-2.5 rounded-md text-sm font-medium text-destructive hover:bg-destructive/10 transition-colors text-left">
+                                className="w-full flex items-center gap-3 px-3 py-2.5 rounded-md text-sm font-medium text-destructive hover:bg-destructive/10 transition-colors text-left">
                             <RiLogoutBoxLine className="h-4 w-4"/>
                             退出登录
                         </button>
                     </form>
                 </div>
-            </aside>
-
-            {/* Main Content Area */}
-            <div className="flex-1 flex flex-col h-screen overflow-hidden">
-                {/* Top Header */}
-                <header
-                    className="h-16 flex items-center justify-between px-6 border-b bg-background shadow-sm shrink-0">
-                    <div className="flex items-center gap-2">
-                        <MobileSidebar adminName={admin.nickname || 'Admin'} handleLogout={handleLogout} />
-                    </div>
-                    <div className="flex items-center gap-4">
-                        <div className="flex items-center gap-2">
-                            {admin.avatar ? (
-                                <img
-                                    src={admin.avatar}
-                                    alt={admin.nickname}
-                                    className="w-8 h-8 rounded-full object-cover"
-                                />
-                            ) : (
-                                <div
-                                    className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary font-semibold text-sm">
-                                    {admin.nickname?.[0]?.toUpperCase() || 'A'}
-                                </div>
-                            )}
-                            <span className="text-sm font-medium hidden md:block">
-                                {admin.nickname || 'Administrator'}
-                            </span>
-                        </div>
-                    </div>
-                </header>
-
-                {/* Page Content */}
-                <ScrollArea className="flex-1 min-h-0">
-                    <main className="p-6 md:p-8">
-                        <div className="mx-auto max-w-6xl">
-                            {children}
-                        </div>
-                    </main>
-                </ScrollArea>
-            </div>
-        </div>
+            </SheetContent>
+        </Sheet>
     );
 }

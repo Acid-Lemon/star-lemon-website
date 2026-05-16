@@ -1,6 +1,32 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getSession } from '../../../lib/auth';
-import { getOssClient, getPublicUrl } from '../../../lib/oss';
+import { getOssClient, getPublicUrl, deleteFile, extractOssKey } from '../../../lib/oss';
+
+export async function DELETE(request: NextRequest) {
+  try {
+    const session = await getSession();
+    if (!session?.user) {
+      return NextResponse.json({ error: '请先登录' }, { status: 401 });
+    }
+
+    const { searchParams } = new URL(request.url);
+    const key = searchParams.get('key');
+    if (!key) {
+      return NextResponse.json({ error: 'Missing key parameter' }, { status: 400 });
+    }
+
+    const ossKey = extractOssKey(key);
+    if (!ossKey) {
+      return NextResponse.json({ error: 'Invalid key' }, { status: 400 });
+    }
+
+    await deleteFile(ossKey);
+    return NextResponse.json({ success: true });
+  } catch (error) {
+    console.error('Delete failed:', error);
+    return NextResponse.json({ error: 'Delete failed' }, { status: 500 });
+  }
+}
 
 export async function POST(request: NextRequest) {
   try {
@@ -36,7 +62,8 @@ export async function POST(request: NextRequest) {
     const client = await getOssClient();
     await client.put(key, buffer);
 
-    return NextResponse.json({ url: `/${key}`, fileName, key });
+    const publicUrl = await getPublicUrl(key);
+    return NextResponse.json({ url: publicUrl, fileName, key });
   } catch (error) {
     console.error('Upload failed:', error);
     return NextResponse.json({ error: 'Upload failed' }, { status: 500 });

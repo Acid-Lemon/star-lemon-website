@@ -101,6 +101,23 @@ export function resetOssClient() {
   ossClient = null;
 }
 
+export function extractOssKey(urlOrKey: string | null | undefined): string | null {
+  if (!urlOrKey) return null;
+  const trimmed = urlOrKey.trim();
+  if (!trimmed) return null;
+
+  if (trimmed.startsWith('http://') || trimmed.startsWith('https://')) {
+    try {
+      const pathname = new URL(trimmed).pathname;
+      return pathname.startsWith('/') ? pathname.slice(1) : pathname;
+    } catch {
+      return null;
+    }
+  }
+
+  return trimmed.startsWith('/') ? trimmed.slice(1) : trimmed;
+}
+
 export async function getPublicUrl(urlOrKey: string | null | undefined): Promise<string | null> {
   if (!urlOrKey) return null;
 

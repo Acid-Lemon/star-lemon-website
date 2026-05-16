@@ -29,12 +29,78 @@ export function UserProfileModal({user, onClose, onUpdate}: UserProfileModalProp
     const [profileLoading, setProfileLoading] = useState(false);
     const [uploading, setUploading] = useState(false);
     const fileInputRef = useRef<HTMLInputElement>(null);
+    const [pendingFile, setPendingFile] = useState<File | null>(null);
+    const [previewUrl, setPreviewUrl] = useState<string>('');
+    const [showCropper, setShowCropper] = useState(false);
+    const [cropImage, setCropImage] = useState<string>('');
+    const cropCanvasRef = useRef<HTMLCanvasElement>(null);
+    const cropImageRef = useRef<HTMLImageElement>(null);
+    const [cropData, setCropData] = useState({ x: 0, y: 0, size: 0 });
+    const [cropScale, setCropScale] = useState(1);
+    const [imgNatural, setImgNatural] = useState({ w: 0, h: 0 });
+    const dragRef = useRef({ dragging: false, startX: 0, startY: 0, startX0: 0, startY0: 0 });
+    const cropViewSize = 256;
+
+    const fitScale = cropData.size > 0 ? cropViewSize / cropData.size : 1;
+    const displayScale = fitScale * cropScale;
+
+    const handleCropPointerDown = (e: React.PointerEvent) => {
+        const imgEl = cropImageRef.current;
+        if (!imgEl) return;
+        dragRef.current = {
+            dragging: true,
+            startX: e.clientX,
+            startY: e.clientY,
+            startX0: cropData.x,
+            startY0: cropData.y,
+        };
+        imgEl.setPointerCapture(e.pointerId);
+        e.preventDefault();
+    };
+
+    const handleCropPointerMove = (e: React.PointerEvent) => {
+        if (!dragRef.current.dragging) return;
+        const d = dragRef.current;
+        const dx = (e.clientX - d.startX) / displayScale;
+        const dy = (e.clientY - d.startY) / displayScale;
+        const imgEl = cropImageRef.current;
+        if (!imgEl) return;
+        const maxX = imgEl.naturalWidth - cropData.size;
+        const maxY = imgEl.naturalHeight - cropData.size;
+        setCropData(prev => ({
+            ...prev,
+            x: Math.max(0, Math.min(d.startX0 - dx, maxX)),
+            y: Math.max(0, Math.min(d.startY0 - dy, maxY)),
+        }));
+    };
+
+    const handleCropPointerUp = () => {
+        dragRef.current.dragging = false;
+    };
+
+    const handleCropWheel = (e: React.WheelEvent) => {
+        e.preventDefault();
+        e.stopPropagation();
+        const delta = e.deltaY < 0 ? 0.1 : -0.1;
+        setCropScale(prev => Math.max(1, Math.min(3, prev + delta)));
+    };
+
+    useEffect(() => {
+        return () => {
+            if (previewUrl) URL.revokeObjectURL(previewUrl);
+        };
+    }, [previewUrl]);
 
     useEffect(() => {
         setNickname(user?.nickname || '');
         setAvatar(user?.avatar || '');
         setBio(user?.bio || '');
         setBirthday(user?.birthday ? (() => { const d = new Date(user.birthday); return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`; })() : '');
+        setPendingFile(null);
+        if (previewUrl) {
+            URL.revokeObjectURL(previewUrl);
+            setPreviewUrl('');
+        }
     }, [user]);
 
     const [newPassword, setNewPassword] = useState('');
@@ -47,31 +113,67 @@ export function UserProfileModal({user, onClose, onUpdate}: UserProfileModalProp
     const [securityAction, setSecurityAction] = useState<'password' | 'email' | null>(null);
     const [qqUnbinding, setQqUnbinding] = useState(false);
 
-    const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
         if (!file) return;
 
-        setUploading(true);
-        try {
-            const formData = new FormData();
-            formData.append('file', file);
-            const res = await fetch('/api/upload', {method: 'POST', body: formData});
-            if (res.ok) {
-                const data = await res.json();
-                setAvatar(data.url);
-                toast.success('头像上传成功');
-            } else {
-                toast.error('头像上传失败');
-            }
-        } catch {
-            toast.error('头像上传失败');
-        } finally {
-            setUploading(false);
-            if (fileInputRef.current) {
-                fileInputRef.current.value = '';
-            }
-        }
+        const reader = new FileReader();
+        reader.onload = (event) => {
+            const img = new Image();
+            img.onload = () => {
+                setCropImage(event.target?.result as string);
+                setImgNatural({ w: img.width, h: img.height });
+                const minDim = Math.min(img.width, img.height);
+                setCropData({
+                    x: (img.width - minDim) / 2,
+                    y: (img.height - minDim) / 2,
+                    size: minDim,
+                });
+                setCropScale(1);
+                setShowCropper(true);
+            };
+            img.src = event.target?.result as string;
+        };
+        reader.readAsDataURL(file);
     };
+
+    const handleCropConfirm = useCallback(async () => {
+        if (!cropImage || !cropCanvasRef.current) return;
+
+        try {
+            const img = new Promise<HTMLImageElement>((resolve, reject) => {
+                const image = new Image();
+                image.onload = () => resolve(image);
+                image.onerror = reject;
+                image.src = cropImage;
+            });
+
+            const loadedImg = await img;
+            const canvas = cropCanvasRef.current;
+            canvas.width = 200;
+            canvas.height = 200;
+
+            const ctx = canvas.getContext('2d');
+            if (!ctx) return;
+
+            ctx.drawImage(loadedImg, cropData.x, cropData.y, cropData.size, cropData.size, 0, 0, 200, 200);
+
+            const blob = await new Promise<Blob>((resolve) => {
+                canvas.toBlob((b) => {
+                    if (b) resolve(b);
+                }, 'image/png');
+            });
+
+            if (previewUrl) URL.revokeObjectURL(previewUrl);
+            const objectUrl = URL.createObjectURL(blob);
+            setPreviewUrl(objectUrl);
+            setPendingFile(new File([blob], 'avatar.png', { type: 'image/png' }));
+            setShowCropper(false);
+            setCropImage('');
+        } catch {
+            toast.error('裁剪失败');
+        }
+    }, [cropImage, cropData, previewUrl]);
 
     const handleProfileSubmit = useCallback(async (e: React.FormEvent) => {
         e.preventDefault();
@@ -82,12 +184,33 @@ export function UserProfileModal({user, onClose, onUpdate}: UserProfileModalProp
 
         setProfileLoading(true);
         try {
+            let newAvatarUrl = avatar;
+
+            if (pendingFile) {
+                setUploading(true);
+                const formData = new FormData();
+                formData.append('file', pendingFile);
+                const uploadRes = await fetch('/api/upload', { method: 'POST', body: formData });
+                setUploading(false);
+                if (!uploadRes.ok) {
+                    toast.error('头像上传失败');
+                    setProfileLoading(false);
+                    return;
+                }
+                const uploadData = await uploadRes.json();
+                newAvatarUrl = uploadData.url;
+
+                if (avatar) {
+                    await fetch(`/api/upload?key=${encodeURIComponent(avatar)}`, { method: 'DELETE' });
+                }
+            }
+
             const res = await fetch('/api/user/profile', {
                 method: 'PUT',
                 headers: {'Content-Type': 'application/json'},
                 body: JSON.stringify({
                     nickname: nickname.trim(),
-                    avatar: avatar || null,
+                    avatar: newAvatarUrl || null,
                     bio: bio.trim() || null,
                     birthday: birthday || null,
                 }),
@@ -106,8 +229,9 @@ export function UserProfileModal({user, onClose, onUpdate}: UserProfileModalProp
             toast.error('更新失败，请重试');
         } finally {
             setProfileLoading(false);
+            setUploading(false);
         }
-    }, [nickname, avatar, bio, birthday, onClose, onUpdate]);
+    }, [nickname, avatar, bio, birthday, pendingFile, previewUrl, onClose, onUpdate]);
 
     const handleSendEmailCode = async () => {
         if (!newEmail) {
@@ -257,8 +381,8 @@ export function UserProfileModal({user, onClose, onUpdate}: UserProfileModalProp
                             <div className="flex flex-col items-center gap-2">
                                 <div className="relative group">
                                     <Avatar className="w-20 h-20">
-                                        {avatar ? (
-                                            <AvatarImage src={avatar} alt="头像" />
+                                        {(previewUrl || avatar) ? (
+                                            <AvatarImage src={previewUrl || avatar} alt="头像" />
                                         ) : (
                                             <AvatarFallback className="w-20 h-20 bg-gradient-to-br from-blue-400 to-blue-500 text-white font-bold text-2xl">
                                                 {nickname?.[0]?.toUpperCase() || user?.nickname?.[0]?.toUpperCase() || 'U'}
@@ -276,11 +400,76 @@ export function UserProfileModal({user, onClose, onUpdate}: UserProfileModalProp
                                         ref={fileInputRef}
                                         type="file"
                                         accept="image/*"
-                                        onChange={handleImageUpload}
+                                        onChange={handleImageSelect}
                                         className="hidden"
                                     />
                                 </div>
                             </div>
+
+                            {showCropper && (
+                                <div className="fixed inset-0 z-50 flex items-center justify-center">
+                                    <div
+                                        className="absolute inset-0 bg-black/50 backdrop-blur-sm"
+                                        onClick={() => setShowCropper(false)}
+                                    />
+                                    <div className="relative bg-white rounded-2xl shadow-xl w-full max-w-sm mx-4">
+                                        <div className="border-b px-6 py-4 flex items-center justify-between">
+                                            <h3 className="text-lg font-semibold">裁剪头像</h3>
+                                            <button
+                                                onClick={() => setShowCropper(false)}
+                                                className="w-8 h-8 rounded-lg hover:bg-gray-100 flex items-center justify-center"
+                                            >
+                                                ×
+                                            </button>
+                                        </div>
+                                        <div className="p-6">
+                                            <div className="relative w-64 h-64 mx-auto mb-4 overflow-hidden rounded-full" onWheel={handleCropWheel}>
+                                                <img
+                                                    ref={cropImageRef}
+                                                    src={cropImage}
+                                                    alt="裁剪原图"
+                                                    className="max-w-none cursor-grab active:cursor-grabbing select-none"
+                                                    style={{
+                                                        position: 'absolute',
+                                                        left: `-${cropData.x * displayScale}px`,
+                                                        top: `-${cropData.y * displayScale}px`,
+                                                        width: `${imgNatural.w * displayScale}px`,
+                                                        height: `${imgNatural.h * displayScale}px`,
+                                                        maxWidth: 'none',
+                                                    }}
+                                                    onPointerDown={handleCropPointerDown}
+                                                    onPointerMove={handleCropPointerMove}
+                                                    onPointerUp={handleCropPointerUp}
+                                                    onWheel={handleCropWheel}
+                                                    draggable={false}
+                                                />
+                                                <div className="absolute inset-0 rounded-full border-2 border-white shadow-[0_0_0_9999px_rgba(0,0,0,0.5)] pointer-events-none" />
+                                            </div>
+                                            <p className="text-sm text-gray-500 mb-4 text-center">
+                                                拖拽移动 · 滚轮缩放
+                                            </p>
+                                            <div className="flex gap-3">
+                                                <Button
+                                                    type="button"
+                                                    variant="outline"
+                                                    onClick={() => setShowCropper(false)}
+                                                    className="flex-1"
+                                                >
+                                                    取消
+                                                </Button>
+                                                <Button
+                                                    type="button"
+                                                    onClick={handleCropConfirm}
+                                                    className="flex-1"
+                                                >
+                                                    确认裁剪
+                                                </Button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <canvas ref={cropCanvasRef} className="hidden" />
+                                </div>
+                            )}
 
                             <div className="space-y-1">
                                 <Label>昵称</Label>

@@ -5,6 +5,7 @@ import db from '../../../../../lib/db';
 import { getSession } from '../../../../../lib/auth';
 import { revalidatePath } from 'next/cache';
 import { generateSummary } from '../../../../../lib/ai';
+import { getPublicUrl, deleteFile, extractOssKey } from '../../../../../lib/oss';
 import { CoverUpload } from '../../../../components/cover-upload';
 
 import { Button } from "@/components/ui/button";
@@ -25,14 +26,18 @@ async function updatePost(formData: FormData) {
     const tagsString = formData.get('tags')?.toString() || '';
     const content = formData.get('content');
     const cover = formData.get('cover')?.toString() || null;
+    const oldCover = formData.get('oldCover')?.toString() || null;
 
     if (!id || !title || !content) return;
 
-    // Convert comma separated string to array for Postgres
     const tagsArray = tagsString.split(',').map(t => t.trim()).filter(t => t);
     
-    // Postgres array format: {tag1,tag2}
     const pgTags = tagsArray.length > 0 ? `{${tagsArray.join(',')}}` : '{}';
+
+    if (oldCover && cover !== oldCover) {
+        const oldKey = extractOssKey(oldCover);
+        if (oldKey) await deleteFile(oldKey);
+    }
 
     // 调用 AI 生成摘要
     const summary = await generateSummary({ 
@@ -75,6 +80,7 @@ export default async function EditPost({ params }: { params: Promise<{ id: strin
     const tagsString = Array.isArray(post.tags) 
         ? post.tags.join(', ') 
         : (post.tags || '').toString().replace(/[{}]/g, '').replace(/"/g, '');
+    const coverUrl = await getPublicUrl(post.cover) || '';
 
     return (
         <div className="space-y-8">
@@ -106,7 +112,7 @@ export default async function EditPost({ params }: { params: Promise<{ id: strin
                         
                         <div className="space-y-2">
                             <label className="text-sm font-medium">封面图片</label>
-                            <CoverUpload defaultValue={post.cover || ''} />
+                            <CoverUpload defaultValue={coverUrl} />
                         </div>
                         
                         <div className="space-y-2">

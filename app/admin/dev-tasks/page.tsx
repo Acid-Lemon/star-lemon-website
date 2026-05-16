@@ -1,8 +1,9 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { toast } from 'sonner';
-import { Button } from '@/components/ui/button';
+import { Button, buttonVariants } from '@/components/ui/button';
+import { cn } from '@/lib/utils';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
@@ -17,6 +18,14 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 import { RiAddLine, RiEditLine, RiDeleteBinLine, RiTaskLine, RiArrowDownSLine, RiArrowRightLine } from '@remixicon/react';
 
 const STATUS_OPTIONS = ['待处理', '待开发', '开发中', '待讨论', '已完成', '暂不开发'] as const;
+const STATUS_SORT_ORDER: Record<string, number> = {
+  开发中: 0,
+  待开发: 1,
+  待处理: 2,
+  待讨论: 3,
+  暂不开发: 4,
+  已完成: 5,
+};
 const TYPE_OPTIONS = ['bug', '新功能', '优化', '重构', '文档'] as const;
 const PRIORITY_OPTIONS = ['高', '中', '低'] as const;
 
@@ -119,6 +128,11 @@ export default function DevTasksPage() {
 
   const [deleteTarget, setDeleteTarget] = useState<DevTask | null>(null);
   const [deleting, setDeleting] = useState(false);
+
+  const sortedTasks = useMemo(
+    () => [...tasks].sort((a, b) => (STATUS_SORT_ORDER[a.status] ?? 99) - (STATUS_SORT_ORDER[b.status] ?? 99)),
+    [tasks]
+  );
 
   useEffect(() => {
     fetchData();
@@ -331,15 +345,19 @@ export default function DevTasksPage() {
                   open={assigneePopoverOpen}
                   onOpenChange={setAssigneePopoverOpen}
                 >
-                  <PopoverTrigger>
-                    <Button variant="outline" className="w-full justify-between" type="button">
-                      <span className={selectedAssignees.length === 0 ? 'text-muted-foreground' : ''}>
-                        {selectedAssignees.length === 0
-                          ? '请选择负责人'
-                          : getAssigneeNames(selectedAssignees)}
-                      </span>
-                      <RiArrowDownSLine className="w-4 h-4 opacity-50" />
-                    </Button>
+                  <PopoverTrigger
+                    className={cn(
+                      buttonVariants({ variant: 'outline' }),
+                      'w-full justify-between'
+                    )}
+                    type="button"
+                  >
+                    <span className={selectedAssignees.length === 0 ? 'text-muted-foreground' : ''}>
+                      {selectedAssignees.length === 0
+                        ? '请选择负责人'
+                        : getAssigneeNames(selectedAssignees)}
+                    </span>
+                    <RiArrowDownSLine className="w-4 h-4 opacity-50" />
                   </PopoverTrigger>
                   <PopoverContent className="w-60 max-h-60 overflow-auto">
                     <div className="space-y-1">
@@ -445,7 +463,7 @@ export default function DevTasksPage() {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {tasks.map((task) => (
+                  {sortedTasks.map((task) => (
                     <TableRow key={task.id}>
                       <TableCell className="max-w-[320px]">
                         <p className="line-clamp-3 whitespace-normal text-sm leading-relaxed" title={task.content}>
@@ -516,15 +534,19 @@ export default function DevTasksPage() {
                 open={editAssigneePopoverOpen}
                 onOpenChange={setEditAssigneePopoverOpen}
               >
-                <PopoverTrigger>
-                  <Button variant="outline" className="w-full justify-between" type="button">
-                    <span className={editAssignees.length === 0 ? 'text-muted-foreground' : ''}>
-                      {editAssignees.length === 0
-                        ? '请选择负责人'
-                        : getAssigneeNames(editAssignees)}
-                    </span>
-                    <RiArrowDownSLine className="w-4 h-4 opacity-50" />
-                  </Button>
+                <PopoverTrigger
+                  className={cn(
+                    buttonVariants({ variant: 'outline' }),
+                    'w-full justify-between'
+                  )}
+                  type="button"
+                >
+                  <span className={editAssignees.length === 0 ? 'text-muted-foreground' : ''}>
+                    {editAssignees.length === 0
+                      ? '请选择负责人'
+                      : getAssigneeNames(editAssignees)}
+                  </span>
+                  <RiArrowDownSLine className="w-4 h-4 opacity-50" />
                 </PopoverTrigger>
                 <PopoverContent className="w-60 max-h-60 overflow-auto">
                   <div className="space-y-1">

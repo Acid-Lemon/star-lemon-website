@@ -6,6 +6,7 @@ import { getSession } from '../../../lib/auth';
 import { generateSummary } from '../../../lib/ai';
 import { CoverUpload } from '../../components/cover-upload';
 import { deleteUploadedFile } from '../../../lib/file';
+import { DeletePostButton } from '../_components/delete-post-button';
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -200,12 +201,7 @@ export default async function AdminPosts() {
                                                                     <RiEditBoxLine className="w-4 h-4" />
                                                                 </Button>
                                                             </Link>
-                                                            <form action={deletePost} className="inline">
-                                                                <input type="hidden" name="id" value={post.id} />
-                                                                <Button type="submit" variant="ghost" size="icon" className="text-destructive hover:text-destructive hover:bg-destructive/10">
-                                                                    <RiDeleteBinLine className="w-4 h-4" />
-                                                                </Button>
-                                                            </form>
+                                                            <DeletePostButton postId={post.id} postTitle={post.title} deleteAction={deletePost} />
                                                         </div>
                                                     </TableCell>
                                                 </TableRow>

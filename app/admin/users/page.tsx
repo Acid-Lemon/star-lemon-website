@@ -23,6 +23,7 @@ interface User {
     bio: string | null;
     birthday: string | null;
     qq_identifier: string | null;
+    sl_coin: number;
     created_at: string;
     updated_at: string;
 }
@@ -34,6 +35,7 @@ export default function UsersPage() {
     const [editNickname, setEditNickname] = useState('');
     const [editRole, setEditRole] = useState('user');
     const [editPassword, setEditPassword] = useState('');
+    const [editSlCoin, setEditSlCoin] = useState(0);
     const [saving, setSaving] = useState(false);
     const [deleteUser, setDeleteUser] = useState<User | null>(null);
     const [deleting, setDeleting] = useState(false);
@@ -63,6 +65,7 @@ export default function UsersPage() {
         setEditNickname(user.nickname);
         setEditRole(user.role);
         setEditPassword('');
+        setEditSlCoin(user.sl_coin || 0);
     };
 
     const handleEditSubmit = async (e: React.FormEvent) => {
@@ -76,7 +79,7 @@ export default function UsersPage() {
 
         setSaving(true);
         try {
-            const body: any = {nickname: editNickname.trim(), role: editRole};
+            const body: any = {nickname: editNickname.trim(), role: editRole, sl_coin: editSlCoin};
             if (editPassword) {
                 body.password = editPassword;
             }
@@ -156,6 +159,7 @@ export default function UsersPage() {
                                     <TableHead>用户</TableHead>
                                     <TableHead>邮箱</TableHead>
                                     <TableHead>角色</TableHead>
+                                    <TableHead>星柠币</TableHead>
                                     <TableHead>注册时间</TableHead>
                                     <TableHead className="text-right">操作</TableHead>
                                 </TableRow>
@@ -177,13 +181,14 @@ export default function UsersPage() {
                                                 <div>
                                                     <p className="font-medium text-sm">{user.nickname}</p>
                                                     {user.qq_identifier && (
-                                                        <p className="text-xs text-muted-foreground">QQ 登录</p>
+                                                        <p className="text-xs text-muted-foreground">已绑定 QQ</p>
                                                     )}
                                                 </div>
                                             </div>
                                         </TableCell>
                                         <TableCell className="text-sm">{user.email}</TableCell>
                                         <TableCell>{getRoleBadge(user.role)}</TableCell>
+                                        <TableCell className="text-sm font-mono">{user.sl_coin || 0}</TableCell>
                                         <TableCell className="text-sm text-muted-foreground">
                                             {new Date(user.created_at).toLocaleDateString('zh-CN')}
                                         </TableCell>
@@ -227,6 +232,10 @@ export default function UsersPage() {
                                     <SelectItem value="user">普通用户</SelectItem>
                                 </SelectContent>
                             </Select>
+                        </div>
+                        <div className="space-y-2">
+                            <Label>星柠币</Label>
+                            <Input type="number" value={editSlCoin} onChange={(e) => setEditSlCoin(parseInt(e.target.value) || 0)} min={0}/>
                         </div>
                         <div className="space-y-2">
                             <Label>重置密码</Label>

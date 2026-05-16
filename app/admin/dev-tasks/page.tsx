@@ -463,13 +463,15 @@ export default function DevTasksPage() {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {sortedTasks.map((task) => (
-                    <TableRow key={task.id}>
-                      <TableCell className="max-w-[320px]">
-                        <p className="line-clamp-3 whitespace-normal text-sm leading-relaxed" title={task.content}>
-                          {task.content}
-                        </p>
-                      </TableCell>
+                  {sortedTasks.map((task) => {
+                      const isDone = task.status === '已完成';
+                      return (
+                        <TableRow key={task.id} className={isDone ? 'opacity-50 bg-muted/20' : ''}>
+                          <TableCell className="max-w-[320px]">
+                            <p className={`line-clamp-3 whitespace-normal text-sm leading-relaxed ${isDone ? 'line-through' : ''}`} title={task.content}>
+                              {task.content}
+                            </p>
+                          </TableCell>
                       <TableCell className="text-sm">{getAssigneeNames(task.assignee_ids)}</TableCell>
                       <TableCell>
                         <Badge variant={getStatusVariant(task.status)}>{task.status}</Badge>
@@ -489,22 +491,24 @@ export default function DevTasksPage() {
                             <Button
                               size="sm"
                               variant="ghost"
+                              type="button"
                               onClick={() => handleAdvance(task)}
                               title={`下一状态: ${NEXT_STATUS[task.status]}`}
                             >
                               <RiArrowRightLine className="w-4 h-4" />
                             </Button>
                           )}
-                          <Button size="sm" variant="ghost" onClick={() => openEdit(task)}>
+                          <Button size="sm" variant="ghost" type="button" onClick={() => openEdit(task)}>
                             <RiEditLine className="w-4 h-4" />
                           </Button>
-                          <Button size="sm" variant="ghost" className="text-destructive hover:text-destructive" onClick={() => setDeleteTarget(task)}>
+                          <Button size="sm" variant="ghost" type="button" className="text-destructive hover:text-destructive" onClick={() => setDeleteTarget(task)}>
                             <RiDeleteBinLine className="w-4 h-4" />
                           </Button>
                         </div>
                       </TableCell>
                     </TableRow>
-                  ))}
+                      );
+                    })}
                 </TableBody>
               </Table>
             )}

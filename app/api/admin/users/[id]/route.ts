@@ -15,7 +15,7 @@ export async function PUT(
 
     const { id } = await params;
     const body = await request.json();
-    const { nickname, role, password } = body;
+    const { nickname, role, password, sl_coin } = body;
 
     const updates: string[] = [];
     const values: any[] = [];
@@ -44,6 +44,15 @@ export async function PUT(
       const hashedPassword = await bcrypt.hash(password, 10);
       updates.push(`password = $${paramIndex++}`);
       values.push(hashedPassword);
+    }
+
+    if (sl_coin !== undefined) {
+      const coin = parseInt(sl_coin, 10);
+      if (isNaN(coin) || coin < 0) {
+        return NextResponse.json({ error: '无效的星柠币数量' }, { status: 400 });
+      }
+      updates.push(`sl_coin = $${paramIndex++}`);
+      values.push(coin);
     }
 
     if (updates.length === 0) {

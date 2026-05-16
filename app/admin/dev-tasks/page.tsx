@@ -32,6 +32,7 @@ const NEXT_STATUS: Record<string, string | null> = {
 interface AdminUser {
   id: number;
   nickname: string;
+  role: string;
 }
 
 interface DevTask {
@@ -131,7 +132,10 @@ export default function DevTasksPage() {
         fetch('/api/admin/users'),
       ]);
       if (tasksRes.ok) setTasks(await tasksRes.json());
-      if (adminsRes.ok) setAdmins(await adminsRes.json());
+      if (adminsRes.ok) {
+        const users = await adminsRes.json();
+        setAdmins(users.filter((u: AdminUser) => u.role === 'admin'));
+      }
     } catch {
       toast.error('获取数据失败');
     } finally {

@@ -32,13 +32,18 @@ jobs:
         env:
           NODE_OPTIONS: "--max-old-space-size=4096"
 
+      - name: Prune dev dependencies
+        run: pnpm install --prod --frozen-lockfile
+        env:
+          NODE_OPTIONS: "--max-old-space-size=4096"
+
       - name: Create deploy archive
         run: |
           tar -czf deploy.tar.gz \
             --exclude=.next/cache \
             --exclude=.next/dev \
             package.json pnpm-lock.yaml next.config.ts \
-            public .next
+            public .next node_modules
 
       - name: Upload to server and deploy
         run: |
@@ -85,8 +90,7 @@ jobs:
           tar -xzf deploy.tar.gz
           rm -f deploy.tar.gz
 
-          echo "[4/4] Installing and starting..."
-          pnpm install --frozen-lockfile --prod
+          echo "[4/4] Starting..."
           bash "$START_SCRIPT"
           sleep 3
 

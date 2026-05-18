@@ -18,7 +18,7 @@ export function getClientIP(request: NextRequest): string | null {
   );
 }
 
-export async function lookupLocation {
+interface IpApiIsResult {
   location?: {
     country?: string;
     state?: string;

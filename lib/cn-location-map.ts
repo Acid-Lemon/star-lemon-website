@@ -126,7 +126,6 @@ const CN_CITY_MAP: Record<string, string> = {
     'Hegang': '鹤岗',
     'Shuangyashan': '双鸭山',
     'Daqing': '大庆',
-    'Yichun': '伊春',
     'Jiamusi': '佳木斯',
     'Qitaihe': '七台河',
     'Mudanjiang': '牡丹江',
@@ -201,7 +200,6 @@ const CN_CITY_MAP: Record<string, string> = {
     'Ganzhou': '赣州',
     'Ji\'an': '吉安',
     'Jian': '吉安',
-    'Yichun': '宜春',
     'Fuzhou-in-Jiangxi': '抚州',
     'Shangrao': '上饶',
     // ── 山东 ──

@@ -84,7 +84,7 @@ export async function lookupLocation(ip: string | null): Promise<{ location: str
   if (!ip) return null;
   if (ip === '127.0.0.1' || ip === '0.0.0.0') return { location: '本机', ip_address: ip };
 
-  const location = await lookupIpApi(ip) || await lookupIpApiIs(ip);
+  const location = await lookupIpApiIs(ip) || await lookupIpApi(ip);
 
   if (!location) return null;
   return { location, ip_address: ip };

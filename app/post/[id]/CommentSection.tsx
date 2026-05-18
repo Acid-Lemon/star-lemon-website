@@ -19,6 +19,7 @@ interface CommentItem {
     image_url: string | null;
     parent_id: number | null;
     created_at: string;
+    location?: string | null;
     children?: CommentItem[];
     _level?: number;
     _parentName?: string;
@@ -100,6 +101,9 @@ export function CommentSection({ postId, user }: { postId: number; user: UserInf
             <div className="flex-1">
                 <div className="flex items-center gap-2 mb-1">
                     <span className="font-medium text-sm text-gray-900 dark:text-gray-100">{comment.nickname}</span>
+                    {comment.location && (
+                        <span className="text-xs text-gray-400">· {comment.location}</span>
+                    )}
                     {comment._level! > 2 && comment._parentName && (
                         <span className="text-xs text-gray-400">
                             回复 <span className="text-blue-500">{comment._parentName}</span>

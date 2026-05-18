@@ -14,6 +14,7 @@ interface CommentItem {
     image_url: string | null;
     parent_id: number | null;
     created_at: string;
+    location?: string | null;
 }
 
 export function CommentForm({

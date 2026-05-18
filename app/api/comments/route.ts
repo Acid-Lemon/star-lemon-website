@@ -5,6 +5,7 @@ import { getSetting } from '../../../lib/settings';
 import { deleteUploadedFile } from '../../../lib/file';
 import { getPublicUrl } from '../../../lib/oss';
 import { sendCommentNotification } from '../../../lib/mail';
+import { getClientIP, lookupLocation } from '../../../lib/ip-location';
 
 // 获取文章的评论（包含回复）
 export async function GET(request: NextRequest) {
@@ -18,7 +19,7 @@ export async function GET(request: NextRequest) {
 
     // 获取已审核的评论及其回复
     const result = await db.query(
-      `SELECT c.id, c.post_id, c.user_id, u.nickname, u.avatar, c.content, c.image_url, c.parent_id, c.status, c.created_at 
+      `SELECT c.id, c.post_id, c.user_id, u.nickname, u.avatar, c.content, c.image_url, c.parent_id, c.status, c.location, c.created_at
        FROM comments c
        LEFT JOIN users u ON c.user_id = u.id
        WHERE c.post_id = $1 AND (c.status = 'approved' OR c.parent_id IS NOT NULL)
@@ -60,16 +61,27 @@ export async function POST(request: NextRequest) {
     const userId = session.user.id;
     const isAdmin = session.user.role === 'admin';
 
+    const ip = getClientIP(request);
+    let ipAddress: string | null = null;
+    let locationText: string | null = null;
+    if (ip) {
+        const locResult = await lookupLocation(ip);
+        if (locResult) {
+            ipAddress = locResult.ip_address;
+            locationText = locResult.location;
+        }
+    }
+
     // 管理员不需要审核，或者根据配置决定
     const commentReview = await getSetting('comment_review', 'true');
     const status = isAdmin ? 'approved' : (commentReview === 'true' ? 'pending' : 'approved');
 
     // 插入评论
     const result = await db.query(
-      `INSERT INTO comments (post_id, user_id, content, image_url, parent_id, status, created_at) 
-       VALUES ($1, $2, $3, $4, $5, $6, NOW()) 
-       RETURNING id, post_id, user_id, content, image_url, parent_id, status, created_at`,
-      [post_id, userId, content || null, image_url || null, parent_id || null, status]
+      `INSERT INTO comments (post_id, user_id, content, image_url, parent_id, status, ip_address, location, created_at)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, NOW())
+       RETURNING id, post_id, user_id, content, image_url, parent_id, status, location, created_at`,
+      [post_id, userId, content || null, image_url || null, parent_id || null, status, ipAddress, locationText]
     );
 
     const userResult = await db.query('SELECT nickname, avatar FROM users WHERE id = $1', [userId]);

@@ -181,6 +181,11 @@ export function MyMessages({ message, bgColor, isOwner, onDeleted, onImageClick 
                             <span className={`font-medium text-xs ${textSecondary}`}>
                                 {message.author_name || '佚名'}
                             </span>
+                            {message.location && (
+                                <span className={`text-xs ${textMuted}`}>
+                                    · {message.location}
+                                </span>
+                            )}
                         </div>
                         <span className={`text-xs ${textMuted}`}>
                             {getRelativeTime(message.created_at)}

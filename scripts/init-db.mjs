@@ -135,6 +135,18 @@ async function init() {
       console.log('✅ messages.image_url 字段添加成功');
     }
 
+    const messageColumns = [
+      { name: 'bg_color', type: 'TEXT' },
+      { name: 'ip_address', type: 'TEXT' },
+      { name: 'location', type: 'TEXT' },
+    ];
+    for (const col of messageColumns) {
+      if (!await columnExists(client, 'messages', col.name)) {
+        await client.query(`ALTER TABLE messages ADD COLUMN ${col.name} ${col.type}`);
+        console.log(`✅ messages.${col.name} 字段添加成功`);
+      }
+    }
+
     // comments
     if (!await tableExists(client, 'comments')) {
       await client.query(`
@@ -150,6 +162,19 @@ async function init() {
       console.log('✅ comments 表创建成功');
     } else {
       console.log('⏭️ comments 表已存在，跳过创建');
+    }
+
+    const commentColumns = [
+      { name: 'image_url', type: 'TEXT' },
+      { name: 'parent_id', type: 'INTEGER' },
+      { name: 'ip_address', type: 'TEXT' },
+      { name: 'location', type: 'TEXT' },
+    ];
+    for (const col of commentColumns) {
+      if (!await columnExists(client, 'comments', col.name)) {
+        await client.query(`ALTER TABLE comments ADD COLUMN ${col.name} ${col.type}`);
+        console.log(`✅ comments.${col.name} 字段添加成功`);
+      }
     }
 
     // moments

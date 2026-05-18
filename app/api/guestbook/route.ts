@@ -5,6 +5,7 @@ import { getSetting } from '@/lib/settings';
 import { sendReviewNotification } from '@/lib/mail';
 import { getPublicUrl } from '@/lib/oss';
 import { revalidatePath } from 'next/cache';
+import { getClientIP, lookupLocation } from '@/lib/ip-location';
 
 const COLORS = ['#fcd34d', '#bfdbfe', '#bbf7d0', '#fbcfe8', '#ddd6fe', '#fef08a', '#fda4af', '#67e8f9'];
 
@@ -62,14 +63,17 @@ export async function GET(req: NextRequest) {
         }
 
         const rows = await Promise.all(
-            result.rows.map(async (row: any) => ({
-                ...row,
-                image_url: row.image_url
-                    ? (await Promise.all(
-                        row.image_url.split(',').map((url: string) => getPublicUrl(url.trim()))
-                      )).filter(Boolean).join(',')
-                    : null,
-            }))
+            result.rows.map(async (row: any) => {
+                const { ip_address, ...rest } = row;
+                return {
+                    ...rest,
+                    image_url: rest.image_url
+                        ? (await Promise.all(
+                            rest.image_url.split(',').map((url: string) => getPublicUrl(url.trim()))
+                          )).filter(Boolean).join(',')
+                        : null,
+                };
+            })
         );
 
         return NextResponse.json(rows);
@@ -99,6 +103,17 @@ export async function POST(req: NextRequest) {
         const userId = session.user.id;
         const bgColor = COLORS[Math.floor(Math.random() * COLORS.length)];
         const isAdmin = session.user.role === 'admin';
+
+        const ip = getClientIP(req);
+        let ipAddress: string | null = null;
+        let locationText: string | null = null;
+        if (ip) {
+            const locResult = await lookupLocation(ip);
+            if (locResult) {
+                ipAddress = locResult.ip_address;
+                locationText = locResult.location;
+            }
+        }
         
         // 管理员不需要审核，或者根据配置决定
         const guestbookReview = await getSetting('guestbook_review', 'true');
@@ -107,10 +122,10 @@ export async function POST(req: NextRequest) {
         console.log('Inserting with user_id:', userId, 'content:', content, 'bg_color:', bgColor);
         
         const result = await db.query(
-            `INSERT INTO messages (user_id, content, image_url, status, bg_color, created_at) 
-             VALUES ($1, $2, $3, $4, $5, NOW()) 
-             RETURNING id, user_id, content, image_url, created_at, bg_color`,
-            [userId, content || null, imageUrl, status, bgColor]
+            `INSERT INTO messages (user_id, content, image_url, status, bg_color, ip_address, location, created_at)
+             VALUES ($1, $2, $3, $4, $5, $6, $7, NOW())
+             RETURNING id, user_id, content, image_url, created_at, bg_color, location`,
+            [userId, content || null, imageUrl, status, bgColor, ipAddress, locationText]
         );
         
         if (!result.rows[0]) {
@@ -127,14 +142,15 @@ export async function POST(req: NextRequest) {
 
         const avatarUrl = await getPublicUrl(session.user.avatar);
 
-        return NextResponse.json({ 
-            success: true, 
-            message: { 
-                ...newMessage, 
+        return NextResponse.json({
+            success: true,
+            message: {
+                ...newMessage,
                 author_name: session.user.nickname || '用户',
                 avatar: avatarUrl,
-                status: status
-            } 
+                status: status,
+                location: locationText,
+            }
         });
     } catch (e: any) {
         console.error('Failed to submit message:', e);

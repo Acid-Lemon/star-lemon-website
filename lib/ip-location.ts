@@ -1,4 +1,5 @@
 import { NextRequest } from 'next/server';
+import { toCnProvince, toCnCity } from './cn-location-map';
 
 function normalizeIp(raw: string | undefined | null): string | null {
   if (!raw) return null;
@@ -17,58 +18,63 @@ export function getClientIP(request: NextRequest): string | null {
   );
 }
 
-interface KugouResponse {
-  errcode?: number;
-  country?: string;
-  province?: string;
-  city?: string;
-}
-
-async function lookupKugou(ip: string): Promise<string | null> {
-  try {
-    const res = await fetch('http://mips.kugou.com/check/iscn', {
-      headers: { 'X-Forwarded-For': ip },
-      signal: AbortSignal.timeout(3000),
-    });
-
-    if (!res.ok) return null;
-
-    const data: KugouResponse = await res.json();
-    if (data.errcode !== 0) return null;
-
-    const parts = [data.province, data.city].filter(Boolean);
-    if (parts.length > 0) return parts.join('·');
-
-    return data.country || null;
-  } catch {
-    return null;
-  }
-}
-
-interface IpApiResult {
+export async function lookupLocation {
   location?: {
     country?: string;
-    region?: string;
+    state?: string;
     city?: string;
   };
-  success?: boolean;
 }
 
 async function lookupIpApiIs(ip: string): Promise<string | null> {
+  const key = process.env.IPAPI_IS_KEY;
+  if (!key) return null;
+
   try {
-    const res = await fetch(`https://ipapi.is/json/?ip=${encodeURIComponent(ip)}`, {
+    const res = await fetch(`https://api.ipapi.is?q=${encodeURIComponent(ip)}&key=${key}`, {
       signal: AbortSignal.timeout(5000),
     });
 
     if (!res.ok) return null;
 
-    const data: IpApiResult = await res.json();
-    if (!data.success || !data.location) return null;
+    const data: IpApiIsResult = await res.json();
+    if (!data.location) return null;
 
-    const parts = [data.location.region, data.location.city].filter(Boolean);
-    if (parts.length > 0) return parts.join('·');
+    const province = toCnProvince(data.location.state) || data.location.state;
+    const city = toCnCity(data.location.city, data.location.state) || data.location.city;
+
+    if (province && city && province !== city) return province + '·' + city;
+    if (province) return province;
+    if (city) return city;
 
     return data.location.country || null;
+  } catch {
+    return null;
+  }
+}
+
+interface IpApiResponse {
+  status?: string;
+  regionName?: string;
+  city?: string;
+  country?: string;
+}
+
+async function lookupIpApi(ip: string): Promise<string | null> {
+  try {
+    const res = await fetch(`http://ip-api.com/json/${encodeURIComponent(ip)}?lang=zh-CN`, {
+      signal: AbortSignal.timeout(5000),
+    });
+
+    if (!res.ok) return null;
+
+    const data: IpApiResponse = await res.json();
+    if (data.status !== 'success') return null;
+
+    const parts = [data.regionName, data.city].filter(Boolean);
+    if (parts.length > 0) return parts.join('·');
+
+    return data.country || null;
   } catch {
     return null;
   }
@@ -78,7 +84,7 @@ export async function lookupLocation(ip: string | null): Promise<{ location: str
   if (!ip) return null;
   if (ip === '127.0.0.1' || ip === '0.0.0.0') return { location: '本机', ip_address: ip };
 
-  const location = await lookupKugou(ip) || await lookupIpApiIs(ip);
+  const location = await lookupIpApi(ip) || await lookupIpApiIs(ip);
 
   if (!location) return null;
   return { location, ip_address: ip };

@@ -46,3 +46,6 @@ next-env.d.ts
 **/*.bat
 **/*.ps1
 # **/*.sh  # remote-deploy.sh 需要提交用于部署
+
+
+/docs/

@@ -65,6 +65,13 @@ function PostContent({content}: { content: string }) {
 
     const components = useMemo<Components>(
         () => ({
+            a: ({href, children, ...props}: React.AnchorHTMLAttributes<HTMLAnchorElement>) => {
+                const isExternal = href && /^https?:\/\//i.test(href);
+                if (isExternal) {
+                    return <a href={href} target="_blank" rel="noopener noreferrer" {...props}>{children}</a>;
+                }
+                return <a href={href} {...props}>{children}</a>;
+            },
             p: ({children, ...props}: React.HTMLAttributes<HTMLParagraphElement>) => {
                 const text = getTextFromChildren(children);
                 if (!text || text.trim() === '') return <p {...props} className="my-2"/>;

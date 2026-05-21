@@ -22,6 +22,8 @@ export default function CommentsPage() {
   const [filter, setFilter] = useState<'all' | 'pending' | 'approved' | 'rejected'>('all');
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [deletingComment, setDeletingComment] = useState<Comment | null>(null);
+  const [updatingId, setUpdatingId] = useState<number | null>(null);
+  const [deleting, setDeleting] = useState(false);
 
   useEffect(() => {
     fetchComments();
@@ -40,6 +42,7 @@ export default function CommentsPage() {
   };
 
   const handleStatusChange = async (id: number, status: string) => {
+    setUpdatingId(id);
     try {
       const res = await fetch(`/api/comments/${id}`, {
         method: 'PUT',
@@ -48,13 +51,15 @@ export default function CommentsPage() {
       });
 
       if (res.ok) {
-        toast.success('状态更新成功');
+        toast.success(status === 'approved' ? '已通过' : '已拒绝');
         fetchComments();
       } else {
         toast.error('更新失败');
       }
     } catch (error) {
       toast.error('更新失败');
+    } finally {
+      setUpdatingId(null);
     }
   };
 
@@ -65,7 +70,8 @@ export default function CommentsPage() {
 
   const confirmDelete = async () => {
     if (!deletingComment) return;
-    
+
+    setDeleting(true);
     try {
       const res = await fetch(`/api/comments/${deletingComment.id}`, { method: 'DELETE' });
       if (res.ok) {
@@ -78,6 +84,8 @@ export default function CommentsPage() {
       }
     } catch (error) {
       toast.error('删除失败');
+    } finally {
+      setDeleting(false);
     }
   };
 
@@ -152,8 +160,9 @@ export default function CommentsPage() {
                         variant="outline"
                         className="text-green-600 hover:text-green-700"
                         onClick={() => handleStatusChange(comment.id, 'approved')}
+                        disabled={updatingId === comment.id}
                       >
-                        通过
+                        {updatingId === comment.id ? '处理中...' : '通过'}
                       </Button>
                     )}
                     {comment.status !== 'rejected' && (
@@ -162,8 +171,9 @@ export default function CommentsPage() {
                         variant="outline"
                         className="text-orange-600 hover:text-orange-700"
                         onClick={() => handleStatusChange(comment.id, 'rejected')}
+                        disabled={updatingId === comment.id}
                       >
-                        拒绝
+                        {updatingId === comment.id ? '处理中...' : '拒绝'}
                       </Button>
                     )}
                     <Button
@@ -199,21 +209,23 @@ export default function CommentsPage() {
                 确定要删除这条评论吗？此操作无法撤销。
               </p>
               <div className="flex gap-3">
-                <Button 
-                  type="button" 
-                  variant="outline" 
-                  onClick={() => setShowDeleteDialog(false)} 
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => setShowDeleteDialog(false)}
                   className="flex-1"
+                  disabled={deleting}
                 >
                   取消
                 </Button>
-                <Button 
-                  type="button" 
-                  variant="destructive" 
-                  onClick={confirmDelete} 
+                <Button
+                  type="button"
+                  variant="destructive"
+                  onClick={confirmDelete}
                   className="flex-1"
+                  disabled={deleting}
                 >
-                  删除
+                  {deleting ? '删除中...' : '删除'}
                 </Button>
               </div>
             </div>

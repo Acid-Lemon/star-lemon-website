@@ -23,6 +23,8 @@ export default function MessagesPage() {
   const [filter, setFilter] = useState<'all' | 'pending' | 'approved' | 'rejected'>('all');
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [deletingMessage, setDeletingMessage] = useState<Message | null>(null);
+  const [updatingId, setUpdatingId] = useState<number | null>(null);
+  const [deleting, setDeleting] = useState(false);
 
   useEffect(() => {
     fetchMessages();
@@ -41,6 +43,7 @@ export default function MessagesPage() {
   };
 
   const handleStatusChange = async (id: number, status: string) => {
+    setUpdatingId(id);
     try {
       const res = await fetch(`/api/messages/${id}`, {
         method: 'PUT',
@@ -49,13 +52,15 @@ export default function MessagesPage() {
       });
 
       if (res.ok) {
-        toast.success('状态更新成功');
+        toast.success(status === 'approved' ? '已通过' : '已拒绝');
         fetchMessages();
       } else {
         toast.error('更新失败');
       }
     } catch (error) {
       toast.error('更新失败');
+    } finally {
+      setUpdatingId(null);
     }
   };
 
@@ -67,6 +72,7 @@ export default function MessagesPage() {
   const confirmDelete = async () => {
     if (!deletingMessage) return;
 
+    setDeleting(true);
     try {
       const res = await fetch(`/api/messages/${deletingMessage.id}`, { method: 'DELETE' });
       if (res.ok) {
@@ -79,6 +85,8 @@ export default function MessagesPage() {
       }
     } catch (error) {
       toast.error('删除失败');
+    } finally {
+      setDeleting(false);
     }
   };
 
@@ -159,8 +167,9 @@ export default function MessagesPage() {
                         variant="outline"
                         className="text-green-600 hover:text-green-700"
                         onClick={() => handleStatusChange(msg.id, 'approved')}
+                        disabled={updatingId === msg.id}
                       >
-                        通过
+                        {updatingId === msg.id ? '处理中...' : '通过'}
                       </Button>
                     )}
                     {msg.status !== 'rejected' && (
@@ -169,8 +178,9 @@ export default function MessagesPage() {
                         variant="outline"
                         className="text-orange-600 hover:text-orange-700"
                         onClick={() => handleStatusChange(msg.id, 'rejected')}
+                        disabled={updatingId === msg.id}
                       >
-                        拒绝
+                        {updatingId === msg.id ? '处理中...' : '拒绝'}
                       </Button>
                     )}
                     <Button
@@ -210,6 +220,7 @@ export default function MessagesPage() {
                   variant="outline"
                   onClick={() => setShowDeleteDialog(false)}
                   className="flex-1"
+                  disabled={deleting}
                 >
                   取消
                 </Button>
@@ -218,8 +229,9 @@ export default function MessagesPage() {
                   variant="destructive"
                   onClick={confirmDelete}
                   className="flex-1"
+                  disabled={deleting}
                 >
-                  删除
+                  {deleting ? '删除中...' : '删除'}
                 </Button>
               </div>
             </div>

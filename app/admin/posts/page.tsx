@@ -1,84 +1,17 @@
 import React from 'react';
 import Link from 'next/link';
 import db from '../../../lib/db';
-import { revalidatePath } from 'next/cache';
 import { getSession } from '../../../lib/auth';
-import { generateSummary } from '../../../lib/ai';
-import { CoverUpload } from '../../components/cover-upload';
-import { deleteUploadedFile } from '../../../lib/file';
 import { DeletePostButton } from '../_components/delete-post-button';
+import { PostPublishForm } from '../_components/post-publish-form';
 
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { RiDeleteBinLine, RiAddCircleLine, RiEditBoxLine } from '@remixicon/react';
+import { RiEditBoxLine } from '@remixicon/react';
 
 export const revalidate = 0;
-
-// 删除文章 Server Action
-async function deletePost(formData: FormData) {
-    'use server';
-    const session = await getSession();
-    if (!session || session.user?.role !== 'admin') return;
-    const id = formData.get('id');
-    if (!id) return;
-    try {
-        // 查询封面图片 URL
-        const result = await db.query('SELECT cover FROM posts WHERE id = $1', [id]);
-        const cover = result.rows[0]?.cover;
-
-        await db.query('DELETE FROM posts WHERE id = $1', [id]);
-
-        // 删除封面图片文件
-        if (cover) {
-            await deleteUploadedFile(cover);
-        }
-
-        revalidatePath('/admin/posts');
-        revalidatePath('/post');
-    } catch (e) {
-        console.error(e);
-    }
-}
-
-// 添加文章 Server Action
-async function addPost(formData: FormData) {
-    'use server';
-    const session = await getSession();
-    if (!session || session.user?.role !== 'admin') return;
-
-    const title = formData.get('title');
-    const tagsString = formData.get('tags')?.toString() || '';
-    const content = formData.get('content');
-    const cover = formData.get('cover')?.toString() || null;
-
-    if (!title || !content) return;
-
-    // Convert comma separated string to array for Postgres
-    const tagsArray = tagsString.split(',').map(t => t.trim()).filter(t => t);
-    
-    // Postgres array format: {tag1,tag2}
-    const pgTags = tagsArray.length > 0 ? `{${tagsArray.join(',')}}` : '{}';
-
-    // 调用 AI 生成摘要
-    const summary = await generateSummary({ 
-        title: title.toString(), 
-        content: content.toString() 
-    });
-
-    try {
-        await db.query(
-            'INSERT INTO posts (title, author_id, tags, summary, content, cover) VALUES ($1, $2, $3, $4, $5, $6)',
-            [title, session.user.id, pgTags, summary, content, cover]
-        );
-        revalidatePath('/admin/posts');
-        revalidatePath('/post');
-    } catch (e) {
-        console.error(e);
-    }
-}
 
 export default async function AdminPosts() {
     let posts: any[] = [];
@@ -104,50 +37,7 @@ export default async function AdminPosts() {
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                {/* 发布文章表单 */}
-                <Card className="lg:col-span-1 h-fit">
-                    <CardHeader>
-                        <CardTitle className="flex items-center gap-2">
-                            <RiEditBoxLine className="w-5 h-5" />
-                            发布新文章
-                        </CardTitle>
-                        <CardDescription>编写你的下一篇博客文章</CardDescription>
-                    </CardHeader>
-                    <CardContent>
-                        <form action={addPost} className="flex flex-col gap-4">
-                            <div className="space-y-2">
-                                <label className="text-sm font-medium">文章标题</label>
-                                <Input type="text" name="title" placeholder="输入引人注目的标题" required />
-                            </div>
-                            
-                            <div className="space-y-2">
-                                <label className="text-sm font-medium">封面图片</label>
-                                <CoverUpload />
-                            </div>
-                            
-                            <div className="space-y-2">
-                                <label className="text-sm font-medium">标签</label>
-                                <Input type="text" name="tags" placeholder="例如: 前端, React (用逗号分隔)" />
-                            </div>
-                            
-                            <div className="space-y-2">
-                                <label className="text-sm font-medium">正文内容 (Markdown支持)</label>
-                                <textarea 
-                                    name="content" 
-                                    rows={12} 
-                                    placeholder="在这里编写你的文章正文，支持Markdown语法..." 
-                                    required 
-                                    className="flex w-full rounded-md border border-input bg-transparent px-3 py-2 text-base shadow-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50 md:text-sm resize-y font-mono"
-                                />
-                            </div>
-                            
-                            <Button type="submit" className="w-full mt-2">
-                                <RiAddCircleLine className="w-4 h-4 mr-2" />
-                                立即发布
-                            </Button>
-                        </form>
-                    </CardContent>
-                </Card>
+                <PostPublishForm />
 
                 {/* 文章列表 */}
                 <Card className="lg:col-span-2">
@@ -201,7 +91,7 @@ export default async function AdminPosts() {
                                                                     <RiEditBoxLine className="w-4 h-4" />
                                                                 </Button>
                                                             </Link>
-                                                            <DeletePostButton postId={post.id} postTitle={post.title} deleteAction={deletePost} />
+                                                            <DeletePostButton postId={post.id} postTitle={post.title} />
                                                         </div>
                                                     </TableCell>
                                                 </TableRow>

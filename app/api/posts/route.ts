@@ -1,6 +1,39 @@
-import { NextResponse } from 'next/server';
+import { NextResponse, NextRequest } from 'next/server';
 import db from '../../../lib/db';
 import { getPublicUrl } from '../../../lib/oss';
+import { getSession } from '../../../lib/auth';
+import { generateSummary } from '../../../lib/ai';
+
+export async function POST(request: NextRequest) {
+    try {
+        const session = await getSession();
+        if (!session || session.user?.role !== 'admin') {
+            return NextResponse.json({ error: '无权限' }, { status: 403 });
+        }
+
+        const body = await request.json();
+        const { title, content, tags, cover } = body;
+
+        if (!title || !content) {
+            return NextResponse.json({ error: '标题和内容不能为空' }, { status: 400 });
+        }
+
+        const tagsArray = (tags || '').split(',').map((t: string) => t.trim()).filter((t: string) => t);
+        const pgTags = tagsArray.length > 0 ? `{${tagsArray.join(',')}}` : '{}';
+
+        const summary = await generateSummary({ title, content });
+
+        const result = await db.query(
+            'INSERT INTO posts (title, author_id, tags, summary, content, cover) VALUES ($1, $2, $3, $4, $5, $6) RETURNING id',
+            [title, session.user.id, pgTags, summary, content, cover || null]
+        );
+
+        return NextResponse.json({ success: true, id: result.rows[0].id });
+    } catch (e) {
+        console.error('Create post error:', e);
+        return NextResponse.json({ error: '发布失败' }, { status: 500 });
+    }
+}
 
 export async function GET(request: Request) {
     const { searchParams } = new URL(request.url);

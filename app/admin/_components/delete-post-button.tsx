@@ -4,20 +4,36 @@ import React, { useState } from 'react';
 import { RiDeleteBinLine } from '@remixicon/react';
 import { Button } from '@/components/ui/button';
 import { AlertDialog, AlertDialogContent, AlertDialogHeader, AlertDialogMedia, AlertDialogTitle, AlertDialogDescription, AlertDialogFooter, AlertDialogCancel, AlertDialogAction } from '@/components/ui/alert-dialog';
+import { toast } from 'sonner';
+import { useRouter } from 'next/navigation';
 
 interface DeletePostButtonProps {
     postId: number;
     postTitle: string;
-    deleteAction: (formData: FormData) => Promise<void>;
 }
 
-export function DeletePostButton({ postId, postTitle, deleteAction }: DeletePostButtonProps) {
+export function DeletePostButton({ postId, postTitle }: DeletePostButtonProps) {
     const [open, setOpen] = useState(false);
-    const formRef = React.useRef<HTMLFormElement>(null);
+    const [deleting, setDeleting] = useState(false);
+    const router = useRouter();
 
-    const handleConfirm = () => {
-        formRef.current?.requestSubmit();
-        setOpen(false);
+    const handleConfirm = async () => {
+        setDeleting(true);
+        try {
+            const res = await fetch(`/api/posts/${postId}`, { method: 'DELETE' });
+            const data = await res.json();
+            if (res.ok && data.success) {
+                toast.success('文章已删除');
+                router.refresh();
+            } else {
+                toast.error(data.error || '删除失败');
+            }
+        } catch {
+            toast.error('删除失败');
+        } finally {
+            setDeleting(false);
+            setOpen(false);
+        }
     };
 
     return (
@@ -32,10 +48,6 @@ export function DeletePostButton({ postId, postTitle, deleteAction }: DeletePost
                 <RiDeleteBinLine className="w-4 h-4" />
             </Button>
 
-            <form ref={formRef} action={deleteAction} className="hidden">
-                <input type="hidden" name="id" value={postId} />
-            </form>
-
             <AlertDialog open={open} onOpenChange={setOpen}>
                 <AlertDialogContent>
                     <AlertDialogHeader>
@@ -48,9 +60,9 @@ export function DeletePostButton({ postId, postTitle, deleteAction }: DeletePost
                         </AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter>
-                        <AlertDialogCancel>取消</AlertDialogCancel>
-                        <AlertDialogAction variant="destructive" onClick={handleConfirm}>
-                            删除
+                        <AlertDialogCancel disabled={deleting}>取消</AlertDialogCancel>
+                        <AlertDialogAction variant="destructive" onClick={handleConfirm} disabled={deleting}>
+                            {deleting ? '删除中...' : '删除'}
                         </AlertDialogAction>
                     </AlertDialogFooter>
                 </AlertDialogContent>

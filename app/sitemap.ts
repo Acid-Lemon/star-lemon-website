@@ -2,6 +2,8 @@ import type { MetadataRoute } from 'next';
 import db from '@/lib/db';
 import { getSettings } from '@/lib/settings';
 
+export const dynamic = 'force-dynamic';
+
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     const settings = await getSettings();
     const siteUrl = settings.site_url || `https://${process.env.VERCEL_URL || 'localhost:3000'}`;

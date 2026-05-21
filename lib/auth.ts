@@ -4,11 +4,15 @@ import {cookies} from 'next/headers';
 const secretKey = process.env.JWT_SECRET || 'star-lemon-secret-key-182566';
 const key = new TextEncoder().encode(secretKey);
 
+export const SESSION_DURATION_MS = 7 * 24 * 60 * 60 * 1000;
+export const SESSION_DURATION_S = 7 * 24 * 60 * 60;
+export const RENEW_THRESHOLD_S = SESSION_DURATION_S / 2;
+
 export async function encrypt(payload: { user: any; time: number }) {
     return await new SignJWT(payload)
         .setProtectedHeader({alg: 'HS256'})
         .setIssuedAt()
-        .setExpirationTime('24h')
+        .setExpirationTime('7d')
         .sign(key);
 }
 
@@ -23,7 +27,7 @@ export async function loginUser(user: any) {
     const session = await encrypt({user, time: Date.now()});
     const cookieStore = await cookies();
     cookieStore.set('session', session, {
-        expires: new Date(Date.now() + 24 * 60 * 60 * 1000),
+        expires: new Date(Date.now() + SESSION_DURATION_MS),
         httpOnly: true,
         secure: process.env.NODE_ENV === 'production',
     });

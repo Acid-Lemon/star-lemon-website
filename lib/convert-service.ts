@@ -9,7 +9,6 @@ export {
   getOutputFormatLabel,
   isValidOutputFormat,
   isPdfOutput,
-  countPdfPages,
 } from './convert-formats';
 export type { FormatCategory } from './convert-formats';
 

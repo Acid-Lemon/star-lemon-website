@@ -74,13 +74,3 @@ export function isValidOutputFormat(srcFormat: string, dstFormat: string): boole
 export function isPdfOutput(dstFormat?: string): boolean {
   return !dstFormat || dstFormat.toLowerCase() === 'pdf';
 }
-
-export function countPdfPages(buffer: Buffer): number {
-  const text = buffer.toString('latin1');
-  const countMatch = text.match(/\/Count\s+(\d+)/);
-  if (countMatch) {
-    return parseInt(countMatch[1]);
-  }
-  const pageMatches = text.match(/\/Type\s*\/Page(?!s)/g);
-  return pageMatches ? pageMatches.length : 1;
-}

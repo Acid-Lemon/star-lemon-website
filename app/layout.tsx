@@ -95,7 +95,12 @@ export default async function RootLayout({children}: Readonly<{ children: React.
     return (
         <html lang="zh-CN" className="h-full antialiased" suppressHydrationWarning>
         <head>
-            <meta name="baidu-site-verification" content={process.env.BAIDU_SITE_VERIFICATION} />
+            {settings.baidu_site_verification && (
+            <meta name="baidu-site-verification" content={settings.baidu_site_verification} />
+          )}
+          {settings.google_site_verification && (
+            <meta name="google-site-verification" content={settings.google_site_verification} />
+          )}
         </head>
         <body className={`min-h-full flex flex-col bg-background text-foreground selection:bg-orange-100 dark:selection:bg-orange-900/30 ${inter.variable} ${playfair.variable} ${notoSerifSC.variable} ${dmMono.variable}`}
               suppressHydrationWarning>

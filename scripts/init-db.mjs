@@ -438,6 +438,25 @@ async function init() {
 
     console.log('\n🎉 数据库初始化完成，已有数据安全无影响');
 
+    // 插入新的站点配置项
+    const newSiteSettings = [
+      { key: 'ipapi_is_key', value: '', category: 'site', label: 'IPAPI 查询 Key' },
+      { key: 'baidu_site_verification', value: '', category: 'site', label: '百度站点验证码' },
+      { key: 'google_site_verification', value: '', category: 'site', label: 'Google 站点验证码' },
+    ];
+    for (const s of newSiteSettings) {
+      const exists = await client.query('SELECT 1 FROM settings WHERE key = $1', [s.key]);
+      if (exists.rows.length === 0) {
+        await client.query(
+          `INSERT INTO settings (key, value, category, label) VALUES ($1, $2, $3, $4)`,
+          [s.key, s.value, s.category, s.label]
+        );
+        console.log(`✅ 设置 ${s.key} 添加成功`);
+      } else {
+        console.log(`⏭️ 设置 ${s.key} 已存在，跳过`);
+      }
+    }
+
     // 插入文件转换服务默认配置
     const convertSettings = [
       { key: 'convert_api_url', value: 'https://gg.goldenglow.top:50006', category: 'convert', label: '转换服务地址' },

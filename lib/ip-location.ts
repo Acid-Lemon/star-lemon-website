@@ -1,5 +1,6 @@
 import { NextRequest } from 'next/server';
 import { toCnProvince, toCnCity } from './cn-location-map';
+import { getSetting } from './settings';
 
 function normalizeIp(raw: string | undefined | null): string | null {
   if (!raw) return null;
@@ -27,7 +28,7 @@ interface IpApiIsResult {
 }
 
 async function lookupIpApiIs(ip: string): Promise<string | null> {
-  const key = process.env.IPAPI_IS_KEY;
+  const key = await getSetting('ipapi_is_key');
   if (!key) return null;
 
   try {

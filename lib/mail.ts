@@ -52,8 +52,8 @@ export async function sendReviewNotification(type: 'message' | 'comment', conten
         const smtpUser = settings.smtp_user || process.env.SMTP_USER;
         const typeLabel = type === 'message' ? '留言' : '评论';
         const reviewUrl = type === 'message'
-            ? `${settings.site_url || 'https://starlemon.dev'}/admin/messages`
-            : `${settings.site_url || 'https://starlemon.dev'}/admin/comments`;
+            ? `${settings.site_url}/admin/messages`
+            : `${settings.site_url}/admin/comments`;
 
         const mailOptions = {
             from: `"star和lemon的小站" <${smtpUser}>`,
@@ -89,7 +89,7 @@ export async function sendCommentNotification(postTitle: string, content: string
     try {
         const transporter = await createTransporter();
         const smtpUser = settings.smtp_user || process.env.SMTP_USER;
-        const postUrl = `${settings.site_url || 'https://starlemon.dev'}/admin/comments`;
+        const postUrl = `${settings.site_url}/admin/comments`;
 
         const mailOptions = {
             from: `"star和lemon的小站" <${smtpUser}>`,

@@ -10,12 +10,12 @@ export async function JsonLd() {
         '@type': 'WebSite',
         name: siteTitle,
         description: siteDescription,
-        url: settings.site_url || 'https://starlemon.dev',
+        url: settings.site_url,
         potentialAction: {
             '@type': 'SearchAction',
             target: {
                 '@type': 'EntryPoint',
-                urlTemplate: `${settings.site_url || 'https://starlemon.dev'}/post?search={search_term_string}`,
+                urlTemplate: `${settings.site_url}/post?search={search_term_string}`,
             },
             'query-input': 'required name=search_term_string',
         },

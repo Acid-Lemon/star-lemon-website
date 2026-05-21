@@ -8,7 +8,7 @@ import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
 import { Skeleton } from '@/components/ui/skeleton';
 import { toast } from 'sonner';
-import { RiSaveLine, RiRefreshLine } from '@remixicon/react';
+import { RiSaveLine, RiCloseLine } from '@remixicon/react';
 
 interface SettingField {
   key: string;
@@ -31,12 +31,12 @@ const categoryMeta: Record<string, { title: string; description: string; icon: s
   convert: { title: '文件转换服务', description: '转换 API 及费用计算参数', icon: '📄' },
 };
 
-const secretKeys = ['smtp_pass', 'deepseek_api_key', 'qq_app_key', 'oss_access_key_secret', 'lantu_key', 'convert_api_key'];
+const secretKeys = ['smtp_pass', 'deepseek_api_key', 'qq_app_key', 'oss_access_key_secret', 'lantu_key', 'convert_api_key', 'ipapi_is_key'];
 
 const booleanKeys = ['smtp_secure', 'comment_review', 'guestbook_review', 'quote_enabled'];
 
 const fieldOrder: Record<string, string[]> = {
-  site: ['site_title', 'site_description', 'site_keywords', 'site_url', 'icp_number', 'comment_review', 'guestbook_review', 'quote_enabled'],
+  site: ['site_title', 'site_description', 'site_keywords', 'site_url', 'icp_number', 'comment_review', 'guestbook_review', 'quote_enabled', 'ipapi_is_key', 'baidu_site_verification', 'google_site_verification'],
   mail: ['smtp_host', 'smtp_port', 'smtp_user', 'smtp_pass', 'smtp_secure'],
   ai: ['deepseek_api_url', 'deepseek_api_key'],
   oauth: ['qq_app_id', 'qq_app_key'],
@@ -46,10 +46,22 @@ const fieldOrder: Record<string, string[]> = {
   convert: ['convert_api_url', 'convert_api_key', 'fc_price_per_file', 'fc_payment_fee', 'fc_service_fee', 'fc_profit_rate'],
 };
 
+function isCategoryDirty(category: string, settings: GroupedSettings, original: GroupedSettings): boolean {
+  const current = settings[category];
+  const orig = original[category];
+  if (!current || !orig) return false;
+  if (current.length !== orig.length) return true;
+  for (let i = 0; i < current.length; i++) {
+    if (current[i].key !== orig[i].key || current[i].value !== orig[i].value) return true;
+  }
+  return false;
+}
+
 export default function SettingsPage() {
   const [settings, setSettings] = useState<GroupedSettings>({});
+  const [originalSettings, setOriginalSettings] = useState<GroupedSettings>({});
   const [loading, setLoading] = useState(true);
-  const [saving, setSaving] = useState(false);
+  const [saving, setSaving] = useState<string | null>(null);
 
   useEffect(() => {
     fetchSettings();
@@ -60,6 +72,7 @@ export default function SettingsPage() {
       const res = await fetch('/api/settings');
       const data = await res.json();
       setSettings(data);
+      setOriginalSettings(JSON.parse(JSON.stringify(data)));
     } catch {
       toast.error('获取设置失败');
     } finally {
@@ -67,14 +80,12 @@ export default function SettingsPage() {
     }
   };
 
-  const handleSave = async () => {
-    setSaving(true);
+  const handleSaveCategory = async (category: string) => {
+    setSaving(category);
     try {
       const flat: Record<string, string> = {};
-      for (const fields of Object.values(settings)) {
-        for (const field of fields) {
-          flat[field.key] = field.value;
-        }
+      for (const field of settings[category]) {
+        flat[field.key] = field.value;
       }
 
       const res = await fetch('/api/settings', {
@@ -84,15 +95,23 @@ export default function SettingsPage() {
       });
 
       if (res.ok) {
-        toast.success('设置保存成功');
+        toast.success(`「${categoryMeta[category]?.title || category}」保存成功`);
+        setOriginalSettings(JSON.parse(JSON.stringify(settings)));
       } else {
         toast.error('保存失败');
       }
     } catch {
       toast.error('保存失败');
     } finally {
-      setSaving(false);
+      setSaving(null);
     }
+  };
+
+  const handleCancelCategory = (category: string) => {
+    setSettings(prev => ({
+      ...prev,
+      [category]: JSON.parse(JSON.stringify(originalSettings[category])),
+    }));
   };
 
   const handleChange = (category: string, key: string, value: string) => {
@@ -123,21 +142,9 @@ export default function SettingsPage() {
 
   return (
     <div className="space-y-8">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight">全局配置</h1>
-          <p className="text-muted-foreground mt-2">管理网站的所有配置项</p>
-        </div>
-        <div className="flex gap-2">
-          <Button variant="outline" onClick={fetchSettings} disabled={loading}>
-            <RiRefreshLine className="w-4 h-4 mr-2" />
-            刷新
-          </Button>
-          <Button onClick={handleSave} disabled={saving}>
-            <RiSaveLine className="w-4 h-4 mr-2" />
-            {saving ? '保存中...' : '保存设置'}
-          </Button>
-        </div>
+      <div>
+        <h1 className="text-3xl font-bold tracking-tight">全局配置</h1>
+        <p className="text-muted-foreground mt-2">管理网站的所有配置项</p>
       </div>
 
       <div className="space-y-6">
@@ -149,6 +156,7 @@ export default function SettingsPage() {
             const ib = order.indexOf(b.key);
             return (ia === -1 ? 999 : ia) - (ib === -1 ? 999 : ib);
           });
+          const dirty = isCategoryDirty(category, settings, originalSettings);
 
           return (
             <Card key={category}>
@@ -193,6 +201,18 @@ export default function SettingsPage() {
                     );
                   })}
                 </div>
+                {dirty && (
+                  <div className="flex gap-2 mt-4 pt-4 border-t">
+                    <Button onClick={() => handleSaveCategory(category)} disabled={saving === category}>
+                      <RiSaveLine className="w-4 h-4 mr-2" />
+                      {saving === category ? '保存中...' : '保存'}
+                    </Button>
+                    <Button variant="outline" onClick={() => handleCancelCategory(category)} disabled={saving === category}>
+                      <RiCloseLine className="w-4 h-4 mr-2" />
+                      取消
+                    </Button>
+                  </div>
+                )}
               </CardContent>
             </Card>
           );

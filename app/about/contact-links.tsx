@@ -28,7 +28,7 @@ export function ContactLinks({ email, bilibili, github }: ContactLinksProps) {
     <div className="flex items-center justify-center gap-3">
       <button
         onClick={copyEmail}
-        className="flex items-center gap-1.5 px-3 py-1.5 bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-full text-xs text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 transition-colors"
+        className="flex items-center gap-1.5 px-3 py-1.5 bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-full text-xs text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 transition-colors cursor-pointer"
         title="点击复制邮箱"
       >
         <RiMailLine className="w-3.5 h-3.5" />

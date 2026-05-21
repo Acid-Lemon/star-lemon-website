@@ -443,6 +443,7 @@ async function init() {
       { key: 'ipapi_is_key', value: '', category: 'site', label: 'IPAPI 查询 Key' },
       { key: 'baidu_site_verification', value: '', category: 'site', label: '百度站点验证码' },
       { key: 'google_site_verification', value: '', category: 'site', label: 'Google 站点验证码' },
+      { key: 'bing_site_verification', value: '', category: 'site', label: 'Bing 站点验证码' },
     ];
     for (const s of newSiteSettings) {
       const exists = await client.query('SELECT 1 FROM settings WHERE key = $1', [s.key]);

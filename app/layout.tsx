@@ -101,6 +101,9 @@ export default async function RootLayout({children}: Readonly<{ children: React.
           {settings.google_site_verification && (
             <meta name="google-site-verification" content={settings.google_site_verification} />
           )}
+          {settings.bing_site_verification && (
+            <meta name="msvalidate.01" content={settings.bing_site_verification} />
+          )}
         </head>
         <body className={`min-h-full flex flex-col bg-background text-foreground selection:bg-orange-100 dark:selection:bg-orange-900/30 ${inter.variable} ${playfair.variable} ${notoSerifSC.variable} ${dmMono.variable}`}
               suppressHydrationWarning>

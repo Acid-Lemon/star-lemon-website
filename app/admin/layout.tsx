@@ -1,7 +1,7 @@
 import React from 'react';
 import Link from 'next/link';
 import {RiTimeLine, RiFileTextLine, RiHomeLine, RiLogoutBoxLine, RiChat3Line, RiChat4Line, RiSideBarLine, RiSettings3Line, RiFlashlightLine, RiDoubleQuotesL, RiUserLine, RiFolderTransferLine, RiLinksLine, RiFilePdf2Line, RiTaskLine} from '@remixicon/react';
-import {getSession, logoutUser} from '../../lib/auth';
+import {getSession} from '../../lib/auth';
 import {redirect} from 'next/navigation';
 import { getPublicUrl } from '../../lib/oss';
 import db from '../../lib/db';
@@ -30,12 +30,6 @@ export default async function AdminLayout({children}: { children: React.ReactNod
         }
     } catch (error) {
         console.error('Failed to fetch admin info:', error);
-    }
-
-    async function handleLogout() {
-        'use server';
-        await logoutUser();
-        redirect('/');
     }
 
     return (
@@ -131,13 +125,11 @@ export default async function AdminLayout({children}: { children: React.ReactNod
                         <RiHomeLine className="h-4 w-4"/>
                         返回前台
                     </Link>
-                    <form action={handleLogout}>
-                        <button type="submit"
+                    <button onClick={() => { fetch('/api/auth/logout', { method: 'POST' }).then(() => { window.location.href = '/'; }); }}
                                 className="w-full mt-1 flex items-center gap-3 px-3 py-2.5 rounded-md text-sm font-medium text-destructive hover:bg-destructive/10 transition-colors text-left">
                             <RiLogoutBoxLine className="h-4 w-4"/>
                             退出登录
                         </button>
-                    </form>
                 </div>
             </aside>
 
@@ -147,7 +139,7 @@ export default async function AdminLayout({children}: { children: React.ReactNod
                 <header
                     className="h-16 flex items-center justify-between px-6 border-b bg-background shadow-sm shrink-0">
                     <div className="flex items-center gap-2">
-                        <MobileSidebar adminName={admin.nickname || 'Admin'} handleLogout={handleLogout} />
+                        <MobileSidebar adminName={admin.nickname || 'Admin'} />
                     </div>
                     <div className="flex items-center gap-4">
                         <div className="flex items-center gap-2">

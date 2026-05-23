@@ -10,10 +10,9 @@ import {ScrollArea} from '@/components/ui/scroll-area';
 
 interface MobileSidebarProps {
     adminName: string;
-    handleLogout: () => Promise<void>;
 }
 
-export function MobileSidebar({adminName, handleLogout}: MobileSidebarProps) {
+export function MobileSidebar({adminName}: MobileSidebarProps) {
     const [open, setOpen] = React.useState(false);
     const pathname = usePathname();
 
@@ -116,13 +115,11 @@ export function MobileSidebar({adminName, handleLogout}: MobileSidebarProps) {
                         <RiHomeLine className="h-4 w-4"/>
                         返回前台
                     </Link>
-                    <form action={handleLogout} className="mt-1">
-                        <button type="submit"
-                                className="w-full flex items-center gap-3 px-3 py-2.5 rounded-md text-sm font-medium text-destructive hover:bg-destructive/10 transition-colors text-left">
-                            <RiLogoutBoxLine className="h-4 w-4"/>
-                            退出登录
-                        </button>
-                    </form>
+                    <button onClick={() => { fetch('/api/auth/logout', { method: 'POST' }).then(() => { window.location.href = '/'; }); }}
+                            className="w-full mt-1 flex items-center gap-3 px-3 py-2.5 rounded-md text-sm font-medium text-destructive hover:bg-destructive/10 transition-colors text-left">
+                        <RiLogoutBoxLine className="h-4 w-4"/>
+                        退出登录
+                    </button>
                 </div>
             </SheetContent>
         </Sheet>

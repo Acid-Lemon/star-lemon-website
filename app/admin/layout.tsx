@@ -1,12 +1,13 @@
 import React from 'react';
 import Link from 'next/link';
-import {RiTimeLine, RiFileTextLine, RiHomeLine, RiLogoutBoxLine, RiChat3Line, RiChat4Line, RiSideBarLine, RiSettings3Line, RiFlashlightLine, RiDoubleQuotesL, RiUserLine, RiFolderTransferLine, RiLinksLine, RiFilePdf2Line, RiTaskLine} from '@remixicon/react';
+import {RiTimeLine, RiFileTextLine, RiHomeLine, RiChat3Line, RiChat4Line, RiSideBarLine, RiSettings3Line, RiFlashlightLine, RiDoubleQuotesL, RiUserLine, RiFolderTransferLine, RiLinksLine, RiFilePdf2Line, RiTaskLine} from '@remixicon/react';
 import {getSession} from '../../lib/auth';
 import {redirect} from 'next/navigation';
 import { getPublicUrl } from '../../lib/oss';
 import db from '../../lib/db';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { MobileSidebar } from './_components/mobile-sidebar';
+import { LogoutButton } from './_components/logout-button';
 
 export default async function AdminLayout({children}: { children: React.ReactNode }) {
     const session: any = await getSession();
@@ -125,11 +126,7 @@ export default async function AdminLayout({children}: { children: React.ReactNod
                         <RiHomeLine className="h-4 w-4"/>
                         返回前台
                     </Link>
-                    <button onClick={() => { fetch('/api/auth/logout', { method: 'POST' }).then(() => { window.location.href = '/'; }); }}
-                                className="w-full mt-1 flex items-center gap-3 px-3 py-2.5 rounded-md text-sm font-medium text-destructive hover:bg-destructive/10 transition-colors text-left">
-                            <RiLogoutBoxLine className="h-4 w-4"/>
-                            退出登录
-                        </button>
+                    <LogoutButton />
                 </div>
             </aside>
 

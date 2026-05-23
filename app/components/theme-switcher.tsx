@@ -14,9 +14,9 @@ interface ThemeOption {
     id: string;
     label: string;
     icon: React.ReactNode;
-    textClass: string;
+    previewBg: string;
+    previewAccent: string;
     activeRingClass: string;
-    activeBorderClass: string;
 }
 
 const themes: ThemeOption[] = [
@@ -24,33 +24,33 @@ const themes: ThemeOption[] = [
         id: 'light',
         label: '明亮',
         icon: <RiSunLine className="w-5 h-5" />,
-        textClass: 'text-orange-500',
+        previewBg: 'bg-gradient-to-br from-orange-50 to-white',
+        previewAccent: 'bg-orange-400',
         activeRingClass: 'ring-orange-400',
-        activeBorderClass: 'border-orange-400',
     },
     {
         id: 'dark',
         label: '深夜',
         icon: <RiMoonLine className="w-5 h-5" />,
-        textClass: 'text-indigo-400',
+        previewBg: 'bg-gradient-to-br from-gray-800 to-gray-900',
+        previewAccent: 'bg-indigo-400',
         activeRingClass: 'ring-indigo-400',
-        activeBorderClass: 'border-indigo-400',
     },
     {
         id: 'tech',
         label: '科技',
         icon: <RiComputerLine className="w-5 h-5" />,
-        textClass: 'text-cyan-400',
+        previewBg: 'bg-gradient-to-br from-[#0c1a3a] to-[#060d1f]',
+        previewAccent: 'bg-cyan-400',
         activeRingClass: 'ring-cyan-400',
-        activeBorderClass: 'border-cyan-400',
     },
     {
         id: 'pastel',
-        label: '少女',
+        label: '梦幻',
         icon: <RiHeartLine className="w-5 h-5" />,
-        textClass: 'text-pink-400',
+        previewBg: 'bg-gradient-to-br from-pink-100 to-fuchsia-50',
+        previewAccent: 'bg-pink-500',
         activeRingClass: 'ring-pink-400',
-        activeBorderClass: 'border-pink-400',
     },
 ];
 
@@ -108,7 +108,7 @@ export function ThemeSwitcher() {
             {isOpen && (
                 <div
                     ref={panelRef}
-                    className="absolute bottom-16 right-0 mb-2 w-48 bg-card/95 backdrop-blur-xl border border-border rounded-2xl shadow-2xl p-3 animate-in fade-in slide-in-from-bottom-4 duration-200"
+                    className="absolute bottom-16 right-0 mb-2 w-56 bg-card/95 backdrop-blur-xl border border-border rounded-2xl shadow-2xl p-3 animate-in fade-in slide-in-from-bottom-4 duration-200"
                     role="dialog"
                     aria-label="主题选择"
                 >
@@ -127,16 +127,32 @@ export function ThemeSwitcher() {
                             <button
                                 key={t.id}
                                 onClick={() => handleSelectTheme(t.id)}
-                                className={`flex flex-col items-center gap-1.5 p-3 rounded-xl border transition-all duration-200 hover:scale-105 active:scale-95 ${
+                                className={`flex flex-col items-center gap-1.5 p-2.5 rounded-xl border transition-all duration-200 hover:scale-105 active:scale-95 ${
                                     theme === t.id
-                                        ? `${t.activeBorderClass} ring-2 ${t.activeRingClass} bg-opacity-10`
+                                        ? `ring-2 ${t.activeRingClass} border-transparent`
                                         : 'border-border hover:border-muted-foreground/30'
                                 }`}
                                 aria-label={`切换到${t.label}主题`}
                                 aria-pressed={theme === t.id}
                             >
-                                <span className={t.textClass}>{t.icon}</span>
-                                <span className="text-xs font-medium text-foreground">{t.label}</span>
+                                {/* Mini preview card */}
+                                <div className={`w-full h-8 rounded-lg ${t.previewBg} relative overflow-hidden flex items-center justify-center`}>
+                                    <div className={`w-2.5 h-2.5 rounded-full ${t.previewAccent} shadow-sm`} />
+                                    {t.id === 'tech' && (
+                                        <div className="absolute inset-0 opacity-30"
+                                             style={{
+                                                 backgroundImage: 'linear-gradient(rgba(56,189,248,0.15) 1px, transparent 1px), linear-gradient(90deg, rgba(56,189,248,0.15) 1px, transparent 1px)',
+                                                 backgroundSize: '8px 8px'
+                                             }} />
+                                    )}
+                                    {t.id === 'pastel' && (
+                                        <span className="absolute text-[6px] opacity-30" style={{ left: '3px', top: '2px' }}>♡</span>
+                                    )}
+                                </div>
+                                <div className="flex items-center gap-1.5">
+                                    <span className="text-foreground">{t.icon}</span>
+                                    <span className="text-xs font-medium text-foreground">{t.label}</span>
+                                </div>
                             </button>
                         ))}
                     </div>
@@ -147,14 +163,25 @@ export function ThemeSwitcher() {
             <button
                 ref={buttonRef}
                 onClick={handleToggle}
-                className="w-12 h-12 rounded-full bg-card/80 backdrop-blur-xl border border-border shadow-lg hover:shadow-xl flex items-center justify-center transition-all duration-300 hover:scale-110 active:scale-95 group"
+                className={`w-12 h-12 rounded-full backdrop-blur-xl border shadow-lg hover:shadow-xl flex items-center justify-center transition-all duration-300 hover:scale-110 active:scale-95 group ${
+                    theme === 'tech'
+                        ? 'bg-[#0c1a3a]/80 border-[#1e3a5f] shadow-[0_0_15px_rgba(56,189,248,0.15)]'
+                        : theme === 'pastel'
+                        ? 'bg-pink-50/80 border-pink-200 shadow-[0_4px_15px_rgba(244,114,182,0.12)]'
+                        : 'bg-card/80 border-border'
+                }`}
                 aria-label={isOpen ? '关闭主题选择' : '打开主题选择'}
                 aria-expanded={isOpen}
             >
                 {isOpen ? (
                     <RiCloseLine className="w-5 h-5 text-muted-foreground group-hover:rotate-90 transition-transform duration-300" />
                 ) : (
-                    <span className={currentTheme.textClass}>
+                    <span className={
+                        theme === 'tech' ? 'text-cyan-400'
+                        : theme === 'pastel' ? 'text-pink-500'
+                        : theme === 'dark' ? 'text-indigo-400'
+                        : 'text-orange-500'
+                    }>
                         {currentTheme.icon}
                     </span>
                 )}

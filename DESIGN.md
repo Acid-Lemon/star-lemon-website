@@ -2,7 +2,7 @@
 
 ## Theme
 
-Multi-theme system built on next-themes. Themes are complete visual re-skins that change the emotional tone while keeping layout stable. Current themes: default (light), dark, tech, pastel (少女/可爱). Themes are applied via CSS custom properties scoped to a class on `<html>`.
+Multi-theme system built on next-themes. Themes are complete visual re-skins that change the emotional tone while keeping layout stable. Current themes: default (light), dark, tech, pastel (梦幻/柔光). Themes are applied via CSS custom properties scoped to a class on `<html>`.
 
 ## Color
 

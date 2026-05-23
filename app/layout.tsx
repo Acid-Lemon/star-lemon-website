@@ -2,6 +2,7 @@ import type {Metadata} from "next";
 import {DM_Mono, Inter, Noto_Serif_SC, Playfair_Display} from 'next/font/google'
 import "./globals.css";
 import { getSession, logoutUser } from "../lib/auth";
+import { redirect } from "next/navigation";
 import { getSettings } from "../lib/settings";
 import { getPublicUrl } from "../lib/oss";
 import { Navigation, Footer } from "./components/navigation";
@@ -90,6 +91,7 @@ export default async function RootLayout({children}: Readonly<{ children: React.
     async function handleLogout() {
         'use server';
         await logoutUser();
+        redirect('/');
     }
 
     return (

@@ -1,8 +1,7 @@
 import type {Metadata} from "next";
 import {DM_Mono, Inter, Noto_Serif_SC, Playfair_Display} from 'next/font/google'
 import "./globals.css";
-import { getSession, logoutUser } from "../lib/auth";
-import { redirect } from "next/navigation";
+import { getSession } from "../lib/auth";
 import { getSettings } from "../lib/settings";
 import { getPublicUrl } from "../lib/oss";
 import { Navigation, Footer } from "./components/navigation";
@@ -88,12 +87,6 @@ export default async function RootLayout({children}: Readonly<{ children: React.
 
     const settings = await getSettings();
 
-    async function handleLogout() {
-        'use server';
-        await logoutUser();
-        redirect('/');
-    }
-
     return (
         <html lang="zh-CN" className="h-full antialiased" suppressHydrationWarning>
         <head>
@@ -111,7 +104,7 @@ export default async function RootLayout({children}: Readonly<{ children: React.
               suppressHydrationWarning>
             <ThemeProvider>
                 <UserProvider user={user}>
-                    <Navigation user={user} handleLogout={handleLogout} />
+                    <Navigation user={user} />
                     <MainWrapper>
                         {children}
                     </MainWrapper>

@@ -1,7 +1,7 @@
 'use client';
 
 import {useState, useEffect} from 'react';
-import {usePathname} from 'next/navigation';
+import {usePathname, useRouter} from 'next/navigation';
 import Link from 'next/link';
 import { RiSearchLine, RiArrowDownSLine, RiSettings3Line, RiUserLine, RiLogoutBoxRLine, RiCloseLine, RiMenuLine, RiCoinLine } from '@remixicon/react';
 import {UserProfileModal} from './user-profile-modal';
@@ -10,7 +10,6 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 
 interface NavigationProps {
     user: UserInfo | null;
-    handleLogout: (formData: FormData) => void;
 }
 
 const navItems = [
@@ -23,8 +22,9 @@ const navItems = [
     { href: '/tools', label: '工具', activeColor: 'text-purple-500', hoverLine: 'via-purple-400' },
 ];
 
-export function Navigation({user, handleLogout}: NavigationProps) {
+export function Navigation({user}: NavigationProps) {
     const pathname = usePathname();
+    const router = useRouter();
     const [showProfile, setShowProfile] = useState(false);
     const [showDropdown, setShowDropdown] = useState(false);
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -32,6 +32,14 @@ export function Navigation({user, handleLogout}: NavigationProps) {
     const [searchQuery, setSearchQuery] = useState('');
     const [searchResults, setSearchResults] = useState<any[]>([]);
     const [searchLoading, setSearchLoading] = useState(false);
+
+    const handleLogout = async () => {
+        try {
+            await fetch('/api/auth/logout', { method: 'POST' });
+        } catch {}
+        router.push('/');
+        router.refresh();
+    };
 
     useEffect(() => {
         setMobileMenuOpen(false);
@@ -143,12 +151,10 @@ export function Navigation({user, handleLogout}: NavigationProps) {
                                                 个人设置
                                             </button>
                                             <div className="border-t border-gray-100 dark:border-gray-800 my-1"/>
-                                            <form action={handleLogout} className="w-full">
-                                                <button type="submit" className="flex items-center gap-2 px-4 py-2.5 text-sm text-red-500 hover:bg-red-50 dark:hover:bg-red-950/30 transition-colors w-full text-left">
+                                            <button onClick={handleLogout} className="flex items-center gap-2 px-4 py-2.5 text-sm text-red-500 hover:bg-red-50 dark:hover:bg-red-950/30 transition-colors w-full text-left">
                                                     <RiLogoutBoxRLine className="w-4 h-4" />
                                                     退出登录
                                                 </button>
-                                            </form>
                                         </div>
                                     </>
                                 )}
@@ -220,11 +226,9 @@ export function Navigation({user, handleLogout}: NavigationProps) {
                                 <button onClick={() => { setMobileMenuOpen(false); setShowProfile(true); }} className="px-4 py-3 rounded-xl text-sm text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors text-left">
                                     个人设置
                                 </button>
-                                <form action={handleLogout} className="w-full">
-                                    <button type="submit" className="px-4 py-3 rounded-xl text-sm text-red-500 hover:bg-red-50 dark:hover:bg-red-950/30 transition-colors w-full text-left">
+                                <button onClick={handleLogout} className="px-4 py-3 rounded-xl text-sm text-red-500 hover:bg-red-50 dark:hover:bg-red-950/30 transition-colors w-full text-left">
                                         退出登录
                                     </button>
-                                </form>
                             </div>
                         ) : (
                             <Link href="/login" className="block px-4 py-3 rounded-xl text-base text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">

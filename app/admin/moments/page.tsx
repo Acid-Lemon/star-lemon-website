@@ -9,6 +9,8 @@ import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { AlertDialog, AlertDialogContent, AlertDialogHeader, AlertDialogTitle, AlertDialogDescription, AlertDialogFooter, AlertDialogCancel, AlertDialogAction } from '@/components/ui/alert-dialog';
 import { RiDeleteBinLine, RiSendPlaneLine, RiImageLine } from '@remixicon/react';
 import { GalleryLightbox } from '../../components/image-lightbox';
+import { DouyinVideoEmbed } from '../../components/douyin-video-embed';
+import { splitContentByDouyin } from '@/lib/douyin';
 
 const MAX_IMAGES = 9;
 
@@ -313,8 +315,12 @@ export default function AdminMomentsPage() {
                                                 <RiDeleteBinLine className="w-4 h-4" />
                                             </Button>
                                         </div>
-                                        <p className="text-sm text-foreground/90 leading-relaxed whitespace-pre-wrap break-words">
-                                            {moment.content}
+                                        <p className="text-sm text-foreground/90 leading-relaxed break-words">
+                                            {splitContentByDouyin(moment.content).map((seg, i, arr) =>
+                                                seg.type === 'douyin'
+                                                    ? <div key={i} className="mt-2"><DouyinVideoEmbed shortUrl={seg.content} /></div>
+                                                    : <span key={i} className="whitespace-pre-wrap">{seg.content}{i < arr.length - 1 ? '\n' : ''}</span>
+                                            )}
                                         </p>
                                         {moment.image_url && <MomentImages imageUrl={moment.image_url} onImageClick={(urls, index) => setLightbox({ images: urls, index })} />}
                                     </div>

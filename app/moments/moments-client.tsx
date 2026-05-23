@@ -3,6 +3,8 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { GalleryLightbox } from '../components/image-lightbox';
+import { DouyinVideoEmbed } from '../components/douyin-video-embed';
+import { splitContentByDouyin } from '@/lib/douyin';
 import { getRelativeTime, cn } from '@/lib/utils';
 import { RiLoader4Line, RiCalendarLine, RiCloseLine } from '@remixicon/react';
 import { Calendar } from '@/components/ui/calendar';
@@ -280,8 +282,12 @@ export default function MomentsClient() {
                                 </div>
                             </div>
 
-                            <div className="text-gray-800 dark:text-gray-200 text-sm leading-relaxed whitespace-pre-wrap break-words">
-                                {moment.content}
+                            <div className="text-gray-800 dark:text-gray-200 text-sm leading-relaxed break-words">
+                                {splitContentByDouyin(moment.content).map((seg, i, arr) =>
+                                    seg.type === 'douyin'
+                                        ? <div key={i} className="mt-2"><DouyinVideoEmbed shortUrl={seg.content} /></div>
+                                        : <span key={i} className="whitespace-pre-wrap">{seg.content}{i < arr.length - 1 ? '\n' : ''}</span>
+                                )}
                             </div>
 
                             {moment.image_url && <MomentImages imageUrl={moment.image_url} onImageClick={handleImageClick} />}

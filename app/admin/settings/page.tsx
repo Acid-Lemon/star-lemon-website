@@ -29,6 +29,7 @@ const categoryMeta: Record<string, { title: string; description: string; icon: s
   pay: { title: '支付服务', description: '蓝兔支付配置', icon: '💳' },
   pricing: { title: '文件快传费用', description: '文件快传费用计算参数', icon: '💰' },
   convert: { title: '文件转换服务', description: '转换 API 及费用计算参数', icon: '📄' },
+  douyin: { title: '抖音解析', description: '抖音视频解析接口配置', icon: '🎬' },
 };
 
 const secretKeys = ['smtp_pass', 'deepseek_api_key', 'qq_app_key', 'oss_access_key_secret', 'lantu_key', 'convert_api_key', 'ipapi_is_key'];
@@ -44,6 +45,7 @@ const fieldOrder: Record<string, string[]> = {
   pay: ['lantu_mch_id', 'lantu_key'],
   pricing: ['ft_storage_price', 'ft_traffic_price', 'ft_payment_fee', 'ft_service_fee', 'ft_profit_rate'],
   convert: ['convert_api_url', 'convert_api_key', 'fc_price_per_file', 'fc_payment_fee', 'fc_service_fee', 'fc_profit_rate'],
+  douyin: ['douyin_api_url'],
 };
 
 function isCategoryDirty(category: string, settings: GroupedSettings, original: GroupedSettings): boolean {
@@ -136,7 +138,7 @@ export default function SettingsPage() {
   }
 
   const sortedCategories = Object.keys(settings).sort((a, b) => {
-    const order = ['site', 'mail', 'ai', 'oauth', 'oss', 'pay', 'pricing', 'convert'];
+    const order = ['site', 'mail', 'ai', 'oauth', 'oss', 'pay', 'pricing', 'convert', 'douyin'];
     return order.indexOf(a) - order.indexOf(b);
   });
 

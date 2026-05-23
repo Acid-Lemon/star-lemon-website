@@ -20,31 +20,36 @@ interface DouyinVideoEmbedProps {
   shortUrl: string;
 }
 
+const proxyUrl = (url: string) => `/api/douyin-proxy?url=${encodeURIComponent(url)}`;
+
 export function DouyinVideoEmbed({ shortUrl }: DouyinVideoEmbedProps) {
   const [data, setData] = useState<DouyinData | null>(null);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const [playing, setPlaying] = useState(false);
 
   useEffect(() => {
     let cancelled = false;
     setLoading(true);
-    setError(false);
+    setError(null);
 
     fetch(`/api/douyin-parse?url=${encodeURIComponent(shortUrl)}`)
-      .then(res => res.json())
+      .then(res => {
+        if (res.status === 429) throw new Error('rate_limit');
+        return res.json();
+      })
       .then(json => {
         if (cancelled) return;
         if (json.code === 200 && json.data) {
           setData(json.data);
         } else {
-          setError(true);
+          setError(json.error || '解析失败');
         }
         setLoading(false);
       })
-      .catch(() => {
+      .catch(err => {
         if (cancelled) return;
-        setError(true);
+        setError(err.message === 'rate_limit' ? '解析服务繁忙，请稍后刷新重试' : '解析失败');
         setLoading(false);
       });
 
@@ -62,14 +67,12 @@ export function DouyinVideoEmbed({ shortUrl }: DouyinVideoEmbedProps) {
 
   if (error || !data) {
     return (
-      <a
-        href={shortUrl}
-        target="_blank"
-        rel="noopener noreferrer"
-        className="mt-3 text-blue-500 hover:underline text-sm break-all"
-      >
-        {shortUrl}
-      </a>
+      <div className="mt-3 rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50 p-3 text-sm text-gray-500 dark:text-gray-400">
+        {error || '解析失败'}
+        {!error?.includes('繁忙') && (
+          <a href={shortUrl} target="_blank" rel="noopener noreferrer" className="ml-2 text-blue-500 hover:underline break-all">{shortUrl}</a>
+        )}
+      </div>
     );
   }
 
@@ -82,7 +85,7 @@ export function DouyinVideoEmbed({ shortUrl }: DouyinVideoEmbedProps) {
               className="relative cursor-pointer group"
               onClick={() => setPlaying(true)}
             >
-              <img src={data.cover} alt={data.title} className="w-full aspect-video object-cover" />
+              <img src={proxyUrl(data.cover)} alt={data.title} className="w-full aspect-video object-cover" />
               <div className="absolute inset-0 flex items-center justify-center bg-black/20 group-hover:bg-black/30 transition-colors">
                 <div className="w-12 h-12 rounded-full bg-white/90 flex items-center justify-center shadow-lg">
                   <RiVideoLine className="w-6 h-6 text-gray-800" />
@@ -92,10 +95,10 @@ export function DouyinVideoEmbed({ shortUrl }: DouyinVideoEmbedProps) {
           )}
           {playing && (
             <video
-              src={data.url}
+              src={proxyUrl(data.url)}
               controls
               autoPlay
-              poster={data.cover}
+              poster={proxyUrl(data.cover)}
               className="w-full aspect-video object-contain"
               playsInline
             />
@@ -121,7 +124,7 @@ export function DouyinVideoEmbed({ shortUrl }: DouyinVideoEmbedProps) {
               className="relative cursor-pointer group"
               onClick={() => setPlaying(true)}
             >
-              <img src={data.live_photo[0].image} alt={data.title} className="w-full aspect-video object-cover" />
+              <img src={proxyUrl(data.live_photo[0].image)} alt={data.title} className="w-full aspect-video object-cover" />
               <div className="absolute inset-0 flex items-center justify-center bg-black/20 group-hover:bg-black/30 transition-colors">
                 <div className="w-12 h-12 rounded-full bg-white/90 flex items-center justify-center shadow-lg">
                   <RiVideoLine className="w-6 h-6 text-gray-800" />
@@ -131,7 +134,7 @@ export function DouyinVideoEmbed({ shortUrl }: DouyinVideoEmbedProps) {
           )}
           {playing && (
             <video
-              src={data.live_photo[0].video}
+              src={proxyUrl(data.live_photo[0].video)}
               controls
               autoPlay
               className="w-full aspect-video object-contain"
@@ -159,7 +162,7 @@ export function DouyinVideoEmbed({ shortUrl }: DouyinVideoEmbedProps) {
         <div className={`grid ${gridCols} gap-1 p-2 bg-white dark:bg-gray-900`}>
           {data.images.map((img, i) => (
             <div key={img + i} className="aspect-square rounded-lg overflow-hidden">
-              <img src={img} alt={`图片${i + 1}`} className="w-full h-full object-cover" loading="lazy" />
+              <img src={proxyUrl(img)} alt={`图片${i + 1}`} className="w-full h-full object-cover" loading="lazy" />
             </div>
           ))}
         </div>
@@ -174,13 +177,9 @@ export function DouyinVideoEmbed({ shortUrl }: DouyinVideoEmbedProps) {
   }
 
   return (
-    <a
-      href={shortUrl}
-      target="_blank"
-      rel="noopener noreferrer"
-      className="mt-3 text-blue-500 hover:underline text-sm break-all"
-    >
-      {shortUrl}
-    </a>
+    <div className="mt-3 rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50 p-3 text-sm">
+      <span className="text-gray-500 dark:text-gray-400">无法识别此内容类型</span>
+      <a href={shortUrl} target="_blank" rel="noopener noreferrer" className="ml-2 text-blue-500 hover:underline break-all">{shortUrl}</a>
+    </div>
   );
 }

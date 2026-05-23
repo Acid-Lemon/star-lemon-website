@@ -8,7 +8,7 @@ import { Navigation, Footer } from "./components/navigation";
 import { MainWrapper } from "./components/main-wrapper";
 import { Toaster } from "@/components/ui/sonner";
 import { ThemeProvider } from "./components/theme-provider";
-import { ThemeToggle } from "./components/theme-toggle";
+import { ThemeSwitcher } from "./components/theme-switcher";
 import { UserProvider } from "./components/user-context";
 import db from "../lib/db";
 
@@ -105,7 +105,7 @@ export default async function RootLayout({children}: Readonly<{ children: React.
             <meta name="msvalidate.01" content={settings.bing_site_verification} />
           )}
         </head>
-        <body className={`min-h-full flex flex-col bg-background text-foreground selection:bg-orange-100 dark:selection:bg-orange-900/30 ${inter.variable} ${playfair.variable} ${notoSerifSC.variable} ${dmMono.variable}`}
+        <body className={`min-h-full flex flex-col bg-background text-foreground ${inter.variable} ${playfair.variable} ${notoSerifSC.variable} ${dmMono.variable}`}
               suppressHydrationWarning>
             <ThemeProvider>
                 <UserProvider user={user}>
@@ -114,7 +114,7 @@ export default async function RootLayout({children}: Readonly<{ children: React.
                         {children}
                     </MainWrapper>
                     <Footer icpNumber={settings.icp_number} />
-                    <ThemeToggle />
+                    <ThemeSwitcher />
                 </UserProvider>
             </ThemeProvider>
             <Toaster position="top-center" />

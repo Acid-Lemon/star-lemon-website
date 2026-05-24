@@ -320,7 +320,7 @@ export default function AdminMomentsPage() {
                                                 <RiDeleteBinLine className="w-4 h-4" />
                                             </Button>
                                         </div>
-                                        <p className="text-sm text-foreground/90 leading-relaxed break-words">
+                                        <div className="text-sm text-foreground/90 leading-relaxed break-words">
                                             {splitContentByVideo(moment.content).map((seg, i, arr) =>
                                                 seg.type === 'douyin'
                                                     ? <div key={i} className="mt-2">{embedMode === 'iframe' ? <DouyinIframeEmbed shortUrl={seg.content} /> : <DouyinVideoEmbed shortUrl={seg.content} />}</div>
@@ -328,7 +328,7 @@ export default function AdminMomentsPage() {
                                                         ? <div key={i} className="mt-2"><BilibiliPlayer bvid={seg.bvid!} time={seg.time} /></div>
                                                         : <span key={i} className="whitespace-pre-wrap">{seg.content}{i < arr.length - 1 ? '\n' : ''}</span>
                                             )}
-                                        </p>
+                                        </div>
                                         {moment.image_url && <MomentImages imageUrl={moment.image_url} onImageClick={(urls, index) => setLightbox({ images: urls, index })} />}
                                     </div>
                                 ))}

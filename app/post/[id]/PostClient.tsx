@@ -54,7 +54,7 @@ function PostContent({content, douyinMode}: { content: string; douyinMode: Douyi
                 // Douyin: line is a pure douyin short URL
                 const douyinRegex = /^https:\/\/v\.douyin\.com\/[^\s]+$/;
                 if (douyinRegex.test(text.trim())) {
-                    return <p {...props}>{douyinMode === 'iframe' ? <DouyinIframeEmbed shortUrl={text.trim()} /> : <DouyinVideoEmbed shortUrl={text.trim()} />}</p>;
+                    return <div {...props}>{douyinMode === 'iframe' ? <DouyinIframeEmbed shortUrl={text.trim()} /> : <DouyinVideoEmbed shortUrl={text.trim()} />}</div>;
                 }
 
                 // Bilibili: 【title】URL format

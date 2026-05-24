@@ -5,7 +5,9 @@ import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { GalleryLightbox } from '../components/image-lightbox';
 import { DouyinVideoEmbed } from '../components/douyin-video-embed';
 import { DouyinIframeEmbed } from '../components/douyin-iframe-embed';
-import { splitContentByDouyin, getDouyinEmbedMode, DouyinEmbedMode } from '@/lib/douyin';
+import { BilibiliPlayer } from '../components/bilibili-player';
+import { splitContentByVideo, getDouyinEmbedMode } from '@/lib/video-embed';
+import { DouyinEmbedMode } from '@/lib/douyin';
 import { getRelativeTime, cn } from '@/lib/utils';
 import { RiLoader4Line, RiCalendarLine, RiCloseLine } from '@remixicon/react';
 import { Calendar } from '@/components/ui/calendar';
@@ -286,10 +288,12 @@ export default function MomentsClient() {
                             </div>
 
                             <div className="text-gray-800 dark:text-gray-200 text-sm leading-relaxed break-words">
-                                {splitContentByDouyin(moment.content).map((seg, i, arr) =>
+                                {splitContentByVideo(moment.content).map((seg, i, arr) =>
                                     seg.type === 'douyin'
                                         ? <div key={i} className="mt-2">{embedMode === 'iframe' ? <DouyinIframeEmbed shortUrl={seg.content} /> : <DouyinVideoEmbed shortUrl={seg.content} />}</div>
-                                        : <span key={i} className="whitespace-pre-wrap">{seg.content}{i < arr.length - 1 ? '\n' : ''}</span>
+                                        : seg.type === 'bilibili'
+                                            ? <div key={i} className="mt-2"><BilibiliPlayer bvid={seg.bvid!} time={seg.time} /></div>
+                                            : <span key={i} className="whitespace-pre-wrap">{seg.content}{i < arr.length - 1 ? '\n' : ''}</span>
                                 )}
                             </div>
 

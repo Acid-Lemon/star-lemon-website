@@ -11,7 +11,9 @@ import { RiDeleteBinLine, RiSendPlaneLine, RiImageLine } from '@remixicon/react'
 import { GalleryLightbox } from '../../components/image-lightbox';
 import { DouyinVideoEmbed } from '../../components/douyin-video-embed';
 import { DouyinIframeEmbed } from '../../components/douyin-iframe-embed';
-import { splitContentByDouyin, getDouyinEmbedMode, DouyinEmbedMode } from '@/lib/douyin';
+import { BilibiliPlayer } from '../../components/bilibili-player';
+import { splitContentByVideo, getDouyinEmbedMode } from '@/lib/video-embed';
+import { DouyinEmbedMode } from '@/lib/douyin';
 
 const MAX_IMAGES = 9;
 
@@ -319,10 +321,12 @@ export default function AdminMomentsPage() {
                                             </Button>
                                         </div>
                                         <p className="text-sm text-foreground/90 leading-relaxed break-words">
-                                            {splitContentByDouyin(moment.content).map((seg, i, arr) =>
+                                            {splitContentByVideo(moment.content).map((seg, i, arr) =>
                                                 seg.type === 'douyin'
                                                     ? <div key={i} className="mt-2">{embedMode === 'iframe' ? <DouyinIframeEmbed shortUrl={seg.content} /> : <DouyinVideoEmbed shortUrl={seg.content} />}</div>
-                                                    : <span key={i} className="whitespace-pre-wrap">{seg.content}{i < arr.length - 1 ? '\n' : ''}</span>
+                                                    : seg.type === 'bilibili'
+                                                        ? <div key={i} className="mt-2"><BilibiliPlayer bvid={seg.bvid!} time={seg.time} /></div>
+                                                        : <span key={i} className="whitespace-pre-wrap">{seg.content}{i < arr.length - 1 ? '\n' : ''}</span>
                                             )}
                                         </p>
                                         {moment.image_url && <MomentImages imageUrl={moment.image_url} onImageClick={(urls, index) => setLightbox({ images: urls, index })} />}

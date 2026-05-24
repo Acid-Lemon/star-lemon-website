@@ -11,6 +11,10 @@ import 'highlight.js/styles/github-dark.css';
 import {toast} from "sonner";
 import {CommentSection} from './CommentSection';
 import {ArticleReaders, usePresence} from '../../components/presence';
+import {BilibiliPlayer} from '../../components/bilibili-player';
+import {DouyinIframeEmbed} from '../../components/douyin-iframe-embed';
+import {DouyinVideoEmbed} from '../../components/douyin-video-embed';
+import {getDouyinEmbedMode, DouyinEmbedMode} from '@/lib/douyin';
 import type {UserInfo} from '../../components/user-context';
 
 function getTextFromChildren(node: React.ReactNode): string {
@@ -24,36 +28,7 @@ function getTextFromChildren(node: React.ReactNode): string {
     return '';
 }
 
-const BilibiliPlayer = React.memo(function BilibiliPlayer({
-                                                              bvid,
-                                                              time,
-                                                          }: {
-    bvid: string;
-    time?: string;
-}) {
-    const params = new URLSearchParams();
-    params.set('bvid', bvid);
-    params.set('autoplay', '0');
-    params.set('danmaku', '0');
-    if (time) params.set('t', time);
-    const src = `https://player.bilibili.com/player.html?${params.toString()}`;
-
-    return (
-        <iframe
-            key={bvid}
-            src={src}
-            scrolling="no"
-            allowFullScreen
-            width="100%"
-            height="400"
-            style={{borderRadius: 8, margin: '24px 0', border: 'none'}}
-            title={`Bilibili ${bvid}`}
-            loading="lazy"
-        />
-    );
-});
-
-function PostContent({content}: { content: string }) {
+function PostContent({content, douyinMode}: { content: string; douyinMode: DouyinEmbedMode }) {
     function createHeading(Tag: 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6') {
         const level = parseInt(Tag[1], 10);
         return function Heading({children, ...props}: React.HTMLAttributes<HTMLHeadingElement>) {
@@ -76,6 +51,13 @@ function PostContent({content}: { content: string }) {
                 const text = getTextFromChildren(children);
                 if (!text || text.trim() === '') return <p {...props} className="my-2"/>;
 
+                // Douyin: line is a pure douyin short URL
+                const douyinRegex = /^https:\/\/v\.douyin\.com\/[^\s]+$/;
+                if (douyinRegex.test(text.trim())) {
+                    return <p {...props}>{douyinMode === 'iframe' ? <DouyinIframeEmbed shortUrl={text.trim()} /> : <DouyinVideoEmbed shortUrl={text.trim()} />}</p>;
+                }
+
+                // Bilibili: 【title】URL format
                 const regex = /(【[^】]+】)(?:\s*【[^】]+】)?\s*(https?:\/\/www\.bilibili\.com\/video\/(BV\w+)[^\s]*)/g;
                 const matches = Array.from(text.matchAll(regex));
                 if (matches.length === 0) return <p {...props}>{children}</p>;
@@ -161,6 +143,12 @@ export default function PostClient({
     const [showBackToTop, setShowBackToTop] = useState(false);
     const [dynamicToc, setDynamicToc] = useState<TocItem[]>(tocItems);
     const {readers} = usePresence(`/post/${postId}`);
+
+    const [douyinMode, setDouyinMode] = useState<DouyinEmbedMode>('iframe');
+
+    useEffect(() => {
+        getDouyinEmbedMode().then(setDouyinMode);
+    }, []);
 
     const wordsPerMinute = 200;
     const textLength = content.replace(/[#`*\[\]]/g, '').length;
@@ -300,7 +288,7 @@ export default function PostClient({
 
                     <div className="w-full h-px bg-gradient-to-r from-transparent via-gray-200 to-transparent my-4"/>
 
-                    <PostContent content={content}/>
+                    <PostContent content={content} douyinMode={douyinMode}/>
 
                     <div
                         className="mt-16 pt-8 border-t border-gray-100 dark:border-gray-800 flex justify-between items-center">

@@ -208,7 +208,7 @@ export default function SettingsPage() {
                           <Label>{isSelect.label}</Label>
                           <Select
                             value={field.value}
-                            onValueChange={(val) => handleChange(category, field.key, val)}
+                            onValueChange={(val) => handleChange(category, field.key, val ?? '')}
                           >
                             <SelectTrigger className="h-9 w-full">
                               <SelectValue />

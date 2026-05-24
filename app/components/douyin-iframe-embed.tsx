@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useRef, useCallback } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { RiLoader4Line } from '@remixicon/react';
 
 interface DouyinIframeEmbedProps {
@@ -21,6 +21,15 @@ export function DouyinIframeEmbed({ shortUrl }: DouyinIframeEmbedProps) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
+  const iframeRef = useRef<HTMLDivElement>(null);
+
+  // Inject iframe HTML via DOM manipulation (not dangerouslySetInnerHTML)
+  // so React won't re-inject and reload the iframe on re-renders
+  useEffect(() => {
+    if (iframeRef.current && iframeCode) {
+      iframeRef.current.innerHTML = iframeCode;
+    }
+  }, [iframeCode]);
 
   useEffect(() => {
     let cancelled = false;
@@ -32,7 +41,6 @@ export function DouyinIframeEmbed({ shortUrl }: DouyinIframeEmbedProps) {
       .then(json => {
         if (cancelled) return;
         if (json.iframeCode) {
-          // Add sandbox attribute to restrict iframe capabilities
           const sandboxedCode = json.iframeCode.replace('<iframe', '<iframe sandbox="allow-scripts allow-same-origin allow-popups allow-forms"');
           setIframeCode(sandboxedCode);
           setIframeSize(parseIframeDimensions(json.iframeCode));
@@ -53,7 +61,6 @@ export function DouyinIframeEmbed({ shortUrl }: DouyinIframeEmbedProps) {
   const updateScale = useCallback(() => {
     if (!containerRef.current || !iframeSize) return;
     const { width: cw, height: ch } = containerRef.current.getBoundingClientRect();
-    // 等比缩放，让iframe填满容器的一边，溢出部分被裁剪
     const scaleW = cw / iframeSize.width;
     const scaleH = ch / iframeSize.height;
     setScale(Math.max(scaleW, scaleH));
@@ -86,6 +93,7 @@ export function DouyinIframeEmbed({ shortUrl }: DouyinIframeEmbedProps) {
   return (
     <div ref={containerRef} className="mt-3 rounded-xl overflow-hidden border border-gray-200 dark:border-gray-700 w-full aspect-video relative">
       <div
+        ref={iframeRef}
         style={{
           width: iframeSize.width,
           height: iframeSize.height,
@@ -93,8 +101,8 @@ export function DouyinIframeEmbed({ shortUrl }: DouyinIframeEmbedProps) {
           transformOrigin: 'top left',
         }}
         className="absolute top-0 left-0"
-        dangerouslySetInnerHTML={{ __html: iframeCode }}
       />
     </div>
   );
 }
+

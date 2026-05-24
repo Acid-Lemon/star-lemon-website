@@ -46,7 +46,7 @@ export default async function AdminPosts() {
                         <CardDescription>共 {posts.length} 篇文章</CardDescription>
                     </CardHeader>
                     <CardContent>
-                        <div className="rounded-md border">
+                        <div className="rounded-md border overflow-x-auto">
                             <Table>
                                 <TableHeader>
                                     <TableRow>

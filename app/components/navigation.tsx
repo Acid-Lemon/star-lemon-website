@@ -192,49 +192,57 @@ export function Navigation({user}: NavigationProps) {
             {mobileMenuOpen && (
                 <div className="fixed inset-0 z-40 md:hidden">
                     <div className="absolute inset-0 bg-black/20 dark:bg-black/50 backdrop-blur-sm" onClick={() => setMobileMenuOpen(false)} />
-                    <div className="absolute top-16 left-2 right-2 bg-white dark:bg-gray-900 rounded-2xl shadow-xl border border-gray-200/50 dark:border-gray-700/50 overflow-hidden p-4">
-                        <div className="flex flex-col gap-1">
+                    <div className="absolute top-0 left-0 bottom-0 w-48 bg-white dark:bg-gray-900 shadow-xl border-r border-gray-200/50 dark:border-gray-700/50 overflow-y-auto">
+                        <div className="h-14 flex items-center justify-between px-4 border-b border-gray-100 dark:border-gray-800 shrink-0">
+                            <span className="font-bold text-sm text-gray-800 dark:text-gray-200">菜单</span>
+                            <button onClick={() => setMobileMenuOpen(false)} className="p-1.5 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
+                                <RiCloseLine className="w-4 h-4 text-gray-500 dark:text-gray-400" />
+                            </button>
+                        </div>
+                        <div className="flex flex-col gap-1 p-3">
                             {navItems.map((item) => (
                                 <Link key={item.href} href={item.href}
-                                      className={`px-4 py-3 rounded-xl text-base transition-all duration-300 ${pathname === item.href ? `${item.activeColor} bg-gray-50 dark:bg-gray-800 font-medium` : 'text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800'}`}>
+                                      className={`px-3 py-2.5 rounded-lg text-sm transition-all duration-300 ${pathname === item.href ? `${item.activeColor} bg-gray-50 dark:bg-gray-800 font-medium` : 'text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800'}`}>
                                     {item.label}
                                 </Link>
                             ))}
                         </div>
-                        <div className="border-t border-gray-100 dark:border-gray-800 my-3" />
-                        {user ? (
-                            <div className="flex flex-col gap-1">
-                                <div className="flex items-center gap-3 px-4 py-2">
-                                    {user.avatar ? (
-                                        <img src={user.avatar} alt={user.nickname} className="w-8 h-8 rounded-full object-cover" />
-                                    ) : (
-                                        <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-400 to-blue-500 flex items-center justify-center text-white font-bold text-sm">
-                                            {user.nickname?.[0]?.toUpperCase() || 'U'}
-                                        </div>
+                        <div className="border-t border-gray-100 dark:border-gray-800 mx-3" />
+                        <div className="flex flex-col gap-1 p-3">
+                            {user ? (
+                                <>
+                                    <div className="flex items-center gap-3 px-3 py-2">
+                                        {user.avatar ? (
+                                            <img src={user.avatar} alt={user.nickname} className="w-7 h-7 rounded-full object-cover" />
+                                        ) : (
+                                            <div className="w-7 h-7 rounded-full bg-gradient-to-br from-blue-400 to-blue-500 flex items-center justify-center text-white font-bold text-xs">
+                                                {user.nickname?.[0]?.toUpperCase() || 'U'}
+                                            </div>
+                                        )}
+                                        <span className="text-sm font-medium text-gray-700 dark:text-gray-300">{user.nickname}</span>
+                                    </div>
+                                    {user.role === 'admin' && (
+                                        <Link href="/admin" className="px-3 py-2.5 rounded-lg text-sm text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
+                                            管理后台
+                                        </Link>
                                     )}
-                                    <span className="text-sm font-medium text-gray-700 dark:text-gray-300">{user.nickname}</span>
-                                </div>
-                                {user.role === 'admin' && (
-                                    <Link href="/admin" className="px-4 py-3 rounded-xl text-sm text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
-                                        管理后台
+                                    <Link href="/recharge" className="px-3 py-2.5 rounded-lg text-sm text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors flex items-center gap-2">
+                                        <RiCoinLine className="w-4 h-4 text-yellow-500" />
+                                        星柠币充值
                                     </Link>
-                                )}
-                                <Link href="/recharge" className="px-4 py-3 rounded-xl text-sm text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors flex items-center gap-2">
-                                    <RiCoinLine className="w-4 h-4 text-yellow-500" />
-                                    星柠币充值
-                                </Link>
-                                <button onClick={() => { setMobileMenuOpen(false); setShowProfile(true); }} className="px-4 py-3 rounded-xl text-sm text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors text-left">
-                                    个人设置
-                                </button>
-                                <button onClick={handleLogout} className="px-4 py-3 rounded-xl text-sm text-red-500 hover:bg-red-50 dark:hover:bg-red-950/30 transition-colors w-full text-left">
+                                    <button onClick={() => { setMobileMenuOpen(false); setShowProfile(true); }} className="px-3 py-2.5 rounded-lg text-sm text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors text-left">
+                                        个人设置
+                                    </button>
+                                    <button onClick={handleLogout} className="px-3 py-2.5 rounded-lg text-sm text-red-500 hover:bg-red-50 dark:hover:bg-red-950/30 transition-colors w-full text-left">
                                         退出登录
                                     </button>
-                            </div>
-                        ) : (
-                            <Link href="/login" className="block px-4 py-3 rounded-xl text-base text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
-                                登录
-                            </Link>
-                        )}
+                                </>
+                            ) : (
+                                <Link href="/login" className="block px-3 py-2.5 rounded-lg text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
+                                    登录
+                                </Link>
+                            )}
+                        </div>
                     </div>
                 </div>
             )}

@@ -6,6 +6,7 @@ import { GalleryLightbox } from '../components/image-lightbox';
 import { DouyinVideoEmbed } from '../components/douyin-video-embed';
 import { DouyinIframeEmbed } from '../components/douyin-iframe-embed';
 import { BilibiliPlayer } from '../components/bilibili-player';
+import { IframeErrorBoundary } from '../components/iframe-error-boundary';
 import { splitContentByVideo, getDouyinEmbedMode } from '@/lib/video-embed';
 import { DouyinEmbedMode } from '@/lib/douyin';
 import { getRelativeTime, cn } from '@/lib/utils';
@@ -290,9 +291,9 @@ export default function MomentsClient() {
                             <div className="text-gray-800 dark:text-gray-200 text-sm leading-relaxed break-words">
                                 {splitContentByVideo(moment.content).map((seg, i, arr) =>
                                     seg.type === 'douyin'
-                                        ? <div key={i} className="mt-2">{embedMode === 'iframe' ? <DouyinIframeEmbed shortUrl={seg.content} /> : <DouyinVideoEmbed shortUrl={seg.content} />}</div>
+                                        ? <div key={i} className="mt-2"><IframeErrorBoundary>{embedMode === 'iframe' ? <DouyinIframeEmbed shortUrl={seg.content} /> : <DouyinVideoEmbed shortUrl={seg.content} />}</IframeErrorBoundary></div>
                                         : seg.type === 'bilibili'
-                                            ? <div key={i} className="mt-2"><BilibiliPlayer bvid={seg.bvid!} time={seg.time} /></div>
+                                            ? <div key={i} className="mt-2"><IframeErrorBoundary><BilibiliPlayer bvid={seg.bvid!} time={seg.time} /></IframeErrorBoundary></div>
                                             : <span key={i} className="whitespace-pre-wrap">{seg.content}{i < arr.length - 1 ? '\n' : ''}</span>
                                 )}
                             </div>
@@ -323,16 +324,26 @@ export default function MomentsClient() {
             <div className="lg:hidden">
                 <div className="mb-4">
                     <div className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-800 shadow-sm p-4">
-                        <button
+                        <div
                             onClick={() => setCalendarOpen(!calendarOpen)}
-                            className="w-full flex items-center justify-between py-2 px-3 rounded-xl bg-gray-50 dark:bg-gray-800/50 text-sm text-gray-600 dark:text-gray-400"
+                            className="w-full flex items-center justify-between py-2 px-3 rounded-xl bg-gray-50 dark:bg-gray-800/50 text-sm text-gray-600 dark:text-gray-400 cursor-pointer"
                         >
                             <span className="flex items-center gap-2">
                                 <RiCalendarLine className="w-4 h-4" />
                                 {selectedDate ? format(selectedDate, 'yyyy年MM月dd日') : '选择日期查看动态'}
                             </span>
-                            <RiCalendarLine className="w-4 h-4" />
-                        </button>
+                            {selectedDate ? (
+                                <button
+                                    onClick={(e) => { e.stopPropagation(); clearDateFilter(); }}
+                                    className="p-1 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
+                                    aria-label="清除日期筛选"
+                                >
+                                    <RiCloseLine className="w-3.5 h-3.5 text-gray-500" />
+                                </button>
+                            ) : (
+                                <RiCalendarLine className="w-4 h-4" />
+                            )}
+                        </div>
                         {calendarOpen && (
                             <div className="mt-3">
                                 <Calendar

@@ -3,7 +3,7 @@
 import Image from 'next/image'
 import React, {useCallback, useEffect, useMemo, useState} from 'react';
 import Link from 'next/link';
-import {RiArrowLeftLine, RiArrowUpSLine, RiShareForwardLine} from '@remixicon/react';
+import {RiArrowLeftLine, RiArrowUpSLine, RiShareForwardLine, RiListUnordered, RiArrowDownSLine, RiArrowRightSLine} from '@remixicon/react';
 import ReactMarkdown, {type Components} from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import rehypeHighlight from 'rehype-highlight';
@@ -14,6 +14,7 @@ import {ArticleReaders, usePresence} from '../../components/presence';
 import {BilibiliPlayer} from '../../components/bilibili-player';
 import {DouyinIframeEmbed} from '../../components/douyin-iframe-embed';
 import {DouyinVideoEmbed} from '../../components/douyin-video-embed';
+import {IframeErrorBoundary} from '../../components/iframe-error-boundary';
 import {getDouyinEmbedMode, DouyinEmbedMode} from '@/lib/douyin';
 import type {UserInfo} from '../../components/user-context';
 
@@ -54,7 +55,7 @@ function PostContent({content, douyinMode}: { content: string; douyinMode: Douyi
                 // Douyin: line is a pure douyin short URL
                 const douyinRegex = /^https:\/\/v\.douyin\.com\/[^\s]+$/;
                 if (douyinRegex.test(text.trim())) {
-                    return <div {...props}>{douyinMode === 'iframe' ? <DouyinIframeEmbed shortUrl={text.trim()} /> : <DouyinVideoEmbed shortUrl={text.trim()} />}</div>;
+                    return <div {...props}><IframeErrorBoundary>{douyinMode === 'iframe' ? <DouyinIframeEmbed shortUrl={text.trim()} /> : <DouyinVideoEmbed shortUrl={text.trim()} />}</IframeErrorBoundary></div>;
                 }
 
                 // Bilibili: 【title】URL format
@@ -72,7 +73,7 @@ function PostContent({content, douyinMode}: { content: string; douyinMode: Douyi
                     const bvid = match[3];
                     const timeMatch = match[2].match(/[?\u0026]t=(\d+)/);
                     const time = timeMatch ? timeMatch[1] : undefined;
-                    nodes.push(<BilibiliPlayer key={`${bvid}-${index}`} bvid={bvid} time={time}/>);
+                    nodes.push(<IframeErrorBoundary key={`${bvid}-${index}`}><BilibiliPlayer bvid={bvid} time={time}/></IframeErrorBoundary>);
                     lastIndex = index + match[0].length;
                 }
                 if (lastIndex < text.length) {
@@ -145,6 +146,7 @@ export default function PostClient({
     const {readers} = usePresence(`/post/${postId}`);
 
     const [douyinMode, setDouyinMode] = useState<DouyinEmbedMode>('iframe');
+    const [tocOpen, setTocOpen] = useState(false);
 
     useEffect(() => {
         getDouyinEmbedMode().then(setDouyinMode);
@@ -253,6 +255,41 @@ export default function PostClient({
                         <RiArrowLeftLine className="w-4 h-4 mr-2 group-hover:-translate-x-1 transition-transform"/>
                         返回文章列表
                     </Link>
+
+                    {finalToc.length > 0 && (
+                        <div className="lg:hidden mt-4">
+                            <div className="bg-white dark:bg-gray-900 rounded-xl border border-gray-100 dark:border-gray-800 shadow-sm p-3">
+                                <button
+                                    onClick={() => setTocOpen(!tocOpen)}
+                                    className="w-full flex items-center justify-between py-2 px-3 rounded-lg bg-gray-50 dark:bg-gray-800/50 text-sm text-gray-600 dark:text-gray-400"
+                                >
+                                    <span className="flex items-center gap-2">
+                                        <RiListUnordered className="w-4 h-4" />
+                                        目录（{finalToc.length} 个章节）
+                                    </span>
+                                    {tocOpen ? <RiArrowDownSLine className="w-4 h-4" /> : <RiArrowRightSLine className="w-4 h-4" />}
+                                </button>
+                                {tocOpen && (
+                                    <nav className="mt-2 space-y-1 px-1">
+                                        {finalToc.map((item, i) => (
+                                            <button
+                                                key={`${item.id}-${i}`}
+                                                onClick={() => { scrollToHeading(item.id); setTocOpen(false); }}
+                                                className={`block w-full text-left text-sm transition-colors py-1.5 pr-2 border-l-2 ${
+                                                    activeId === item.id
+                                                        ? 'border-blue-500 text-blue-600 font-medium'
+                                                        : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100'
+                                                }`}
+                                                style={{paddingLeft: `${(item.level - 2) * 12 + 12}px`}}
+                                            >
+                                                {item.text}
+                                            </button>
+                                        ))}
+                                    </nav>
+                                )}
+                            </div>
+                        </div>
+                    )}
 
                     <header className="space-y-6 mt-6">
                         {cover && (

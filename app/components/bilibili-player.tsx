@@ -18,7 +18,7 @@ const BilibiliPlayer = React.memo(function BilibiliPlayer({
     <iframe
       key={bvid}
       src={src}
-      scrolling="no"
+      sandbox="allow-scripts allow-same-origin allow-popups allow-forms"
       allowFullScreen
       width="100%"
       height="400"

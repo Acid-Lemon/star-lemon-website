@@ -30,48 +30,48 @@ export default function GuestbookClient({ initialMessages, session }: { initialM
             </div>
 
             <section className="w-full">
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div className="grid grid-cols-3 gap-3">
                     <Card className="border-0 bg-gradient-to-br from-white to-blue-50/50 dark:from-gray-900 dark:to-blue-950/20 hover:shadow-lg transition-all duration-300 hover:-translate-y-1">
-                        <CardContent className="p-5">
-                            <div className="flex items-center gap-4">
-                                <div className="w-12 h-12 rounded-xl bg-blue-100 dark:bg-blue-900/40 flex items-center justify-center">
-                                    <RiChat3Line className="w-6 h-6 text-blue-600 dark:text-blue-400" />
+                        <CardContent className="p-3 md:p-5">
+                            <div className="flex items-center gap-2 md:gap-4">
+                                <div className="w-8 h-8 md:w-12 md:h-12 rounded-lg md:rounded-xl bg-blue-100 dark:bg-blue-900/40 flex items-center justify-center">
+                                    <RiChat3Line className="w-4 h-4 md:w-6 md:h-6 text-blue-600 dark:text-blue-400" />
                                 </div>
                                 <div>
-                                    <div className="text-2xl font-bold text-gray-800 dark:text-gray-100">{messages.length}</div>
-                                    <div className="text-sm text-gray-500 dark:text-gray-400">总留言数</div>
+                                    <div className="text-lg md:text-2xl font-bold text-gray-800 dark:text-gray-100">{messages.length}</div>
+                                    <div className="text-xs md:text-sm text-gray-500 dark:text-gray-400">总留言数</div>
                                 </div>
                             </div>
                         </CardContent>
                     </Card>
 
                     <Card className="border-0 bg-gradient-to-br from-white to-green-50/50 dark:from-gray-900 dark:to-green-950/20 hover:shadow-lg transition-all duration-300 hover:-translate-y-1">
-                        <CardContent className="p-5">
-                            <div className="flex items-center gap-4">
-                                <div className="w-12 h-12 rounded-xl bg-green-100 dark:bg-green-900/40 flex items-center justify-center">
-                                    <RiCheckboxCircleLine className="w-6 h-6 text-green-600 dark:text-green-400" />
+                        <CardContent className="p-3 md:p-5">
+                            <div className="flex items-center gap-2 md:gap-4">
+                                <div className="w-8 h-8 md:w-12 md:h-12 rounded-lg md:rounded-xl bg-green-100 dark:bg-green-900/40 flex items-center justify-center">
+                                    <RiCheckboxCircleLine className="w-4 h-4 md:w-6 md:h-6 text-green-600 dark:text-green-400" />
                                 </div>
                                 <div>
-                                    <div className="text-2xl font-bold text-gray-800 dark:text-gray-100">
+                                    <div className="text-lg md:text-2xl font-bold text-gray-800 dark:text-gray-100">
                                         {messages.filter(m => m.status === 'approved').length}
                                     </div>
-                                    <div className="text-sm text-gray-500 dark:text-gray-400">已显示</div>
+                                    <div className="text-xs md:text-sm text-gray-500 dark:text-gray-400">已显示</div>
                                 </div>
                             </div>
                         </CardContent>
                     </Card>
 
                     <Card className="border-0 bg-gradient-to-br from-white to-purple-50/50 dark:from-gray-900 dark:to-purple-950/20 hover:shadow-lg transition-all duration-300 hover:-translate-y-1">
-                        <CardContent className="p-5">
-                            <div className="flex items-center gap-4">
-                                <div className="w-12 h-12 rounded-xl bg-purple-100 dark:bg-purple-900/40 flex items-center justify-center">
-                                    <RiTeamLine className="w-6 h-6 text-purple-600 dark:text-purple-400" />
+                        <CardContent className="p-3 md:p-5">
+                            <div className="flex items-center gap-2 md:gap-4">
+                                <div className="w-8 h-8 md:w-12 md:h-12 rounded-lg md:rounded-xl bg-purple-100 dark:bg-purple-900/40 flex items-center justify-center">
+                                    <RiTeamLine className="w-4 h-4 md:w-6 md:h-6 text-purple-600 dark:text-purple-400" />
                                 </div>
                                 <div>
-                                    <div className="text-2xl font-bold text-gray-800 dark:text-gray-100">
+                                    <div className="text-lg md:text-2xl font-bold text-gray-800 dark:text-gray-100">
                                         {new Set(messages.map(m => m.user_id)).size}
                                     </div>
-                                    <div className="text-sm text-gray-500 dark:text-gray-400">参与人数</div>
+                                    <div className="text-xs md:text-sm text-gray-500 dark:text-gray-400">参与人数</div>
                                 </div>
                             </div>
                         </CardContent>

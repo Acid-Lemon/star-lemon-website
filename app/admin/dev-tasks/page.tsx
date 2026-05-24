@@ -444,7 +444,7 @@ export default function DevTasksPage() {
             <CardTitle>全部任务</CardTitle>
             <CardDescription>共 {tasks.length} 条</CardDescription>
           </CardHeader>
-          <CardContent className="p-0">
+          <CardContent className="p-0 overflow-x-auto">
             {tasks.length === 0 ? (
               <div className="py-12 text-center text-muted-foreground">
                 暂无任务

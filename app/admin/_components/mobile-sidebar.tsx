@@ -25,7 +25,7 @@ export function MobileSidebar({adminName}: MobileSidebarProps) {
                 <RiMenuLine className="h-5 w-5" />
                 <span className="sr-only">打开菜单</span>
             </SheetTrigger>
-            <SheetContent side="left" className="w-64 p-0">
+            <SheetContent side="left" className="data-[side=left]:w-48 sm:data-[side=left]:w-64 p-0">
                 <SheetHeader className="h-16 flex flex-row items-center px-6 border-b shrink-0">
                     <SheetTitle className="flex items-center gap-2">
                         <RiSideBarLine className="h-5 w-5 text-primary"/>

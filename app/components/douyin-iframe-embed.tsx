@@ -32,7 +32,9 @@ export function DouyinIframeEmbed({ shortUrl }: DouyinIframeEmbedProps) {
       .then(json => {
         if (cancelled) return;
         if (json.iframeCode) {
-          setIframeCode(json.iframeCode);
+          // Add sandbox attribute to restrict iframe capabilities
+          const sandboxedCode = json.iframeCode.replace('<iframe', '<iframe sandbox="allow-scripts allow-same-origin allow-popups allow-forms"');
+          setIframeCode(sandboxedCode);
           setIframeSize(parseIframeDimensions(json.iframeCode));
         } else {
           setError(true);
@@ -82,7 +84,7 @@ export function DouyinIframeEmbed({ shortUrl }: DouyinIframeEmbedProps) {
   }
 
   return (
-    <div ref={containerRef} className="mt-3 rounded-xl overflow-hidden border border-gray-200 dark:border-gray-700 w-full aspect-video">
+    <div ref={containerRef} className="mt-3 rounded-xl overflow-hidden border border-gray-200 dark:border-gray-700 w-full aspect-video relative">
       <div
         style={{
           width: iframeSize.width,
@@ -90,6 +92,7 @@ export function DouyinIframeEmbed({ shortUrl }: DouyinIframeEmbedProps) {
           transform: `scale(${scale})`,
           transformOrigin: 'top left',
         }}
+        className="absolute top-0 left-0"
         dangerouslySetInnerHTML={{ __html: iframeCode }}
       />
     </div>

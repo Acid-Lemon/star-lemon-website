@@ -9,6 +9,7 @@ import { Switch } from '@/components/ui/switch';
 import { Skeleton } from '@/components/ui/skeleton';
 import { toast } from 'sonner';
 import { RiSaveLine, RiCloseLine } from '@remixicon/react';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
 interface SettingField {
   key: string;
@@ -36,6 +37,16 @@ const secretKeys = ['smtp_pass', 'deepseek_api_key', 'qq_app_key', 'oss_access_k
 
 const booleanKeys = ['smtp_secure', 'comment_review', 'guestbook_review', 'quote_enabled'];
 
+const selectKeys: Record<string, { label: string; options: { value: string; label: string }[] }> = {
+  douyin_embed_mode: {
+    label: '嵌入方式',
+    options: [
+      { value: 'iframe', label: 'iframe 嵌入（推荐）' },
+      { value: 'proxy', label: '代理播放' },
+    ],
+  },
+};
+
 const fieldOrder: Record<string, string[]> = {
   site: ['site_title', 'site_description', 'site_keywords', 'site_url', 'icp_number', 'comment_review', 'guestbook_review', 'quote_enabled', 'ipapi_is_key', 'baidu_site_verification', 'google_site_verification', 'bing_site_verification'],
   mail: ['smtp_host', 'smtp_port', 'smtp_user', 'smtp_pass', 'smtp_secure'],
@@ -45,7 +56,7 @@ const fieldOrder: Record<string, string[]> = {
   pay: ['lantu_mch_id', 'lantu_key'],
   pricing: ['ft_storage_price', 'ft_traffic_price', 'ft_payment_fee', 'ft_service_fee', 'ft_profit_rate'],
   convert: ['convert_api_url', 'convert_api_key', 'fc_price_per_file', 'fc_payment_fee', 'fc_service_fee', 'fc_profit_rate'],
-  douyin: ['douyin_api_url'],
+  douyin: ['douyin_api_url', 'douyin_embed_mode'],
 };
 
 function isCategoryDirty(category: string, settings: GroupedSettings, original: GroupedSettings): boolean {
@@ -174,6 +185,7 @@ export default function SettingsPage() {
                   {fields.map((field) => {
                     const isBoolean = booleanKeys.includes(field.key);
                     const isSecret = secretKeys.includes(field.key);
+                    const isSelect = selectKeys[field.key];
 
                     if (isBoolean) {
                       return (
@@ -186,6 +198,27 @@ export default function SettingsPage() {
                               onCheckedChange={(checked) => handleSwitchChange(category, field.key, checked)}
                             />
                           </div>
+                        </div>
+                      );
+                    }
+
+                    if (isSelect) {
+                      return (
+                        <div key={field.key} className="col-span-3 space-y-2">
+                          <Label>{isSelect.label}</Label>
+                          <Select
+                            value={field.value}
+                            onValueChange={(val) => handleChange(category, field.key, val)}
+                          >
+                            <SelectTrigger className="h-9 w-full">
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {isSelect.options.map((opt) => (
+                                <SelectItem key={opt.value} value={opt.value}>{opt.label}</SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
                         </div>
                       );
                     }

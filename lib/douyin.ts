@@ -25,3 +25,20 @@ export function splitContentByDouyin(content: string): ContentSegment[] {
 
   return segments;
 }
+
+export type DouyinEmbedMode = 'iframe' | 'proxy';
+
+export async function getDouyinEmbedMode(): Promise<DouyinEmbedMode> {
+  try {
+    const res = await fetch('/api/settings');
+    const data = await res.json();
+    const douyinFields = data.douyin;
+    if (douyinFields) {
+      const modeField = douyinFields.find((f: { key: string; value: string }) => f.key === 'douyin_embed_mode');
+      if (modeField && modeField.value === 'proxy') return 'proxy';
+    }
+    return 'iframe';
+  } catch {
+    return 'iframe';
+  }
+}

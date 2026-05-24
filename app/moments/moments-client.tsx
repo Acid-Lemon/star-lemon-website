@@ -4,7 +4,8 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { GalleryLightbox } from '../components/image-lightbox';
 import { DouyinVideoEmbed } from '../components/douyin-video-embed';
-import { splitContentByDouyin } from '@/lib/douyin';
+import { DouyinIframeEmbed } from '../components/douyin-iframe-embed';
+import { splitContentByDouyin, getDouyinEmbedMode, DouyinEmbedMode } from '@/lib/douyin';
 import { getRelativeTime, cn } from '@/lib/utils';
 import { RiLoader4Line, RiCalendarLine, RiCloseLine } from '@remixicon/react';
 import { Calendar } from '@/components/ui/calendar';
@@ -142,6 +143,7 @@ export default function MomentsClient() {
     const [loadingMore, setLoadingMore] = useState(false);
     const [hasMore, setHasMore] = useState(true);
     const [lightbox, setLightbox] = useState<{ images: string[]; index: number } | null>(null);
+    const [embedMode, setEmbedMode] = useState<DouyinEmbedMode>('iframe');
     const [selectedDate, setSelectedDate] = useState<Date | undefined>(undefined);
     const [calendarOpen, setCalendarOpen] = useState(false);
     const observerRef = useRef<IntersectionObserver | null>(null);
@@ -172,6 +174,7 @@ export default function MomentsClient() {
             setHasMore(data.length >= PAGE_SIZE);
             setLoading(false);
         })();
+        getDouyinEmbedMode().then(setEmbedMode);
     }, [fetchMoments]);
 
     const loadMore = useCallback(async () => {
@@ -285,7 +288,7 @@ export default function MomentsClient() {
                             <div className="text-gray-800 dark:text-gray-200 text-sm leading-relaxed break-words">
                                 {splitContentByDouyin(moment.content).map((seg, i, arr) =>
                                     seg.type === 'douyin'
-                                        ? <div key={i} className="mt-2"><DouyinVideoEmbed shortUrl={seg.content} /></div>
+                                        ? <div key={i} className="mt-2">{embedMode === 'iframe' ? <DouyinIframeEmbed shortUrl={seg.content} /> : <DouyinVideoEmbed shortUrl={seg.content} />}</div>
                                         : <span key={i} className="whitespace-pre-wrap">{seg.content}{i < arr.length - 1 ? '\n' : ''}</span>
                                 )}
                             </div>

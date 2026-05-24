@@ -10,7 +10,8 @@ import { AlertDialog, AlertDialogContent, AlertDialogHeader, AlertDialogTitle, A
 import { RiDeleteBinLine, RiSendPlaneLine, RiImageLine } from '@remixicon/react';
 import { GalleryLightbox } from '../../components/image-lightbox';
 import { DouyinVideoEmbed } from '../../components/douyin-video-embed';
-import { splitContentByDouyin } from '@/lib/douyin';
+import { DouyinIframeEmbed } from '../../components/douyin-iframe-embed';
+import { splitContentByDouyin, getDouyinEmbedMode, DouyinEmbedMode } from '@/lib/douyin';
 
 const MAX_IMAGES = 9;
 
@@ -82,6 +83,7 @@ export default function AdminMomentsPage() {
     const [submitting, setSubmitting] = useState(false);
     const [uploading, setUploading] = useState(false);
     const [deleteTarget, setDeleteTarget] = useState<number | null>(null);
+    const [embedMode, setEmbedMode] = useState<DouyinEmbedMode>('iframe');
     const [lightbox, setLightbox] = useState<{ images: string[]; index: number } | null>(null);
     const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -104,6 +106,7 @@ export default function AdminMomentsPage() {
 
     useEffect(() => {
         fetchMoments();
+        getDouyinEmbedMode().then(setEmbedMode);
     }, [fetchMoments]);
 
     const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -318,7 +321,7 @@ export default function AdminMomentsPage() {
                                         <p className="text-sm text-foreground/90 leading-relaxed break-words">
                                             {splitContentByDouyin(moment.content).map((seg, i, arr) =>
                                                 seg.type === 'douyin'
-                                                    ? <div key={i} className="mt-2"><DouyinVideoEmbed shortUrl={seg.content} /></div>
+                                                    ? <div key={i} className="mt-2">{embedMode === 'iframe' ? <DouyinIframeEmbed shortUrl={seg.content} /> : <DouyinVideoEmbed shortUrl={seg.content} />}</div>
                                                     : <span key={i} className="whitespace-pre-wrap">{seg.content}{i < arr.length - 1 ? '\n' : ''}</span>
                                             )}
                                         </p>

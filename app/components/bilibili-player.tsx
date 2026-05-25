@@ -15,17 +15,19 @@ const BilibiliPlayer = React.memo(function BilibiliPlayer({
   const src = `https://player.bilibili.com/player.html?${params.toString()}`;
 
   return (
-    <iframe
-      key={bvid}
-      src={src}
-      sandbox="allow-scripts allow-same-origin allow-popups allow-forms"
-      allowFullScreen
-      width="100%"
-      height="400"
-      style={{ borderRadius: 8, margin: '24px 0', border: 'none' }}
-      title={`Bilibili ${bvid}`}
-      loading="lazy"
-    />
+    <div className="mt-3 rounded-xl overflow-hidden w-full aspect-video">
+      <iframe
+        key={bvid}
+        src={src}
+        sandbox="allow-scripts allow-same-origin allow-popups allow-forms"
+        allowFullScreen
+        width="100%"
+        height="100%"
+        style={{ border: 'none' }}
+        title={`Bilibili ${bvid}`}
+        loading="lazy"
+      />
+    </div>
   );
 });
 

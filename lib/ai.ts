@@ -6,9 +6,10 @@ interface GenerateSummaryOptions {
 }
 
 export async function generateSummary({title, content}: GenerateSummaryOptions): Promise<string> {
-    const apiKey = await getSetting('summary_api_key') || process.env.DEEPSEEK_API_KEY;
-    const apiUrl = await getSetting('summary_api_url') || process.env.DEEPSEEK_API_URL || 'https://api.deepseek.com/v1/chat/completions';
-    const model = await getSetting('summary_api_model') || 'deepseek-v4-flash';
+    const apiKey = await getSetting('summary_api_key');
+    const rawUrl = await getSetting('summary_api_url');
+    const apiUrl = rawUrl?.endsWith('/chat/completions') ? rawUrl : (rawUrl || '').replace(/\/+$/, '') + '/v1/chat/completions';
+    const model = await getSetting('summary_api_model');
 
     if (!apiKey) {
         console.warn('DEEPSEEK_API_KEY not configured, returning empty summary');

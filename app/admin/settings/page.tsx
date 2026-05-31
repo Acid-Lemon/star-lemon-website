@@ -6,6 +6,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
+import { Textarea } from '@/components/ui/textarea';
 import { Skeleton } from '@/components/ui/skeleton';
 import { toast } from 'sonner';
 import { RiSaveLine, RiCloseLine } from '@remixicon/react';
@@ -23,8 +24,10 @@ interface GroupedSettings {
 
 const categoryMeta: Record<string, { title: string; description: string; icon: string }> = {
   site: { title: '网站信息', description: '基本网站设置', icon: '🌐' },
+  ipapi: { title: 'IP 查询', description: 'IPAPI IP 地址查询服务配置', icon: '📍' },
   mail: { title: '邮件服务', description: 'SMTP 邮件发送配置', icon: '📧' },
-  ai: { title: 'AI 服务', description: 'DeepSeek AI 接口配置', icon: '🤖' },
+  summary: { title: '文章摘要', description: 'AI 文章摘要生成配置', icon: '📝' },
+  ai: { title: 'AI 助手', description: '网站 AI 助手聊天功能配置', icon: '🤖' },
   oauth: { title: '第三方登录', description: 'QQ 等第三方登录配置', icon: '🔑' },
   oss: { title: '对象存储', description: '阿里云 OSS / ESA 配置', icon: '☁️' },
   pay: { title: '支付服务', description: '蓝兔支付配置', icon: '💳' },
@@ -33,9 +36,28 @@ const categoryMeta: Record<string, { title: string; description: string; icon: s
   douyin: { title: '抖音解析', description: '抖音视频解析接口配置', icon: '🎬' },
 };
 
-const secretKeys = ['smtp_pass', 'deepseek_api_key', 'qq_app_key', 'oss_access_key_secret', 'lantu_key', 'convert_api_key', 'ipapi_is_key'];
+const secretKeys = ['smtp_pass', 'summary_api_key', 'assistant_llm_api_key', 'assistant_tts_api_key', 'qq_app_key', 'oss_access_key_secret', 'lantu_key', 'convert_api_key', 'ipapi_is_key'];
 
-const booleanKeys = ['smtp_secure', 'comment_review', 'guestbook_review', 'quote_enabled'];
+const booleanKeys = ['comment_review', 'guestbook_review', 'quote_enabled', 'assistant_enabled'];
+
+const textareaKeys = ['assistant_system_prompt'];
+
+const colSpanMap: Record<string, string> = {
+  assistant_enabled: 'col-span-6',
+  assistant_llm_api_url: 'col-span-2',
+  assistant_llm_model: 'col-span-2',
+  assistant_llm_api_key: 'col-span-2',
+  assistant_tts_api_url: 'col-span-2',
+  assistant_tts_model: 'col-span-2',
+  assistant_tts_api_key: 'col-span-2',
+  assistant_system_prompt: 'col-span-6',
+  summary_api_url: 'col-span-2',
+  summary_api_model: 'col-span-2',
+  summary_api_key: 'col-span-2',
+  baidu_site_verification: 'col-span-2',
+  bing_site_verification: 'col-span-2',
+  google_site_verification: 'col-span-2',
+};
 
 const selectKeys: Record<string, { label: string; options: { value: string; label: string }[] }> = {
   douyin_embed_mode: {
@@ -48,9 +70,11 @@ const selectKeys: Record<string, { label: string; options: { value: string; labe
 };
 
 const fieldOrder: Record<string, string[]> = {
-  site: ['site_title', 'site_description', 'site_keywords', 'site_url', 'icp_number', 'comment_review', 'guestbook_review', 'quote_enabled', 'ipapi_is_key', 'baidu_site_verification', 'google_site_verification', 'bing_site_verification'],
-  mail: ['smtp_host', 'smtp_port', 'smtp_user', 'smtp_pass', 'smtp_secure'],
-  ai: ['deepseek_api_url', 'deepseek_api_key'],
+  site: ['site_title', 'site_description', 'site_keywords', 'site_url', 'icp_number', 'comment_review', 'guestbook_review', 'quote_enabled', 'baidu_site_verification', 'bing_site_verification', 'google_site_verification'],
+  ipapi: ['ipapi_is_key'],
+  mail: ['smtp_host', 'smtp_port', 'smtp_user', 'smtp_pass'],
+  summary: ['summary_api_url', 'summary_api_model', 'summary_api_key'],
+  ai: ['assistant_enabled', 'assistant_llm_api_url', 'assistant_llm_model', 'assistant_llm_api_key', 'assistant_tts_api_url', 'assistant_tts_model', 'assistant_tts_api_key', 'assistant_system_prompt'],
   oauth: ['qq_app_id', 'qq_app_key'],
   oss: ['oss_endpoint', 'oss_region', 'oss_bucket', 'oss_access_key_id', 'oss_access_key_secret', 'esa_domain'],
   pay: ['lantu_mch_id', 'lantu_key'],
@@ -149,7 +173,7 @@ export default function SettingsPage() {
   }
 
   const sortedCategories = Object.keys(settings).sort((a, b) => {
-    const order = ['site', 'mail', 'ai', 'oauth', 'oss', 'pay', 'pricing', 'convert', 'douyin'];
+    const order = ['site', 'ipapi', 'mail', 'summary', 'ai', 'oauth', 'oss', 'pay', 'pricing', 'convert', 'douyin'];
     return order.indexOf(a) - order.indexOf(b);
   });
 
@@ -186,10 +210,24 @@ export default function SettingsPage() {
                     const isBoolean = booleanKeys.includes(field.key);
                     const isSecret = secretKeys.includes(field.key);
                     const isSelect = selectKeys[field.key];
+                    const isTextarea = textareaKeys.includes(field.key);
 
                     if (isBoolean) {
+                      const spanClass = colSpanMap[field.key] || 'col-span-1';
+                      if (spanClass === 'col-span-6') {
+                        return (
+                          <div key={field.key} className={`${spanClass} flex items-center gap-3`}>
+                            <Label>{field.label}</Label>
+                            <Switch
+                              size="sm"
+                              checked={field.value === 'true'}
+                              onCheckedChange={(checked) => handleSwitchChange(category, field.key, checked)}
+                            />
+                          </div>
+                        );
+                      }
                       return (
-                        <div key={field.key} className="col-span-1 space-y-2">
+                        <div key={field.key} className={`${spanClass} space-y-2`}>
                           <Label>{field.label}</Label>
                           <div className="h-9 flex items-center">
                             <Switch
@@ -223,8 +261,22 @@ export default function SettingsPage() {
                       );
                     }
 
+                    if (isTextarea) {
+                      return (
+                        <div key={field.key} className={`${colSpanMap[field.key] || 'col-span-6'} space-y-2`}>
+                          <Label>{field.label}</Label>
+                          <Textarea
+                            value={field.value}
+                            onChange={(e) => handleChange(category, field.key, e.target.value)}
+                            placeholder={field.label}
+                            rows={4}
+                          />
+                        </div>
+                      );
+                    }
+
                     return (
-                      <div key={field.key} className="col-span-3 space-y-2">
+                      <div key={field.key} className={`${colSpanMap[field.key] || 'col-span-3'} space-y-2`}>
                         <Label>{field.label}</Label>
                         <Input
                           type={isSecret ? 'password' : 'text'}

@@ -6,8 +6,9 @@ interface GenerateSummaryOptions {
 }
 
 export async function generateSummary({title, content}: GenerateSummaryOptions): Promise<string> {
-    const apiKey = await getSetting('deepseek_api_key') || process.env.DEEPSEEK_API_KEY;
-    const apiUrl = await getSetting('deepseek_api_url') || process.env.DEEPSEEK_API_URL || 'https://api.deepseek.com/v1/chat/completions';
+    const apiKey = await getSetting('summary_api_key') || process.env.DEEPSEEK_API_KEY;
+    const apiUrl = await getSetting('summary_api_url') || process.env.DEEPSEEK_API_URL || 'https://api.deepseek.com/v1/chat/completions';
+    const model = await getSetting('summary_api_model') || 'deepseek-v4-flash';
 
     if (!apiKey) {
         console.warn('DEEPSEEK_API_KEY not configured, returning empty summary');
@@ -22,7 +23,7 @@ export async function generateSummary({title, content}: GenerateSummaryOptions):
                 'Authorization': `Bearer ${apiKey}`,
             },
             body: JSON.stringify({
-                model: 'deepseek-v4-flash',
+                model: model,
                 extra_body: {"thinking": {"type": "disabled"}},
                 messages: [
                     {

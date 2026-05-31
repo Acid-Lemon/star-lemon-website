@@ -440,10 +440,26 @@ async function init() {
 
     // 插入新的站点配置项
     const newSiteSettings = [
-      { key: 'ipapi_is_key', value: '', category: 'site', label: 'IPAPI 查询 Key' },
       { key: 'baidu_site_verification', value: '', category: 'site', label: '百度站点验证码' },
-      { key: 'google_site_verification', value: '', category: 'site', label: 'Google 站点验证码' },
-      { key: 'bing_site_verification', value: '', category: 'site', label: 'Bing 站点验证码' },
+      { key: 'bing_site_verification', value: '', category: 'site', label: 'Bing站点验证码' },
+      { key: 'google_site_verification', value: '', category: 'site', label: 'Google站点验证码' },
+    ];
+    for (const s of newSiteSettings) {
+      const exists = await client.query('SELECT 1 FROM settings WHERE key = $1', [s.key]);
+      if (exists.rows.length === 0) {
+        await client.query(
+          `INSERT INTO settings (key, value, category, label) VALUES ($1, $2, $3, $4)`,
+          [s.key, s.value, s.category, s.label]
+        );
+        console.log(`✅ 设置 ${s.key} 添加成功`);
+      } else {
+        console.log(`⏭️ 设置 ${s.key} 已存在，跳过`);
+      }
+    }
+
+    // IP 查询配置项
+    const ipapiSettings = [
+      { key: 'ipapi_is_key', value: '', category: 'ipapi', label: 'IPAPI 查询 Key' },
     ];
     for (const s of newSiteSettings) {
       const exists = await client.query('SELECT 1 FROM settings WHERE key = $1', [s.key]);
@@ -492,6 +508,49 @@ async function init() {
 
     // 迁移：更新 fc_price_per_file 标签
     await client.query("UPDATE settings SET label = '文件单价（元）' WHERE key = 'fc_price_per_file' AND label != '文件单价（元）'");
+
+    // 文章摘要配置项
+    const summarySettings = [
+      { key: 'summary_api_url', value: 'https://api.deepseek.com/v1/chat/completions', category: 'summary', label: '摘要接口地址' },
+      { key: 'summary_api_key', value: '', category: 'summary', label: '摘要 API Key' },
+      { key: 'summary_api_model', value: 'deepseek-v4-flash', category: 'summary', label: '摘要模型' },
+    ];
+    for (const s of summarySettings) {
+      const exists = await client.query('SELECT 1 FROM settings WHERE key = $1', [s.key]);
+      if (exists.rows.length === 0) {
+        await client.query(
+          `INSERT INTO settings (key, value, category, label) VALUES ($1, $2, $3, $4)`,
+          [s.key, s.value, s.category, s.label]
+        );
+        console.log(`✅ 设置 ${s.key} 添加成功`);
+      } else {
+        console.log(`⏭️ 设置 ${s.key} 已存在，跳过`);
+      }
+    }
+
+    // AI 助手配置项
+    const assistantSettings = [
+      { key: 'assistant_enabled', value: 'false', category: 'ai', label: '启用' },
+      { key: 'assistant_llm_api_url', value: '', category: 'ai', label: 'LLM接口地址' },
+      { key: 'assistant_llm_model', value: 'deepseek-v4-flash', category: 'ai', label: 'LLM模型' },
+      { key: 'assistant_llm_api_key', value: '', category: 'ai', label: 'LLM API Key' },
+      { key: 'assistant_tts_api_url', value: '', category: 'ai', label: 'TTS接口地址' },
+      { key: 'assistant_tts_model', value: '', category: 'ai', label: 'TTS模型' },
+      { key: 'assistant_tts_api_key', value: '', category: 'ai', label: 'TTS API Key' },
+      { key: 'assistant_system_prompt', value: '你是star和lemon的小站的AI助手，友好地回答访客的问题。', category: 'ai', label: '系统提示词' },
+    ];
+    for (const s of assistantSettings) {
+      const exists = await client.query('SELECT 1 FROM settings WHERE key = $1', [s.key]);
+      if (exists.rows.length === 0) {
+        await client.query(
+          `INSERT INTO settings (key, value, category, label) VALUES ($1, $2, $3, $4)`,
+          [s.key, s.value, s.category, s.label]
+        );
+        console.log(`✅ 设置 ${s.key} 添加成功`);
+      } else {
+        console.log(`⏭️ 设置 ${s.key} 已存在，跳过`);
+      }
+    }
 
     process.exit(0);
   } catch (err) {

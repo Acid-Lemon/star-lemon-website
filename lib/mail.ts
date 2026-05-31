@@ -5,8 +5,8 @@ async function createTransporter() {
     const settings = await getSettings();
     return nodemailer.createTransport({
         host: settings.smtp_host || process.env.SMTP_HOST,
-        port: parseInt(settings.smtp_port || process.env.SMTP_PORT || '587'),
-        secure: (settings.smtp_secure || process.env.SMTP_SECURE) === 'true',
+        port: parseInt(settings.smtp_port || process.env.SMTP_PORT || '465'),
+        secure: true,
         auth: {
             user: settings.smtp_user || process.env.SMTP_USER,
             pass: settings.smtp_pass || process.env.SMTP_PASS,

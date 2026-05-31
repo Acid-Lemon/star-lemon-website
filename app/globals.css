@@ -1420,3 +1420,37 @@ body *::after {
 .pastel .prose td {
     border-bottom-color: #fbcfe8;
 }
+
+/* AI assistant chat markdown overrides */
+.chat-markdown p {
+    margin-top: 0.125rem;
+    margin-bottom: 0.125rem;
+}
+
+.chat-markdown h1 {
+    font-size: 1rem;
+    margin-top: 0.25rem;
+    margin-bottom: 0.25rem;
+}
+
+.chat-markdown h2 {
+    font-size: 0.875rem;
+    margin-top: 0.25rem;
+    margin-bottom: 0.25rem;
+}
+
+.chat-markdown h3 {
+    font-size: 0.875rem;
+    margin-top: 0.25rem;
+    margin-bottom: 0.25rem;
+}
+
+.chat-markdown hr {
+    margin-top: 0.125rem;
+    margin-bottom: 0.125rem;
+}
+
+.chat-markdown pre {
+    margin-top: 0.25rem;
+    margin-bottom: 0.25rem;
+}

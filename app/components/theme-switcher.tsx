@@ -98,17 +98,17 @@ export function ThemeSwitcher() {
 
     if (!mounted) {
         return (
-            <div className="fixed bottom-6 right-6 z-50 w-12 h-12 rounded-full bg-white/80 backdrop-blur-xl border border-border shadow-lg" />
+            <div className="fixed bottom-6 left-6 z-50 w-12 h-12 rounded-full bg-white/80 backdrop-blur-xl border border-border shadow-lg" />
         );
     }
 
     return (
-        <div className="fixed bottom-6 right-6 z-50">
+        <div className="fixed bottom-6 left-6 z-50">
             {/* Theme Panel */}
             {isOpen && (
                 <div
                     ref={panelRef}
-                    className="absolute bottom-16 right-0 mb-2 w-56 bg-card/95 backdrop-blur-xl border border-border rounded-2xl shadow-2xl p-3 animate-in fade-in slide-in-from-bottom-4 duration-200"
+                    className="absolute bottom-16 left-0 mb-2 w-56 bg-card/95 backdrop-blur-xl border border-border rounded-2xl shadow-2xl p-3 animate-in fade-in slide-in-from-bottom-4 duration-200"
                     role="dialog"
                     aria-label="主题选择"
                 >

@@ -10,6 +10,8 @@ import { Toaster } from "@/components/ui/sonner";
 import { ThemeProvider } from "./components/theme-provider";
 import { ThemeSwitcher } from "./components/theme-switcher";
 import { UserProvider } from "./components/user-context";
+import { AssistantProvider } from "./components/assistant-store";
+import { AiAssistant } from "./components/ai-assistant";
 import db from "../lib/db";
 
 const inter = Inter({
@@ -104,12 +106,15 @@ export default async function RootLayout({children}: Readonly<{ children: React.
               suppressHydrationWarning>
             <ThemeProvider>
                 <UserProvider user={user}>
+                    <AssistantProvider>
                     <Navigation user={user} />
                     <MainWrapper>
                         {children}
                     </MainWrapper>
                     <Footer icpNumber={settings.icp_number} />
                     <ThemeSwitcher />
+                    <AiAssistant />
+                    </AssistantProvider>
                 </UserProvider>
             </ThemeProvider>
             <Toaster position="top-center" />

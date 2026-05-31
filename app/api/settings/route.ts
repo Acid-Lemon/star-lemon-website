@@ -36,10 +36,14 @@ export async function PUT(request: NextRequest) {
     const body = await request.json();
 
     for (const [key, value] of Object.entries(body)) {
+      const existing = await db.query('SELECT category, label FROM settings WHERE key = $1', [key]);
+      const category = existing.rows.length > 0 ? existing.rows[0].category : 'site';
+      const label = existing.rows.length > 0 ? existing.rows[0].label : key;
+
       await db.query(
-        `INSERT INTO settings (key, value, category, label) VALUES ($1, $2, 'site', $1)
+        `INSERT INTO settings (key, value, category, label) VALUES ($1, $2, $3, $4)
          ON CONFLICT (key) DO UPDATE SET value = $2, updated_at = CURRENT_TIMESTAMP`,
-        [key, value]
+        [key, value, category, label]
       );
     }
 

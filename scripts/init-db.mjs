@@ -14,11 +14,7 @@ envContent.split('\n').forEach(line => {
 });
 
 const pool = new Pool({
-  host: env.DB_HOST,
-  port: parseInt(env.DB_PORT || '5432'),
-  user: env.DB_USER,
-  password: env.DB_PASSWORD,
-  database: env.DB_NAME,
+  connectionString: env.DATABASE_URL,
 });
 
 async function tableExists(client, tableName) {

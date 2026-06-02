@@ -16,6 +16,7 @@ const securityHeaders = [
 ];
 
 const nextConfig: NextConfig = {
+    output: 'standalone',
     images: {
         remotePatterns: [
             {

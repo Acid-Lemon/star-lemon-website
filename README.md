@@ -57,14 +57,7 @@
 创建 `.env.local` 文件，仅存放数据库连接和 JWT 密钥：
 
 ```env
-# 数据库
-DB_HOST=localhost
-DB_PORT=5432
-DB_USER=postgres
-DB_PASSWORD=your_password
-DB_NAME=star_lemon
-
-# JWT
+DATABASE_URL=postgresql://user:password@host:5432/star_lemon
 JWT_SECRET=your_jwt_secret
 ```
 

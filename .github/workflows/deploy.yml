@@ -14,90 +14,53 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build Docker image
+        uses: docker/build-push-action@v6
         with:
-          node-version: '24'
+          context: .
+          load: true
+          tags: star-lemon-website:latest
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
 
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v3
-        with:
-          version: 9
+      - name: Save Docker image
+        run: docker save star-lemon-website:latest | gzip > /tmp/image.tar.gz
 
-      - name: Install dependencies
-        run: pnpm install
-
-      - name: Build
-        run: pnpm build
-        env:
-          NODE_OPTIONS: "--max-old-space-size=4096"
-
-      - name: Prune dev dependencies
-        run: pnpm install --prod --frozen-lockfile
-        env:
-          NODE_OPTIONS: "--max-old-space-size=4096"
-
-      - name: Create deploy archive
+      - name: Deploy to server
         run: |
-          tar -czf deploy.tar.gz \
-            --exclude=.next/cache \
-            --exclude=.next/dev \
-            package.json pnpm-lock.yaml next.config.ts \
-            public .next node_modules
-
-      - name: Upload to server and deploy
-        run: |
-          # Setup SSH key
           mkdir -p ~/.ssh
           echo "${{ secrets.SERVER_SSH_KEY }}" > ~/.ssh/deploy_key
           chmod 600 ~/.ssh/deploy_key
 
           SSH_OPTS="-i ~/.ssh/deploy_key -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null"
 
-          scp $SSH_OPTS deploy.tar.gz ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_IP }}:/tmp/
+          scp $SSH_OPTS /tmp/image.tar.gz ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_IP }}:/tmp/
 
           ssh $SSH_OPTS ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_IP }} bash -s << 'ENDSSH'
           set -e
-          DEPLOY_DIR=/www/wwwroot/star-lemon.top
-          PID_FILE=/www/server/nodejs/vhost/pids/star_lemon_top.pid
-          START_SCRIPT=/www/server/nodejs/vhost/scripts/star_lemon_top.sh
-          export PATH=/www/server/nodejs/v24.15.0/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/root/bin
+          DEPLOY_DIR=/opt/star-lemon
 
-          echo "=== Star Lemon Remote Deploy ==="
+          echo "=== Star Lemon Docker Deploy ==="
 
-          echo "[1/4] Stopping service..."
-          if [ -f "$PID_FILE" ]; then
-            PID=$(cat "$PID_FILE")
-            if kill -0 "$PID" 2>/dev/null; then
-              echo "Stopping process $PID"
-              kill -9 "$PID"
-            fi
-            rm -f "$PID_FILE"
-          fi
-          ORPHAN=$(netstat -tlnp 2>/dev/null | grep ':3000' | awk '{print $7}' | cut -d'/' -f1 | head -1)
-          if [ -n "$ORPHAN" ] && [ "$ORPHAN" != '-' ]; then
-            echo "Killing orphaned $ORPHAN"
-            kill -9 "$ORPHAN" 2>/dev/null || true
-          fi
-          sleep 2
+          echo "[1/3] Loading image..."
+          docker load < /tmp/image.tar.gz
+          rm -f /tmp/image.tar.gz
 
-          echo "[2/4] Cleaning old files..."
+          echo "[2/3] Restarting container..."
           cd "$DEPLOY_DIR"
-          find . -mindepth 1 -not -name '.env.local' -delete
+          docker compose down || true
+          docker compose up -d
 
-          echo "[3/4] Extracting archive..."
-          mv /tmp/deploy.tar.gz .
-          tar -xzf deploy.tar.gz
-          rm -f deploy.tar.gz
-
-          echo "[4/4] Starting..."
-          bash "$START_SCRIPT"
-          sleep 3
-
-          if netstat -tlnp 2>/dev/null | grep -q ':3000'; then
+          echo "[3/3] Health check..."
+          sleep 5
+          if docker ps | grep -q star-lemon-website; then
             echo "=== Deploy completed ==="
           else
-            echo "ERROR: Port 3000 not listening"
+            echo "ERROR: Container not running"
+            docker logs star-lemon-website --tail 50
             exit 1
           fi
           ENDSSH

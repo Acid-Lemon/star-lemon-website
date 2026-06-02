@@ -13,6 +13,8 @@ import { UserProvider } from "./components/user-context";
 import { AssistantProvider } from "./components/assistant-store";
 import { AiAssistant } from "./components/ai-assistant";
 import db from "../lib/db";
+import { isInitialized } from "../lib/migrate";
+import SetupForm from "./setup/setup-form";
 
 const inter = Inter({
     subsets: ['latin'],
@@ -66,6 +68,22 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function RootLayout({children}: Readonly<{ children: React.ReactNode }>) {
+    const initialized = await isInitialized();
+
+    if (!initialized) {
+        return (
+            <html lang="zh-CN" className="h-full antialiased" suppressHydrationWarning>
+            <body className={`min-h-full flex flex-col bg-background text-foreground ${inter.variable} ${playfair.variable} ${notoSerifSC.variable} ${dmMono.variable}`}
+                  suppressHydrationWarning>
+                <ThemeProvider>
+                    <SetupForm />
+                </ThemeProvider>
+                <Toaster position="top-center" />
+            </body>
+            </html>
+        );
+    }
+
     const session = await getSession();
     let user = null;
 

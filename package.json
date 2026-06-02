@@ -55,6 +55,7 @@
     "tailwindcss": "^4",
     "typescript": "^5"
   },
+  "packageManager": "pnpm@9.15.4",
   "pnpm": {
     "onlyBuiltDependencies": ["sharp", "unrs-resolver"]
   }

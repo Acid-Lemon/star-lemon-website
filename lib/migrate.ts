@@ -240,22 +240,28 @@ export async function migrate(): Promise<string[]> {
 
 const defaultSettings: { key: string; value: string; category: string; label: string }[] = [
   // site
+  { key: 'site_title', value: '', category: 'site', label: '网站标题' },
+  { key: 'site_description', value: '', category: 'site', label: '网站描述' },
+  { key: 'site_keywords', value: '', category: 'site', label: '网站关键词' },
+  { key: 'site_url', value: '', category: 'site', label: '网站地址' },
+  { key: 'icp_number', value: '', category: 'site', label: 'ICP备案号' },
+  { key: 'comment_review', value: 'true', category: 'site', label: '评论审核' },
+  { key: 'guestbook_review', value: 'true', category: 'site', label: '留言审核' },
+  { key: 'quote_enabled', value: 'true', category: 'site', label: '一言功能' },
   { key: 'baidu_site_verification', value: '', category: 'site', label: '百度站点验证码' },
   { key: 'bing_site_verification', value: '', category: 'site', label: 'Bing站点验证码' },
   { key: 'google_site_verification', value: '', category: 'site', label: 'Google站点验证码' },
   // ipapi
   { key: 'ipapi_is_key', value: '', category: 'ipapi', label: 'IPAPI 查询 Key' },
-  // convert
-  { key: 'convert_api_url', value: '', category: 'convert', label: '转换服务地址' },
-  { key: 'convert_api_key', value: '', category: 'convert', label: '转换服务 API Key' },
-  { key: 'fc_price_per_file', value: '0.01', category: 'convert', label: '文件单价（元）' },
-  { key: 'fc_payment_fee', value: '0.6', category: 'convert', label: '支付手续费率(%)' },
-  { key: 'fc_service_fee', value: '0.7', category: 'convert', label: '服务费率(%)' },
-  { key: 'fc_profit_rate', value: '5', category: 'convert', label: '利润率(%)' },
+  // mail
+  { key: 'smtp_host', value: '', category: 'mail', label: 'SMTP 服务器' },
+  { key: 'smtp_port', value: '465', category: 'mail', label: 'SMTP 端口' },
+  { key: 'smtp_user', value: '', category: 'mail', label: 'SMTP 用户' },
+  { key: 'smtp_pass', value: '', category: 'mail', label: 'SMTP 密码' },
   // summary
   { key: 'summary_api_url', value: '', category: 'summary', label: '摘要接口地址' },
-  { key: 'summary_api_key', value: '', category: 'summary', label: '摘要 API Key' },
   { key: 'summary_api_model', value: 'deepseek-v4-flash', category: 'summary', label: '摘要模型' },
+  { key: 'summary_api_key', value: '', category: 'summary', label: '摘要 API Key' },
   // ai
   { key: 'assistant_enabled', value: 'false', category: 'ai', label: '启用' },
   { key: 'assistant_llm_api_url', value: '', category: 'ai', label: 'LLM接口地址' },
@@ -265,6 +271,35 @@ const defaultSettings: { key: string; value: string; category: string; label: st
   { key: 'assistant_tts_model', value: '', category: 'ai', label: 'TTS模型' },
   { key: 'assistant_tts_api_key', value: '', category: 'ai', label: 'TTS API Key' },
   { key: 'assistant_system_prompt', value: '你是star和lemon的小站的AI助手，友好地回答访客的问题。', category: 'ai', label: '系统提示词' },
+  // oauth
+  { key: 'qq_app_id', value: '', category: 'oauth', label: 'QQ App ID' },
+  { key: 'qq_app_key', value: '', category: 'oauth', label: 'QQ App Key' },
+  // oss
+  { key: 'oss_endpoint', value: '', category: 'oss', label: 'OSS Endpoint' },
+  { key: 'oss_region', value: '', category: 'oss', label: 'OSS Region' },
+  { key: 'oss_bucket', value: '', category: 'oss', label: 'OSS Bucket' },
+  { key: 'oss_access_key_id', value: '', category: 'oss', label: 'OSS Access Key ID' },
+  { key: 'oss_access_key_secret', value: '', category: 'oss', label: 'OSS Access Key Secret' },
+  { key: 'esa_domain', value: '', category: 'oss', label: 'ESA域名' },
+  // pay
+  { key: 'lantu_mch_id', value: '', category: 'pay', label: '蓝兔商户ID' },
+  { key: 'lantu_key', value: '', category: 'pay', label: '蓝兔密钥' },
+  // pricing
+  { key: 'ft_storage_price', value: '0.01', category: 'pricing', label: '存储单价（元/MB/天）' },
+  { key: 'ft_traffic_price', value: '0.05', category: 'pricing', label: '流量单价（元/GB）' },
+  { key: 'ft_payment_fee', value: '0.6', category: 'pricing', label: '支付手续费率(%)' },
+  { key: 'ft_service_fee', value: '0.7', category: 'pricing', label: '服务费率(%)' },
+  { key: 'ft_profit_rate', value: '5', category: 'pricing', label: '利润率(%)' },
+  // convert
+  { key: 'convert_api_url', value: '', category: 'convert', label: '转换服务地址' },
+  { key: 'convert_api_key', value: '', category: 'convert', label: '转换服务 API Key' },
+  { key: 'fc_price_per_file', value: '0.01', category: 'convert', label: '文件单价（元）' },
+  { key: 'fc_payment_fee', value: '0.6', category: 'convert', label: '支付手续费率(%)' },
+  { key: 'fc_service_fee', value: '0.7', category: 'convert', label: '服务费率(%)' },
+  { key: 'fc_profit_rate', value: '5', category: 'convert', label: '利润率(%)' },
+  // douyin
+  { key: 'douyin_api_url', value: '', category: 'douyin', label: '抖音解析接口' },
+  { key: 'douyin_embed_mode', value: 'iframe', category: 'douyin', label: '嵌入方式' },
 ];
 
 export async function insertDefaultSettings(): Promise<void> {

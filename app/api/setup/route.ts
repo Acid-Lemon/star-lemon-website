@@ -6,10 +6,7 @@ import { migrate, insertDefaultSettings, isInitialized } from '@/lib/migrate';
 
 export async function GET() {
   const initialized = await isInitialized();
-  if (initialized) {
-    return NextResponse.json({ initialized: true });
-  }
-  return NextResponse.json({ initialized: false });
+  return NextResponse.json({ initialized });
 }
 
 export async function POST(request: NextRequest) {
@@ -23,9 +20,10 @@ export async function POST(request: NextRequest) {
     const nickname = body.nickname?.toString();
     const email = body.email?.toString();
     const password = body.password?.toString();
+    const settings: Record<string, string> = body.settings || {};
 
     if (!nickname || !email || !password) {
-      return NextResponse.json({ error: '请填写完整信息' }, { status: 400 });
+      return NextResponse.json({ error: '请填写完整管理员信息' }, { status: 400 });
     }
 
     if (password.length < 6) {
@@ -35,8 +33,20 @@ export async function POST(request: NextRequest) {
     // Create tables and apply migrations
     await migrate();
 
-    // Insert default settings
+    // Insert default settings first
     await insertDefaultSettings();
+
+    // Update settings provided by the wizard
+    if (Object.keys(settings).length > 0) {
+      for (const [key, value] of Object.entries(settings)) {
+        if (value) {
+          await db.query(
+            `UPDATE settings SET value = $1, updated_at = CURRENT_TIMESTAMP WHERE key = $2`,
+            [value, key]
+          );
+        }
+      }
+    }
 
     // Create admin account
     const hashedPassword = await bcrypt.hash(password, 10);
@@ -48,7 +58,7 @@ export async function POST(request: NextRequest) {
     const admin = result.rows[0];
     await loginUser({ id: admin.id, nickname: admin.nickname, email: admin.email, role: admin.role, avatar: admin.avatar });
 
-    return NextResponse.json({ success: true, message: '站点初始化完成' });
+    return NextResponse.json({ success: true });
   } catch (error) {
     console.error('Setup failed:', error);
     return NextResponse.json({ error: '初始化失败: ' + (error as Error).message }, { status: 500 });

@@ -70,7 +70,22 @@ jobs:
           fi
           git -C "$APP_DIR" remote remove origin >/dev/null 2>&1 || true
           git -C "$APP_DIR" remote add origin "$AUTH_REPO_URL"
-          git -C "$APP_DIR" fetch --depth 1 origin "$GITHUB_REF_NAME"
+
+          for attempt in 1 2 3 4 5; do
+            if git -C "$APP_DIR" -c http.version=HTTP/1.1 fetch --depth 1 origin "$GITHUB_REF_NAME"; then
+              break
+            fi
+
+            if [ "$attempt" -eq 5 ]; then
+              echo "ERROR: git fetch failed after 5 attempts."
+              exit 1
+            fi
+
+            sleep_seconds=$((attempt * 10))
+            echo "git fetch failed; retrying in ${sleep_seconds}s..."
+            sleep "$sleep_seconds"
+          done
+
           git -C "$APP_DIR" checkout -B "$GITHUB_REF_NAME" FETCH_HEAD
           git -C "$APP_DIR" reset --hard "$GITHUB_SHA"
           cleanup_auth_remote

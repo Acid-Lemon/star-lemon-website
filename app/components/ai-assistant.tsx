@@ -4,12 +4,15 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import { RiSendPlaneLine, RiVolumeUpLine, RiDeleteBinLine, RiCloseLine, RiChatSmileLine } from '@remixicon/react';
 import { Dialog, DialogContent, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
+import { Switch } from '@/components/ui/switch';
 import { useAssistantStore } from './assistant-store';
 import { useUser } from './user-context';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import rehypeHighlight from 'rehype-highlight';
 import 'highlight.js/styles/github-dark.css';
+
+const AUTO_READ_KEY = 'ai-assistant-auto-read';
 
 export function AiAssistant() {
   const store = useAssistantStore();
@@ -20,6 +23,13 @@ export function AiAssistant() {
   const [ttsPlaying, setTtsPlaying] = useState<string | null>(null);
   const [ttsLoading, setTtsLoading] = useState<string | null>(null);
   const [ttsAvailable, setTtsAvailable] = useState(false);
+  const [autoRead, setAutoRead] = useState(() => {
+    try {
+      return localStorage.getItem(AUTO_READ_KEY) === 'true';
+    } catch {
+      return false;
+    }
+  });
   const inputRef = useRef<HTMLInputElement>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
   const abortRef = useRef<AbortController | null>(null);
@@ -42,10 +52,67 @@ export function AiAssistant() {
   }, [store.isOpen]);
 
   useEffect(() => {
+    try {
+      localStorage.setItem(AUTO_READ_KEY, autoRead ? 'true' : 'false');
+    } catch {}
+  }, [autoRead]);
+
+  useEffect(() => {
     if (scrollRef.current) {
       scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
     }
   }, [store.messages, store.streamingContent]);
+
+  const playTts = useCallback(async (text: string, messageId: string) => {
+    if (ttsPlaying === messageId || ttsLoading === messageId) return;
+    setTtsLoading(messageId);
+
+    try {
+      const response = await fetch('/api/assistant/tts', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ text }),
+      });
+
+      if (!response.ok) {
+        setTtsLoading(null);
+        return;
+      }
+
+      const contentType = response.headers.get('content-type') || '';
+
+      if (contentType.includes('audio') || contentType.includes('octet-stream')) {
+        const blob = await response.blob();
+        const url = URL.createObjectURL(blob);
+        const audio = new Audio(url);
+        setTtsLoading(null);
+        setTtsPlaying(messageId);
+        audio.onended = () => {
+          setTtsPlaying(null);
+          URL.revokeObjectURL(url);
+        };
+        audio.onerror = () => {
+          setTtsPlaying(null);
+          URL.revokeObjectURL(url);
+        };
+        await audio.play();
+      } else {
+        const data = await response.json();
+        if (data.audioUrl || data.url) {
+          setTtsLoading(null);
+          setTtsPlaying(messageId);
+          const audio = new Audio(data.audioUrl || data.url);
+          audio.onended = () => setTtsPlaying(null);
+          audio.onerror = () => setTtsPlaying(null);
+          await audio.play();
+        }
+        setTtsLoading(null);
+      }
+    } catch {
+      setTtsLoading(null);
+      setTtsPlaying(null);
+    }
+  }, [ttsLoading, ttsPlaying]);
 
   const sendMessage = useCallback(async () => {
     const text = input.trim();
@@ -99,6 +166,7 @@ export function AiAssistant() {
       }
 
       let buffer = '';
+      let assistantContent = '';
 
       while (true) {
         const { done, value } = await reader.read();
@@ -118,6 +186,7 @@ export function AiAssistant() {
           try {
             const parsed = JSON.parse(data);
             if (parsed.content) {
+              assistantContent += parsed.content;
               store.appendStreamingContent(parsed.content);
             }
           } catch {
@@ -127,8 +196,11 @@ export function AiAssistant() {
       }
 
       store.finalizeStreaming();
-    } catch (error: any) {
-      if (error.name === 'AbortError') {
+      if (autoRead && ttsAvailable && assistantContent.trim()) {
+        void playTts(assistantContent, `auto-${Date.now()}`);
+      }
+    } catch (error: unknown) {
+      if (error instanceof Error && error.name === 'AbortError') {
         store.finalizeStreaming();
       } else {
         store.setStreaming(false);
@@ -140,63 +212,12 @@ export function AiAssistant() {
         });
       }
     }
-  }, [input, store]);
+  }, [autoRead, input, playTts, store, ttsAvailable]);
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
       sendMessage();
-    }
-  };
-
-  const playTts = async (text: string, messageId: string) => {
-    if (ttsPlaying === messageId || ttsLoading === messageId) return;
-    setTtsLoading(messageId);
-
-    try {
-      const response = await fetch('/api/assistant/tts', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ text }),
-      });
-
-      if (!response.ok) {
-        setTtsLoading(null);
-        return;
-      }
-
-      const contentType = response.headers.get('content-type') || '';
-
-      if (contentType.includes('audio') || contentType.includes('octet-stream')) {
-        const blob = await response.blob();
-        const url = URL.createObjectURL(blob);
-        const audio = new Audio(url);
-        setTtsLoading(null);
-        setTtsPlaying(messageId);
-        audio.onended = () => {
-          setTtsPlaying(null);
-          URL.revokeObjectURL(url);
-        };
-        audio.onerror = () => {
-          setTtsPlaying(null);
-          URL.revokeObjectURL(url);
-        };
-        await audio.play();
-      } else {
-        const data = await response.json();
-        if (data.audioUrl || data.url) {
-          setTtsLoading(null);
-          setTtsPlaying(messageId);
-          const audio = new Audio(data.audioUrl || data.url);
-          audio.onended = () => setTtsPlaying(null);
-          audio.onerror = () => setTtsPlaying(null);
-          await audio.play();
-        }
-        setTtsLoading(null);
-      }
-    } catch {
-      setTtsLoading(null);
-      setTtsPlaying(null);
     }
   };
 
@@ -230,6 +251,12 @@ export function AiAssistant() {
               <DialogDescription className="text-xs">有什么问题都可以问我</DialogDescription>
             </div>
             <div className="flex items-center gap-1">
+              {ttsAvailable && (
+                <label className="flex items-center gap-2 px-2 text-xs text-gray-500 dark:text-gray-400">
+                  <Switch size="sm" checked={autoRead} onCheckedChange={setAutoRead} />
+                  自动朗读
+                </label>
+              )}
               <Button
                 variant="ghost"
                 size="icon-sm"

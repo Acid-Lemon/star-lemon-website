@@ -1,6 +1,14 @@
 import { NextRequest } from 'next/server';
 import { getSetting } from '@/lib/settings';
 
+function getErrorMessage(error: unknown): string {
+  return error instanceof Error ? error.message : 'unknown error';
+}
+
+function isHeaderSafe(value: string): boolean {
+  return /^[\x00-\xff]*$/.test(value);
+}
+
 export async function POST(request: NextRequest) {
   const apiKey = await getSetting('assistant_llm_api_key');
   const apiUrl = await getSetting('assistant_llm_api_url');
@@ -14,6 +22,12 @@ export async function POST(request: NextRequest) {
 
   if (!apiKey || !apiUrl) {
     return new Response('AI助手未配置', { status: 503 });
+  }
+
+  const normalizedApiKey = apiKey.trim();
+
+  if (!isHeaderSafe(normalizedApiKey)) {
+    return new Response('LLM API Key 包含非法字符，请检查是否填入了中文、全角字符或占位文字', { status: 400 });
   }
 
   const { messages } = await request.json();
@@ -35,18 +49,26 @@ export async function POST(request: NextRequest) {
     ? apiUrl
     : apiUrl.replace(/\/+$/, '') + '/v1/chat/completions';
 
-  const response = await fetch(endpoint, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${apiKey}`,
-    },
-    body: JSON.stringify({
-      model: model || 'deepseek-v4-flash',
-      messages: apiMessages,
-      stream: true,
-    }),
-  });
+  let response: Response;
+
+  try {
+    response = await fetch(endpoint, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${normalizedApiKey}`,
+      },
+      body: JSON.stringify({
+        model: model || 'deepseek-v4-flash',
+        messages: apiMessages,
+        stream: true,
+      }),
+    });
+  } catch (error: unknown) {
+    const message = getErrorMessage(error);
+    console.error('Assistant LLM request failed:', message);
+    return new Response(`LLM 请求失败: ${message}`, { status: 502 });
+  }
 
   if (!response.ok) {
     const errorText = await response.text();
@@ -61,7 +83,7 @@ export async function POST(request: NextRequest) {
     async start(controller) {
       const reader = response.body?.getReader();
       if (!reader) {
-        controller.close();
+        controller.error(new Error('LLM API 未返回响应流'));
         return;
       }
 

@@ -1,6 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getSetting } from '@/lib/settings';
 
+function isHeaderSafe(value: string): boolean {
+  return /^[\x00-\xff]*$/.test(value);
+}
+
 export async function POST(request: NextRequest) {
   const apiKey = await getSetting('assistant_tts_api_key');
   const apiUrl = await getSetting('assistant_tts_api_url');
@@ -8,11 +12,17 @@ export async function POST(request: NextRequest) {
   const enabled = await getSetting('assistant_enabled');
 
   if (enabled !== 'true') {
-    return NextResponse.json({ error: 'AI助手未启用', status: 403 });
+    return NextResponse.json({ error: 'AI助手未启用' }, { status: 403 });
   }
 
   if (!apiKey || !apiUrl) {
-    return NextResponse.json({ error: 'TTS未配置', status: 503 });
+    return NextResponse.json({ error: 'TTS未配置' }, { status: 503 });
+  }
+
+  const normalizedApiKey = apiKey.trim();
+
+  if (!isHeaderSafe(normalizedApiKey)) {
+    return NextResponse.json({ error: 'TTS API Key 包含非法字符，请检查是否填入了中文、全角字符或占位文字' }, { status: 400 });
   }
 
   const { text } = await request.json();
@@ -30,7 +40,7 @@ export async function POST(request: NextRequest) {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${apiKey}`,
+        'Authorization': `Bearer ${normalizedApiKey}`,
       },
       body: JSON.stringify({
         model: model || 'tts-1',
@@ -54,7 +64,7 @@ export async function POST(request: NextRequest) {
     if (!response.ok) {
       const errorText = await response.text();
       console.error('TTS API error:', response.status, errorText);
-      return NextResponse.json({ error: `TTS API 错误: ${response.status}`, status: response.status });
+      return NextResponse.json({ error: `TTS API 错误: ${response.status}` }, { status: response.status });
     }
 
     const contentType = response.headers.get('content-type') || '';
@@ -91,9 +101,9 @@ export async function POST(request: NextRequest) {
     }
 
     console.error('TTS API returned no audio data:', JSON.stringify(data).slice(0, 200));
-    return NextResponse.json({ error: 'TTS API 未返回音频数据' }, { status: 500 });
+    return NextResponse.json({ error: 'TTS API 未返回音频数据' }, { status: 502 });
   } catch (error) {
     console.error('TTS request failed:', error);
-    return NextResponse.json({ error: 'TTS请求失败' }, { status: 500 });
+    return NextResponse.json({ error: 'TTS请求失败' }, { status: 502 });
   }
 }

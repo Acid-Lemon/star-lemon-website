@@ -80,6 +80,7 @@ export async function migrate(): Promise<string[]> {
       user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
       content TEXT NOT NULL,
       image_url TEXT,
+      status VARCHAR(50) DEFAULT 'approved',
       created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     )`],
     ['timeline', `CREATE TABLE timeline (
@@ -233,6 +234,12 @@ export async function migrate(): Promise<string[]> {
       await db.query(`ALTER TABLE file_conversions DROP COLUMN ${col}`);
       logs.push(`file_conversions.${col} 已移除`);
     }
+  }
+
+  // Migration: moments status column
+  if (!await columnExists('moments', 'status')) {
+    await db.query("ALTER TABLE moments ADD COLUMN status VARCHAR(50) DEFAULT 'approved'");
+    logs.push('moments.status 已添加');
   }
 
   return logs;

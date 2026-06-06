@@ -28,6 +28,15 @@ interface Moment {
     created_at: string;
 }
 
+function getApiError(data: unknown, fallback: string) {
+    if (!data || typeof data !== 'object') return fallback;
+    const record = data as Record<string, unknown>;
+    const message = [record.error, record.detail]
+        .filter((value): value is string => typeof value === 'string' && value.length > 0)
+        .join('：');
+    return message || fallback;
+}
+
 function MomentImages({ imageUrl, onImageClick }: { imageUrl: string; onImageClick: (urls: string[], index: number) => void }) {
     const urls = imageUrl.split(',').filter(Boolean);
     const count = urls.length;
@@ -93,7 +102,10 @@ export default function AdminMomentsPage() {
     const fetchMoments = useCallback(async () => {
         try {
             const res = await fetch('/api/moments?limit=50');
-            const data = await res.json();
+            const data = await res.json().catch(() => ({}));
+            if (!res.ok) {
+                throw new Error(getApiError(data, '获取动态列表失败'));
+            }
             if (Array.isArray(data)) {
                 setMoments(data);
             } else {
@@ -101,7 +113,7 @@ export default function AdminMomentsPage() {
             }
         } catch (error) {
             console.error('Failed to fetch moments:', error);
-            toast.error('获取动态列表失败');
+            toast.error(error instanceof Error ? error.message : '获取动态列表失败');
         } finally {
             setLoading(false);
         }
@@ -177,10 +189,10 @@ export default function AdminMomentsPage() {
                 toast.success('动态发布成功');
             } else {
                 const data = await res.json().catch(() => ({}));
-                toast.error(data.error || '发布失败');
+                toast.error(getApiError(data, '发布失败'));
             }
-        } catch {
-            toast.error('发布失败');
+        } catch (error) {
+            toast.error(error instanceof Error ? error.message : '发布失败');
         } finally {
             setSubmitting(false);
         }
@@ -194,10 +206,10 @@ export default function AdminMomentsPage() {
                 toast.success('删除成功');
             } else {
                 const data = await res.json().catch(() => ({}));
-                toast.error(data.error || '删除失败');
+                toast.error(getApiError(data, '删除失败'));
             }
-        } catch {
-            toast.error('删除失败');
+        } catch (error) {
+            toast.error(error instanceof Error ? error.message : '删除失败');
         } finally {
             setDeleteTarget(null);
         }

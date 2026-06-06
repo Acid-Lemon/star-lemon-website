@@ -49,12 +49,18 @@ jobs:
           chmod 600 ~/.ssh/deploy_key
           ssh-keyscan -H "${{ secrets.SERVER_IP }}" >> ~/.ssh/known_hosts
 
-          SSH_OPTS="-i ~/.ssh/deploy_key -o IdentitiesOnly=yes -o BatchMode=yes"
+          SSH_OPTS="-i ~/.ssh/deploy_key -o IdentitiesOnly=yes -o BatchMode=yes -o ConnectTimeout=15 -o ServerAliveInterval=30 -o ServerAliveCountMax=4"
 
           echo "Starting remote deploy..."
 
           echo "Uploading standalone bundle..."
-          scp $SSH_OPTS /tmp/star-lemon-standalone.tar.gz ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_IP }}:/tmp/
+          ls -lh /tmp/star-lemon-standalone.tar.gz
+          if ssh $SSH_OPTS ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_IP }} "command -v rsync >/dev/null 2>&1"; then
+            rsync -az --info=progress2 -e "ssh $SSH_OPTS" /tmp/star-lemon-standalone.tar.gz ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_IP }}:/tmp/
+          else
+            echo "rsync is not available on the server; falling back to scp without progress output."
+            scp $SSH_OPTS /tmp/star-lemon-standalone.tar.gz ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_IP }}:/tmp/
+          fi
 
           ssh $SSH_OPTS ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_IP }} bash -s << 'ENDSSH'
           set -e

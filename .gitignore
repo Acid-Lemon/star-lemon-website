@@ -45,6 +45,8 @@ next-env.d.ts
 # 避免包含密钥的脚本被上传到仓库
 **/*.bat
 **/*.ps1
+!scripts/deploy-local.bat
+!scripts/deploy-local.ps1
 # **/*.sh  # remote-deploy.sh 需要提交用于部署
 
 

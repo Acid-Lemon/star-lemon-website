@@ -69,6 +69,24 @@ const selectKeys: Record<string, { label: string; options: { value: string; labe
   },
 };
 
+const labelOverrides: Record<string, string> = {
+  oss_region: 'OSS 地域',
+  oss_endpoint: 'OSS Endpoint（可选）',
+  oss_bucket: 'Bucket',
+  oss_access_key_id: 'Access Key ID',
+  oss_access_key_secret: 'Access Key Secret',
+  esa_domain: 'ESA / CDN 域名（可选）',
+};
+
+const placeholderOverrides: Record<string, string> = {
+  oss_region: 'oss-cn-hangzhou',
+  oss_endpoint: '留空则按地域自动使用默认 Endpoint',
+  oss_bucket: 'my-bucket',
+  oss_access_key_id: 'LTAI...',
+  oss_access_key_secret: 'Access Key Secret',
+  esa_domain: 'cdn.star-lemon.top，不要带 https://',
+};
+
 const fieldOrder: Record<string, string[]> = {
   site: ['site_title', 'site_description', 'site_keywords', 'site_url', 'icp_number', 'comment_review', 'guestbook_review', 'quote_enabled', 'baidu_site_verification', 'bing_site_verification', 'google_site_verification'],
   ipapi: ['ipapi_is_key'],
@@ -211,13 +229,15 @@ export default function SettingsPage() {
                     const isSecret = secretKeys.includes(field.key);
                     const isSelect = selectKeys[field.key];
                     const isTextarea = textareaKeys.includes(field.key);
+                    const displayLabel = labelOverrides[field.key] || field.label;
+                    const placeholder = placeholderOverrides[field.key] || displayLabel;
 
                     if (isBoolean) {
                       const spanClass = colSpanMap[field.key] || 'col-span-1';
                       if (spanClass === 'col-span-6') {
                         return (
                           <div key={field.key} className={`${spanClass} flex items-center gap-3`}>
-                            <Label>{field.label}</Label>
+                            <Label>{displayLabel}</Label>
                             <Switch
                               size="sm"
                               checked={field.value === 'true'}
@@ -228,7 +248,7 @@ export default function SettingsPage() {
                       }
                       return (
                         <div key={field.key} className={`${spanClass} space-y-2`}>
-                          <Label>{field.label}</Label>
+                          <Label>{displayLabel}</Label>
                           <div className="h-9 flex items-center">
                             <Switch
                               size="sm"
@@ -264,11 +284,11 @@ export default function SettingsPage() {
                     if (isTextarea) {
                       return (
                         <div key={field.key} className={`${colSpanMap[field.key] || 'col-span-6'} space-y-2`}>
-                          <Label>{field.label}</Label>
+                          <Label>{displayLabel}</Label>
                           <Textarea
                             value={field.value}
                             onChange={(e) => handleChange(category, field.key, e.target.value)}
-                            placeholder={field.label}
+                            placeholder={placeholder}
                             rows={4}
                           />
                         </div>
@@ -277,12 +297,12 @@ export default function SettingsPage() {
 
                     return (
                       <div key={field.key} className={`${colSpanMap[field.key] || 'col-span-3'} space-y-2`}>
-                        <Label>{field.label}</Label>
+                        <Label>{displayLabel}</Label>
                         <Input
                           type={isSecret ? 'password' : 'text'}
                           value={field.value}
                           onChange={(e) => handleChange(category, field.key, e.target.value)}
-                          placeholder={field.label}
+                          placeholder={placeholder}
                         />
                       </div>
                     );

@@ -7,19 +7,50 @@ import { randomBytes } from 'crypto';
 
 let ossClient: InstanceType<typeof OSS> | null = null;
 
+function getErrorMessage(error: unknown): string | undefined {
+  return error instanceof Error ? error.message : undefined;
+}
+
+function getErrorCode(error: unknown): string | undefined {
+  return typeof error === 'object' && error !== null && 'code' in error
+    ? String((error as { code?: unknown }).code)
+    : undefined;
+}
+
 export async function getOssClient() {
   if (ossClient) return ossClient;
 
   const settings = await getSettings();
+  const region = settings.oss_region || 'oss-cn-hangzhou';
+  const endpoint = settings.oss_endpoint?.trim();
+  const accessKeyId = settings.oss_access_key_id || '';
+  const accessKeySecret = settings.oss_access_key_secret || '';
+  const bucket = settings.oss_bucket || '';
 
-  ossClient = new OSS({
-    endpoint: settings.oss_endpoint || '',
-    accessKeyId: settings.oss_access_key_id || '',
-    accessKeySecret: settings.oss_access_key_secret || '',
-    bucket: settings.oss_bucket || '',
-    region: settings.oss_region || 'oss-cn-hangzhou',
+  if (!accessKeyId || !accessKeySecret || !bucket) {
+    throw new Error('OSS 未配置完整，请填写 Bucket、Access Key ID 和 Access Key Secret');
+  }
+
+  const options: {
+    accessKeyId: string;
+    accessKeySecret: string;
+    bucket: string;
+    region: string;
+    secure: boolean;
+    endpoint?: string;
+  } = {
+    accessKeyId,
+    accessKeySecret,
+    bucket,
+    region,
     secure: true,
-  });
+  };
+
+  if (endpoint) {
+    options.endpoint = endpoint;
+  }
+
+  ossClient = new OSS(options);
 
   return ossClient;
 }
@@ -51,7 +82,7 @@ export async function multipartUpload(
 
   try {
     let lastPct = 0;
-    const result = await (client as any).multipartUpload(key, tmpPath, {
+    const result = await client.multipartUpload(key, tmpPath, {
       progress: async (pct: number) => {
         const rounded = Math.round(pct * 100);
         if (rounded !== lastPct) {
@@ -68,7 +99,7 @@ export async function multipartUpload(
 
 export async function generateDownloadUrl(key: string, fileName: string): Promise<string> {
   const settings = await getSettings();
-  const esaDomain = settings.esa_domain;
+  const esaDomain = settings.esa_domain?.trim().replace(/^https?:\/\//, '').replace(/\/$/, '');
 
   if (esaDomain) {
     return `https://${esaDomain}/${key}`;
@@ -90,9 +121,9 @@ export async function deleteFile(key: string): Promise<void> {
   try {
     const client = await getOssClient();
     await client.delete(key);
-  } catch (error: any) {
-    if (error?.code !== 'NoSuchKey') {
-      console.error('Failed to delete OSS file:', key, error?.message);
+  } catch (error: unknown) {
+    if (getErrorCode(error) !== 'NoSuchKey') {
+      console.error('Failed to delete OSS file:', key, getErrorMessage(error));
     }
   }
 }
@@ -130,7 +161,7 @@ export async function getPublicUrl(urlOrKey: string | null | undefined): Promise
 
   const key = trimmed.startsWith('/') ? trimmed.slice(1) : trimmed;
   const settings = await getSettings();
-  const esaDomain = settings.esa_domain;
+  const esaDomain = settings.esa_domain?.trim().replace(/^https?:\/\//, '').replace(/\/$/, '');
 
   // 配置了 ESA 时，直接返回 ESA 域名URL
   // ESA 应开启"私有Bucket回源"功能，由ESA负责回源鉴权

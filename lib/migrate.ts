@@ -275,12 +275,12 @@ const defaultSettings: { key: string; value: string; category: string; label: st
   { key: 'qq_app_id', value: '', category: 'oauth', label: 'QQ App ID' },
   { key: 'qq_app_key', value: '', category: 'oauth', label: 'QQ App Key' },
   // oss
-  { key: 'oss_endpoint', value: '', category: 'oss', label: 'OSS Endpoint' },
-  { key: 'oss_region', value: '', category: 'oss', label: 'OSS Region' },
-  { key: 'oss_bucket', value: '', category: 'oss', label: 'OSS Bucket' },
+  { key: 'oss_endpoint', value: '', category: 'oss', label: 'OSS Endpoint（可选）' },
+  { key: 'oss_region', value: 'oss-cn-hangzhou', category: 'oss', label: 'OSS 地域' },
+  { key: 'oss_bucket', value: '', category: 'oss', label: 'Bucket' },
   { key: 'oss_access_key_id', value: '', category: 'oss', label: 'OSS Access Key ID' },
   { key: 'oss_access_key_secret', value: '', category: 'oss', label: 'OSS Access Key Secret' },
-  { key: 'esa_domain', value: '', category: 'oss', label: 'ESA域名' },
+  { key: 'esa_domain', value: '', category: 'oss', label: 'ESA / CDN 域名（可选）' },
   // pay
   { key: 'lantu_mch_id', value: '', category: 'pay', label: '蓝兔商户ID' },
   { key: 'lantu_key', value: '', category: 'pay', label: '蓝兔密钥' },

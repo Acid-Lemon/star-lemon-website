@@ -19,6 +19,21 @@ const STEPS = [
   { title: '服务配置', desc: '可选，也可以稍后在后台配置' },
 ];
 
+function parseOssBucketDomain(domain: string) {
+  const normalized = domain.trim().replace(/^https?:\/\//, '').split('/')[0];
+  const firstDot = normalized.indexOf('.');
+
+  if (!normalized || firstDot <= 0) {
+    return null;
+  }
+
+  const bucket = normalized.slice(0, firstDot);
+  const endpoint = normalized.slice(firstDot + 1);
+  const region = endpoint.split('.')[0] || 'oss-cn-hangzhou';
+
+  return { bucket, endpoint, region };
+}
+
 export default function SetupWizard() {
   const [step, setStep] = useState(0);
   const [loading, setLoading] = useState(false);
@@ -28,7 +43,7 @@ export default function SetupWizard() {
   const [site, setSite] = useState({ site_title: '', site_description: '', site_keywords: '', site_url: '', icp_number: '' });
   const [services, setServices] = useState({
     smtp_host: '', smtp_port: '465', smtp_user: '', smtp_pass: '',
-    oss_endpoint: '', oss_region: '', oss_bucket: '', oss_access_key_id: '', oss_access_key_secret: '', esa_domain: '',
+    oss_bucket_domain: '', oss_endpoint: '', oss_region: 'oss-cn-hangzhou', oss_bucket: '', oss_access_key_id: '', oss_access_key_secret: '', esa_domain: '',
   });
 
   async function handleFinish() {
@@ -36,8 +51,17 @@ export default function SetupWizard() {
     setLoading(true);
     try {
       const settings: Record<string, string> = {};
+      const { oss_bucket_domain: ossBucketDomainValue, ...normalizedServices } = services;
+      const ossBucketDomain = parseOssBucketDomain(ossBucketDomainValue);
+
+      if (ossBucketDomain) {
+        normalizedServices.oss_bucket = ossBucketDomain.bucket;
+        normalizedServices.oss_endpoint = ossBucketDomain.endpoint;
+        normalizedServices.oss_region = ossBucketDomain.region;
+      }
+
       for (const [k, v] of Object.entries(site)) { if (v) settings[k] = v; }
-      for (const [k, v] of Object.entries(services)) { if (v) settings[k] = v; }
+      for (const [k, v] of Object.entries(normalizedServices)) { if (v) settings[k] = v; }
 
       const res = await fetch('/api/setup', {
         method: 'POST',
@@ -146,17 +170,9 @@ export default function SetupWizard() {
             <div>
               <p className="text-sm font-medium mb-2">对象存储 (OSS)</p>
               <div className="grid grid-cols-2 gap-3">
-                <div className="space-y-1.5">
-                  <Label>Endpoint</Label>
-                  <Input value={services.oss_endpoint} onChange={e => setServices(s => ({ ...s, oss_endpoint: e.target.value }))} placeholder="oss-cn-hangzhou.aliyuncs.com" />
-                </div>
-                <div className="space-y-1.5">
-                  <Label>Region</Label>
-                  <Input value={services.oss_region} onChange={e => setServices(s => ({ ...s, oss_region: e.target.value }))} placeholder="cn-hangzhou" />
-                </div>
-                <div className="space-y-1.5">
-                  <Label>Bucket</Label>
-                  <Input value={services.oss_bucket} onChange={e => setServices(s => ({ ...s, oss_bucket: e.target.value }))} placeholder="my-bucket" />
+                <div className="space-y-1.5 col-span-2">
+                  <Label>Bucket 域名</Label>
+                  <Input value={services.oss_bucket_domain} onChange={e => setServices(s => ({ ...s, oss_bucket_domain: e.target.value }))} placeholder="star-lemon-website.oss-rg-china-mainland.aliyuncs.com" />
                 </div>
                 <div className="space-y-1.5">
                   <Label>Access Key ID</Label>
@@ -167,8 +183,8 @@ export default function SetupWizard() {
                   <Input type="password" value={services.oss_access_key_secret} onChange={e => setServices(s => ({ ...s, oss_access_key_secret: e.target.value }))} placeholder="OSS密钥" />
                 </div>
                 <div className="space-y-1.5">
-                  <Label>ESA域名</Label>
-                  <Input value={services.esa_domain} onChange={e => setServices(s => ({ ...s, esa_domain: e.target.value }))} placeholder="cdn.star-lemon.top" />
+                  <Label>ESA / CDN 域名（可选）</Label>
+                  <Input value={services.esa_domain} onChange={e => setServices(s => ({ ...s, esa_domain: e.target.value }))} placeholder="cdn.star-lemon.top，不要带 https://" />
                 </div>
               </div>
             </div>

@@ -1,12 +1,12 @@
 declare module 'ali-oss' {
   interface OSSOptions {
-    endpoint: string;
+    endpoint?: string;
     accessKeyId: string;
     accessKeySecret: string;
     bucket: string;
     region?: string;
     secure?: boolean;
-    [key: string]: any;
+    [key: string]: unknown;
   }
 
   interface SignatureUrlOptions {
@@ -16,7 +16,7 @@ declare module 'ali-oss' {
     response?: {
       [key: string]: string;
     };
-    [key: string]: any;
+    [key: string]: unknown;
   }
 
   interface PutResult {
@@ -31,7 +31,8 @@ declare module 'ali-oss' {
   class OSS {
     constructor(options: OSSOptions);
     put(key: string, buffer: Buffer): Promise<PutResult>;
-    delete(key: string): Promise<any>;
+    multipartUpload(key: string, file: string, options?: { progress?: (pct: number) => void | Promise<void>; [key: string]: unknown }): Promise<{ name?: string }>;
+    delete(key: string): Promise<unknown>;
     signatureUrl(key: string, options?: SignatureUrlOptions): string;
   }
 

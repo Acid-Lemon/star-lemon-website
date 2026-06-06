@@ -15,33 +15,6 @@ jobs:
     environment: production
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Set up pnpm
-        uses: pnpm/action-setup@v4
-        with:
-          version: 9.15.4
-
-      - name: Set up Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: 24
-          cache: pnpm
-
-      - name: Install dependencies
-        run: |
-          pnpm install --frozen-lockfile
-
-      - name: Build Next.js standalone app
-        run: |
-          pnpm build
-          mkdir -p .next/standalone/.next
-          cp -r public .next/standalone/public
-          cp -r .next/static .next/standalone/.next/static
-          tar -czf /tmp/star-lemon-standalone.tar.gz -C .next/standalone .
-          ls -lh /tmp/star-lemon-standalone.tar.gz
-
       - name: Deploy to server
         run: |
           mkdir -p ~/.ssh
@@ -53,25 +26,21 @@ jobs:
 
           echo "Starting remote deploy..."
 
-          echo "Uploading standalone bundle..."
-          ls -lh /tmp/star-lemon-standalone.tar.gz
-          if ssh $SSH_OPTS ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_IP }} "command -v rsync >/dev/null 2>&1"; then
-            rsync -az --info=progress2 -e "ssh $SSH_OPTS" /tmp/star-lemon-standalone.tar.gz ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_IP }}:/tmp/
-          else
-            echo "rsync is not available on the server; falling back to scp without progress output."
-            scp $SSH_OPTS /tmp/star-lemon-standalone.tar.gz ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_IP }}:/tmp/
-          fi
-
-          ssh $SSH_OPTS ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_IP }} bash -s << 'ENDSSH'
+          ssh $SSH_OPTS ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_IP }} \
+            GITHUB_TOKEN='${{ secrets.GITHUB_TOKEN }}' \
+            GITHUB_REPOSITORY='${{ github.repository }}' \
+            GITHUB_REF_NAME='${{ github.ref_name }}' \
+            GITHUB_SHA='${{ github.sha }}' \
+            bash -s << 'ENDSSH'
           set -e
           APP_DIR="/opt/star-lemon"
-          RELEASE_DIR="$APP_DIR/releases/${{ github.sha }}"
-          SHARED_ENV="$APP_DIR/shared/.env.local"
+          SAFE_REPO_URL="https://github.com/$GITHUB_REPOSITORY.git"
+          AUTH_HEADER="AUTHORIZATION: bearer $GITHUB_TOKEN"
 
-          echo "=== Star Lemon Standalone Deploy ==="
+          echo "=== Star Lemon 1Panel Runtime Deploy ==="
 
-          if ! command -v node >/dev/null 2>&1; then
-            echo "ERROR: Node.js is required on the server."
+          if ! command -v git >/dev/null 2>&1; then
+            echo "ERROR: git is required on the server."
             exit 1
           fi
 
@@ -85,34 +54,23 @@ jobs:
             exit 1
           fi
 
-          echo "[1/5] Preparing release directory..."
-          mkdir -p "$RELEASE_DIR" "$APP_DIR/releases" "$APP_DIR/shared"
-          tar -xzf /tmp/star-lemon-standalone.tar.gz -C "$RELEASE_DIR"
-          rm -f /tmp/star-lemon-standalone.tar.gz
-
-          echo "[2/5] Switching current release..."
-          ln -sfn "$RELEASE_DIR" "$APP_DIR/current"
-
-          echo "[3/5] Stopping previous app..."
-          if [ -f "$APP_DIR/app.pid" ] && kill -0 "$(cat "$APP_DIR/app.pid")" 2>/dev/null; then
-            kill "$(cat "$APP_DIR/app.pid")"
-          fi
-
-          echo "[4/5] Starting app..."
-          cd "$APP_DIR/current"
-          set -a
-          [ -f "$SHARED_ENV" ] && . "$SHARED_ENV"
-          set +a
-          NODE_ENV=production PORT=3000 HOSTNAME=0.0.0.0 nohup node server.js > "$APP_DIR/app.log" 2>&1 &
-          echo $! > "$APP_DIR/app.pid"
-
-          echo "[5/5] Health check..."
-          sleep 5
-          if curl -fsS http://127.0.0.1:3000 >/dev/null; then
-            echo "=== Deploy completed ==="
-          else
-            echo "ERROR: App health check failed"
-            tail -100 "$APP_DIR/app.log"
+          if ! command -v docker >/dev/null 2>&1; then
+            echo "ERROR: docker is required to restart the 1Panel runtime container."
             exit 1
           fi
+
+          echo "[1/3] Syncing source code..."
+          if [ ! -d "$APP_DIR/.git" ]; then
+            git -C "$APP_DIR" init
+          fi
+          git -C "$APP_DIR" remote remove origin >/dev/null 2>&1 || true
+          git -C "$APP_DIR" remote add origin "$SAFE_REPO_URL"
+          git -C "$APP_DIR" -c http.extraheader="$AUTH_HEADER" fetch --depth 1 origin "$GITHUB_REF_NAME"
+          git -C "$APP_DIR" checkout -B "$GITHUB_REF_NAME" FETCH_HEAD
+          git -C "$APP_DIR" reset --hard "$GITHUB_SHA"
+
+          echo "[2/3] Restarting 1Panel runtime container..."
+          docker restart star-lemon
+
+          echo "[3/3] Deploy completed."
           ENDSSH

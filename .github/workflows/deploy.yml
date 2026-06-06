@@ -35,7 +35,12 @@ jobs:
           set -e
           APP_DIR="/opt/star-lemon"
           SAFE_REPO_URL="https://github.com/$GITHUB_REPOSITORY.git"
-          AUTH_HEADER="AUTHORIZATION: bearer $GITHUB_TOKEN"
+          AUTH_REPO_URL="https://x-access-token:$GITHUB_TOKEN@github.com/$GITHUB_REPOSITORY.git"
+
+          cleanup_auth_remote() {
+            git -C "$APP_DIR" remote set-url origin "$SAFE_REPO_URL" >/dev/null 2>&1 || true
+          }
+          trap cleanup_auth_remote EXIT
 
           echo "=== Star Lemon 1Panel Runtime Deploy ==="
 
@@ -61,13 +66,14 @@ jobs:
 
           echo "[1/3] Syncing source code..."
           if [ ! -d "$APP_DIR/.git" ]; then
-            git -C "$APP_DIR" init
+            git -C "$APP_DIR" init -b "$GITHUB_REF_NAME"
           fi
           git -C "$APP_DIR" remote remove origin >/dev/null 2>&1 || true
-          git -C "$APP_DIR" remote add origin "$SAFE_REPO_URL"
-          git -C "$APP_DIR" -c http.extraheader="$AUTH_HEADER" fetch --depth 1 origin "$GITHUB_REF_NAME"
+          git -C "$APP_DIR" remote add origin "$AUTH_REPO_URL"
+          git -C "$APP_DIR" fetch --depth 1 origin "$GITHUB_REF_NAME"
           git -C "$APP_DIR" checkout -B "$GITHUB_REF_NAME" FETCH_HEAD
           git -C "$APP_DIR" reset --hard "$GITHUB_SHA"
+          cleanup_auth_remote
 
           echo "[2/3] Restarting 1Panel runtime container..."
           docker restart star-lemon

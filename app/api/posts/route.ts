@@ -4,13 +4,22 @@ import { getPublicUrl } from '../../../lib/oss';
 import { getSession } from '../../../lib/auth';
 import { generateSummary } from '../../../lib/ai';
 
+interface PostListRow {
+    cover: string | null;
+    author_avatar: string | null;
+    [key: string]: unknown;
+}
+
 export async function POST(request: NextRequest) {
+    let stage = '初始化';
     try {
+        stage = '校验登录';
         const session = await getSession();
         if (!session || session.user?.role !== 'admin') {
             return NextResponse.json({ error: '无权限' }, { status: 403 });
         }
 
+        stage = '解析请求';
         const body = await request.json();
         const { title, content, tags, cover } = body;
 
@@ -21,8 +30,10 @@ export async function POST(request: NextRequest) {
         const tagsArray = (tags || '').split(',').map((t: string) => t.trim()).filter((t: string) => t);
         const pgTags = tagsArray.length > 0 ? `{${tagsArray.join(',')}}` : '{}';
 
+        stage = '生成文章摘要';
         const summary = await generateSummary({ title, content });
 
+        stage = '写入文章数据';
         const result = await db.query(
             'INSERT INTO posts (title, author_id, tags, summary, content, cover) VALUES ($1, $2, $3, $4, $5, $6) RETURNING id',
             [title, session.user.id, pgTags, summary, content, cover || null]
@@ -30,8 +41,9 @@ export async function POST(request: NextRequest) {
 
         return NextResponse.json({ success: true, id: result.rows[0].id });
     } catch (e) {
-        console.error('Create post error:', e);
-        return NextResponse.json({ error: '发布失败' }, { status: 500 });
+        const detail = e instanceof Error ? e.message : String(e);
+        console.error(`Create post error at stage "${stage}":`, e);
+        return NextResponse.json({ error: `${stage}失败`, detail }, { status: 500 });
     }
 }
 
@@ -49,7 +61,7 @@ export async function GET(request: Request) {
             LEFT JOIN users ON posts.author_id = users.id 
         `;
         const conditions: string[] = [];
-        const params: any[] = [];
+        const params: (string | number)[] = [];
         let paramIndex = 1;
 
         if (search) {
@@ -75,7 +87,7 @@ export async function GET(request: Request) {
         const result = await db.query(query, params);
 
         const posts = await Promise.all(
-            result.rows.map(async (row: any) => ({
+            result.rows.map(async (row: PostListRow) => ({
                 ...row,
                 cover: await getPublicUrl(row.cover),
                 author_avatar: await getPublicUrl(row.author_avatar),

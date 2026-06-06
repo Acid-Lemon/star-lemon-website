@@ -18,7 +18,7 @@ export async function PUT(
     const { nickname, role, password, sl_coin } = body;
 
     const updates: string[] = [];
-    const values: any[] = [];
+    const values: (string | number)[] = [];
     let paramIndex = 1;
 
     if (nickname !== undefined) {

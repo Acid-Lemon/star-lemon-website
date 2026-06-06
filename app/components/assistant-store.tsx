@@ -23,7 +23,7 @@ interface AssistantActions {
   setStreaming: (streaming: boolean) => void;
   setStreamingContent: (content: string) => void;
   appendStreamingContent: (chunk: string) => void;
-  finalizeStreaming: () => void;
+  finalizeStreaming: () => Message | null;
   clearMessages: () => void;
 }
 
@@ -96,17 +96,20 @@ export function AssistantProvider({ children }: { children: ReactNode }) {
 
   const finalizeStreaming = useCallback(() => {
     const content = streamingRef.current;
+    let message: Message | null = null;
     if (content) {
-      addMessage({
+      message = {
         id: `msg-${Date.now()}`,
         role: 'assistant',
         content,
         timestamp: Date.now(),
-      });
+      };
+      addMessage(message);
     }
     streamingRef.current = '';
     setIsStreaming(false);
     setStreamingContentState('');
+    return message;
   }, [addMessage]);
 
   const clearMessages = useCallback(() => {

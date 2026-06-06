@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useRef, useCallback, useEffect } from 'react';
+import { forwardRef, useState, useRef, useCallback, useEffect, useImperativeHandle } from 'react';
 import { RiImageLine } from '@remixicon/react';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
@@ -8,9 +8,19 @@ import { toast } from 'sonner';
 interface CoverUploadProps {
   defaultValue?: string;
   onChange?: (url: string) => void;
+  deferUpload?: boolean;
 }
 
-export function CoverUpload({ defaultValue, onChange }: CoverUploadProps) {
+export interface CoverUploadHandle {
+  hasPendingCover: () => boolean;
+  uploadPendingCover: () => Promise<string | null>;
+  reset: () => void;
+}
+
+export const CoverUpload = forwardRef<CoverUploadHandle, CoverUploadProps>(function CoverUpload(
+  { defaultValue, onChange, deferUpload = false },
+  ref
+) {
   const [cover, setCover] = useState(defaultValue || '');
   const [uploading, setUploading] = useState(false);
   const [showCropper, setShowCropper] = useState(false);
@@ -25,10 +35,45 @@ export function CoverUpload({ defaultValue, onChange }: CoverUploadProps) {
   const imageRef = useRef<HTMLImageElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const submittingRef = useRef(false);
+  const skipNextSubmitRef = useRef(false);
   const dragRef = useRef({ dragging: false, startX: 0, startY: 0, startCropX: 0, startCropY: 0 });
 
   const fitScale = cropData.w > 0 ? 640 / cropData.w : 1;
   const displayScale = fitScale * cropScale;
+
+  const uploadPendingCover = useCallback(async () => {
+    if (!pendingBlob) return cover || null;
+
+    setUploading(true);
+
+    try {
+      const formData = new FormData();
+      formData.append('file', pendingBlob, 'cover.jpg');
+
+      const res = await fetch('/api/upload', {
+        method: 'POST',
+        body: formData,
+      });
+
+      if (!res.ok) {
+        throw new Error('封面上传失败');
+      }
+
+      const data = await res.json();
+      setCover(data.url);
+      onChange?.(data.url);
+
+      const hiddenInput = containerRef.current?.querySelector('input[name="cover"]') as HTMLInputElement | null;
+      if (hiddenInput) hiddenInput.value = data.url;
+
+      if (previewUrl) URL.revokeObjectURL(previewUrl);
+      setPreviewUrl('');
+      setPendingBlob(null);
+      return data.url as string;
+    } finally {
+      setUploading(false);
+    }
+  }, [cover, onChange, pendingBlob, previewUrl]);
 
   useEffect(() => {
     return () => {
@@ -37,6 +82,8 @@ export function CoverUpload({ defaultValue, onChange }: CoverUploadProps) {
   }, [previewUrl]);
 
   useEffect(() => {
+    if (deferUpload) return;
+
     const container = containerRef.current;
     if (!container) return;
 
@@ -44,6 +91,10 @@ export function CoverUpload({ defaultValue, onChange }: CoverUploadProps) {
     if (!form) return;
 
     const handleSubmit = async (e: Event) => {
+      if (skipNextSubmitRef.current) {
+        skipNextSubmitRef.current = false;
+        return;
+      }
       if (!pendingBlob || submittingRef.current) return;
 
       e.preventDefault();
@@ -52,29 +103,10 @@ export function CoverUpload({ defaultValue, onChange }: CoverUploadProps) {
       setUploading(true);
 
       try {
-        const formData = new FormData();
-        formData.append('file', pendingBlob, 'cover.jpg');
-
-        const res = await fetch('/api/upload', {
-          method: 'POST',
-          body: formData,
-        });
-
-        if (res.ok) {
-          const data = await res.json();
-          setCover(data.url);
-          onChange?.(data.url);
-
-          const hiddenInput = container?.querySelector('input[name="cover"]') as HTMLInputElement;
-          if (hiddenInput) hiddenInput.value = data.url;
-
-          if (previewUrl) URL.revokeObjectURL(previewUrl);
-          setPreviewUrl('');
-          setPendingBlob(null);
-        } else {
-          toast.error('封面上传失败');
-          submittingRef.current = false;
-        }
+        await uploadPendingCover();
+        submittingRef.current = false;
+        skipNextSubmitRef.current = true;
+        window.setTimeout(() => form.requestSubmit(), 0);
       } catch {
         toast.error('封面上传失败');
         submittingRef.current = false;
@@ -87,7 +119,7 @@ export function CoverUpload({ defaultValue, onChange }: CoverUploadProps) {
     return () => {
       form.removeEventListener('submit', handleSubmit);
     };
-  }, [pendingBlob, previewUrl, onChange]);
+  }, [deferUpload, pendingBlob, uploadPendingCover]);
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -219,7 +251,26 @@ export function CoverUpload({ defaultValue, onChange }: CoverUploadProps) {
     }
   };
 
+  const reset = useCallback(() => {
+    if (previewUrl) URL.revokeObjectURL(previewUrl);
+    setCover(defaultValue || '');
+    setPreviewUrl('');
+    setPendingBlob(null);
+    setOriginalImage('');
+    setShowCropper(false);
+    onChange?.(defaultValue || '');
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
+  }, [defaultValue, onChange, previewUrl]);
+
   const displayUrl = previewUrl || cover;
+
+  useImperativeHandle(ref, () => ({
+    hasPendingCover: () => !!pendingBlob,
+    uploadPendingCover,
+    reset,
+  }), [pendingBlob, reset, uploadPendingCover]);
 
   return (
     <div ref={containerRef} className="space-y-3">
@@ -358,4 +409,4 @@ export function CoverUpload({ defaultValue, onChange }: CoverUploadProps) {
       />
     </div>
   );
-}
+});

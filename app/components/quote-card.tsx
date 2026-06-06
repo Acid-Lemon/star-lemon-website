@@ -30,6 +30,8 @@ const categoryIcons: Record<string, React.ReactNode> = {
     '其他': <RiMoreLine className="w-3 h-3 mr-1" />,
 };
 
+const cardClassName = 'w-full min-h-[156px] bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-800 shadow-sm p-5 flex flex-col';
+
 export function QuoteCard() {
     const [quote, setQuote] = useState<Quote | null>(null);
     const [loading, setLoading] = useState(true);
@@ -54,20 +56,41 @@ export function QuoteCard() {
 
     if (loading) {
         return (
-            <div className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-800 shadow-sm p-5">
-                <div className="animate-pulse space-y-3">
-                    <div className="h-4 bg-gray-100 dark:bg-gray-800 rounded w-3/4" />
-                    <div className="h-4 bg-gray-100 dark:bg-gray-800 rounded w-1/2" />
-                    <div className="h-3 bg-gray-100 dark:bg-gray-800 rounded w-1/4" />
+            <div className={cardClassName}>
+                <div className="flex items-center justify-between mb-3">
+                    <div className="h-4 bg-gray-100 dark:bg-gray-800 rounded w-10 animate-pulse" />
+                    <div className="h-3 bg-gray-100 dark:bg-gray-800 rounded w-12 animate-pulse" />
+                </div>
+                <div className="animate-pulse space-y-3 flex-1 py-1">
+                    <div className="h-4 bg-gray-100 dark:bg-gray-800 rounded w-full" />
+                    <div className="h-4 bg-gray-100 dark:bg-gray-800 rounded w-2/3" />
+                    <div className="h-3 bg-gray-100 dark:bg-gray-800 rounded w-1/3 mt-4" />
                 </div>
             </div>
         );
     }
 
-    if (!quote) return null;
+    if (!quote) {
+        return (
+            <div className={cardClassName}>
+                <div className="flex items-center justify-between mb-3">
+                    <h3 className="text-sm font-semibold text-gray-900 dark:text-gray-100">一言</h3>
+                    <button
+                        onClick={fetchRandom}
+                        className="text-xs text-blue-500 dark:text-blue-400 hover:text-blue-600 dark:hover:text-blue-300 transition-colors font-medium"
+                    >
+                        重试
+                    </button>
+                </div>
+                <div className="flex-1 flex items-center justify-center text-sm text-gray-400 dark:text-gray-500">
+                    暂无一言
+                </div>
+            </div>
+        );
+    }
 
     return (
-        <div className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-800 shadow-sm p-5">
+        <div className={cardClassName}>
             <div className="flex items-center justify-between mb-3">
                 <h3 className="text-sm font-semibold text-gray-900 dark:text-gray-100">一言</h3>
                 <button
@@ -78,7 +101,7 @@ export function QuoteCard() {
                 </button>
             </div>
 
-            <div className="relative pl-4 border-l-2 border-blue-200 dark:border-blue-800">
+            <div className="relative pl-4 border-l-2 border-blue-200 dark:border-blue-800 flex-1">
                 <p className="text-sm text-gray-700 dark:text-gray-300 leading-relaxed break-words font-serif">
                     {quote.content}
                 </p>

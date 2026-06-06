@@ -41,6 +41,43 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
     }
 }
 
+export async function PATCH(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+    let stage = '初始化';
+    try {
+        stage = '校验登录';
+        const session = await getSession();
+        if (!session || session.user?.role !== 'admin') {
+            return NextResponse.json({ error: '无权限' }, { status: 403 });
+        }
+
+        stage = '解析请求';
+        const { id } = await params;
+        const body = await request.json();
+        const { cover, oldCover } = body;
+
+        stage = '删除旧封面';
+        if (oldCover && cover !== oldCover) {
+            await deleteUploadedFile(oldCover);
+        }
+
+        stage = '更新封面';
+        const result = await db.query(
+            'UPDATE posts SET cover = $1 WHERE id = $2 RETURNING id',
+            [cover || null, id]
+        );
+
+        if (result.rowCount === 0) {
+            return NextResponse.json({ error: '文章不存在' }, { status: 404 });
+        }
+
+        return NextResponse.json({ success: true });
+    } catch (e) {
+        const detail = e instanceof Error ? e.message : String(e);
+        console.error(`Update post cover error at stage "${stage}":`, e);
+        return NextResponse.json({ error: `${stage}失败`, detail }, { status: 500 });
+    }
+}
+
 export async function DELETE(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
     try {
         const session = await getSession();

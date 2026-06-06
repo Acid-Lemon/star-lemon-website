@@ -35,6 +35,8 @@ const categoryIcons: Record<string, React.ReactNode> = {
     '其他': <RiMoreLine className="w-3 h-3 mr-1" />,
 };
 
+const quoteCardClassName = 'w-full min-h-[156px] bg-white dark:bg-gray-900 border-gray-100 dark:border-gray-800';
+
 export default function QuotesClient() {
     const [quoteList, setQuoteList] = useState<Quote[]>([]);
     const [loading, setLoading] = useState(true);
@@ -59,12 +61,12 @@ export default function QuotesClient() {
     }, [fetchAll]);
 
     return (
-        <div className="max-w-6xl mx-auto">
+        <div className="w-full max-w-6xl mx-auto">
             {loading ? (
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                     {Array.from({ length: 6 }).map((_, i) => (
-                        <Card key={i}>
-                            <CardContent className="p-5 space-y-3">
+                        <Card key={i} className={quoteCardClassName}>
+                            <CardContent className="p-5 space-y-3 h-full">
                                 <Skeleton className="h-4 w-16" />
                                 <Skeleton className="h-5 w-full" />
                                 <Skeleton className="h-5 w-3/4" />
@@ -78,7 +80,7 @@ export default function QuotesClient() {
                     {quoteList.map((item) => (
                         <Card
                             key={item.id}
-                            className="transition-all hover:shadow-md bg-white dark:bg-gray-900 border-gray-100 dark:border-gray-800"
+                            className={`transition-all hover:shadow-md ${quoteCardClassName}`}
                         >
                             <CardContent className="p-5 flex flex-col h-full">
                                 <div className="flex items-center gap-2 mb-3">
@@ -100,8 +102,8 @@ export default function QuotesClient() {
                     ))}
                 </div>
             ) : (
-                <Card className="max-w-md mx-auto bg-white dark:bg-gray-900 border-gray-100 dark:border-gray-800">
-                    <CardContent className="p-8 text-center">
+                <Card className={quoteCardClassName}>
+                    <CardContent className="p-8 text-center min-h-[156px] flex items-center justify-center">
                         <p className="text-muted-foreground dark:text-gray-500 text-sm">暂无一言</p>
                     </CardContent>
                 </Card>

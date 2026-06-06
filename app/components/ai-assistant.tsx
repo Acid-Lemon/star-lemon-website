@@ -166,8 +166,6 @@ export function AiAssistant() {
       }
 
       let buffer = '';
-      let assistantContent = '';
-
       while (true) {
         const { done, value } = await reader.read();
         if (done) break;
@@ -186,7 +184,6 @@ export function AiAssistant() {
           try {
             const parsed = JSON.parse(data);
             if (parsed.content) {
-              assistantContent += parsed.content;
               store.appendStreamingContent(parsed.content);
             }
           } catch {
@@ -195,9 +192,9 @@ export function AiAssistant() {
         }
       }
 
-      store.finalizeStreaming();
-      if (autoRead && ttsAvailable && assistantContent.trim()) {
-        void playTts(assistantContent, `auto-${Date.now()}`);
+      const assistantMessage = store.finalizeStreaming();
+      if (autoRead && ttsAvailable && assistantMessage) {
+        void playTts(assistantMessage.content, assistantMessage.id);
       }
     } catch (error: unknown) {
       if (error instanceof Error && error.name === 'AbortError') {

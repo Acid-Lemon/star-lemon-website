@@ -12,7 +12,7 @@ import {AlertDialog, AlertDialogContent, AlertDialogHeader, AlertDialogMedia, Al
 import {Avatar, AvatarImage, AvatarFallback} from '@/components/ui/avatar';
 import {Badge} from '@/components/ui/badge';
 import {Select, SelectTrigger, SelectValue, SelectContent, SelectItem} from '@/components/ui/select';
-import {RiUserLine, RiEditLine, RiDeleteBinLine, RiShieldUserLine} from '@remixicon/react';
+import {RiAddLine, RiEditLine, RiDeleteBinLine, RiShieldUserLine} from '@remixicon/react';
 
 interface User {
     id: number;
@@ -28,6 +28,10 @@ interface User {
     updated_at: string;
 }
 
+function getRoleLabel(role: string) {
+    return role === 'admin' ? '管理员' : '普通用户';
+}
+
 export default function UsersPage() {
     const [users, setUsers] = useState<User[]>([]);
     const [loading, setLoading] = useState(true);
@@ -37,6 +41,13 @@ export default function UsersPage() {
     const [editPassword, setEditPassword] = useState('');
     const [editSlCoin, setEditSlCoin] = useState(0);
     const [saving, setSaving] = useState(false);
+    const [createOpen, setCreateOpen] = useState(false);
+    const [createEmail, setCreateEmail] = useState('');
+    const [createNickname, setCreateNickname] = useState('');
+    const [createPassword, setCreatePassword] = useState('');
+    const [createRole, setCreateRole] = useState('user');
+    const [createSlCoin, setCreateSlCoin] = useState(0);
+    const [creating, setCreating] = useState(false);
     const [deleteUser, setDeleteUser] = useState<User | null>(null);
     const [deleting, setDeleting] = useState(false);
 
@@ -79,7 +90,11 @@ export default function UsersPage() {
 
         setSaving(true);
         try {
-            const body: any = {nickname: editNickname.trim(), role: editRole, sl_coin: editSlCoin};
+            const body: { nickname: string; role: string; sl_coin: number; password?: string } = {
+                nickname: editNickname.trim(),
+                role: editRole,
+                sl_coin: editSlCoin,
+            };
             if (editPassword) {
                 body.password = editPassword;
             }
@@ -102,6 +117,52 @@ export default function UsersPage() {
             toast.error('更新失败');
         } finally {
             setSaving(false);
+        }
+    };
+
+    const resetCreateForm = () => {
+        setCreateEmail('');
+        setCreateNickname('');
+        setCreatePassword('');
+        setCreateRole('user');
+        setCreateSlCoin(0);
+    };
+
+    const handleCreateSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
+
+        if (!createEmail.trim() || !createNickname.trim() || !createPassword) {
+            toast.error('请填写邮箱、昵称和密码');
+            return;
+        }
+
+        setCreating(true);
+        try {
+            const res = await fetch('/api/admin/users', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({
+                    email: createEmail.trim(),
+                    nickname: createNickname.trim(),
+                    password: createPassword,
+                    role: createRole,
+                    sl_coin: createSlCoin,
+                }),
+            });
+
+            const data = await res.json().catch(() => ({}));
+            if (res.ok) {
+                toast.success('用户创建成功');
+                setCreateOpen(false);
+                resetCreateForm();
+                fetchUsers();
+            } else {
+                toast.error(data.error || '创建失败');
+            }
+        } catch {
+            toast.error('创建失败');
+        } finally {
+            setCreating(false);
         }
     };
 
@@ -128,9 +189,9 @@ export default function UsersPage() {
 
     const getRoleBadge = (role: string) => {
         if (role === 'admin') {
-            return <Badge variant="default" className="gap-1"><RiShieldUserLine className="w-3 h-3"/>管理员</Badge>;
+            return <Badge variant="default" className="gap-1"><RiShieldUserLine className="w-3 h-3"/>{getRoleLabel(role)}</Badge>;
         }
-        return <Badge variant="secondary">普通用户</Badge>;
+        return <Badge variant="secondary">{getRoleLabel(role)}</Badge>;
     };
 
     if (loading) {
@@ -141,7 +202,13 @@ export default function UsersPage() {
         <div className="space-y-6">
             <div className="flex items-center justify-between">
                 <h1 className="text-2xl font-bold">用户管理</h1>
-                <div className="text-sm text-muted-foreground">共 {users.length} 个用户</div>
+                <div className="flex items-center gap-3">
+                    <div className="text-sm text-muted-foreground">共 {users.length} 个用户</div>
+                    <Button size="sm" onClick={() => setCreateOpen(true)}>
+                        <RiAddLine className="w-4 h-4"/>
+                        新增用户
+                    </Button>
+                </div>
             </div>
 
             {users.length === 0 ? (
@@ -210,6 +277,53 @@ export default function UsersPage() {
                 </Card>
             )}
 
+            <Dialog open={createOpen} onOpenChange={(open) => { setCreateOpen(open); if (!open) resetCreateForm(); }}>
+                <DialogContent className="sm:max-w-md">
+                    <DialogHeader>
+                        <DialogTitle>新增用户</DialogTitle>
+                        <DialogDescription>管理员创建用户无需邮箱验证</DialogDescription>
+                    </DialogHeader>
+                    <form onSubmit={handleCreateSubmit} className="space-y-4">
+                        <div className="space-y-2">
+                            <Label>邮箱</Label>
+                            <Input type="email" value={createEmail} onChange={(e) => setCreateEmail(e.target.value)} placeholder="user@example.com" required/>
+                        </div>
+                        <div className="space-y-2">
+                            <Label>昵称</Label>
+                            <Input value={createNickname} onChange={(e) => setCreateNickname(e.target.value)} placeholder="用户昵称" required/>
+                        </div>
+                        <div className="space-y-2">
+                            <Label>初始密码</Label>
+                            <Input type="password" value={createPassword} onChange={(e) => setCreatePassword(e.target.value)} placeholder="至少 6 位" minLength={6} required/>
+                        </div>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div className="space-y-2">
+                                <Label>角色</Label>
+                                <Select value={createRole} onValueChange={(v) => { if (v) setCreateRole(v); }}>
+                                    <SelectTrigger className="w-full">
+                                        <SelectValue>{getRoleLabel(createRole)}</SelectValue>
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        <SelectItem value="admin">管理员</SelectItem>
+                                        <SelectItem value="user">普通用户</SelectItem>
+                                    </SelectContent>
+                                </Select>
+                            </div>
+                            <div className="space-y-2">
+                                <Label>星柠币</Label>
+                                <Input type="number" value={createSlCoin} onChange={(e) => setCreateSlCoin(parseInt(e.target.value) || 0)} min={0}/>
+                            </div>
+                        </div>
+                        <DialogFooter>
+                            <DialogClose render={<Button variant="outline" type="button"/>}>取消</DialogClose>
+                            <Button type="submit" disabled={creating}>
+                                {creating ? '创建中...' : '创建用户'}
+                            </Button>
+                        </DialogFooter>
+                    </form>
+                </DialogContent>
+            </Dialog>
+
             <Dialog open={!!editUser} onOpenChange={(open) => { if (!open) setEditUser(null); }}>
                 <DialogContent className="sm:max-w-md">
                     <DialogHeader>
@@ -221,21 +335,23 @@ export default function UsersPage() {
                             <Label>昵称</Label>
                             <Input value={editNickname} onChange={(e) => setEditNickname(e.target.value)} placeholder="用户昵称"/>
                         </div>
-                        <div className="space-y-2">
-                            <Label>角色</Label>
-                            <Select value={editRole} onValueChange={(v) => { if (v) setEditRole(v); }}>
-                                <SelectTrigger>
-                                    <SelectValue/>
-                                </SelectTrigger>
-                                <SelectContent>
-                                    <SelectItem value="admin">管理员</SelectItem>
-                                    <SelectItem value="user">普通用户</SelectItem>
-                                </SelectContent>
-                            </Select>
-                        </div>
-                        <div className="space-y-2">
-                            <Label>星柠币</Label>
-                            <Input type="number" value={editSlCoin} onChange={(e) => setEditSlCoin(parseInt(e.target.value) || 0)} min={0}/>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div className="space-y-2">
+                                <Label>角色</Label>
+                                <Select value={editRole} onValueChange={(v) => { if (v) setEditRole(v); }}>
+                                    <SelectTrigger className="w-full">
+                                        <SelectValue>{getRoleLabel(editRole)}</SelectValue>
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        <SelectItem value="admin">管理员</SelectItem>
+                                        <SelectItem value="user">普通用户</SelectItem>
+                                    </SelectContent>
+                                </Select>
+                            </div>
+                            <div className="space-y-2">
+                                <Label>星柠币</Label>
+                                <Input type="number" value={editSlCoin} onChange={(e) => setEditSlCoin(parseInt(e.target.value) || 0)} min={0}/>
+                            </div>
                         </div>
                         <div className="space-y-2">
                             <Label>重置密码</Label>

@@ -6,7 +6,6 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "start:1panel": "next build && next start",
     "lint": "eslint"
   },
   "dependencies": {
@@ -58,6 +57,9 @@
   },
   "packageManager": "pnpm@9.15.4",
   "pnpm": {
-    "onlyBuiltDependencies": ["sharp", "unrs-resolver"]
+    "onlyBuiltDependencies": [
+      "sharp",
+      "unrs-resolver"
+    ]
   }
 }

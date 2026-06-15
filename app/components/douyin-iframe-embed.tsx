@@ -7,17 +7,21 @@ interface DouyinIframeEmbedProps {
   shortUrl: string;
 }
 
+const DOUYIN_IFRAME_WIDTH = 736;
+const DOUYIN_IFRAME_HEIGHT = 414;
+
 function parseIframeDimensions(code: string): { width: number; height: number } | null {
-  const w = code.match(/width="(\d+)"/);
-  const h = code.match(/height="(\d+)"/);
+  const w = code.match(/width=["']?(\d+)/);
+  const h = code.match(/height=["']?(\d+)/);
   if (!w || !h) return null;
-  return { width: parseInt(w[1]), height: parseInt(h[1]) };
+  return { width: DOUYIN_IFRAME_WIDTH, height: DOUYIN_IFRAME_HEIGHT };
 }
 
 export function DouyinIframeEmbed({ shortUrl }: DouyinIframeEmbedProps) {
   const [iframeCode, setIframeCode] = useState<string | null>(null);
   const [iframeSize, setIframeSize] = useState<{ width: number; height: number } | null>(null);
   const [scale, setScale] = useState(1);
+  const [offset, setOffset] = useState({ x: 0, y: 0 });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -28,21 +32,41 @@ export function DouyinIframeEmbed({ shortUrl }: DouyinIframeEmbedProps) {
   useEffect(() => {
     if (iframeRef.current && iframeCode) {
       iframeRef.current.innerHTML = iframeCode;
+      const iframe = iframeRef.current.querySelector('iframe');
+      if (iframe) {
+        if (iframeSize) {
+          iframe.setAttribute('width', String(iframeSize.width));
+          iframe.setAttribute('height', String(iframeSize.height));
+          iframe.style.width = `${iframeSize.width}px`;
+          iframe.style.height = `${iframeSize.height}px`;
+        }
+        iframe.setAttribute('scrolling', 'no');
+        iframe.setAttribute('border', '0');
+        iframe.setAttribute('frameborder', 'no');
+        iframe.setAttribute('framespacing', '0');
+        iframe.setAttribute('allowfullscreen', 'true');
+        iframe.style.overflow = 'hidden';
+        iframe.style.border = '0';
+        iframe.style.display = 'block';
+      }
     }
-  }, [iframeCode]);
+  }, [iframeCode, iframeSize]);
 
   useEffect(() => {
     let cancelled = false;
-    setLoading(true);
-    setError(false);
+
+    queueMicrotask(() => {
+      if (cancelled) return;
+      setLoading(true);
+      setError(false);
+    });
 
     fetch(`/api/douyin-resolve?url=${encodeURIComponent(shortUrl)}`)
       .then(res => res.json())
       .then(json => {
         if (cancelled) return;
         if (json.iframeCode) {
-          const sandboxedCode = json.iframeCode.replace('<iframe', '<iframe sandbox="allow-scripts allow-same-origin allow-popups allow-forms"');
-          setIframeCode(sandboxedCode);
+          setIframeCode(json.iframeCode);
           setIframeSize(parseIframeDimensions(json.iframeCode));
         } else {
           setError(true);
@@ -60,14 +84,20 @@ export function DouyinIframeEmbed({ shortUrl }: DouyinIframeEmbedProps) {
 
   const updateScale = useCallback(() => {
     if (!containerRef.current || !iframeSize) return;
-    const { width: cw, height: ch } = containerRef.current.getBoundingClientRect();
+    const cw = containerRef.current.clientWidth;
+    const ch = containerRef.current.clientHeight;
     const scaleW = cw / iframeSize.width;
     const scaleH = ch / iframeSize.height;
-    setScale(Math.max(scaleW, scaleH));
+    const nextScale = Math.min(scaleW, scaleH);
+    setScale(nextScale);
+    setOffset({
+      x: (cw - iframeSize.width * nextScale) / 2,
+      y: (ch - iframeSize.height * nextScale) / 2,
+    });
   }, [iframeSize]);
 
   useEffect(() => {
-    updateScale();
+    queueMicrotask(updateScale);
     window.addEventListener('resize', updateScale);
     return () => window.removeEventListener('resize', updateScale);
   }, [updateScale]);
@@ -91,18 +121,22 @@ export function DouyinIframeEmbed({ shortUrl }: DouyinIframeEmbedProps) {
   }
 
   return (
-    <div ref={containerRef} className="mt-3 rounded-xl overflow-hidden border border-gray-200 dark:border-gray-700 w-full aspect-video relative">
+    <div
+      ref={containerRef}
+      className="mt-3 rounded-xl overflow-hidden border border-gray-200 dark:border-gray-700 relative bg-black w-full aspect-video"
+    >
       <div
         ref={iframeRef}
         style={{
           width: iframeSize.width,
           height: iframeSize.height,
+          left: offset.x,
+          top: offset.y,
           transform: `scale(${scale})`,
           transformOrigin: 'top left',
         }}
-        className="absolute top-0 left-0"
+        className="absolute"
       />
     </div>
   );
 }
-

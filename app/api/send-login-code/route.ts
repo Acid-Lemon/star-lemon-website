@@ -1,13 +1,18 @@
 import { NextRequest, NextResponse } from 'next/server';
 import db from '@/lib/db';
 import { sendVerificationCode, generateVerificationCode } from '@/lib/mail';
+import { verifyCaptcha } from '@/lib/captcha';
 
 export async function POST(request: NextRequest) {
   try {
-    const { email } = await request.json();
+    const { email, captchaToken, captchaText } = await request.json();
 
     if (!email) {
       return NextResponse.json({ error: '请提供邮箱地址' }, { status: 400 });
+    }
+
+    if (!await verifyCaptcha(captchaToken, captchaText)) {
+      return NextResponse.json({ error: '图形验证码错误或已过期' }, { status: 400 });
     }
 
     const userResult = await db.query('SELECT id FROM users WHERE email = $1', [email]);

@@ -11,6 +11,17 @@ const BROWSER_HEADERS = {
   'Referer': 'https://www.douyin.com/',
 };
 
+async function fetchWithTimeout(input: string, init: RequestInit = {}, timeoutMs = 8000) {
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), timeoutMs);
+
+  try {
+    return await fetch(input, { ...init, signal: controller.signal });
+  } finally {
+    clearTimeout(timeout);
+  }
+}
+
 function extractVideoId(text: string): string | null {
   const patterns = [
     /douyin\.com\/video\/(\d+)/,
@@ -42,7 +53,7 @@ export async function GET(request: NextRequest) {
   // Step 1: extract video ID from short URL
   let videoId: string | null = null;
   try {
-    const res = await fetch(url, { redirect: 'follow', headers: BROWSER_HEADERS });
+    const res = await fetchWithTimeout(url, { redirect: 'follow', headers: BROWSER_HEADERS });
     videoId = extractVideoId(res.url);
     if (!videoId) {
       videoId = extractVideoId(await res.text());
@@ -54,7 +65,7 @@ export async function GET(request: NextRequest) {
   if (!videoId) {
     try {
       const douyinApiUrl = await getSetting('douyin_api_url', 'https://api.bugpk.com/api/douyin');
-      const parseRes = await fetch(`${douyinApiUrl}?url=${encodeURIComponent(url)}`, {
+      const parseRes = await fetchWithTimeout(`${douyinApiUrl}?url=${encodeURIComponent(url)}`, {
         headers: { 'User-Agent': 'Mozilla/5.0' },
       });
       if (parseRes.ok) {
@@ -75,7 +86,7 @@ export async function GET(request: NextRequest) {
   // Step 2: call official Douyin iframe API
   let iframeCode: string | undefined;
   try {
-    const officialApiRes = await fetch(
+    const officialApiRes = await fetchWithTimeout(
       `https://open.douyin.com/api/douyin/v1/video/get_iframe_by_video?video_id=${videoId}`
     );
     if (officialApiRes.ok) {

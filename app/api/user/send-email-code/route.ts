@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import db from '../../../../lib/db';
 import { getSession } from '../../../../lib/auth';
 import { sendVerificationCode, generateVerificationCode } from '../../../../lib/mail';
+import { verifyCaptcha } from '../../../../lib/captcha';
 
 // 发送修改邮箱的验证码
 export async function POST(request: NextRequest) {
@@ -11,10 +12,14 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: '请先登录' }, { status: 401 });
     }
 
-    const { email } = await request.json();
+    const { email, captchaToken, captchaText } = await request.json();
 
     if (!email) {
       return NextResponse.json({ error: '请提供邮箱地址' }, { status: 400 });
+    }
+
+    if (!await verifyCaptcha(captchaToken, captchaText)) {
+      return NextResponse.json({ error: '图形验证码错误或已过期' }, { status: 400 });
     }
 
     // 检查是否和当前邮箱相同

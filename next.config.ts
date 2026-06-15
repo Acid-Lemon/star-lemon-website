@@ -25,7 +25,7 @@ const nextConfig: NextConfig = {
             },
         ],
     },
-    serverExternalPackages: ['ali-oss', 'urllib', 'proxy-agent'],
+    serverExternalPackages: ['ali-oss', 'urllib', 'proxy-agent', 'svg-captcha'],
     async headers() {
         return [
             {

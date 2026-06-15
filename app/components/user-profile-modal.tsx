@@ -14,6 +14,7 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import {RiLockLine, RiMailLine, RiArrowRightSLine, RiQqFill, RiLinksLine} from '@remixicon/react';
 
 import {UserInfo} from './user-context';
+import {CaptchaInput} from './captcha-input';
 
 interface UserProfileModalProps {
     user: UserInfo | null;
@@ -107,6 +108,8 @@ export function UserProfileModal({user, onClose, onUpdate}: UserProfileModalProp
     const [confirmPassword, setConfirmPassword] = useState('');
     const [newEmail, setNewEmail] = useState('');
     const [emailCode, setEmailCode] = useState('');
+    const [captchaText, setCaptchaText] = useState('');
+    const [captchaToken, setCaptchaToken] = useState('');
     const [securityLoading, setSecurityLoading] = useState(false);
     const [sendingCode, setSendingCode] = useState(false);
     const [countdown, setCountdown] = useState(0);
@@ -238,13 +241,17 @@ export function UserProfileModal({user, onClose, onUpdate}: UserProfileModalProp
             toast.error('请输入新邮箱地址');
             return;
         }
+        if (!captchaText) {
+            toast.error('请先填写图形验证码');
+            return;
+        }
 
         setSendingCode(true);
         try {
             const res = await fetch('/api/user/send-email-code', {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({email: newEmail}),
+                body: JSON.stringify({email: newEmail, captchaToken, captchaText}),
             });
             const data = await res.json();
 
@@ -541,6 +548,14 @@ export function UserProfileModal({user, onClose, onUpdate}: UserProfileModalProp
                                     <div className="space-y-2">
                                         <Label>新邮箱</Label>
                                         <Input type="email" value={newEmail} onChange={(e) => setNewEmail(e.target.value)} placeholder="your.email@example.com" />
+                                    </div>
+                                    <div className="space-y-2">
+                                        <Label>图形验证码</Label>
+                                        <CaptchaInput
+                                            value={captchaText}
+                                            onChange={setCaptchaText}
+                                            onTokenChange={setCaptchaToken}
+                                        />
                                     </div>
                                     <div className="space-y-2">
                                         <Label>验证码</Label>

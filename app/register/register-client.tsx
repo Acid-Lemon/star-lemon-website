@@ -6,6 +6,7 @@ import { RiCloseCircleLine, RiEyeLine, RiEyeOffLine } from '@remixicon/react';
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { CaptchaInput } from "@/app/components/captcha-input";
 
 export default function RegisterClient() {
     const [errorMsg, setErrorMsg] = useState('');
@@ -14,6 +15,8 @@ export default function RegisterClient() {
     const [confirmPassword, setConfirmPassword] = useState('');
     const [nickname, setNickname] = useState('');
     const [code, setCode] = useState('');
+    const [captchaText, setCaptchaText] = useState('');
+    const [captchaToken, setCaptchaToken] = useState('');
     const [showPassword, setShowPassword] = useState(false);
     const [sendingCode, setSendingCode] = useState(false);
     const [countdown, setCountdown] = useState(0);
@@ -25,6 +28,11 @@ export default function RegisterClient() {
             return;
         }
 
+        if (!captchaText) {
+            setErrorMsg('请先填写图形验证码');
+            return;
+        }
+
         setSendingCode(true);
         setErrorMsg('');
 
@@ -32,7 +40,7 @@ export default function RegisterClient() {
             const res = await fetch('/api/send-code', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ email }),
+                body: JSON.stringify({ email, captchaToken, captchaText }),
             });
             const data = await res.json();
 
@@ -119,6 +127,15 @@ export default function RegisterClient() {
                             onChange={(e) => setEmail(e.target.value)}
                             required
                             placeholder="your.email@example.com"
+                        />
+                    </div>
+
+                    <div className="space-y-2">
+                        <label htmlFor="reg-captcha" className="text-sm font-medium leading-none">图形验证码</label>
+                        <CaptchaInput
+                            value={captchaText}
+                            onChange={setCaptchaText}
+                            onTokenChange={setCaptchaToken}
                         />
                     </div>
 

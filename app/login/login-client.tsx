@@ -11,6 +11,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { toast } from 'sonner';
 import { RiQqFill, RiMailLine, RiLockLine, RiEyeLine, RiEyeOffLine } from '@remixicon/react';
 import { QqBindDialog } from '@/app/components/qq-bind-dialog';
+import { CaptchaInput } from '@/app/components/captcha-input';
 
 export default function LoginClientPage({ qqAuthUrl, errorMsg, returnUrl, qqCode, qqState }: {
     qqAuthUrl: string | null;
@@ -23,6 +24,8 @@ export default function LoginClientPage({ qqAuthUrl, errorMsg, returnUrl, qqCode
     const [password, setPassword] = useState('');
     const [showPassword, setShowPassword] = useState(false);
     const [code, setCode] = useState('');
+    const [captchaText, setCaptchaText] = useState('');
+    const [captchaToken, setCaptchaToken] = useState('');
     const [loginLoading, setLoginLoading] = useState(false);
     const [codeSending, setCodeSending] = useState(false);
     const [countdown, setCountdown] = useState(0);
@@ -65,12 +68,16 @@ export default function LoginClientPage({ qqAuthUrl, errorMsg, returnUrl, qqCode
             toast.error('请先输入邮箱');
             return;
         }
+        if (!captchaText) {
+            toast.error('请先填写图形验证码');
+            return;
+        }
         setCodeSending(true);
         try {
             const res = await fetch('/api/send-login-code', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ email }),
+                body: JSON.stringify({ email, captchaToken, captchaText }),
             });
             const data = await res.json();
             if (res.ok) {
@@ -238,6 +245,14 @@ export default function LoginClientPage({ qqAuthUrl, errorMsg, returnUrl, qqCode
                                         onChange={(e) => setEmail(e.target.value)}
                                         placeholder="your.email@example.com"
                                         required
+                                    />
+                                </div>
+                                <div className="space-y-2">
+                                    <Label>图形验证码</Label>
+                                    <CaptchaInput
+                                        value={captchaText}
+                                        onChange={setCaptchaText}
+                                        onTokenChange={setCaptchaToken}
                                     />
                                 </div>
                                 <div className="space-y-2">

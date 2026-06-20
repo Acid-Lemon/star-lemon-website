@@ -61,6 +61,7 @@ async function init() {
       { name: 'bio', type: 'TEXT' },
       { name: 'birthday', type: 'DATE' },
       { name: 'qq_identifier', type: 'TEXT' },
+      { name: 'ceru_identifier', type: 'TEXT' },
       { name: 'sl_coin', type: 'INTEGER DEFAULT 0' },
     ];
     for (const col of userColumns) {

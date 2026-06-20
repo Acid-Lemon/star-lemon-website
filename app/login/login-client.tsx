@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
-import { useRouter, useSearchParams } from 'next/navigation';
+import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -13,12 +13,13 @@ import { RiQqFill, RiMailLine, RiLockLine, RiEyeLine, RiEyeOffLine } from '@remi
 import { QqBindDialog } from '@/app/components/qq-bind-dialog';
 import { CaptchaInput } from '@/app/components/captcha-input';
 
-export default function LoginClientPage({ qqAuthUrl, errorMsg, returnUrl, qqCode, qqState }: {
+export default function LoginClientPage({ qqAuthUrl, ceruAuthUrl, errorMsg, returnUrl, authCode, authState }: {
     qqAuthUrl: string | null;
+    ceruAuthUrl: string | null;
     errorMsg?: string;
     returnUrl: string;
-    qqCode?: string;
-    qqState?: string;
+    authCode?: string;
+    authState?: string;
 }) {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
@@ -30,11 +31,32 @@ export default function LoginClientPage({ qqAuthUrl, errorMsg, returnUrl, qqCode
     const [codeSending, setCodeSending] = useState(false);
     const [countdown, setCountdown] = useState(0);
     const [qqLoading, setQqLoading] = useState(false);
+    const [ceruLoading, setCeruLoading] = useState(false);
     const [showBindDialog, setShowBindDialog] = useState(false);
     const [bindToken, setBindToken] = useState('');
-    const [qqNickname, setQqNickname] = useState('');
-    const [qqAvatar, setQqAvatar] = useState('');
-    const router = useRouter();
+    const [oauthProvider, setOauthProvider] = useState<'qq' | 'ceru'>('qq');
+    const [oauthNickname, setOauthNickname] = useState('');
+    const [oauthAvatar, setOauthAvatar] = useState('');
+    const [oauthEmail, setOauthEmail] = useState('');
+
+    const parseQqState = useCallback((state: string | undefined) => {
+        if (state?.startsWith('qq-bind:')) {
+            return { action: 'bind', returnUrl: state.replace(/^qq-bind:/, '') || returnUrl };
+        }
+        if (state?.startsWith('bind:')) {
+            return { action: 'bind', returnUrl: state.replace(/^bind:/, '') || returnUrl };
+        }
+        if (state?.startsWith('qq:')) {
+            return { action: 'login', returnUrl: state.replace(/^qq:/, '') || returnUrl };
+        }
+
+        return { action: 'login', returnUrl: state || returnUrl };
+    }, [returnUrl]);
+
+    const parseOAuthReturnUrl = useCallback((state: string | undefined) => {
+        if (state?.startsWith('ceru:')) return state.replace(/^ceru:/, '') || returnUrl;
+        return parseQqState(state).returnUrl;
+    }, [parseQqState, returnUrl]);
 
     const handlePasswordLogin = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -137,25 +159,26 @@ export default function LoginClientPage({ qqAuthUrl, errorMsg, returnUrl, qqCode
         if (!code) return;
         setQqLoading(true);
 
-        const isBind = state?.startsWith('bind:');
-        const actualState = isBind ? state!.replace(/^bind:/, '') : (state || returnUrl);
+        const qqState = parseQqState(state);
 
         fetch('/api/auth/qq/callback', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ code, state: actualState, action: isBind ? 'bind' : 'login' }),
+            body: JSON.stringify({ code, state: qqState.returnUrl, action: qqState.action }),
         })
             .then(async (res) => {
                 const data = await res.json();
                 if (res.ok && data.success) {
                     if (data.needs_bind) {
                         setBindToken(data.bind_token);
-                        setQqNickname(data.qq_nickname);
-                        setQqAvatar(data.qq_avatar);
+                        setOauthProvider('qq');
+                        setOauthNickname(data.qq_nickname);
+                        setOauthAvatar(data.qq_avatar);
+                        setOauthEmail('');
                         setShowBindDialog(true);
                         setQqLoading(false);
                     } else {
-                        window.location.href = data.redirectUrl || state || returnUrl;
+                        window.location.href = data.redirectUrl || qqState.returnUrl;
                     }
                 } else {
                     toast.error(data.error || 'QQ登录失败');
@@ -166,11 +189,51 @@ export default function LoginClientPage({ qqAuthUrl, errorMsg, returnUrl, qqCode
                 toast.error('QQ登录失败');
                 setQqLoading(false);
             });
+    }, [parseQqState]);
+
+    useEffect(() => {
+        if (authState?.startsWith('ceru:')) return;
+        handleQqCallback(authCode || '', authState);
+    }, [authCode, authState, handleQqCallback]);
+
+    const handleCeruCallback = useCallback((code: string, state: string | undefined) => {
+        if (!code || !state?.startsWith('ceru:')) return;
+        const actualState = state.replace(/^ceru:/, '') || returnUrl;
+        setCeruLoading(true);
+
+        fetch('/api/auth/ceru/callback', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ code, state: actualState }),
+        })
+            .then(async (res) => {
+                const data = await res.json();
+                if (res.ok && data.success) {
+                    if (data.needs_bind) {
+                        setBindToken(data.bind_token);
+                        setOauthProvider(data.oauth_provider || 'ceru');
+                        setOauthNickname(data.oauth_nickname);
+                        setOauthAvatar(data.oauth_avatar);
+                        setOauthEmail(data.oauth_email || '');
+                        setShowBindDialog(true);
+                        setCeruLoading(false);
+                    } else {
+                        window.location.href = data.redirectUrl || actualState;
+                    }
+                } else {
+                    toast.error(data.error || '澜音登录失败');
+                    setCeruLoading(false);
+                }
+            })
+            .catch(() => {
+                toast.error('澜音登录失败');
+                setCeruLoading(false);
+            });
     }, [returnUrl]);
 
     useEffect(() => {
-        handleQqCallback(qqCode || '', qqState);
-    }, [qqCode, qqState, handleQqCallback]);
+        handleCeruCallback(authCode || '', authState);
+    }, [authCode, authState, handleCeruCallback]);
 
     return (
         <div className="flex-1 flex flex-col items-center justify-center py-10 px-4">
@@ -284,16 +347,32 @@ export default function LoginClientPage({ qqAuthUrl, errorMsg, returnUrl, qqCode
                         </TabsContent>
                     </Tabs>
 
-                    {qqAuthUrl && (
-                        <div className="mt-6 flex justify-center">
-                            <a href={qqAuthUrl}
-                                className={`w-10 h-10 flex items-center justify-center bg-[#12B7F5] hover:bg-[#0aa3e8] text-white rounded-full transition-colors ${qqLoading ? 'opacity-50 pointer-events-none' : ''}`}>
-                                {qqLoading ? (
-                                    <span className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                                ) : (
-                                    <RiQqFill className="w-5 h-5" />
-                                )}
-                            </a>
+                    {(qqAuthUrl || ceruAuthUrl) && (
+                        <div className="mt-6 flex justify-center gap-3">
+                            {ceruAuthUrl && (
+                                <a href={ceruAuthUrl}
+                                    aria-label="使用澜音登录"
+                                    title="使用澜音登录"
+                                    className={`w-10 h-10 flex items-center justify-center bg-[#f8fffb] hover:bg-[#eefbf4] text-foreground rounded-full border border-border transition-colors ${ceruLoading ? 'opacity-50 pointer-events-none' : ''}`}>
+                                    {ceruLoading ? (
+                                        <span className="w-5 h-5 border-2 border-foreground/60 border-t-transparent rounded-full animate-spin" />
+                                    ) : (
+                                        <Image src="/logo/ceru-music.svg" alt="" width={24} height={24} className="rounded-md" />
+                                    )}
+                                </a>
+                            )}
+                            {qqAuthUrl && (
+                                <a href={qqAuthUrl}
+                                    aria-label="使用QQ登录"
+                                    title="使用QQ登录"
+                                    className={`w-10 h-10 flex items-center justify-center bg-[#12B7F5] hover:bg-[#0aa3e8] text-white rounded-full transition-colors ${qqLoading ? 'opacity-50 pointer-events-none' : ''}`}>
+                                    {qqLoading ? (
+                                        <span className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                                    ) : (
+                                        <RiQqFill className="w-5 h-5" />
+                                    )}
+                                </a>
+                            )}
                         </div>
                     )}
 
@@ -309,9 +388,11 @@ export default function LoginClientPage({ qqAuthUrl, errorMsg, returnUrl, qqCode
                     open={showBindDialog}
                     onClose={() => setShowBindDialog(false)}
                     bindToken={bindToken}
-                    qqNickname={qqNickname}
-                    qqAvatar={qqAvatar}
-                    redirectUrl={qqState?.startsWith('bind:') ? qqState.replace(/^bind:/, '') : returnUrl}
+                    oauthProvider={oauthProvider}
+                    oauthNickname={oauthNickname}
+                    oauthAvatar={oauthAvatar}
+                    oauthEmail={oauthEmail}
+                    redirectUrl={parseOAuthReturnUrl(authState)}
                 />
             )}
         </div>

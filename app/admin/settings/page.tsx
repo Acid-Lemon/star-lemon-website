@@ -36,7 +36,7 @@ const categoryMeta: Record<string, { title: string; description: string; icon: s
   douyin: { title: '抖音解析', description: '抖音视频解析接口配置', icon: '🎬' },
 };
 
-const secretKeys = ['smtp_pass', 'summary_api_key', 'assistant_llm_api_key', 'assistant_tts_api_key', 'qq_app_key', 'oss_access_key_secret', 'lantu_key', 'convert_api_key', 'ipapi_is_key'];
+const secretKeys = ['smtp_pass', 'summary_api_key', 'assistant_llm_api_key', 'assistant_tts_api_key', 'qq_app_key', 'ceru_app_secret', 'oss_access_key_secret', 'lantu_key', 'convert_api_key', 'ipapi_is_key'];
 
 const booleanKeys = ['comment_review', 'guestbook_review', 'quote_enabled', 'assistant_enabled'];
 
@@ -93,7 +93,7 @@ const fieldOrder: Record<string, string[]> = {
   mail: ['smtp_host', 'smtp_port', 'smtp_user', 'smtp_pass'],
   summary: ['summary_api_url', 'summary_api_model', 'summary_api_key'],
   ai: ['assistant_enabled', 'assistant_llm_api_url', 'assistant_llm_model', 'assistant_llm_api_key', 'assistant_tts_api_url', 'assistant_tts_model', 'assistant_tts_api_key', 'assistant_system_prompt'],
-  oauth: ['qq_app_id', 'qq_app_key'],
+  oauth: ['qq_app_id', 'qq_app_key', 'ceru_endpoint', 'ceru_app_id', 'ceru_app_secret'],
   oss: ['oss_endpoint', 'oss_region', 'oss_bucket', 'oss_access_key_id', 'oss_access_key_secret', 'esa_domain'],
   pay: ['lantu_mch_id', 'lantu_key'],
   pricing: ['ft_storage_price', 'ft_traffic_price', 'ft_payment_fee', 'ft_service_fee', 'ft_profit_rate'],

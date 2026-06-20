@@ -1,7 +1,9 @@
 interface BindData {
-    openid: string;
+    provider: 'qq' | 'ceru';
+    identifier: string;
     nickname: string;
     avatar: string;
+    email?: string;
     expires: number;
 }
 

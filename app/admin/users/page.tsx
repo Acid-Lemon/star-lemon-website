@@ -1,6 +1,7 @@
 'use client';
 
 import {useState, useEffect} from 'react';
+import Image from 'next/image';
 import {toast} from 'sonner';
 import {Button} from '@/components/ui/button';
 import {Input} from '@/components/ui/input';
@@ -12,7 +13,8 @@ import {AlertDialog, AlertDialogContent, AlertDialogHeader, AlertDialogMedia, Al
 import {Avatar, AvatarImage, AvatarFallback} from '@/components/ui/avatar';
 import {Badge} from '@/components/ui/badge';
 import {Select, SelectTrigger, SelectValue, SelectContent, SelectItem} from '@/components/ui/select';
-import {RiAddLine, RiEditLine, RiDeleteBinLine, RiShieldUserLine} from '@remixicon/react';
+import {Tooltip, TooltipContent, TooltipProvider, TooltipTrigger} from '@/components/ui/tooltip';
+import {RiAddLine, RiEditLine, RiDeleteBinLine, RiShieldUserLine, RiQqFill} from '@remixicon/react';
 
 interface User {
     id: number;
@@ -23,6 +25,7 @@ interface User {
     bio: string | null;
     birthday: string | null;
     qq_identifier: string | null;
+    ceru_identifier: string | null;
     sl_coin: number;
     created_at: string;
     updated_at: string;
@@ -194,6 +197,41 @@ export default function UsersPage() {
         return <Badge variant="secondary">{getRoleLabel(role)}</Badge>;
     };
 
+    const getOAuthBadges = (user: User) => {
+        if (!user.qq_identifier && !user.ceru_identifier) return null;
+
+        return (
+            <TooltipProvider>
+                <div className="mt-1 flex items-center gap-1.5">
+                    {user.qq_identifier && (
+                        <Tooltip>
+                            <TooltipTrigger
+                                render={
+                                    <span className="inline-flex h-5 w-5 items-center justify-center rounded-full bg-[#12B7F5] text-white" aria-label="已绑定 QQ">
+                                        <RiQqFill className="h-3.5 w-3.5" />
+                                    </span>
+                                }
+                            />
+                            <TooltipContent>已绑定 QQ</TooltipContent>
+                        </Tooltip>
+                    )}
+                    {user.ceru_identifier && (
+                        <Tooltip>
+                            <TooltipTrigger
+                                render={
+                                    <span className="inline-flex h-5 w-5 items-center justify-center rounded-full border border-border bg-[#f8fffb]" aria-label="已绑定澜音">
+                                        <Image src="/logo/ceru-music.svg" alt="" width={14} height={14} className="rounded-[3px]" />
+                                    </span>
+                                }
+                            />
+                            <TooltipContent>已绑定澜音</TooltipContent>
+                        </Tooltip>
+                    )}
+                </div>
+            </TooltipProvider>
+        );
+    };
+
     if (loading) {
         return <div className="flex items-center justify-center h-64">加载中...</div>;
     }
@@ -247,9 +285,7 @@ export default function UsersPage() {
                                                 </Avatar>
                                                 <div>
                                                     <p className="font-medium text-sm">{user.nickname}</p>
-                                                    {user.qq_identifier && (
-                                                        <p className="text-xs text-muted-foreground">已绑定 QQ</p>
-                                                    )}
+                                                    {getOAuthBadges(user)}
                                                 </div>
                                             </div>
                                         </TableCell>

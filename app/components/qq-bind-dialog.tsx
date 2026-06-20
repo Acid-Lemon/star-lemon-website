@@ -8,28 +8,45 @@ import { Label } from '@/components/ui/label';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
-import { RiQqFill, RiEyeLine, RiEyeOffLine } from '@remixicon/react';
+import { RiEyeLine, RiEyeOffLine, RiMusic2Line, RiQqFill } from '@remixicon/react';
 
 interface QqBindDialogProps {
     open: boolean;
     onClose: () => void;
     bindToken: string;
-    qqNickname: string;
-    qqAvatar: string;
+    oauthProvider?: 'qq' | 'ceru';
+    oauthNickname: string;
+    oauthAvatar: string;
+    oauthEmail?: string;
     redirectUrl: string;
 }
 
-export function QqBindDialog({ open, onClose, bindToken, qqNickname, qqAvatar, redirectUrl }: QqBindDialogProps) {
-    const [email, setEmail] = useState('');
+const providerMeta = {
+    qq: {
+        name: 'QQ',
+        fallbackClassName: 'bg-[#12B7F5] text-white',
+        icon: <RiQqFill className="w-5 h-5" />,
+    },
+    ceru: {
+        name: '澜音',
+        fallbackClassName: 'bg-[#eafff1] text-foreground',
+        icon: <RiMusic2Line className="w-5 h-5" />,
+    },
+} as const;
+
+export function QqBindDialog({ open, onClose, bindToken, oauthProvider = 'qq', oauthNickname, oauthAvatar, oauthEmail = '', redirectUrl }: QqBindDialogProps) {
+    const [email, setEmail] = useState(oauthEmail);
     const [password, setPassword] = useState('');
     const [showPassword, setShowPassword] = useState(false);
-    const [nickname, setNickname] = useState(qqNickname || '');
+    const [nickname, setNickname] = useState(oauthNickname || '');
     const [loading, setLoading] = useState(false);
+    const provider = providerMeta[oauthProvider];
+    const hasOauthEmail = Boolean(oauthEmail);
 
     const handleBind = async (e: React.FormEvent) => {
         e.preventDefault();
-        if (!email || !password) {
-            toast.error('请填写邮箱和密码');
+        if ((!hasOauthEmail && !email) || !password) {
+            toast.error(hasOauthEmail ? '请填写密码' : '请填写邮箱和密码');
             return;
         }
 
@@ -38,7 +55,7 @@ export function QqBindDialog({ open, onClose, bindToken, qqNickname, qqAvatar, r
             const res = await fetch('/api/auth/qq/bind-login', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ email, password, bind_token: bindToken, action: 'bind', redirectUrl }),
+                body: JSON.stringify({ email: hasOauthEmail ? undefined : email, password, bind_token: bindToken, action: 'bind', redirectUrl }),
             });
             const data = await res.json();
             if (res.ok && data.success) {
@@ -55,7 +72,7 @@ export function QqBindDialog({ open, onClose, bindToken, qqNickname, qqAvatar, r
 
     const handleRegister = async (e: React.FormEvent) => {
         e.preventDefault();
-        if (!email || !password || !nickname) {
+        if ((!hasOauthEmail && !email) || !password || !nickname) {
             toast.error('请填写完整信息');
             return;
         }
@@ -69,7 +86,7 @@ export function QqBindDialog({ open, onClose, bindToken, qqNickname, qqAvatar, r
             const res = await fetch('/api/auth/qq/bind-login', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ email, password, nickname, bind_token: bindToken, action: 'register', redirectUrl }),
+                body: JSON.stringify({ email: hasOauthEmail ? undefined : email, password, nickname, bind_token: bindToken, action: 'register', redirectUrl }),
             });
             const data = await res.json();
             if (res.ok && data.success) {
@@ -88,22 +105,28 @@ export function QqBindDialog({ open, onClose, bindToken, qqNickname, qqAvatar, r
         <Dialog open={open} onOpenChange={(o) => { if (!o) onClose(); }}>
             <DialogContent className="sm:max-w-md" showCloseButton>
                 <DialogHeader>
-                    <DialogTitle>完成QQ登录</DialogTitle>
-                    <DialogDescription>将你的QQ账号与网站账号关联</DialogDescription>
+                    <DialogTitle>完成{provider.name}登录</DialogTitle>
+                    <DialogDescription>将你的{provider.name}账号与网站账号关联</DialogDescription>
                 </DialogHeader>
 
                 <div className="flex items-center gap-3 p-3 bg-muted/50 rounded-xl mb-2">
                     <Avatar className="w-12 h-12 shrink-0">
-                        {qqAvatar ? <AvatarImage src={qqAvatar} alt="QQ头像" /> : null}
-                        <AvatarFallback className="bg-[#12B7F5] text-white">
-                            <RiQqFill className="w-5 h-5" />
+                        {oauthAvatar ? <AvatarImage src={oauthAvatar} alt={`${provider.name}头像`} /> : null}
+                        <AvatarFallback className={provider.fallbackClassName}>
+                            {provider.icon}
                         </AvatarFallback>
                     </Avatar>
                     <div>
-                        <p className="text-sm font-medium">QQ：{qqNickname}</p>
+                        <p className="text-sm font-medium">{provider.name}：{oauthNickname}</p>
                         <p className="text-xs text-muted-foreground">请选择关联方式</p>
                     </div>
                 </div>
+
+                {hasOauthEmail && (
+                    <div className="mb-2 rounded-lg border bg-muted/30 px-3 py-2 text-xs text-muted-foreground">
+                        将使用 {oauthEmail} 作为网站账号邮箱
+                    </div>
+                )}
 
                 <Tabs defaultValue="bind">
                     <TabsList className="grid w-full grid-cols-2 mb-4">
@@ -113,16 +136,18 @@ export function QqBindDialog({ open, onClose, bindToken, qqNickname, qqAvatar, r
 
                     <TabsContent value="bind">
                         <form onSubmit={handleBind} className="space-y-4">
-                            <div className="space-y-2">
-                                <Label>邮箱地址</Label>
-                                <Input
-                                    type="email"
-                                    value={email}
-                                    onChange={(e) => setEmail(e.target.value)}
-                                    placeholder="your.email@example.com"
-                                    required
-                                />
-                            </div>
+                            {!hasOauthEmail && (
+                                <div className="space-y-2">
+                                    <Label>邮箱地址</Label>
+                                    <Input
+                                        type="email"
+                                        value={email}
+                                        onChange={(e) => setEmail(e.target.value)}
+                                        placeholder="your.email@example.com"
+                                        required
+                                    />
+                                </div>
+                            )}
                             <div className="space-y-2">
                                 <Label>密码</Label>
                                 <div className="relative">
@@ -143,7 +168,7 @@ export function QqBindDialog({ open, onClose, bindToken, qqNickname, qqAvatar, r
                                 </div>
                             </div>
                             <p className="text-xs text-muted-foreground">
-                                输入已有账号的邮箱和密码，将QQ绑定到此账号
+                                输入已有账号的邮箱和密码，将{provider.name}绑定到此账号
                             </p>
                             <DialogFooter>
                                 <Button type="button" variant="outline" onClick={onClose}>取消</Button>
@@ -156,16 +181,18 @@ export function QqBindDialog({ open, onClose, bindToken, qqNickname, qqAvatar, r
 
                     <TabsContent value="register">
                         <form onSubmit={handleRegister} className="space-y-4">
-                            <div className="space-y-2">
-                                <Label>邮箱地址</Label>
-                                <Input
-                                    type="email"
-                                    value={email}
-                                    onChange={(e) => setEmail(e.target.value)}
-                                    placeholder="your.email@example.com"
-                                    required
-                                />
-                            </div>
+                            {!hasOauthEmail && (
+                                <div className="space-y-2">
+                                    <Label>邮箱地址</Label>
+                                    <Input
+                                        type="email"
+                                        value={email}
+                                        onChange={(e) => setEmail(e.target.value)}
+                                        placeholder="your.email@example.com"
+                                        required
+                                    />
+                                </div>
+                            )}
                             <div className="space-y-2">
                                 <Label>昵称</Label>
                                 <Input
@@ -196,7 +223,7 @@ export function QqBindDialog({ open, onClose, bindToken, qqNickname, qqAvatar, r
                                 </div>
                             </div>
                             <p className="text-xs text-muted-foreground">
-                                使用QQ信息创建新账号，后续可通过QQ快捷登录
+                                使用{provider.name}信息创建新账号，后续可通过{provider.name}快捷登录
                             </p>
                             <DialogFooter>
                                 <Button type="button" variant="outline" onClick={onClose}>取消</Button>

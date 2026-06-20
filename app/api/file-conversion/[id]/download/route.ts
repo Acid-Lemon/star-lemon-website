@@ -2,6 +2,17 @@ import { NextRequest, NextResponse } from 'next/server';
 import db from '@/lib/db';
 import { downloadConvertedFile } from '@/lib/convert-service';
 
+function getConvertedFileName(fileName: string, dstFormat: string) {
+  const cleanFormat = dstFormat.replace(/^\.+/, '').toLowerCase() || 'pdf';
+  const baseName = fileName.replace(/\.[^./\\]+$/, '');
+  return `${baseName}_formated.${cleanFormat}`;
+}
+
+function getContentDisposition(fileName: string) {
+  const fallbackName = fileName.replace(/[^\x20-\x7E]/g, '_').replace(/["\\]/g, '_');
+  return `attachment; filename="${fallbackName}"; filename*=UTF-8''${encodeURIComponent(fileName)}`;
+}
+
 export async function POST(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     const { id } = await params;
@@ -33,13 +44,13 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
     }
 
     const dstFormat = conversion.dst_format || 'pdf';
-    const outputFileName = conversion.file_name.replace(/\.[^.]+$/, `.${dstFormat.toLowerCase()}`);
+    const outputFileName = getConvertedFileName(conversion.file_name, dstFormat);
     const fileBuffer = await downloadConvertedFile(conversion.task_id);
 
     return new NextResponse(new Uint8Array(fileBuffer), {
       headers: {
         'Content-Type': 'application/octet-stream',
-        'Content-Disposition': `attachment; filename="${encodeURIComponent(outputFileName)}"`,
+        'Content-Disposition': getContentDisposition(outputFileName),
       },
     });
   } catch (error) {

@@ -2,13 +2,25 @@ import { NextRequest, NextResponse } from 'next/server';
 import db from '../../../lib/db';
 import { getSession } from '../../../lib/auth';
 import { clearSettingsCache } from '../../../lib/settings';
+import { insertDefaultSettings, migrate } from '../../../lib/migrate';
+
+interface SettingRow {
+  key: string;
+  value: string | null;
+  category: string;
+  label: string | null;
+}
 
 export async function GET() {
   try {
+    await migrate();
+    await insertDefaultSettings();
+    clearSettingsCache();
+
     const result = await db.query('SELECT key, value, category, label FROM settings ORDER BY category, key');
 
     const grouped: Record<string, { key: string; value: string; label: string }[]> = {};
-    result.rows.forEach((row: any) => {
+    result.rows.forEach((row: SettingRow) => {
       if (!grouped[row.category]) {
         grouped[row.category] = [];
       }

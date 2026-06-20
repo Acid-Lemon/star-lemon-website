@@ -17,10 +17,9 @@ export async function GET(req: NextRequest) {
     const baseUrl = settings.site_url || process.env.NEXT_PUBLIC_URL || 'http://localhost:3000';
     const returnUrl = req.nextUrl.searchParams.get('returnUrl') || '/';
     const redirectUri = `${baseUrl}/login`;
-    const state = encodeURIComponent(`bind:${returnUrl}`);
+    const state = encodeURIComponent(`qq-bind:${returnUrl}`);
 
     const authUrl = `https://graph.qq.com/oauth2.0/authorize?response_type=code&client_id=${qqAppId}&redirect_uri=${encodeURIComponent(redirectUri)}&state=${state}`;
 
     return NextResponse.redirect(authUrl);
 }
-

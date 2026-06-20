@@ -32,14 +32,14 @@ const playfair = Playfair_Display({
 
 const notoSerifSC = Noto_Serif_SC({
     weight: ['300', '400'],
-    subsets: ['latin', 'chinese-simplified'] as never,
+    subsets: ['latin'],
     display: 'swap',
     variable: '--font-serif',
 })
 
 const dmMono = DM_Mono({
     weight: ['400'],
-    subsets: ['latin', 'chinese-simplified'] as never,
+    subsets: ['latin'],
     display: 'swap',
     variable: '--font-mono',
 })

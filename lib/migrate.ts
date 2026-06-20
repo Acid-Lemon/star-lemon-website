@@ -30,6 +30,7 @@ export async function migrate(): Promise<string[]> {
       bio TEXT,
       birthday DATE,
       qq_identifier TEXT,
+      ceru_identifier TEXT,
       sl_coin INTEGER DEFAULT 0,
       created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
       updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
@@ -242,6 +243,12 @@ export async function migrate(): Promise<string[]> {
     logs.push('moments.status 已添加');
   }
 
+  // Migration: Ceru Music OAuth identifier
+  if (!await columnExists('users', 'ceru_identifier')) {
+    await db.query('ALTER TABLE users ADD COLUMN ceru_identifier TEXT');
+    logs.push('users.ceru_identifier 已添加');
+  }
+
   return logs;
 }
 
@@ -281,6 +288,9 @@ const defaultSettings: { key: string; value: string; category: string; label: st
   // oauth
   { key: 'qq_app_id', value: '', category: 'oauth', label: 'QQ App ID' },
   { key: 'qq_app_key', value: '', category: 'oauth', label: 'QQ App Key' },
+  { key: 'ceru_endpoint', value: 'https://auth.shiqianjiang.cn/oidc', category: 'oauth', label: '澜音 Issuer Endpoint' },
+  { key: 'ceru_app_id', value: 'wg0mdkakeio0g8obf6iy5', category: 'oauth', label: '澜音 App ID' },
+  { key: 'ceru_app_secret', value: 'YJxlAYpgAyZkZMjpWfRelI5pT6SUA0R6', category: 'oauth', label: '澜音 App Secret' },
   // oss
   { key: 'oss_endpoint', value: '', category: 'oss', label: 'OSS Endpoint（可选）' },
   { key: 'oss_region', value: 'oss-cn-hangzhou', category: 'oss', label: 'OSS 地域' },
@@ -314,6 +324,18 @@ export async function insertDefaultSettings(): Promise<void> {
     await db.query(
       `INSERT INTO settings (key, value, category, label) VALUES ($1, $2, $3, $4) ON CONFLICT (key) DO NOTHING`,
       [s.key, s.value, s.category, s.label]
+    );
+  }
+
+  for (const s of defaultSettings.filter((item) => item.key.startsWith('ceru_'))) {
+    await db.query(
+      `UPDATE settings
+       SET value = CASE WHEN COALESCE(value, '') = '' THEN $1 ELSE value END,
+           label = $2,
+           category = $3,
+           updated_at = CURRENT_TIMESTAMP
+       WHERE key = $4`,
+      [s.value, s.label, s.category, s.key]
     );
   }
 

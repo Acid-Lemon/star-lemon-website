@@ -9,6 +9,8 @@ import { Badge } from '@/components/ui/badge';
 import { toast } from 'sonner';
 import { RiArrowLeftLine, RiFileLine, RiCloseLine, RiUploadCloudLine, RiWechatPayLine, RiCheckLine, RiDownloadLine, RiFolderLine, RiBillLine, RiRefreshLine, RiDeleteBinLine } from '@remixicon/react';
 import { AlertDialog, AlertDialogContent, AlertDialogHeader, AlertDialogMedia, AlertDialogTitle, AlertDialogDescription, AlertDialogFooter, AlertDialogCancel, AlertDialogAction } from '@/components/ui/alert-dialog';
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { ScrollArea } from '@/components/ui/scroll-area';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { getOutputFormats, getOutputFormatLabel, getSrcFormat } from '@/lib/convert-formats';
 
@@ -20,6 +22,15 @@ const SUPPORTED_FORMATS: { category: string; exts: string }[] = [
 ];
 
 const ACCEPT_STRING = SUPPORTED_FORMATS.flatMap(f => f.exts.split(' ')).join(',');
+
+function getDownloadFileName(res: Response) {
+  const disposition = res.headers.get('Content-Disposition') || '';
+  const utf8Match = disposition.match(/filename\*=UTF-8''([^;]+)/i);
+  if (utf8Match?.[1]) return decodeURIComponent(utf8Match[1]);
+
+  const fallbackMatch = disposition.match(/filename="([^"]+)"/i);
+  return fallbackMatch?.[1] || 'download';
+}
 
 function formatFileSize(bytes: number): string {
   if (bytes < 1024) return bytes + ' B';
@@ -271,7 +282,7 @@ function ConvertPanel() {
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
-      a.download = '';
+      a.download = getDownloadFileName(res);
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
@@ -540,6 +551,7 @@ function MyConversionsPanel({ refreshKey }: { refreshKey?: number }) {
   const [conversions, setConversions] = useState<UserConversion[]>([]);
   const [loading, setLoading] = useState(true);
   const [deleteTarget, setDeleteTarget] = useState<number | null>(null);
+  const [showAll, setShowAll] = useState(false);
 
   useEffect(() => {
     fetchConversions();
@@ -584,7 +596,7 @@ function MyConversionsPanel({ refreshKey }: { refreshKey?: number }) {
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
-      a.download = '';
+      a.download = getDownloadFileName(res);
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
@@ -612,18 +624,74 @@ function MyConversionsPanel({ refreshKey }: { refreshKey?: number }) {
     }
   };
 
+  const renderConversionList = (items: UserConversion[]) => (
+    <div className="space-y-3">
+      {items.map((conv) => (
+        <div key={conv.id} className="border rounded-lg p-3 space-y-2">
+          <div className="flex items-center justify-between gap-2">
+            <div className="flex items-center gap-2 min-w-0">
+              <RiFileLine className="w-4 h-4 text-primary shrink-0" />
+              <span className="font-medium text-sm truncate">{conv.file_name}</span>
+            </div>
+            {getStatusBadge(conv)}
+          </div>
+          <div className="flex items-center justify-between gap-2">
+            <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-muted-foreground">
+              <span>{formatFileSize(conv.file_size)}</span>
+              {conv.page_count != null && conv.page_count > 0 && <span>{conv.page_count} 页</span>}
+              <span>{new Date(conv.created_at).toLocaleDateString('zh-CN')}</span>
+            </div>
+            {conv.order_status === 'paid' && (() => {
+              const hoursSince = (Date.now() - new Date(conv.created_at).getTime()) / 3600000;
+              if (hoursSince > 24) return null;
+              return (
+                <button
+                  onClick={() => handleDownload(conv.id)}
+                  className="p-1 rounded hover:bg-primary/10 text-primary transition-colors shrink-0"
+                  title="下载文件"
+                >
+                  <RiDownloadLine className="w-4 h-4" />
+                </button>
+              );
+            })()}
+            {conv.status === 'failed' && (
+              <button
+                onClick={() => setDeleteTarget(conv.id)}
+                className="p-1 rounded hover:bg-destructive/10 text-destructive transition-colors shrink-0"
+                title="删除记录"
+              >
+                <RiDeleteBinLine className="w-4 h-4" />
+              </button>
+            )}
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+
   if (loading) {
     return <div className="flex items-center justify-center h-48">加载中...</div>;
   }
 
+  const recentConversions = conversions.slice(0, 2);
+
   return (
     <Card>
       <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          <RiFolderLine className="w-5 h-5" />
-          我的转换
-        </CardTitle>
-        <CardDescription>查看您的文件转换记录</CardDescription>
+        <div className="flex items-start justify-between gap-3">
+          <div>
+            <CardTitle className="flex items-center gap-2">
+              <RiFolderLine className="w-5 h-5" />
+              我的转换
+            </CardTitle>
+            <CardDescription>查看您的文件转换记录</CardDescription>
+          </div>
+          {conversions.length > 2 && (
+            <Button variant="ghost" size="sm" onClick={() => setShowAll(true)}>
+              全部
+            </Button>
+          )}
+        </div>
       </CardHeader>
       <CardContent>
         {conversions.length === 0 ? (
@@ -631,50 +699,21 @@ function MyConversionsPanel({ refreshKey }: { refreshKey?: number }) {
             暂无转换记录，请先登录并转换文件
           </div>
         ) : (
-          <div className="space-y-3">
-            {conversions.map((conv) => (
-              <div key={conv.id} className="border rounded-lg p-3 space-y-2">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <RiFileLine className="w-4 h-4 text-primary" />
-                    <span className="font-medium text-sm truncate max-w-[180px]">{conv.file_name}</span>
-                  </div>
-                  {getStatusBadge(conv)}
-                </div>
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-4 text-xs text-muted-foreground">
-                    <span>{formatFileSize(conv.file_size)}</span>
-                    {conv.page_count != null && conv.page_count > 0 && <span>{conv.page_count} 页</span>}
-                    <span>{new Date(conv.created_at).toLocaleDateString('zh-CN')}</span>
-                  </div>
-                  {conv.order_status === 'paid' && (() => {
-                    const hoursSince = (Date.now() - new Date(conv.created_at).getTime()) / 3600000;
-                    if (hoursSince > 24) return null;
-                    return (
-                      <button
-                        onClick={() => handleDownload(conv.id)}
-                        className="p-1 rounded hover:bg-primary/10 text-primary transition-colors"
-                        title="下载文件"
-                      >
-                        <RiDownloadLine className="w-4 h-4" />
-                      </button>
-                    );
-                  })()}
-                  {conv.status === 'failed' && (
-                    <button
-                      onClick={() => setDeleteTarget(conv.id)}
-                      className="p-1 rounded hover:bg-destructive/10 text-destructive transition-colors"
-                      title="删除记录"
-                    >
-                      <RiDeleteBinLine className="w-4 h-4" />
-                    </button>
-                  )}
-                </div>
-              </div>
-            ))}
-          </div>
+          renderConversionList(recentConversions)
         )}
       </CardContent>
+
+        <Dialog open={showAll} onOpenChange={setShowAll}>
+          <DialogContent className="sm:max-w-2xl">
+            <DialogHeader>
+              <DialogTitle>全部转换记录</DialogTitle>
+              <DialogDescription>共 {conversions.length} 条记录</DialogDescription>
+            </DialogHeader>
+            <ScrollArea className="max-h-[70vh] pr-3">
+              {renderConversionList(conversions)}
+            </ScrollArea>
+          </DialogContent>
+        </Dialog>
 
         <AlertDialog open={deleteTarget !== null} onOpenChange={(v) => { if (!v) setDeleteTarget(null); }}>
           <AlertDialogContent>
@@ -695,6 +734,7 @@ function MyConversionsPanel({ refreshKey }: { refreshKey?: number }) {
   function MyOrdersPanel({ refreshKey }: { refreshKey?: number }) {
   const [orders, setOrders] = useState<UserOrder[]>([]);
   const [loading, setLoading] = useState(true);
+  const [showAll, setShowAll] = useState(false);
 
   useEffect(() => {
     fetchOrders();
@@ -724,18 +764,55 @@ function MyConversionsPanel({ refreshKey }: { refreshKey?: number }) {
     return <Badge variant="default">已完成</Badge>;
   };
 
+  const renderOrderList = (items: UserOrder[]) => (
+    <div className="space-y-3">
+      {items.map((order) => (
+        <div key={order.id} className="border rounded-lg p-3 space-y-2">
+          <div className="flex items-center justify-between gap-2">
+            <div className="flex items-center gap-2 min-w-0">
+              <RiFileLine className="w-4 h-4 text-primary shrink-0" />
+              <span className="font-medium text-sm truncate">{order.file_name || '(已删除)'}</span>
+            </div>
+            {getStatusBadge(order)}
+          </div>
+          <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-muted-foreground">
+            <span>{order.page_count ? `${order.page_count} 页` : '-'}</span>
+            <span>¥{parseFloat(order.price).toFixed(2)}</span>
+            {parseFloat(order.refund_amount) > 0 && (
+              <span className="text-destructive">退 ¥{parseFloat(order.refund_amount).toFixed(2)}</span>
+            )}
+          </div>
+          <div className="text-xs text-muted-foreground">
+            {new Date(order.created_at).toLocaleString('zh-CN')}
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+
   if (loading) {
     return <div className="flex items-center justify-center h-48">加载中...</div>;
   }
 
+  const recentOrders = orders.slice(0, 2);
+
   return (
     <Card>
       <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          <RiBillLine className="w-5 h-5" />
-          我的订单
-        </CardTitle>
-        <CardDescription>查看您的转换支付订单</CardDescription>
+        <div className="flex items-start justify-between gap-3">
+          <div>
+            <CardTitle className="flex items-center gap-2">
+              <RiBillLine className="w-5 h-5" />
+              我的订单
+            </CardTitle>
+            <CardDescription>查看您的转换支付订单</CardDescription>
+          </div>
+          {orders.length > 2 && (
+            <Button variant="ghost" size="sm" onClick={() => setShowAll(true)}>
+              全部
+            </Button>
+          )}
+        </div>
       </CardHeader>
       <CardContent>
         {orders.length === 0 ? (
@@ -743,31 +820,21 @@ function MyConversionsPanel({ refreshKey }: { refreshKey?: number }) {
             暂无订单记录
           </div>
         ) : (
-          <div className="space-y-3">
-            {orders.map((order) => (
-              <div key={order.id} className="border rounded-lg p-3 space-y-2">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <RiFileLine className="w-4 h-4 text-primary" />
-                    <span className="font-medium text-sm truncate max-w-[180px]">{order.file_name || '(已删除)'}</span>
-                  </div>
-                  {getStatusBadge(order)}
-                </div>
-                <div className="flex items-center gap-4 text-xs text-muted-foreground">
-                  <span>{order.page_count ? `${order.page_count} 页` : '-'}</span>
-                  <span>¥{parseFloat(order.price).toFixed(2)}</span>
-                  {parseFloat(order.refund_amount) > 0 && (
-                    <span className="text-destructive">退 ¥{parseFloat(order.refund_amount).toFixed(2)}</span>
-                  )}
-                </div>
-                <div className="text-xs text-muted-foreground">
-                  {new Date(order.created_at).toLocaleString('zh-CN')}
-                </div>
-              </div>
-            ))}
-          </div>
+          renderOrderList(recentOrders)
         )}
       </CardContent>
+
+      <Dialog open={showAll} onOpenChange={setShowAll}>
+        <DialogContent className="sm:max-w-2xl">
+          <DialogHeader>
+            <DialogTitle>全部订单</DialogTitle>
+            <DialogDescription>共 {orders.length} 条订单</DialogDescription>
+          </DialogHeader>
+          <ScrollArea className="max-h-[70vh] pr-3">
+            {renderOrderList(orders)}
+          </ScrollArea>
+        </DialogContent>
+      </Dialog>
     </Card>
   );
 }

@@ -92,7 +92,8 @@ export async function POST(req: NextRequest) {
         }
 
         const bindToken = storeBindData({
-            openid: openId,
+            provider: 'qq',
+            identifier: openId,
             nickname: userInfo.nickname?.slice(0, 20) || 'QQ用户',
             avatar: userInfo.figureurl_qq_2 || userInfo.figureurl || '',
         });

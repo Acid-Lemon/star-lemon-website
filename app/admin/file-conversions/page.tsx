@@ -15,6 +15,7 @@ interface FileConversion {
   file_name: string;
   file_size: number;
   src_format: string;
+  dst_format: string | null;
   task_id: string | null;
   page_count: number | null;
   status: string;
@@ -35,6 +36,7 @@ interface OrderRecord {
   file_size: number | null;
   page_count: number | null;
   src_format: string | null;
+  dst_format: string | null;
   price: string;
   pay_order_no: string | null;
   user_nickname: string | null;
@@ -128,7 +130,7 @@ function ConversionManagementTab() {
                 <TableRow>
                   <TableHead>文件</TableHead>
                   <TableHead>源格式</TableHead>
-                  <TableHead>页数</TableHead>
+                  <TableHead>目标格式</TableHead>
                   <TableHead>状态</TableHead>
                   <TableHead>支付金额</TableHead>
                   <TableHead>用户</TableHead>
@@ -152,7 +154,7 @@ function ConversionManagementTab() {
                       <span className="text-sm font-mono">{conv.src_format}</span>
                     </TableCell>
                     <TableCell>
-                      <span className="text-sm">{conv.page_count ?? '-'}</span>
+                      <span className="text-sm font-mono">{conv.dst_format || '-'}</span>
                     </TableCell>
                     <TableCell>{getStatusBadge(conv)}</TableCell>
                     <TableCell>
@@ -266,7 +268,7 @@ function OrderRecordsTab() {
                 <TableRow>
                   <TableHead>订单号</TableHead>
                   <TableHead>文件</TableHead>
-                  <TableHead>页数</TableHead>
+                  <TableHead>目标格式</TableHead>
                   <TableHead>状态</TableHead>
                   <TableHead>支付金额</TableHead>
                   <TableHead>退款金额</TableHead>
@@ -287,7 +289,7 @@ function OrderRecordsTab() {
                       </div>
                     </TableCell>
                     <TableCell>
-                      <span className="text-sm">{order.page_count ?? '-'}</span>
+                      <span className="text-sm font-mono">{order.dst_format || '-'}</span>
                     </TableCell>
                     <TableCell>{getStatusBadge(order)}</TableCell>
                     <TableCell className="text-sm font-medium">¥{parseFloat(order.price).toFixed(2)}</TableCell>

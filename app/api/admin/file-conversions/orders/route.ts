@@ -13,7 +13,7 @@ export async function GET() {
       `SELECT
         fco.id, fco.conversion_id, fco.price, fco.pay_order_no,
         fco.status, fco.refund_amount, fco.created_at,
-        fc.file_name, fc.file_size, fc.page_count, fc.src_format,
+        fc.file_name, fc.file_size, fc.page_count, fc.src_format, fc.dst_format,
         u.nickname as user_nickname, u.email as user_email
       FROM file_conversion_orders fco
       LEFT JOIN file_conversions fc ON fc.id = fco.conversion_id

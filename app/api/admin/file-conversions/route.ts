@@ -11,7 +11,7 @@ export async function GET() {
 
     const result = await db.query(
       `SELECT
-        fc.id, fc.file_name, fc.file_size, fc.src_format, fc.task_id,
+        fc.id, fc.file_name, fc.file_size, fc.src_format, fc.dst_format, fc.task_id,
         fc.page_count, fc.status, fc.created_at, fc.updated_at,
         u.id as user_id, u.nickname as user_nickname, u.email as user_email,
         fco.price, fco.status as order_status, fco.pay_order_no

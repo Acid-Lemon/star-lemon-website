@@ -1,116 +1,174 @@
 # Star & Lemon 博客 / 个人小站
 
-基于 Next.js 16 App Router 构建的现代化全栈个人博客与小站系统，集成了博客文章、动态分享、留言互动、文件快传、支付系统以及完善的后台管理。
+Star & Lemon（星柠）是一个基于 Next.js App Router 构建的个人博客与小站系统。项目以内容展示和访客互动为核心，同时包含文件快传、文件转换、站点积分、支付、AI 助手和后台管理能力。
 
-## 核心特性
+## 核心功能
 
-### 前台功能
-- **博客文章系统**：支持 Markdown 文章发布、阅读，卡片式排版，AI 辅助生成摘要
-- **动态分享（Moments）**：发布图文动态，支持图片上传，瀑布流展示
-- **互动留言板**：弹幕式留言墙，支持图片上传，留言审核机制
-- **文件快传**：上传文件生成取件码，支持微信扫码支付，按存储和流量计费
-- **一言（Hitokoto）**：每日随机展示精选语句
-- **发展时间轴**：记录网站或个人的重要里程碑
-- **用户系统**：邮箱注册/登录、邮箱验证码登录、QQ 互联登录、个人资料管理
+### 前台体验
+
+- **博客文章**：支持文章列表、详情页、Markdown 渲染、代码高亮、封面图、评论与 AI 摘要。
+- **动态分享**：发布图文动态，前台瀑布流展示，后台审核与管理。
+- **留言板**：支持文字、图片、颜色背景、访客位置记录和后台审核。
+- **朋友链接**：展示友链并支持访客提交申请。
+- **一言/语录**：展示站内语录内容，可在后台维护。
+- **时间轴**：记录网站或个人的重要节点。
+- **用户系统**：邮箱注册、密码登录、邮箱验证码登录、QQ 登录/绑定、Ceru OAuth 登录、个人资料和安全设置。
+- **AI 助手**：可配置 LLM 与 TTS 接口，为访客提供站内助手对话。
+
+### 工具与交易
+
+- **文件快传**：上传文件生成取件码，支持下载次数、保留天数、过期时间、微信扫码支付和退款记录。
+- **文件转换**：上传文件并调用外部转换服务，支持任务状态、下载、计费与订单记录。
+- **星柠币充值**：用户可充值站内积分，用于站内付费能力扩展。
 
 ### 后台管理
-- **仪表盘**：数据统计概览
-- **内容管理**：文章管理、动态管理、一言管理
-- **互动审核**：留言审核、评论审核
-- **用户管理**：查看用户列表、编辑用户信息、重置密码、删除用户
-- **文件快传管理**：文件管理（查看/删除/退款）、订单记录查询
-- **系统设置**：站点配置、邮件服务、AI 接口、OAuth、OSS、支付、定价等全局配置
+
+- **仪表盘**：站点数据概览。
+- **内容管理**：文章、动态、留言、评论、语录、时间轴、友链管理。
+- **用户管理**：用户列表、资料编辑、权限与账号操作。
+- **工具管理**：文件快传、文件转换、订单和退款记录管理。
+- **开发任务**：站内开发任务记录与分配。
+- **系统设置**：站点信息、SEO 验证、邮件、OAuth、OSS、支付、AI、文件转换、价格策略等配置。
 
 ## 技术栈
 
 | 类别 | 技术 |
-|------|------|
-| 框架 | Next.js 16.2.2 (App Router) |
+| --- | --- |
+| 框架 | Next.js 16.2.6, App Router |
 | 前端 | React 19.2.4, TypeScript 5 |
 | 样式 | Tailwind CSS 4, shadcn/ui, @base-ui/react |
 | 图标 | @remixicon/react |
-| 数据库 | PostgreSQL (pg) |
-| 认证 | JWT (jose), bcryptjs |
+| 数据库 | PostgreSQL, pg |
+| 认证 | JWT, jose, bcryptjs |
 | 存储 | 阿里云 OSS |
-| 加速 | 阿里云 ESA (Edge Security Acceleration) |
-| 支付 | 蓝兔支付（微信 Native 扫码支付）|
+| 支付 | 蓝兔支付 |
 | 邮件 | Nodemailer |
-| AI | DeepSeek API |
-| 其他 | Sonner, react-markdown, recharts, embla-carousel |
+| AI | 可配置 LLM / TTS 接口，默认摘要接口指向 DeepSeek 兼容 API |
+| 其他 | Sonner, react-markdown, rehype-highlight, recharts, embla-carousel |
 
-## 数据库表
+## 环境要求
 
-- `users` — 用户表（支持邮箱/QQ登录）
-- `verification_codes` — 邮箱验证码表
-- `posts` — 博客文章表
-- `messages` — 留言表
-- `comments` — 评论表
-- `moments` — 动态表
-- `timeline` — 时间轴表
-- `hitokoto` — 一言语句表
-- `settings` — 系统配置表（键值对）
-- `file_transfers` — 文件快传记录表（文件信息、支付状态）
-- `file_transfer_orders` — 文件快传支付订单表（订单状态、退款信息，通过 transfer_id 关联 file_transfers）
+- Node.js 20+
+- pnpm 9.15.4
+- PostgreSQL
 
-## 环境变量
+## 本地启动
 
-创建 `.env.local` 文件，仅存放数据库连接和 JWT 密钥：
+1. 安装依赖：
+
+```bash
+pnpm install
+```
+
+2. 创建 `.env.local`：
 
 ```env
 DATABASE_URL=postgresql://user:password@host:5432/star_lemon
 JWT_SECRET=your_jwt_secret
+NEXT_PUBLIC_URL=http://localhost:3000
 ```
 
-其他所有配置（QQ 登录、邮件服务、OSS、支付、AI 等）均在管理后台的「系统设置」页面中进行配置，数据存储在数据库的 `settings` 表中。部分配置也支持通过环境变量覆盖（优先级：数据库设置 > 环境变量 > 默认值）。
+`DATABASE_URL` 是必需项。`JWT_SECRET` 建议显式配置，避免使用代码中的开发默认值。`NEXT_PUBLIC_URL` 用于 OAuth 回调、支付通知地址和站点链接生成。
 
-## 开始使用
+3. 初始化或迁移数据库：
 
 ```bash
-# 安装依赖
-pnpm install
-
-# 初始化数据库
 node scripts/init-db.mjs
+```
 
-# 运行开发服务器
+该脚本会安全创建缺失的数据表和字段，不会删除已有业务数据。
+
+4. 启动开发服务器：
+
+```bash
 pnpm dev
 ```
 
-访问 [http://localhost:3000](http://localhost:3000)，管理后台路由为 `/admin`。
+访问 [http://localhost:3000](http://localhost:3000)。后台入口为 `/admin`。
+
+## 常用脚本
+
+```bash
+pnpm dev      # 使用 webpack 启动 Next.js 开发服务器
+pnpm build    # 构建生产版本
+pnpm start    # 启动生产服务器
+pnpm lint     # 运行 ESLint
+```
+
+## 配置说明
+
+项目只要求少量基础环境变量，其余配置主要通过后台「系统设置」写入 `settings` 表。
+
+常见可配置项包括：
+
+- 站点名称、站点地址、SEO 验证码
+- SMTP 邮件服务
+- QQ 互联、Ceru OAuth
+- 阿里云 OSS
+- 蓝兔支付
+- 文件快传价格策略
+- 文件转换服务地址、API Key 和价格策略
+- AI 摘要、AI 助手 LLM 与 TTS
+- IP 查询服务
+
+配置读取优先级通常为：数据库设置 > 环境变量 > 默认值。
+
+## 数据库表
+
+初始化脚本会维护以下核心表：
+
+- `users`：用户、资料、第三方登录标识和站内积分
+- `verification_codes`：邮箱验证码
+- `posts`：博客文章
+- `messages`：留言板消息
+- `comments`：文章评论
+- `moments`：动态
+- `timeline`：时间轴
+- `quotes`：语录
+- `settings`：系统配置
+- `friend_links`：友链
+- `file_transfers`：文件快传记录
+- `file_transfer_orders`：文件快传订单
+- `file_conversions`：文件转换任务
+- `file_conversion_orders`：文件转换订单
+- `coin_recharge_orders`：站内积分充值订单
+- `dev_tasks`：开发任务
 
 ## 项目结构
 
 ```text
 ├── app/
-│   ├── admin/           # 后台管理页面
-│   ├── api/             # API 路由
-│   ├── components/      # 共享组件
-│   ├── guestbook/       # 留言板
-│   ├── login/           # 登录页
-│   ├── moments/         # 动态页
-│   ├── post/            # 文章列表/详情
-│   ├── register/        # 注册页
-│   ├── tools/           # 工具箱（文件快传）
-│   ├── about/           # 关于/联系
-│   ├── page.tsx         # 首页
-│   └── layout.tsx       # 根布局
-├── components/ui/       # shadcn/ui 组件
-├── lib/                 # 核心库（db, auth, oss, mail, ai, pay）
-├── scripts/             # 数据库迁移脚本
-└── next.config.ts       # Next.js 配置
+│   ├── admin/                  # 后台管理页面
+│   ├── api/                    # Route Handlers
+│   ├── components/             # 业务共享组件
+│   ├── guestbook/              # 留言板
+│   ├── login/                  # 登录
+│   ├── register/               # 注册
+│   ├── moments/                # 动态
+│   ├── post/                   # 文章列表与详情
+│   ├── quotes/                 # 语录页
+│   ├── friends/                # 友链页
+│   ├── tools/                  # 文件快传、文件转换等工具
+│   ├── recharge/               # 星柠币充值
+│   ├── contact/                # 联系页
+│   ├── about/                  # 关于页
+│   ├── layout.tsx              # 根布局
+│   └── page.tsx                # 首页
+├── components/ui/              # shadcn/ui 组件
+├── hooks/                      # React hooks
+├── lib/                        # 数据库、认证、OSS、邮件、支付、AI 等核心库
+├── public/                     # 静态资源
+├── scripts/                    # 数据库初始化脚本
+├── types/                      # 类型声明
+├── middleware.ts               # 中间件
+├── next.config.ts              # Next.js 配置
+└── package.json                # 项目脚本与依赖
 ```
 
-## 第三方服务集成
+## 相关文档
 
-- **QQ 互联**：OAuth2 登录
-- **阿里云 OSS**：图片/文件存储
-- **阿里云 ESA**：CDN 加速下载
-- **蓝兔支付**：微信支付（Native 扫码）
-- **DeepSeek**：AI 文章摘要生成
-- **Hitokoto API**：每日语句
-
-## 更多文档
-
+- [PRODUCT.md](./PRODUCT.md)：产品定位与设计原则
+- [DESIGN.md](./DESIGN.md)：主题、色彩、排版与组件规范
 - [Next.js 文档](https://nextjs.org/docs)
 - [Tailwind CSS 文档](https://tailwindcss.com/docs)
 - [shadcn/ui 文档](https://ui.shadcn.com)

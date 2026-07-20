@@ -23,6 +23,10 @@ function formatFileSize(bytes: number): string {
 
 type Step = 'form' | 'paying' | 'uploading' | 'done';
 
+const SIGNED_PART_BATCH_SIZE = 24;
+const PROGRESS_UPDATE_INTERVAL_MS = 200;
+const SPEED_SAMPLE_WINDOW_MS = 2000;
+
 interface UserFile {
   id: number;
   code: string;
@@ -84,7 +88,6 @@ function UploadPanel({ onUploadSuccess }: { onUploadSuccess?: () => void }) {
   const pollingRef = useRef<NodeJS.Timeout | null>(null);
   const fileRef = useRef<File | null>(null);
   const orderIdRef = useRef<number | null>(null);
-  const lastProgressRef = useRef<{ time: number; loaded: number } | null>(null);
 
   // Keep refs in sync with state
   useEffect(() => { fileRef.current = file; }, [file]);
@@ -109,7 +112,6 @@ function UploadPanel({ onUploadSuccess }: { onUploadSuccess?: () => void }) {
     setUploadError(null);
     setUploadedBytes(0);
     setUploadSpeed(0);
-    lastProgressRef.current = null;
 
     let uploadId: string;
     let partSize: number;
@@ -132,58 +134,97 @@ function UploadPanel({ onUploadSuccess }: { onUploadSuccess?: () => void }) {
     }
 
     const partProgress = new Map<number, number>();
-    const uploadPart = (partNumber: number, part: Blob) => new Promise<string>((resolve, reject) => {
-      fetch(`/api/file-transfer/${oid}/upload`, {
+    const speedSamples: Array<{ time: number; loaded: number }> = [];
+    let totalUploaded = 0;
+    let lastProgressUpdate = 0;
+
+    const reportPartProgress = (partNumber: number, loaded: number, partSize: number) => {
+      const nextLoaded = Math.min(loaded, partSize);
+      const previousLoaded = partProgress.get(partNumber) || 0;
+      if (nextLoaded <= previousLoaded) return;
+
+      partProgress.set(partNumber, nextLoaded);
+      totalUploaded += nextLoaded - previousLoaded;
+
+      const now = Date.now();
+      speedSamples.push({ time: now, loaded: totalUploaded });
+      while (speedSamples.length > 1 && speedSamples[0].time < now - SPEED_SAMPLE_WINDOW_MS) {
+        speedSamples.shift();
+      }
+
+      if (now - lastProgressUpdate < PROGRESS_UPDATE_INTERVAL_MS && totalUploaded < currentFile.size) return;
+
+      const firstSample = speedSamples[0];
+      const elapsedSeconds = (now - firstSample.time) / 1000;
+      setUploadSpeed(elapsedSeconds > 0 ? (totalUploaded - firstSample.loaded) / elapsedSeconds : 0);
+      setUploadedBytes(totalUploaded);
+      setUploadProgress(Math.round((totalUploaded / currentFile.size) * 100));
+      lastProgressUpdate = now;
+    };
+
+    const getPartUploadUrls = async (partNumbers: number[]) => {
+      const urlRes = await fetch(`/api/file-transfer/${oid}/upload`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ action: 'part', uploadId, partNumber }),
-      }).then(async (urlRes) => {
-        const urlData = await urlRes.json();
-        if (!urlRes.ok || !urlData.uploadUrl) throw new Error(urlData.error || '获取分片上传地址失败');
-        const xhr = new XMLHttpRequest();
-        xhr.open('PUT', urlData.uploadUrl);
-        xhr.upload.onprogress = (e) => {
-          if (e.lengthComputable) {
-            partProgress.set(partNumber, Math.min(e.loaded, part.size));
-            const loaded = [...partProgress.values()].reduce((total, value) => total + value, 0);
-            const now = Date.now();
-            const prev = lastProgressRef.current;
-            if (prev && now - prev.time > 0) setUploadSpeed((loaded - prev.loaded) / ((now - prev.time) / 1000));
-            lastProgressRef.current = { time: now, loaded };
-            setUploadedBytes(loaded);
-            setUploadProgress(Math.round((loaded / currentFile.size) * 100));
-          }
-        };
-        xhr.onload = () => {
-          if (xhr.status >= 200 && xhr.status < 300) {
-            const etag = xhr.getResponseHeader('ETag') || xhr.getResponseHeader('etag');
-            if (etag) resolve(etag);
-            else reject(new Error('OSS 未返回分片 ETag，请检查 CORS 暴露响应头'));
-          } else {
-            const code = xhr.responseText.match(new RegExp('<Code>([^<]+)</Code>', 'i'))?.[1];
-            const message = xhr.responseText.match(new RegExp('<Message>([^<]+)</Message>', 'i'))?.[1];
-            reject(new Error(`OSS ${xhr.status}${code ? ` (${code})` : ''}${message ? `：${message}` : ''}`));
-          }
-        };
-        xhr.onerror = () => reject(new Error('无法连接到文件存储，请检查网络后重试'));
-        xhr.send(part);
-      }).catch(reject);
+        body: JSON.stringify({ action: 'parts', uploadId, partNumbers }),
+      });
+      const urlData = await urlRes.json();
+      if (!urlRes.ok || !Array.isArray(urlData.uploadUrls)) {
+        throw new Error(urlData.error || '获取分片上传地址失败');
+      }
+
+      const uploadUrls = new Map<number, string>(
+        urlData.uploadUrls.map((item: { partNumber: number; uploadUrl: string }) => [item.partNumber, item.uploadUrl])
+      );
+      if (partNumbers.some((partNumber) => !uploadUrls.get(partNumber))) {
+        throw new Error('获取分片上传地址失败');
+      }
+      return uploadUrls;
+    };
+
+    const uploadPart = (partNumber: number, part: Blob, uploadUrl: string) => new Promise<string>((resolve, reject) => {
+      const xhr = new XMLHttpRequest();
+      xhr.open('PUT', uploadUrl);
+      xhr.upload.onprogress = (e) => {
+        if (e.lengthComputable) reportPartProgress(partNumber, e.loaded, part.size);
+      };
+      xhr.onload = () => {
+        if (xhr.status >= 200 && xhr.status < 300) {
+          reportPartProgress(partNumber, part.size, part.size);
+          const etag = xhr.getResponseHeader('ETag') || xhr.getResponseHeader('etag');
+          if (etag) resolve(etag);
+          else reject(new Error('OSS 未返回分片 ETag，请检查 CORS 暴露响应头'));
+        } else {
+          const code = xhr.responseText.match(new RegExp('<Code>([^<]+)</Code>', 'i'))?.[1];
+          const message = xhr.responseText.match(new RegExp('<Message>([^<]+)</Message>', 'i'))?.[1];
+          reject(new Error(`OSS ${xhr.status}${code ? ` (${code})` : ''}${message ? `：${message}` : ''}`));
+        }
+      };
+      xhr.onerror = () => reject(new Error('无法连接到文件存储，请检查网络后重试'));
+      xhr.send(part);
     });
 
     try {
       const partCount = Math.ceil(currentFile.size / partSize);
       const parts = new Array<{ number: number; etag: string }>(partCount);
-      let nextPartNumber = 1;
-      const worker = async () => {
-        while (nextPartNumber <= partCount) {
-          const partNumber = nextPartNumber++;
-          const offset = (partNumber - 1) * partSize;
-          const part = currentFile.slice(offset, Math.min(offset + partSize, currentFile.size));
-          const etag = await uploadPart(partNumber, part);
-          parts[partNumber - 1] = { number: partNumber, etag };
-        }
-      };
-      await Promise.all(Array.from({ length: Math.min(concurrency, partCount) }, worker));
+      for (let batchStart = 1; batchStart <= partCount; batchStart += SIGNED_PART_BATCH_SIZE) {
+        const batchEnd = Math.min(batchStart + SIGNED_PART_BATCH_SIZE - 1, partCount);
+        const partNumbers = Array.from({ length: batchEnd - batchStart + 1 }, (_, index) => batchStart + index);
+        const uploadUrls = await getPartUploadUrls(partNumbers);
+        let nextBatchIndex = 0;
+        const worker = async () => {
+          while (nextBatchIndex < partNumbers.length) {
+            const partNumber = partNumbers[nextBatchIndex++];
+            const offset = (partNumber - 1) * partSize;
+            const part = currentFile.slice(offset, Math.min(offset + partSize, currentFile.size));
+            const etag = await uploadPart(partNumber, part, uploadUrls.get(partNumber)!);
+            parts[partNumber - 1] = { number: partNumber, etag };
+          }
+        };
+        await Promise.all(Array.from({ length: Math.min(concurrency, partNumbers.length) }, worker));
+      }
+      setUploadedBytes(currentFile.size);
+      setUploadProgress(100);
       setMerging(true);
       const completeRes = await fetch(`/api/file-transfer/${oid}/upload`, {
         method: 'POST',

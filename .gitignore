@@ -42,9 +42,12 @@ next-env.d.ts
 
 .idea
 
-# 避免包含密钥的脚本被上传到仓库
+# 部署脚本可跟踪，本地部署配置不得提交
 **/*.bat
 **/*.ps1
+!scripts/deploy-local.bat
+!scripts/deploy-local.ps1
+scripts/deploy-local.config.ps1
 
 
 /docs/

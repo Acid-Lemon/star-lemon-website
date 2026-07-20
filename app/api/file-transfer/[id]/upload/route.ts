@@ -10,6 +10,8 @@ import {
   initTransferMultipartUpload,
 } from '@/lib/oss';
 
+const MAX_SIGNED_PARTS_PER_REQUEST = 32;
+
 async function getPaidTransfer(id: number, userId: number) {
   const result = await db.query(
     `SELECT ft.id, ft.file_name, ft.file_size, ft.file_key
@@ -42,7 +44,7 @@ export async function GET(_request: NextRequest, { params }: { params: Promise<{
     return NextResponse.json({
       ...multipart,
       partSize: 8 * 1024 * 1024,
-      concurrency: 3,
+      concurrency: 4,
     });
   } catch (error) {
     console.error('Generate upload URL error:', error);
@@ -67,6 +69,30 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
     }
 
     const body = await request.json().catch(() => ({}));
+    if (body.action === 'parts') {
+      if (typeof body.uploadId !== 'string' || !Array.isArray(body.partNumbers)) {
+        return NextResponse.json({ error: '分片参数无效' }, { status: 400 });
+      }
+
+      const partNumbers = [...new Set<number>(
+        body.partNumbers.map((value: unknown) => Number(value))
+      )];
+      if (
+        partNumbers.length === 0
+        || partNumbers.length > MAX_SIGNED_PARTS_PER_REQUEST
+        || partNumbers.some((partNumber) => !Number.isInteger(partNumber) || partNumber < 1)
+      ) {
+        return NextResponse.json({ error: '分片参数无效' }, { status: 400 });
+      }
+
+      const key = getTransferObjectKey(transfer.id, transfer.file_name);
+      const uploadUrls = await Promise.all(partNumbers.map(async (partNumber) => ({
+        partNumber,
+        uploadUrl: await generatePartUploadUrl(key, body.uploadId, partNumber),
+      })));
+      return NextResponse.json({ uploadUrls });
+    }
+
     if (body.action === 'complete') {
       if (typeof body.uploadId !== 'string' || !Array.isArray(body.parts) || body.parts.length === 0) {
         return NextResponse.json({ error: '分片上传参数无效' }, { status: 400 });

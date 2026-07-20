@@ -236,10 +236,10 @@ export default async function Home() {
                                 Icon: RiChat3Line
                             },
                         ].map((item, index) => (
-                            <div
-                                key={index}
-                                className="group relative overflow-hidden rounded-2xl bg-white dark:bg-gray-900 p-6 shadow-sm hover:shadow-xl transition-all duration-500 hover:-translate-y-1 border border-gray-100 dark:border-gray-800"
-                            >
+                            <div key={index} className="group">
+                                <div
+                                    className="relative overflow-hidden rounded-2xl bg-white dark:bg-gray-900 p-6 shadow-sm group-hover:shadow-xl transition-all duration-500 group-hover:-translate-y-1 h-full border border-gray-100 dark:border-gray-800"
+                                >
                                 <div className="relative flex items-center gap-4">
                                     <div
                                         className={`flex items-center justify-center w-12 h-12 rounded-xl ${item.bgColor} text-gray-600 dark:text-gray-400 group-hover:scale-110 transition-transform duration-300`}>
@@ -254,6 +254,7 @@ export default async function Home() {
                                 </div>
                                 <div
                                     className={`absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r ${item.color} transform scale-x-0 group-hover:scale-x-100 transition-transform duration-500 origin-left`}/>
+                                </div>
                             </div>
                         ))}
                     </div>
@@ -309,9 +310,9 @@ export default async function Home() {
                             Icon: RiSettings3Line
                         },
                     ].map((item) => (
-                        <Link key={item.href} href={item.href}>
+                        <Link key={item.href} href={item.href} className="group">
                             <Card
-                                className={`group hover:shadow-lg transition-all duration-300 hover:-translate-y-1 cursor-pointer h-full border-0 bg-gradient-to-br ${item.bg}`}>
+                                className={`group-hover:shadow-lg transition-all duration-300 group-hover:-translate-y-1 cursor-pointer h-full border-0 bg-gradient-to-br ${item.bg}`}>
                                 <CardHeader className="text-center">
                                     <div
                                         className={`w-12 h-12 mx-auto mb-3 rounded-full ${item.iconBg} flex items-center justify-center group-hover:scale-110 transition-transform duration-300`}>

@@ -299,6 +299,7 @@ async function init() {
           out_trade_no VARCHAR(100),
           status VARCHAR(20) NOT NULL DEFAULT 'unpaid',
           refund_amount NUMERIC(10,2) DEFAULT 0,
+          paid_at TIMESTAMP,
           created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         )
       `);
@@ -307,6 +308,20 @@ async function init() {
       console.log('✅ file_transfer_orders 表创建成功');
     } else {
       console.log('⏭️ file_transfer_orders 表已存在，跳过创建');
+    }
+
+    if (!await columnExists(client, 'file_transfer_orders', 'paid_at')) {
+      await client.query('ALTER TABLE file_transfer_orders ADD COLUMN paid_at TIMESTAMP');
+      console.log('✅ file_transfer_orders.paid_at 字段添加成功');
+    }
+
+    const migratedTransferCoinOrders = await client.query(`
+      UPDATE file_transfer_orders
+      SET pay_order_no = 'COIN-FT-' || id, out_trade_no = NULL
+      WHERE pay_order_no = 'COIN'
+    `);
+    if (migratedTransferCoinOrders.rowCount > 0) {
+      console.log(`✅ ${migratedTransferCoinOrders.rowCount} 笔文件快传星柠币订单号迁移成功`);
     }
 
     // file_conversions
@@ -407,6 +422,15 @@ async function init() {
       console.log('✅ file_conversion_orders 表创建成功');
     } else {
       console.log('⏭️ file_conversion_orders 表已存在，跳过创建');
+    }
+
+    const migratedConversionCoinOrders = await client.query(`
+      UPDATE file_conversion_orders
+      SET pay_order_no = 'COIN-FC-' || id, out_trade_no = NULL
+      WHERE pay_order_no = 'COIN'
+    `);
+    if (migratedConversionCoinOrders.rowCount > 0) {
+      console.log(`✅ ${migratedConversionCoinOrders.rowCount} 笔文件转换星柠币订单号迁移成功`);
     }
 
     // coin_recharge_orders

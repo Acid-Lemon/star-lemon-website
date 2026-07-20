@@ -52,7 +52,9 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
 
         await client.query(
           `UPDATE file_transfer_orders
-           SET status = 'paid', paid_at = NOW(), pay_order_no = 'COIN'
+           SET status = 'paid', paid_at = NOW(),
+               pay_order_no = 'COIN-FT-' || id,
+               out_trade_no = NULL
            WHERE id = $1`,
           [transfer.order_id]
         );

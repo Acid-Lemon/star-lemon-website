@@ -79,7 +79,8 @@ export default function About() {
                 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                     {/* Star 的卡片 */}
-                    <Card className="group hover:shadow-xl transition-all duration-500 hover:-translate-y-2 border-0 bg-gradient-to-br from-white to-blue-50/50">
+                    <div className="group">
+                    <Card className="h-full group-hover:shadow-xl transition-all duration-500 group-hover:-translate-y-2 border-0 bg-gradient-to-br from-white to-blue-50/50">
                         <CardHeader className="text-center pb-0">
                             <div className="flex justify-center mb-4">
                                 <div className="relative">
@@ -111,9 +112,11 @@ export default function About() {
                             </div>
                         </CardContent>
                     </Card>
+                    </div>
 
                     {/* Lemon 的卡片 */}
-                    <Card className="group hover:shadow-xl transition-all duration-500 hover:-translate-y-2 border-0 bg-gradient-to-br from-white to-yellow-50/50">
+                    <div className="group">
+                    <Card className="h-full group-hover:shadow-xl transition-all duration-500 group-hover:-translate-y-2 border-0 bg-gradient-to-br from-white to-yellow-50/50">
                         <CardHeader className="text-center pb-0">
                             <div className="flex justify-center mb-4">
                                 <div className="relative">
@@ -145,6 +148,7 @@ export default function About() {
                             </div>
                         </CardContent>
                     </Card>
+                    </div>
                 </div>
             </section>
 
@@ -156,8 +160,8 @@ export default function About() {
                 </div>
                 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-2xl mx-auto">
-                    <a href="mailto:star@example.com" className="group">
-                        <Card className="h-full border-0 bg-gradient-to-br from-white to-blue-50/30 hover:shadow-lg transition-all duration-300 hover:-translate-y-1">
+                   <a href="mailto:star@example.com" className="group">
+                        <Card className="h-full border-0 bg-gradient-to-br from-white to-blue-50/30 group-hover:shadow-lg transition-all duration-300 group-hover:-translate-y-1">
                             <CardContent className="p-6 flex items-center gap-4">
                                 <div className="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center group-hover:bg-blue-200 transition-colors">
                                     <RiMailLine className="w-6 h-6 text-blue-600" />
@@ -170,8 +174,8 @@ export default function About() {
                         </Card>
                     </a>
                     
-                    <a href="mailto:lemon@example.com" className="group">
-                        <Card className="h-full border-0 bg-gradient-to-br from-white to-yellow-50/30 hover:shadow-lg transition-all duration-300 hover:-translate-y-1">
+                   <a href="mailto:lemon@example.com" className="group">
+                        <Card className="h-full border-0 bg-gradient-to-br from-white to-yellow-50/30 group-hover:shadow-lg transition-all duration-300 group-hover:-translate-y-1">
                             <CardContent className="p-6 flex items-center gap-4">
                                 <div className="w-12 h-12 rounded-full bg-yellow-100 flex items-center justify-center group-hover:bg-yellow-200 transition-colors">
                                     <RiMailLine className="w-6 h-6 text-yellow-600" />

@@ -20,7 +20,7 @@ interface FileTransfer {
   download_count: number;
   retain_days: number;
   expire_at: string;
-  price: string;
+  price: string | null;
   created_at: string;
   updated_at: string;
   user_id: number | null;
@@ -52,6 +52,12 @@ function formatFileSize(bytes: number): string {
   if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
   if (bytes < 1024 * 1024 * 1024) return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
   return (bytes / (1024 * 1024 * 1024)).toFixed(2) + ' GB';
+}
+
+function formatPrice(value: string | null | undefined): string {
+  if (value === null || value === undefined || value.trim() === '') return '-';
+  const price = Number(value);
+  return Number.isFinite(price) ? `¥${price.toFixed(2)}` : '-';
 }
 
 function FileManagementTab() {
@@ -157,7 +163,7 @@ function FileManagementTab() {
                       </div>
                     </TableCell>
                     <TableCell>
-                      <span className="text-sm font-medium">¥{parseFloat(file.price).toFixed(2)}</span>
+                      <span className="text-sm font-medium">{formatPrice(file.price)}</span>
                     </TableCell>
                     <TableCell>
                       {file.user_nickname ? (
@@ -285,7 +291,7 @@ function OrderRecordsTab() {
                       <span className="font-mono font-bold text-sm">{order.code || '-'}</span>
                     </TableCell>
                     <TableCell>{getStatusBadge(order)}</TableCell>
-                    <TableCell className="text-sm font-medium">¥{order.price ? parseFloat(order.price).toFixed(2) : '0.00'}</TableCell>
+                    <TableCell className="text-sm font-medium">{formatPrice(order.price)}</TableCell>
                     <TableCell className="text-sm">
                       {parseFloat(order.refund_amount) > 0 ? (
                         <span className="text-destructive font-medium">¥{parseFloat(order.refund_amount).toFixed(2)}</span>

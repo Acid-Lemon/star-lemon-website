@@ -145,6 +145,7 @@ export async function migrate(): Promise<string[]> {
       out_trade_no VARCHAR(100),
       status VARCHAR(20) NOT NULL DEFAULT 'unpaid',
       refund_amount NUMERIC(10,2) DEFAULT 0,
+      paid_at TIMESTAMP,
       created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     )`],
     ['file_conversions', `CREATE TABLE file_conversions (
@@ -217,6 +218,30 @@ export async function migrate(): Promise<string[]> {
 
   for (const sql of indexes) {
     await db.query(sql);
+  }
+
+  // Migration: file transfer payment timestamp
+  if (!await columnExists('file_transfer_orders', 'paid_at')) {
+    await db.query('ALTER TABLE file_transfer_orders ADD COLUMN paid_at TIMESTAMP');
+    logs.push('file_transfer_orders.paid_at 已添加');
+  }
+
+  const migratedTransferCoinOrders = await db.query(
+    `UPDATE file_transfer_orders
+     SET pay_order_no = 'COIN-FT-' || id, out_trade_no = NULL
+     WHERE pay_order_no = 'COIN'`
+  );
+  if ((migratedTransferCoinOrders.rowCount ?? 0) > 0) {
+    logs.push(`${migratedTransferCoinOrders.rowCount} 笔文件快传星柠币订单号已迁移`);
+  }
+
+  const migratedConversionCoinOrders = await db.query(
+    `UPDATE file_conversion_orders
+     SET pay_order_no = 'COIN-FC-' || id, out_trade_no = NULL
+     WHERE pay_order_no = 'COIN'`
+  );
+  if ((migratedConversionCoinOrders.rowCount ?? 0) > 0) {
+    logs.push(`${migratedConversionCoinOrders.rowCount} 笔文件转换星柠币订单号已迁移`);
   }
 
   // Migration: dev_tasks columns

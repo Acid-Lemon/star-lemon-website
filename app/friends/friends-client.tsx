@@ -50,9 +50,9 @@ export default function FriendsClient({ links }: { links: FriendLink[] }) {
                                 href={link.url}
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                className="group block"
-                            >
-                                <Card className="border-0 bg-gradient-to-br from-white to-gray-50/50 dark:from-gray-900 dark:to-gray-800/50 hover:shadow-xl transition-all duration-500 hover:-translate-y-2 h-full overflow-hidden">
+                               className="group block"
+                           >
+                                <Card className="border-0 bg-gradient-to-br from-white to-gray-50/50 dark:from-gray-900 dark:to-gray-800/50 group-hover:shadow-xl transition-all duration-500 group-hover:-translate-y-2 h-full overflow-hidden">
                                     <CardContent className="p-5">
                                         <div className="flex items-start gap-4">
                                             <div className="shrink-0">

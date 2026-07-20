@@ -67,8 +67,10 @@ export async function DELETE(
       refundAmount = Math.ceil(refundAmount * 100) / 100;
     }
 
+    const isCoinPay = !transfer.out_trade_no;
+
     // Call refund API first
-    if (transfer.out_trade_no && refundAmount > 0) {
+    if (!isCoinPay && refundAmount > 0) {
       const siteUrl = await getSetting('site_url') || 'http://localhost:3000';
       try {
         await refundPayOrder({
@@ -87,7 +89,17 @@ export async function DELETE(
     try {
       await client.query('BEGIN');
 
-      if (refundAmount > 0) {
+      if (isCoinPay && refundAmount > 0) {
+        const refundCoin = Math.floor(refundAmount * 100);
+        await client.query(
+          'UPDATE users SET sl_coin = COALESCE(sl_coin, 0) + $1 WHERE id = $2',
+          [refundCoin, transfer.user_id]
+        );
+        await client.query(
+          'UPDATE file_transfer_orders SET status = $1, refund_amount = $2 WHERE transfer_id = $3',
+          ['refunded', refundAmount, transfer.id]
+        );
+      } else if (refundAmount > 0) {
         await client.query(
           'UPDATE file_transfer_orders SET status = $1, refund_amount = $2 WHERE transfer_id = $3',
           ['refunding', refundAmount, transfer.id]

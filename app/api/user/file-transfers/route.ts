@@ -17,6 +17,7 @@ export async function GET() {
       JOIN file_transfer_orders fto ON fto.transfer_id = ft.id
       WHERE ft.user_id = $1
         AND fto.status = 'paid'
+        AND NULLIF(BTRIM(ft.file_key), '') IS NOT NULL
         AND ft.download_count < ft.max_downloads
         AND ft.expire_at > NOW()
       ORDER BY ft.created_at DESC`,

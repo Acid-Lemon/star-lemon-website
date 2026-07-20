@@ -64,8 +64,8 @@ export async function FeaturedPosts() {
   return (
     <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
       {posts.map((post, index) => (
-        <Link key={post.id} href={`/post/${post.id}`}>
-          <article className="group h-full bg-white dark:bg-gray-900 rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-500 hover:-translate-y-2 border border-gray-100 dark:border-gray-800">
+        <Link key={post.id} href={`/post/${post.id}`} className="group">
+          <article className="h-full bg-white dark:bg-gray-900 rounded-2xl overflow-hidden shadow-sm group-hover:shadow-xl transition-all duration-500 group-hover:-translate-y-2 border border-gray-100 dark:border-gray-800">
             <div className="relative h-48 bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-850 overflow-hidden">
               {post.cover ? (
                 <img

@@ -66,7 +66,7 @@ export async function DELETE(
       refundAmount = Math.ceil(refundAmount * 100) / 100;
     }
 
-    const isCoinPay = transfer.pay_order_no === 'COIN';
+    const isCoinPay = !transfer.out_trade_no;
 
     // 微信支付才调用退款API
     if (!isCoinPay && transfer.out_trade_no && refundAmount > 0) {

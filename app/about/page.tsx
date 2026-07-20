@@ -23,8 +23,9 @@ export default function About() {
             </div>
 
             <section className="w-full">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                    <Card className="group hover:shadow-xl transition-all duration-500 hover:-translate-y-2 border-0 bg-gradient-to-br from-white to-blue-50/50 dark:from-gray-900 dark:to-blue-950/20">
+               <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <div className="group">
+                    <Card className="h-full group-hover:shadow-xl transition-all duration-500 group-hover:-translate-y-2 border-0 bg-gradient-to-br from-white to-blue-50/50 dark:from-gray-900 dark:to-blue-950/20">
                         <CardHeader className="text-center pb-0">
                             <div className="flex justify-center mb-4">
                                 <div className="relative">
@@ -59,10 +60,12 @@ export default function About() {
                                 bilibili="https://space.bilibili.com/25124707"
                                 github="https://github.com/star-starry-sea"
                             />
-                        </CardContent>
+                    </CardContent>
                     </Card>
+                    </div>
 
-                    <Card className="group hover:shadow-xl transition-all duration-500 hover:-translate-y-2 border-0 bg-gradient-to-br from-white to-yellow-50/50 dark:from-gray-900 dark:to-yellow-950/20">
+                    <div className="group">
+                    <Card className="h-full group-hover:shadow-xl transition-all duration-500 group-hover:-translate-y-2 border-0 bg-gradient-to-br from-white to-yellow-50/50 dark:from-gray-900 dark:to-yellow-950/20">
                         <CardHeader className="text-center pb-0">
                             <div className="flex justify-center mb-4">
                                 <div className="relative">
@@ -99,6 +102,7 @@ export default function About() {
                             />
                         </CardContent>
                     </Card>
+                    </div>
                 </div>
             </section>
 

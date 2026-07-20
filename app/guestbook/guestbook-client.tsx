@@ -31,7 +31,8 @@ export default function GuestbookClient({ initialMessages, session }: { initialM
 
             <section className="w-full">
                 <div className="grid grid-cols-3 gap-3">
-                    <Card className="border-0 bg-gradient-to-br from-white to-blue-50/50 dark:from-gray-900 dark:to-blue-950/20 hover:shadow-lg transition-all duration-300 hover:-translate-y-1">
+                    <div className="group">
+                    <Card className="border-0 bg-gradient-to-br from-white to-blue-50/50 dark:from-gray-900 dark:to-blue-950/20 group-hover:shadow-lg transition-all duration-300 group-hover:-translate-y-1 h-full">
                         <CardContent className="p-3 md:p-5">
                             <div className="flex items-center gap-2 md:gap-4">
                                 <div className="w-8 h-8 md:w-12 md:h-12 rounded-lg md:rounded-xl bg-blue-100 dark:bg-blue-900/40 flex items-center justify-center">
@@ -44,8 +45,10 @@ export default function GuestbookClient({ initialMessages, session }: { initialM
                             </div>
                         </CardContent>
                     </Card>
+                    </div>
 
-                    <Card className="border-0 bg-gradient-to-br from-white to-green-50/50 dark:from-gray-900 dark:to-green-950/20 hover:shadow-lg transition-all duration-300 hover:-translate-y-1">
+                    <div className="group">
+                    <Card className="border-0 bg-gradient-to-br from-white to-green-50/50 dark:from-gray-900 dark:to-green-950/20 group-hover:shadow-lg transition-all duration-300 group-hover:-translate-y-1 h-full">
                         <CardContent className="p-3 md:p-5">
                             <div className="flex items-center gap-2 md:gap-4">
                                 <div className="w-8 h-8 md:w-12 md:h-12 rounded-lg md:rounded-xl bg-green-100 dark:bg-green-900/40 flex items-center justify-center">
@@ -60,8 +63,10 @@ export default function GuestbookClient({ initialMessages, session }: { initialM
                             </div>
                         </CardContent>
                     </Card>
+                    </div>
 
-                    <Card className="border-0 bg-gradient-to-br from-white to-purple-50/50 dark:from-gray-900 dark:to-purple-950/20 hover:shadow-lg transition-all duration-300 hover:-translate-y-1">
+                    <div className="group">
+                    <Card className="border-0 bg-gradient-to-br from-white to-purple-50/50 dark:from-gray-900 dark:to-purple-950/20 group-hover:shadow-lg transition-all duration-300 group-hover:-translate-y-1 h-full">
                         <CardContent className="p-3 md:p-5">
                             <div className="flex items-center gap-2 md:gap-4">
                                 <div className="w-8 h-8 md:w-12 md:h-12 rounded-lg md:rounded-xl bg-purple-100 dark:bg-purple-900/40 flex items-center justify-center">
@@ -76,6 +81,7 @@ export default function GuestbookClient({ initialMessages, session }: { initialM
                             </div>
                         </CardContent>
                     </Card>
+                    </div>
                 </div>
             </section>
 
@@ -128,11 +134,11 @@ export default function GuestbookClient({ initialMessages, session }: { initialM
                 ) : (
                     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5">
                         {messages.map((msg, index) => (
-                            <div
-                                key={msg.id}
-                                className="transform transition-all duration-300 hover:-translate-y-2 animate-fadeInUp"
-                                style={{ animationDelay: `${index * 50}ms` }}
-                            >
+                            <div key={msg.id} className="group">
+                                <div
+                                    className="transform transition-all duration-300 group-hover:-translate-y-2 animate-fadeInUp h-full"
+                                    style={{ animationDelay: `${index * 50}ms` }}
+                                >
                                 <MyMessages
                                     message={msg}
                                     bgColor={msg.bg_color}
@@ -140,6 +146,7 @@ export default function GuestbookClient({ initialMessages, session }: { initialM
                                     onDeleted={(id: number) => setMessages(prev => prev.filter(m => m.id !== id))}
                                     onImageClick={handleImageClick}
                                 />
+                                </div>
                             </div>
                         ))}
                     </div>

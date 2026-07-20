@@ -7,6 +7,25 @@ import { randomBytes } from 'crypto';
 
 let ossClient: InstanceType<typeof OSS> | null = null;
 
+type OssClientV4 = InstanceType<typeof OSS> & {
+  signatureUrlV4(
+    method: 'GET' | 'PUT',
+    expires: number,
+    request: { queries?: Record<string, string> } | undefined,
+    objectName: string
+  ): Promise<string>;
+  getObjectMeta(objectName: string): Promise<{
+    res: { headers: Record<string, string | undefined> };
+  }>;
+  initMultipartUpload(objectName: string): Promise<{ uploadId: string }>;
+  completeMultipartUpload(objectName: string, uploadId: string, parts: Array<{ number: number; etag: string }>): Promise<unknown>;
+  abortMultipartUpload(objectName: string, uploadId: string): Promise<unknown>;
+};
+
+function asV4Client(client: InstanceType<typeof OSS>): OssClientV4 {
+  return client as OssClientV4;
+}
+
 function getErrorMessage(error: unknown): string | undefined {
   return error instanceof Error ? error.message : undefined;
 }
@@ -55,18 +74,53 @@ export async function getOssClient() {
   return ossClient;
 }
 
-export async function generateUploadCredentials(fileName: string) {
+export async function generateUploadCredentials(transferId: number, fileName: string) {
   const settings = await getSettings();
   const client = await getOssClient();
-  const key = `file-transfer/${Date.now()}-${Math.random().toString(36).substring(2, 8)}/${fileName}`;
+  const key = `file-transfer/${transferId}/${fileName}`;
 
-  const credentials = client.signatureUrl(key, {
-    method: 'PUT',
-    expires: 3600,
-    'Content-Type': 'application/octet-stream',
-  });
+  const credentials = await asV4Client(client).signatureUrlV4('PUT', 3600, undefined, key);
 
   return { key, uploadUrl: credentials, bucket: settings.oss_bucket || '' };
+}
+
+export function getTransferObjectKey(transferId: number, fileName: string): string {
+  return `file-transfer/${transferId}/${fileName}`;
+}
+
+export async function initTransferMultipartUpload(transferId: number, fileName: string) {
+  const client = await getOssClient();
+  const key = getTransferObjectKey(transferId, fileName);
+  const result = await asV4Client(client).initMultipartUpload(key);
+  return { key, uploadId: result.uploadId };
+}
+
+export async function generatePartUploadUrl(key: string, uploadId: string, partNumber: number): Promise<string> {
+  const client = await getOssClient();
+  return asV4Client(client).signatureUrlV4('PUT', 3600, {
+    queries: { uploadId, partNumber: String(partNumber) },
+  }, key);
+}
+
+export async function completeTransferMultipartUpload(
+  key: string,
+  uploadId: string,
+  parts: Array<{ number: number; etag: string }>
+) {
+  const client = await getOssClient();
+  return asV4Client(client).completeMultipartUpload(key, uploadId, parts);
+}
+
+export async function abortTransferMultipartUpload(key: string, uploadId: string) {
+  const client = await getOssClient();
+  return asV4Client(client).abortMultipartUpload(key, uploadId);
+}
+
+export async function getFileSize(key: string): Promise<number> {
+  const client = await getOssClient();
+  const result = await asV4Client(client).getObjectMeta(key);
+  const contentLength = result.res.headers['content-length'];
+  return Number(contentLength);
 }
 
 export async function multipartUpload(
@@ -100,19 +154,21 @@ export async function multipartUpload(
 export async function generateDownloadUrl(key: string, fileName: string): Promise<string> {
   const settings = await getSettings();
   const esaDomain = settings.esa_domain?.trim().replace(/^https?:\/\//, '').replace(/\/$/, '');
-
   if (esaDomain) {
-    return `https://${esaDomain}/${key}`;
+    return `https://${esaDomain}/${key.split('/').map(encodeURIComponent).join('/')}`;
   }
 
   const client = await getOssClient();
-  const signedUrl = client.signatureUrl(key, {
-    method: 'GET',
-    expires: 300,
-    response: {
-      'content-disposition': `attachment; filename="${fileName}"`,
+  const signedUrl = await asV4Client(client).signatureUrlV4(
+    'GET',
+    300,
+    {
+      queries: {
+        'response-content-disposition': `attachment; filename="${fileName}"`,
+      },
     },
-  });
+    key
+  );
 
   return signedUrl;
 }

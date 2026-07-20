@@ -51,10 +51,10 @@ export async function StatsCards() {
   return (
     <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
       {statItems.map((item, index) => (
-        <div
-          key={index}
-          className="group relative overflow-hidden rounded-2xl bg-white dark:bg-gray-900 p-6 shadow-sm hover:shadow-xl transition-all duration-500 hover:-translate-y-1 border border-gray-100 dark:border-gray-800"
-        >
+        <div key={index} className="group">
+          <div
+            className="relative overflow-hidden rounded-2xl bg-white dark:bg-gray-900 p-6 shadow-sm group-hover:shadow-xl transition-all duration-500 group-hover:-translate-y-1 h-full border border-gray-100 dark:border-gray-800"
+          >
           <div className="absolute top-0 right-0 w-32 h-32 -mr-8 -mt-8 rounded-full opacity-10 group-hover:opacity-20 transition-opacity duration-500"
             style={{
               background: `linear-gradient(135deg, ${item.color.split(' ')[0].replace('from-', '')}, ${item.color.split(' ')[1].replace('to-', '')})`
@@ -74,6 +74,7 @@ export async function StatsCards() {
           </div>
 
           <div className={`absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r ${item.color} transform scale-x-0 group-hover:scale-x-100 transition-transform duration-500 origin-left`} />
+          </div>
         </div>
       ))}
     </div>

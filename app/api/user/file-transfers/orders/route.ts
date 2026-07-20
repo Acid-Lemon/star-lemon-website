@@ -11,7 +11,7 @@ export async function GET() {
 
     const result = await db.query(
       `SELECT 
-        fto.id, fto.transfer_id, ft.code, ft.file_name, ft.file_size, ft.max_downloads,
+        fto.id, fto.transfer_id, ft.code, ft.file_name, ft.file_size, ft.file_key, ft.max_downloads,
         ft.download_count, ft.retain_days, fto.price, fto.pay_order_no, fto.status,
         fto.refund_amount, fto.created_at
       FROM file_transfer_orders fto

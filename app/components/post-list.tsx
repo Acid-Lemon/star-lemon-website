@@ -147,9 +147,9 @@ export function PostList({ initialPosts, allTags }: PostListProps) {
                     const tags = post.tags || [];
 
                     return (
-                        <Link href={`/post/${post.id}`} className="block group" key={`post-${post.id}`}>
-                            <article className="relative flex flex-col sm:flex-row items-start gap-6 p-6 bg-white dark:bg-gray-900 rounded-2xl shadow-sm hover:shadow-xl transition-all duration-300 hover:-translate-y-1 border border-gray-100 dark:border-gray-800 overflow-hidden">
-                                <div className={`absolute left-0 top-0 bottom-0 w-1 ${color.gradient} bg-gradient-to-b opacity-60 group-hover:opacity-100 transition-opacity`} />
+                       <Link href={`/post/${post.id}`} className="block group" key={`post-${post.id}`}>
+                            <article className="relative flex flex-col sm:flex-row items-start gap-6 p-6 bg-white dark:bg-gray-900 rounded-2xl shadow-sm group-hover:shadow-xl transition-all duration-300 group-hover:-translate-y-1 border border-gray-100 dark:border-gray-800 overflow-hidden">
+                               <div className={`absolute left-0 top-0 bottom-0 w-1 ${color.gradient} bg-gradient-to-b opacity-60 group-hover:opacity-100 transition-opacity`} />
 
                                 <div className="relative w-full sm:w-56 aspect-video rounded-xl overflow-hidden shrink-0">
                                     {post.cover ? (

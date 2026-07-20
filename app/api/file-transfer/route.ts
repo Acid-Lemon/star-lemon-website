@@ -49,8 +49,8 @@ export async function POST(request: NextRequest) {
       await client.query('BEGIN');
 
       const transferResult = await client.query(
-        `INSERT INTO file_transfers (code, file_name, file_size, file_key, max_downloads, retain_days, expire_at, user_id)
-         VALUES ($1, $2, $3, '', $4, $5, $6, $7)
+        `INSERT INTO file_transfers (code, file_name, file_size, max_downloads, retain_days, expire_at, user_id)
+         VALUES ($1, $2, $3, $4, $5, $6, $7)
          RETURNING id, code`,
         [code, fileName, fileSize, maxDownloads, retainDays, expireAt, session.user.id]
       );
@@ -95,7 +95,7 @@ export async function GET(request: NextRequest) {
       `SELECT ft.id, ft.code, ft.file_name, ft.file_size, ft.max_downloads, ft.download_count, ft.retain_days, ft.expire_at, fto.status
        FROM file_transfers ft
        LEFT JOIN file_transfer_orders fto ON fto.transfer_id = ft.id
-       WHERE ft.code = $1`,
+       WHERE ft.code = $1 AND NULLIF(BTRIM(ft.file_key), '') IS NOT NULL`,
       [code]
     );
 

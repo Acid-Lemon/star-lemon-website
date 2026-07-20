@@ -42,7 +42,7 @@ export async function GET(_request: NextRequest, { params }: { params: Promise<{
     return NextResponse.json({
       ...multipart,
       partSize: 8 * 1024 * 1024,
-      concurrency: 3,
+      concurrency: 32,
     });
   } catch (error) {
     console.error('Generate upload URL error:', error);

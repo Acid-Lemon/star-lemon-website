@@ -85,6 +85,11 @@ function UploadPanel({ onUploadSuccess }: { onUploadSuccess?: () => void }) {
   const fileRef = useRef<File | null>(null);
   const orderIdRef = useRef<number | null>(null);
   const lastProgressRef = useRef<{ time: number; loaded: number } | null>(null);
+  const uploadTaskRef = useRef<{
+    token: symbol;
+    cancelled: boolean;
+    xhrs: Set<XMLHttpRequest>;
+  } | null>(null);
 
   // Keep refs in sync with state
   useEffect(() => { fileRef.current = file; }, [file]);
@@ -98,12 +103,29 @@ function UploadPanel({ onUploadSuccess }: { onUploadSuccess?: () => void }) {
   }, []);
 
   useEffect(() => {
-    return () => stopPolling();
+    return () => {
+      stopPolling();
+      const task = uploadTaskRef.current;
+      if (task) {
+        task.cancelled = true;
+        task.xhrs.forEach((xhr) => xhr.abort());
+        uploadTaskRef.current = null;
+      }
+    };
   }, [stopPolling]);
 
   const startUpload = useCallback(async (oid: number) => {
     const currentFile = fileRef.current;
     if (!currentFile) return;
+    if (uploadTaskRef.current) return;
+
+    const task = { token: Symbol('upload-task'), cancelled: false, xhrs: new Set<XMLHttpRequest>() };
+    uploadTaskRef.current = task;
+    const ensureActive = () => {
+      if (task.cancelled || uploadTaskRef.current?.token !== task.token) {
+        throw new Error('上传任务已取消');
+      }
+    };
     setStep('uploading');
     setMerging(false);
     setUploadError(null);
@@ -115,15 +137,18 @@ function UploadPanel({ onUploadSuccess }: { onUploadSuccess?: () => void }) {
     let partSize: number;
     let concurrency: number;
     try {
+      ensureActive();
       const credentialsRes = await fetch(`/api/file-transfer/${oid}/upload`);
       const credentials = await credentialsRes.json();
+      ensureActive();
       if (!credentialsRes.ok || !credentials.uploadId || !credentials.partSize) {
         throw new Error(credentials.error || '获取上传地址失败');
       }
       uploadId = credentials.uploadId;
       partSize = credentials.partSize;
-      concurrency = Math.max(1, Math.min(Number(credentials.concurrency) || 3, 4));
+      concurrency = Math.max(1, Math.min(Number(credentials.concurrency) || 32, 32));
     } catch (error) {
+      if (task.cancelled) return;
       const message = error instanceof Error ? error.message : '获取上传地址失败';
       setAutoUploading(false);
       setUploadError(message);
@@ -141,9 +166,10 @@ function UploadPanel({ onUploadSuccess }: { onUploadSuccess?: () => void }) {
         const urlData = await urlRes.json();
         if (!urlRes.ok || !urlData.uploadUrl) throw new Error(urlData.error || '获取分片上传地址失败');
         const xhr = new XMLHttpRequest();
+        task.xhrs.add(xhr);
         xhr.open('PUT', urlData.uploadUrl);
         xhr.upload.onprogress = (e) => {
-          if (e.lengthComputable) {
+          if (!task.cancelled && uploadTaskRef.current?.token === task.token && e.lengthComputable) {
             partProgress.set(partNumber, Math.min(e.loaded, part.size));
             const loaded = [...partProgress.values()].reduce((total, value) => total + value, 0);
             const now = Date.now();
@@ -155,6 +181,7 @@ function UploadPanel({ onUploadSuccess }: { onUploadSuccess?: () => void }) {
           }
         };
         xhr.onload = () => {
+          task.xhrs.delete(xhr);
           if (xhr.status >= 200 && xhr.status < 300) {
             const etag = xhr.getResponseHeader('ETag') || xhr.getResponseHeader('etag');
             if (etag) resolve(etag);
@@ -165,7 +192,10 @@ function UploadPanel({ onUploadSuccess }: { onUploadSuccess?: () => void }) {
             reject(new Error(`OSS ${xhr.status}${code ? ` (${code})` : ''}${message ? `：${message}` : ''}`));
           }
         };
-        xhr.onerror = () => reject(new Error('无法连接到文件存储，请检查网络后重试'));
+        xhr.onerror = () => {
+          task.xhrs.delete(xhr);
+          reject(new Error('无法连接到文件存储，请检查网络后重试'));
+        };
         xhr.send(part);
       }).catch(reject);
     });
@@ -176,6 +206,7 @@ function UploadPanel({ onUploadSuccess }: { onUploadSuccess?: () => void }) {
       let nextPartNumber = 1;
       const worker = async () => {
         while (nextPartNumber <= partCount) {
+          ensureActive();
           const partNumber = nextPartNumber++;
           const offset = (partNumber - 1) * partSize;
           const part = currentFile.slice(offset, Math.min(offset + partSize, currentFile.size));
@@ -184,6 +215,7 @@ function UploadPanel({ onUploadSuccess }: { onUploadSuccess?: () => void }) {
         }
       };
       await Promise.all(Array.from({ length: Math.min(concurrency, partCount) }, worker));
+      ensureActive();
       setMerging(true);
       const completeRes = await fetch(`/api/file-transfer/${oid}/upload`, {
         method: 'POST',
@@ -191,15 +223,20 @@ function UploadPanel({ onUploadSuccess }: { onUploadSuccess?: () => void }) {
         body: JSON.stringify({ action: 'complete', uploadId, parts }),
       });
       const completeData = await completeRes.json();
+      ensureActive();
       if (!completeRes.ok || !completeData.success) throw new Error(completeData.error || '合并文件失败');
       const confirmRes = await fetch(`/api/file-transfer/${oid}/upload`, { method: 'POST' });
       const confirmData = await confirmRes.json();
+      ensureActive();
       if (!confirmRes.ok || !confirmData.success) throw new Error(confirmData.error || '确认上传失败');
       setStep('done');
       toast.success('文件上传成功！');
       onUploadSuccess?.();
     } catch (error) {
+      if (task.cancelled) return;
       const message = error instanceof Error ? error.message : '文件上传失败';
+      task.cancelled = true;
+      task.xhrs.forEach((xhr) => xhr.abort());
       await fetch(`/api/file-transfer/${oid}/upload`, {
         method: 'DELETE',
         headers: { 'Content-Type': 'application/json' },
@@ -208,6 +245,7 @@ function UploadPanel({ onUploadSuccess }: { onUploadSuccess?: () => void }) {
       setUploadError(message);
       toast.error(message);
     } finally {
+      if (uploadTaskRef.current?.token === task.token) uploadTaskRef.current = null;
       setAutoUploading(false);
       setMerging(false);
     }
@@ -322,6 +360,12 @@ function UploadPanel({ onUploadSuccess }: { onUploadSuccess?: () => void }) {
 
   const handleReset = () => {
     stopPolling();
+    const task = uploadTaskRef.current;
+    if (task) {
+      task.cancelled = true;
+      task.xhrs.forEach((xhr) => xhr.abort());
+      uploadTaskRef.current = null;
+    }
     setFile(null);
     setPrice(null);
     setStep('form');
@@ -430,7 +474,13 @@ function UploadPanel({ onUploadSuccess }: { onUploadSuccess?: () => void }) {
           {uploadError && (
             <div className="space-y-3 rounded-md border border-destructive/30 bg-destructive/5 p-4">
               <p className="text-sm text-destructive">{uploadError}</p>
-              <Button className="w-full" onClick={() => orderId && startUpload(orderId)}>重新上传</Button>
+              <Button
+                className="w-full"
+                onClick={() => orderId && startUpload(orderId)}
+                disabled={!!uploadTaskRef.current}
+              >
+                重新上传
+              </Button>
             </div>
           )}
         </CardContent>

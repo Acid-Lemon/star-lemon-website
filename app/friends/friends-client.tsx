@@ -3,7 +3,7 @@
 import { Card, CardContent } from '@/components/ui/card';
 import { RiLinksLine, RiExternalLinkLine } from '@remixicon/react';
 
-interface FriendLink {
+export interface FriendLink {
     id: number;
     name: string;
     url: string;

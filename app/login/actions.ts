@@ -4,11 +4,12 @@ import db from '@/lib/db';
 import { loginUser } from '@/lib/auth';
 import { redirect } from 'next/navigation';
 import bcrypt from 'bcryptjs';
+import { safeReturnUrl } from '@/lib/security';
 
 export async function loginAction(formData: FormData) {
     const email = formData.get('email')?.toString();
     const password = formData.get('password')?.toString();
-    const returnUrlPath = formData.get('returnUrl')?.toString() || '/';
+    const returnUrlPath = safeReturnUrl(formData.get('returnUrl')?.toString());
 
     if (!email || !password) {
         redirect(`/login?error=${encodeURIComponent('请输入邮箱和密码')}&returnUrl=${encodeURIComponent(returnUrlPath)}`);
@@ -32,8 +33,8 @@ export async function loginAction(formData: FormData) {
                 redirectUrl = returnUrlPath;
             }
         }
-    } catch (e: any) {
-        console.error('Login error:', e);
+    } catch (error: unknown) {
+        console.error('Login error:', error);
         redirectUrl = `/login?error=${encodeURIComponent('登录失败，请重试')}&returnUrl=${encodeURIComponent(returnUrlPath)}`;
     }
 

@@ -20,7 +20,7 @@ export async function GET(req: NextRequest) {
             );
 
             const rows = await Promise.all(
-                result.rows.map(async (row: any) => ({
+                result.rows.map(async (row) => ({
                     ...row,
                     avatar: await getPublicUrl(row.avatar),
                 }))
@@ -34,15 +34,15 @@ export async function GET(req: NextRequest) {
         );
 
         const rows = await Promise.all(
-            result.rows.map(async (row: any) => ({
+            result.rows.map(async (row) => ({
                 ...row,
                 avatar: await getPublicUrl(row.avatar),
             }))
         );
 
         return NextResponse.json(rows);
-    } catch (e: any) {
-        console.error('Failed to fetch friend links:', e);
+    } catch (error: unknown) {
+        console.error('Failed to fetch friend links:', error);
         return NextResponse.json({ error: 'Failed to fetch friend links' }, { status: 500 });
     }
 }

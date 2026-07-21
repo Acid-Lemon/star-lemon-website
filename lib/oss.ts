@@ -152,10 +152,16 @@ export async function multipartUpload(
 }
 
 export async function generateDownloadUrl(key: string, fileName: string): Promise<string> {
+  const fallbackName = fileName.replace(/[^\x20-\x7e]/g, '_').replace(/["\\]/g, '_') || 'download';
+  const contentDisposition = `attachment; filename="${fallbackName}"; filename*=UTF-8''${encodeURIComponent(fileName)}`;
   const settings = await getSettings();
   const esaDomain = settings.esa_domain?.trim().replace(/^https?:\/\//, '').replace(/\/$/, '');
   if (esaDomain) {
-    return `https://${esaDomain}/${key.split('/').map(encodeURIComponent).join('/')}`;
+    const query = new URLSearchParams({
+      'response-content-disposition': contentDisposition,
+    });
+    const objectPath = key.split('/').map(encodeURIComponent).join('/');
+    return `https://${esaDomain}/${objectPath}?${query}`;
   }
 
   const client = await getOssClient();
@@ -164,7 +170,7 @@ export async function generateDownloadUrl(key: string, fileName: string): Promis
     300,
     {
       queries: {
-        'response-content-disposition': `attachment; filename="${fileName}"`,
+        'response-content-disposition': contentDisposition,
       },
     },
     key

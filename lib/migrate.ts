@@ -314,8 +314,8 @@ const defaultSettings: { key: string; value: string; category: string; label: st
   { key: 'qq_app_id', value: '', category: 'oauth', label: 'QQ App ID' },
   { key: 'qq_app_key', value: '', category: 'oauth', label: 'QQ App Key' },
   { key: 'ceru_endpoint', value: 'https://auth.shiqianjiang.cn/oidc', category: 'oauth', label: '澜音 Issuer Endpoint' },
-  { key: 'ceru_app_id', value: 'wg0mdkakeio0g8obf6iy5', category: 'oauth', label: '澜音 App ID' },
-  { key: 'ceru_app_secret', value: 'YJxlAYpgAyZkZMjpWfRelI5pT6SUA0R6', category: 'oauth', label: '澜音 App Secret' },
+  { key: 'ceru_app_id', value: '', category: 'oauth', label: '澜音 App ID' },
+  { key: 'ceru_app_secret', value: '', category: 'oauth', label: '澜音 App Secret' },
   // oss
   { key: 'oss_endpoint', value: '', category: 'oss', label: 'OSS Endpoint（可选）' },
   { key: 'oss_region', value: 'oss-cn-hangzhou', category: 'oss', label: 'OSS 地域' },

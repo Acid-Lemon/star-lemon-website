@@ -18,7 +18,7 @@ export async function PUT(
         const { name, url, avatar, description, status, sort_order } = body;
 
         const setClauses: string[] = ['updated_at = NOW()'];
-        const values: any[] = [];
+        const values: unknown[] = [];
         let paramIndex = 1;
 
         if (name !== undefined) { setClauses.push(`name = $${paramIndex++}`); values.push(name); }

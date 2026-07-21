@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { RiLoader4Line, RiVideoLine, RiUserLine, RiMusic2Line } from '@remixicon/react';
+import { RiLoader4Line, RiVideoLine, RiUserLine } from '@remixicon/react';
 
 interface DouyinData {
   type: string;
@@ -23,6 +23,10 @@ interface DouyinVideoEmbedProps {
 const proxyUrl = (url: string) => `/api/douyin-proxy?url=${encodeURIComponent(url)}`;
 
 export function DouyinVideoEmbed({ shortUrl }: DouyinVideoEmbedProps) {
+  return <DouyinVideoContent key={shortUrl} shortUrl={shortUrl} />;
+}
+
+function DouyinVideoContent({ shortUrl }: DouyinVideoEmbedProps) {
   const [data, setData] = useState<DouyinData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -30,9 +34,6 @@ export function DouyinVideoEmbed({ shortUrl }: DouyinVideoEmbedProps) {
 
   useEffect(() => {
     let cancelled = false;
-    setLoading(true);
-    setError(null);
-
     fetch(`/api/douyin-parse?url=${encodeURIComponent(shortUrl)}`)
       .then(res => {
         if (res.status === 429) throw new Error('rate_limit');

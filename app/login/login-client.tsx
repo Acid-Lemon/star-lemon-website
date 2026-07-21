@@ -38,25 +38,7 @@ export default function LoginClientPage({ qqAuthUrl, ceruAuthUrl, errorMsg, retu
     const [oauthNickname, setOauthNickname] = useState('');
     const [oauthAvatar, setOauthAvatar] = useState('');
     const [oauthEmail, setOauthEmail] = useState('');
-
-    const parseQqState = useCallback((state: string | undefined) => {
-        if (state?.startsWith('qq-bind:')) {
-            return { action: 'bind', returnUrl: state.replace(/^qq-bind:/, '') || returnUrl };
-        }
-        if (state?.startsWith('bind:')) {
-            return { action: 'bind', returnUrl: state.replace(/^bind:/, '') || returnUrl };
-        }
-        if (state?.startsWith('qq:')) {
-            return { action: 'login', returnUrl: state.replace(/^qq:/, '') || returnUrl };
-        }
-
-        return { action: 'login', returnUrl: state || returnUrl };
-    }, [returnUrl]);
-
-    const parseOAuthReturnUrl = useCallback((state: string | undefined) => {
-        if (state?.startsWith('ceru:')) return state.replace(/^ceru:/, '') || returnUrl;
-        return parseQqState(state).returnUrl;
-    }, [parseQqState, returnUrl]);
+    const [oauthRedirectUrl, setOauthRedirectUrl] = useState('/');
 
     const handlePasswordLogin = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -159,12 +141,10 @@ export default function LoginClientPage({ qqAuthUrl, ceruAuthUrl, errorMsg, retu
         if (!code) return;
         setQqLoading(true);
 
-        const qqState = parseQqState(state);
-
         fetch('/api/auth/qq/callback', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ code, state: qqState.returnUrl, action: qqState.action }),
+            body: JSON.stringify({ code, state }),
         })
             .then(async (res) => {
                 const data = await res.json();
@@ -175,10 +155,11 @@ export default function LoginClientPage({ qqAuthUrl, ceruAuthUrl, errorMsg, retu
                         setOauthNickname(data.qq_nickname);
                         setOauthAvatar(data.qq_avatar);
                         setOauthEmail('');
+                        setOauthRedirectUrl(data.redirectUrl || '/');
                         setShowBindDialog(true);
                         setQqLoading(false);
                     } else {
-                        window.location.href = data.redirectUrl || qqState.returnUrl;
+                        window.location.href = data.redirectUrl || '/';
                     }
                 } else {
                     toast.error(data.error || 'QQ登录失败');
@@ -189,7 +170,7 @@ export default function LoginClientPage({ qqAuthUrl, ceruAuthUrl, errorMsg, retu
                 toast.error('QQ登录失败');
                 setQqLoading(false);
             });
-    }, [parseQqState]);
+    }, []);
 
     useEffect(() => {
         if (authState?.startsWith('ceru:')) return;
@@ -198,13 +179,12 @@ export default function LoginClientPage({ qqAuthUrl, ceruAuthUrl, errorMsg, retu
 
     const handleCeruCallback = useCallback((code: string, state: string | undefined) => {
         if (!code || !state?.startsWith('ceru:')) return;
-        const actualState = state.replace(/^ceru:/, '') || returnUrl;
         setCeruLoading(true);
 
         fetch('/api/auth/ceru/callback', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ code, state: actualState }),
+            body: JSON.stringify({ code, state }),
         })
             .then(async (res) => {
                 const data = await res.json();
@@ -215,10 +195,11 @@ export default function LoginClientPage({ qqAuthUrl, ceruAuthUrl, errorMsg, retu
                         setOauthNickname(data.oauth_nickname);
                         setOauthAvatar(data.oauth_avatar);
                         setOauthEmail(data.oauth_email || '');
+                        setOauthRedirectUrl(data.redirectUrl || '/');
                         setShowBindDialog(true);
                         setCeruLoading(false);
                     } else {
-                        window.location.href = data.redirectUrl || actualState;
+                        window.location.href = data.redirectUrl || '/';
                     }
                 } else {
                     toast.error(data.error || '澜音登录失败');
@@ -229,7 +210,7 @@ export default function LoginClientPage({ qqAuthUrl, ceruAuthUrl, errorMsg, retu
                 toast.error('澜音登录失败');
                 setCeruLoading(false);
             });
-    }, [returnUrl]);
+    }, []);
 
     useEffect(() => {
         handleCeruCallback(authCode || '', authState);
@@ -392,7 +373,7 @@ export default function LoginClientPage({ qqAuthUrl, ceruAuthUrl, errorMsg, retu
                     oauthNickname={oauthNickname}
                     oauthAvatar={oauthAvatar}
                     oauthEmail={oauthEmail}
-                    redirectUrl={parseOAuthReturnUrl(authState)}
+                    redirectUrl={oauthRedirectUrl}
                 />
             )}
         </div>

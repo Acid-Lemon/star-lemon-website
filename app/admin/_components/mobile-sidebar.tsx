@@ -8,11 +8,7 @@ import {Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger} from '@/comp
 import {Button} from '@/components/ui/button';
 import {ScrollArea} from '@/components/ui/scroll-area';
 
-interface MobileSidebarProps {
-    adminName: string;
-}
-
-export function MobileSidebar({adminName}: MobileSidebarProps) {
+export function MobileSidebar() {
     const [open, setOpen] = React.useState(false);
     const pathname = usePathname();
 

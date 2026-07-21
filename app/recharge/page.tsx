@@ -134,7 +134,7 @@ export default function RechargePage() {
 
     setLoading(true);
     try {
-      const payload: Record<string, any> = { tierId: selectedTier };
+      const payload: Record<string, string | number> = { tierId: selectedTier };
       if (isCustom) {
         payload.customAmount = customYuan;
       }

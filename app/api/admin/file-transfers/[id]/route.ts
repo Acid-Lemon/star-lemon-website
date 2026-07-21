@@ -43,7 +43,6 @@ export async function DELETE(
     const remainingDownloads = transfer.max_downloads - transfer.download_count;
     const totalDays = transfer.retain_days;
     const createdAt = new Date(transfer.created_at);
-    const expireAt = new Date(transfer.expire_at);
     const now = new Date();
     const usedDays = Math.max(0, Math.ceil((now.getTime() - createdAt.getTime()) / (24 * 60 * 60 * 1000)));
     const remainingDays = Math.max(0, totalDays - usedDays);
@@ -79,9 +78,10 @@ export async function DELETE(
           outRefundNo: `RF${transfer.id}${Date.now()}`,
           notifyUrl: `${siteUrl}/api/file-transfer/refund-notify`,
         });
-      } catch (refundErr: any) {
-        console.error('Refund API call failed:', refundErr.message);
-        return NextResponse.json({ error: `退款失败: ${refundErr.message}` }, { status: 500 });
+      } catch (refundErr: unknown) {
+        const message = refundErr instanceof Error ? refundErr.message : '未知错误';
+        console.error('Refund API call failed:', message);
+        return NextResponse.json({ error: `退款失败: ${message}` }, { status: 500 });
       }
     }
 

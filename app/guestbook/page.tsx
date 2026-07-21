@@ -4,6 +4,7 @@ import db from '@/lib/db';
 import { getSession } from '@/lib/auth';
 import { getPublicUrl } from '@/lib/oss';
 import GuestbookClient from './guestbook-client';
+import type { GuestbookMessage } from './types';
 
 export const metadata: Metadata = {
     title: '留言',
@@ -13,7 +14,7 @@ export const metadata: Metadata = {
 export default async function Guestbook() {
     const session = await getSession();
     
-    let messages: any[] = [];
+    let messages: GuestbookMessage[] = [];
     try {
         let result;
         if (session?.user?.id) {
@@ -34,7 +35,7 @@ export default async function Guestbook() {
             `);
         }
         messages = await Promise.all(
-            result.rows.map(async (row: any) => ({
+            result.rows.map(async (row) => ({
                 ...row,
                 image_url: row.image_url
                     ? (await Promise.all(

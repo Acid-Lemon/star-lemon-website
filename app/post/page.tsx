@@ -3,7 +3,7 @@ import type { Metadata } from 'next';
 import { RiArticleLine } from '@remixicon/react';
 import db from '../../lib/db';
 import { getPublicUrl } from '../../lib/oss';
-import {PostList} from '../components/post-list';
+import {PostList, type Post as PostItem} from '../components/post-list';
 
 export const revalidate = 60;
 
@@ -15,7 +15,7 @@ export const metadata: Metadata = {
 async function getAllTags(): Promise<string[]> {
     try {
         const result = await db.query('SELECT DISTINCT unnest(tags) as tag FROM posts ORDER BY tag');
-        return result.rows.map((row: any) => row.tag);
+        return result.rows.map((row) => row.tag);
     } catch (e) {
         console.error('Failed to fetch tags', e);
         return [];
@@ -23,7 +23,7 @@ async function getAllTags(): Promise<string[]> {
 }
 
 export default async function Post() {
-    let posts: any[] = [];
+    let posts: PostItem[] = [];
     let tags: string[] = [];
 
     try {
@@ -38,7 +38,7 @@ export default async function Post() {
         ]);
 
         posts = await Promise.all(
-            postsResult.rows.map(async (row: any) => ({
+            postsResult.rows.map(async (row) => ({
                 ...row,
                 cover: await getPublicUrl(row.cover),
                 author_avatar: await getPublicUrl(row.author_avatar),

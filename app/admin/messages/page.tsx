@@ -35,7 +35,7 @@ export default function MessagesPage() {
       const res = await fetch('/api/guestbook?all=true');
       const data = await res.json();
       setMessages(Array.isArray(data) ? data : []);
-    } catch (error) {
+    } catch {
       toast.error('获取留言失败');
     } finally {
       setLoading(false);
@@ -57,7 +57,7 @@ export default function MessagesPage() {
       } else {
         toast.error('更新失败');
       }
-    } catch (error) {
+    } catch {
       toast.error('更新失败');
     } finally {
       setUpdatingId(null);
@@ -83,7 +83,7 @@ export default function MessagesPage() {
       } else {
         toast.error('删除失败');
       }
-    } catch (error) {
+    } catch {
       toast.error('删除失败');
     } finally {
       setDeleting(false);

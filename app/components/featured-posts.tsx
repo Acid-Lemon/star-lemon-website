@@ -26,7 +26,7 @@ export async function FeaturedPosts() {
       LIMIT 3
     `);
     posts = await Promise.all(
-      result.rows.map(async (row: any) => ({
+      result.rows.map(async (row) => ({
         ...row,
         cover: await getPublicUrl(row.cover),
         author_avatar: await getPublicUrl(row.author_avatar),

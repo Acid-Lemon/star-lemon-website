@@ -9,6 +9,12 @@ export async function GET() {
       return NextResponse.json({ error: '请先登录' }, { status: 401 });
     }
 
+    await db.query(
+      `UPDATE file_conversions SET status = 'failed', updated_at = CURRENT_TIMESTAMP
+       WHERE user_id = $1 AND status = 'uploading' AND updated_at < CURRENT_TIMESTAMP - INTERVAL '15 minutes'`,
+      [session.user.id]
+    );
+
     const result = await db.query(
       `SELECT fc.id, fc.file_name, fc.file_size, fc.src_format, fc.page_count, fc.status, fc.created_at,
               fco.price, fco.status as order_status

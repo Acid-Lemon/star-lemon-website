@@ -7,12 +7,13 @@ import { SubmitMessageForm } from './submit-form';
 import { MyMessages } from './my-messages';
 import { Card, CardContent } from '@/components/ui/card';
 import { GalleryLightbox } from '../components/image-lightbox';
+import type { GuestbookMessage, GuestbookSession } from './types';
 
-export default function GuestbookClient({ initialMessages, session }: { initialMessages: any[], session: any }) {
+export default function GuestbookClient({ initialMessages, session }: { initialMessages: GuestbookMessage[]; session?: GuestbookSession }) {
     const [messages, setMessages] = useState(initialMessages);
     const [lightbox, setLightbox] = useState<{ images: string[]; index: number } | null>(null);
 
-    function handleNewMessage(message: any) {
+    function handleNewMessage(message: GuestbookMessage) {
         setMessages(prev => [message, ...prev]);
     }
 

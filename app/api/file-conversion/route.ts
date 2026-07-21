@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import db from '@/lib/db';
 import { getSession } from '@/lib/auth';
 import { isFormatSupported, getSrcFormat, isValidOutputFormat } from '@/lib/convert-service';
+import { MAX_CONVERSION_FILE_SIZE } from '@/lib/convert-constants';
 
 export async function POST(request: NextRequest) {
   try {
@@ -13,8 +14,12 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     const { fileName, fileSize, dstFormat } = body;
 
-    if (!fileName || !fileSize) {
+    if (typeof fileName !== 'string' || !fileName || fileName.length > 500 || !Number.isSafeInteger(fileSize) || fileSize <= 0) {
       return NextResponse.json({ error: '参数不完整' }, { status: 400 });
+    }
+
+    if (fileSize > MAX_CONVERSION_FILE_SIZE) {
+      return NextResponse.json({ error: '文件不能超过 100 MB' }, { status: 413 });
     }
 
     if (!isFormatSupported(fileName)) {
@@ -22,9 +27,9 @@ export async function POST(request: NextRequest) {
     }
 
     const srcFormat = getSrcFormat(fileName)!;
-    const resolvedDst = dstFormat || 'pdf';
+    const resolvedDst = dstFormat === undefined ? 'pdf' : dstFormat;
 
-    if (!isValidOutputFormat(srcFormat, resolvedDst)) {
+    if (typeof resolvedDst !== 'string' || !isValidOutputFormat(srcFormat, resolvedDst)) {
       return NextResponse.json({ error: `不支持转换为 ${resolvedDst} 格式` }, { status: 400 });
     }
 

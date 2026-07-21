@@ -2,11 +2,11 @@ import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 import { decrypt, encrypt, SESSION_DURATION_MS, RENEW_THRESHOLD_S } from './lib/auth';
 
-export async function middleware(request: NextRequest) {
+export async function proxy(request: NextRequest) {
   const sessionCookie = request.cookies.get('session')?.value;
   const { pathname } = request.nextUrl;
 
-  let sessionPayload: any = null;
+  let sessionPayload: Awaited<ReturnType<typeof decrypt>> | null = null;
   let newSessionToken: string | null = null;
   let clearSession = false;
 
@@ -15,7 +15,7 @@ export async function middleware(request: NextRequest) {
       sessionPayload = await decrypt(sessionCookie);
       const now = Math.floor(Date.now() / 1000);
       const remaining = (sessionPayload.exp as number) - now;
-      if (remaining > 0 && remaining < RENEW_THRESHOLD_S) {
+      if (remaining > 0 && remaining < RENEW_THRESHOLD_S && sessionPayload.user && typeof sessionPayload.time === 'number') {
         newSessionToken = await encrypt({ user: sessionPayload.user, time: sessionPayload.time });
       }
     } catch {
@@ -43,6 +43,8 @@ export async function middleware(request: NextRequest) {
       expires: new Date(Date.now() + SESSION_DURATION_MS),
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+      path: '/',
     });
   } else if (clearSession) {
     response.cookies.set('session', '', { expires: new Date(0) });

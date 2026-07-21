@@ -1,7 +1,7 @@
 'use client';
 
 import { useTheme } from 'next-themes';
-import { useEffect, useState, useRef, useCallback } from 'react';
+import { useEffect, useState, useRef, useCallback, useSyncExternalStore } from 'react';
 import {
     RiSunLine,
     RiMoonLine,
@@ -56,14 +56,10 @@ const themes: ThemeOption[] = [
 
 export function ThemeSwitcher() {
     const { theme, setTheme } = useTheme();
-    const [mounted, setMounted] = useState(false);
+    const mounted = useSyncExternalStore(() => () => {}, () => true, () => false);
     const [isOpen, setIsOpen] = useState(false);
     const panelRef = useRef<HTMLDivElement>(null);
     const buttonRef = useRef<HTMLButtonElement>(null);
-
-    useEffect(() => {
-        setMounted(true);
-    }, []);
 
     const handleSelectTheme = (themeId: string) => {
         setTheme(themeId);

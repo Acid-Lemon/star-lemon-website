@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getSettings } from '@/lib/settings';
+import { createOAuthState, safeReturnUrl } from '@/lib/security';
 
 export async function GET(req: NextRequest) {
     const settings = await getSettings();
@@ -11,10 +12,12 @@ export async function GET(req: NextRequest) {
         return NextResponse.json({ error: 'QQ登录未配置' }, { status: 500 });
     }
 
-    const redirectUri = `${baseUrl}/api/auth/qq/callback`;
-    const state = req.nextUrl.searchParams.get('state') || '/';
+    const redirectUri = `${baseUrl}/login`;
+    const { nonce, state } = createOAuthState('qq', 'login', safeReturnUrl(req.nextUrl.searchParams.get('state')));
     
     const authUrl = `https://graph.qq.com/oauth2.0/authorize?response_type=code&client_id=${qqAppId}&redirect_uri=${encodeURIComponent(redirectUri)}&state=${encodeURIComponent(state)}`;
     
-    return NextResponse.redirect(authUrl);
+    const response = NextResponse.redirect(authUrl);
+    response.cookies.set('oauth_nonce', nonce, { httpOnly: true, secure: process.env.NODE_ENV === 'production', sameSite: 'lax', path: '/', maxAge: 600 });
+    return response;
 }

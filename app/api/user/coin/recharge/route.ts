@@ -3,7 +3,7 @@ import db from '@/lib/db';
 import { getSession } from '@/lib/auth';
 import { createNativePayOrder } from '@/lib/lantu-pay';
 import { getSetting } from '@/lib/settings';
-import { RECHARGE_TIERS, getTierById, getTotalCoin, calcCustomCoin } from '@/lib/coin-recharge';
+import { RECHARGE_TIERS, getTierById, calcCustomCoin } from '@/lib/coin-recharge';
 
 export async function GET() {
   return NextResponse.json({ tiers: RECHARGE_TIERS });
@@ -74,8 +74,8 @@ export async function POST(request: NextRequest) {
       coinAmount,
       bonusCoin,
     });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Coin recharge error:', error);
-    return NextResponse.json({ error: error.message || '发起充值失败' }, { status: 500 });
+    return NextResponse.json({ error: error instanceof Error ? error.message : '发起充值失败' }, { status: 500 });
   }
 }

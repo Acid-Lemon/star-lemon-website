@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import db from '@/lib/db';
 import { loginUser } from '@/lib/auth';
 import bcrypt from 'bcryptjs';
+import { consumeRateLimit, requestClientKey } from '@/lib/security';
 
 export async function POST(request: NextRequest) {
   try {
@@ -10,6 +11,9 @@ export async function POST(request: NextRequest) {
 
     if (!email || !password) {
       return NextResponse.json({ error: '请输入邮箱和密码' }, { status: 400 });
+    }
+    if (!consumeRateLimit(requestClientKey(request, 'password-login', email), 5, 15 * 60 * 1000)) {
+      return NextResponse.json({ error: '登录尝试过于频繁，请稍后再试' }, { status: 429 });
     }
 
     const result = await db.query('SELECT * FROM users WHERE email = $1', [email]);

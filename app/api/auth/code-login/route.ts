@@ -1,16 +1,20 @@
 import { NextRequest, NextResponse } from 'next/server';
 import db from '@/lib/db';
 import { loginUser } from '@/lib/auth';
+import { consumeRateLimit, requestClientKey, safeReturnUrl } from '@/lib/security';
 
 export async function POST(request: NextRequest) {
   try {
     const formData = await request.formData();
     const email = formData.get('email')?.toString();
     const code = formData.get('code')?.toString();
-    const returnUrl = formData.get('returnUrl')?.toString() || '/';
+    const returnUrl = safeReturnUrl(formData.get('returnUrl')?.toString());
 
     if (!email || !code) {
       return NextResponse.json({ error: '请输入邮箱和验证码' }, { status: 400 });
+    }
+    if (!consumeRateLimit(requestClientKey(request, 'code-login', email), 5, 15 * 60 * 1000)) {
+      return NextResponse.json({ error: '登录尝试过于频繁，请稍后再试' }, { status: 429 });
     }
 
     const codeResult = await db.query(

@@ -12,7 +12,17 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    ".agents/**",
+    ".claude/**",
+    ".opencode/**",
+    ".idea/**",
   ]),
+  {
+    rules: {
+      // Most images are user/OSS URLs with runtime dimensions and cannot use next/image safely.
+      "@next/next/no-img-element": "off",
+    },
+  },
 ]);
 
 export default eslintConfig;

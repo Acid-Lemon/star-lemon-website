@@ -34,7 +34,7 @@ export default function CommentsPage() {
       const res = await fetch('/api/comments/all');
       const data = await res.json();
       setComments(data);
-    } catch (error) {
+    } catch {
       toast.error('获取评论失败');
     } finally {
       setLoading(false);
@@ -56,7 +56,7 @@ export default function CommentsPage() {
       } else {
         toast.error('更新失败');
       }
-    } catch (error) {
+    } catch {
       toast.error('更新失败');
     } finally {
       setUpdatingId(null);
@@ -82,7 +82,7 @@ export default function CommentsPage() {
       } else {
         toast.error('删除失败');
       }
-    } catch (error) {
+    } catch {
       toast.error('删除失败');
     } finally {
       setDeleting(false);

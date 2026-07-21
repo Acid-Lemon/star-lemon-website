@@ -4,7 +4,7 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import Link from 'next/link';
 import { RiArrowRightLine, RiArticleLine, RiLoader4Line } from '@remixicon/react';
 
-interface Post {
+export interface Post {
     id: number;
     title: string;
     summary: string;
@@ -69,23 +69,23 @@ export function PostList({ initialPosts, allTags }: PostListProps) {
         return () => observer.disconnect();
     }, [loadMore, hasMore, loading]);
 
-    useEffect(() => {
-        setPosts([]);
-        setHasMore(true);
+    const handleTagSelect = async (tag: string) => {
+        setSelectedTag(tag);
         setLoading(true);
-
         const params = new URLSearchParams({ offset: '0', limit: '6' });
-        if (selectedTag) params.set('tag', selectedTag);
-
-        fetch(`/api/posts?${params}`)
-            .then(res => res.json())
-            .then(data => {
-                setPosts(data.posts || []);
-                setHasMore((data.posts || []).length >= 6);
-            })
-            .catch(() => setPosts([]))
-            .finally(() => setLoading(false));
-    }, [selectedTag]);
+        if (tag) params.set('tag', tag);
+        try {
+            const res = await fetch(`/api/posts?${params}`);
+            const data = await res.json();
+            setPosts(data.posts || []);
+            setHasMore((data.posts || []).length >= 6);
+        } catch {
+            setPosts([]);
+            setHasMore(false);
+        } finally {
+            setLoading(false);
+        }
+    };
 
     const getRelativeTime = (dateStr: string) => {
         try {
@@ -116,7 +116,7 @@ export function PostList({ initialPosts, allTags }: PostListProps) {
             {allTags.length > 0 && (
                 <div className="mb-8 flex flex-wrap gap-2">
                     <button
-                        onClick={() => setSelectedTag('')}
+                        onClick={() => handleTagSelect('')}
                         className={`px-3 py-1.5 rounded-full text-sm font-medium transition-all duration-300 ${
                             selectedTag === ''
                                 ? 'bg-orange-500 text-white shadow-md'
@@ -128,7 +128,7 @@ export function PostList({ initialPosts, allTags }: PostListProps) {
                     {allTags.map((tag) => (
                         <button
                             key={tag}
-                            onClick={() => setSelectedTag(selectedTag === tag ? '' : tag)}
+                            onClick={() => handleTagSelect(selectedTag === tag ? '' : tag)}
                             className={`px-3 py-1.5 rounded-full text-sm font-medium transition-all duration-300 ${
                                 selectedTag === tag
                                     ? 'bg-orange-500 text-white shadow-md'

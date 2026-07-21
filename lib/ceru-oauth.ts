@@ -14,8 +14,6 @@ export interface CeruDiscovery {
 }
 
 const DEFAULT_CERU_ISSUER = 'https://auth.shiqianjiang.cn/oidc';
-const DEFAULT_CERU_APP_ID = 'wg0mdkakeio0g8obf6iy5';
-const DEFAULT_CERU_APP_SECRET = 'YJxlAYpgAyZkZMjpWfRelI5pT6SUA0R6';
 
 function trimTrailingSlash(value: string): string {
     return value.replace(/\/+$/, '');
@@ -26,8 +24,8 @@ export async function getCeruOAuthConfig(): Promise<CeruOAuthConfig> {
 
     return {
         issuer: trimTrailingSlash(settings.ceru_endpoint || process.env.CERU_ISSUER || process.env.CERU_ENDPOINT || DEFAULT_CERU_ISSUER),
-        appId: settings.ceru_app_id || process.env.CERU_APP_ID || DEFAULT_CERU_APP_ID,
-        appSecret: settings.ceru_app_secret || process.env.CERU_APP_SECRET || DEFAULT_CERU_APP_SECRET,
+        appId: settings.ceru_app_id || process.env.CERU_APP_ID || '',
+        appSecret: settings.ceru_app_secret || process.env.CERU_APP_SECRET || '',
         baseUrl: trimTrailingSlash(settings.site_url || process.env.NEXT_PUBLIC_URL || 'http://localhost:3000'),
     };
 }

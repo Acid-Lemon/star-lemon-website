@@ -4,6 +4,8 @@ import db from '@/lib/db';
 import { loginUser } from '@/lib/auth';
 import { getCeruDiscovery, getCeruOAuthConfig, getCeruRedirectUri } from '@/lib/ceru-oauth';
 import { storeBindData } from '@/lib/qq-bind-store';
+import { cookies } from 'next/headers';
+import { readOAuthState } from '@/lib/security';
 
 interface CeruUserInfo {
     sub?: string;
@@ -27,7 +29,12 @@ export async function POST(req: NextRequest) {
     try {
         const body = await req.json();
         const code = body.code;
-        const state = body.state || '/';
+        const cookieStore = await cookies();
+        const oauthState = readOAuthState(body.state, cookieStore.get('oauth_nonce')?.value, 'ceru');
+        if (!oauthState) {
+            return NextResponse.json({ error: 'OAuth state 无效或已过期', success: false }, { status: 400 });
+        }
+        cookieStore.delete('oauth_nonce');
         const config = await getCeruOAuthConfig();
 
         if (!code || !config.appId || !config.appSecret) {
@@ -83,7 +90,7 @@ export async function POST(req: NextRequest) {
         if (existingUser) {
             await loginUser({ id: existingUser.id, nickname: existingUser.nickname, email: existingUser.email, role: existingUser.role, avatar: existingUser.avatar });
             revalidatePath('/');
-            return NextResponse.json({ success: true, redirectUrl: state });
+            return NextResponse.json({ success: true, redirectUrl: oauthState.returnUrl });
         }
 
         const nickname = normalizeNickname(userInfo);
@@ -97,7 +104,7 @@ export async function POST(req: NextRequest) {
             email,
         });
 
-        return NextResponse.json({ success: true, needs_bind: true, bind_token: bindToken, oauth_provider: 'ceru', oauth_nickname: nickname, oauth_avatar: avatar, oauth_email: email });
+        return NextResponse.json({ success: true, needs_bind: true, bind_token: bindToken, oauth_provider: 'ceru', oauth_nickname: nickname, oauth_avatar: avatar, oauth_email: email, redirectUrl: oauthState.returnUrl });
     } catch (error) {
         console.error('Ceru login error:', error);
         return NextResponse.json({ error: '澜音登录失败', success: false }, { status: 500 });

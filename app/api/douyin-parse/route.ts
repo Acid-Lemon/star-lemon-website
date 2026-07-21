@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getSetting } from '../../../lib/settings';
 
-const cache = new Map<string, { data: any; expiry: number }>();
+const cache = new Map<string, { data: unknown; expiry: number }>();
 const CACHE_TTL = 30 * 60 * 1000;
 
 export async function GET(request: NextRequest) {

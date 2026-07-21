@@ -51,21 +51,25 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
       await client.query('COMMIT');
     }
 
-    const userResult = await client.query(
-      'SELECT sl_coin FROM users WHERE id = $1 FOR UPDATE',
-      [session.user.id]
+    const coinNeeded = Math.ceil(price * 100);
+    await client.query('BEGIN');
+    const lockedOrder = await client.query(
+      "SELECT id FROM file_conversion_orders WHERE conversion_id = $1 AND status = 'unpaid' FOR UPDATE",
+      [conversion.id]
     );
-
-    if (userResult.rows.length > 0) {
-      const userCoin = parseFloat(userResult.rows[0].sl_coin || '0');
-      const coinNeeded = Math.ceil(price * 100);
-
-      if (userCoin >= coinNeeded) {
-        await client.query('BEGIN');
-        await client.query(
-          'UPDATE users SET sl_coin = sl_coin - $1 WHERE id = $2',
+    const coinDebit = lockedOrder.rows.length > 0
+      ? await client.query(
+          'UPDATE users SET sl_coin = sl_coin - $1 WHERE id = $2 AND sl_coin >= $1 RETURNING id',
           [coinNeeded, session.user.id]
-        );
+        )
+      : { rows: [] };
+
+    if (lockedOrder.rows.length === 0) {
+      await client.query('ROLLBACK');
+      return NextResponse.json({ paid: true });
+    }
+
+    if (coinDebit.rows.length > 0) {
         await client.query(
           `UPDATE file_conversion_orders
            SET status = 'paid', paid_at = NOW(),
@@ -74,10 +78,10 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
            WHERE conversion_id = $1`,
           [conversion.id]
         );
-        await client.query('COMMIT');
-        return NextResponse.json({ paid: true, coinUsed: coinNeeded });
-      }
+      await client.query('COMMIT');
+      return NextResponse.json({ paid: true, coinUsed: coinNeeded });
     }
+    await client.query('ROLLBACK');
 
     const siteUrl = await getSetting('site_url') || process.env.NEXT_PUBLIC_URL || 'http://localhost:3000';
     const notifyUrl = `${siteUrl}/api/file-conversion/pay-notify`;
@@ -102,10 +106,10 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
       paid: false,
       price,
     });
-  } catch (error: any) {
+  } catch (error: unknown) {
     await client.query('ROLLBACK').catch(() => {});
     console.error('Pay error:', error);
-    return NextResponse.json({ error: error.message || '发起支付失败' }, { status: 500 });
+    return NextResponse.json({ error: error instanceof Error ? error.message : '发起支付失败' }, { status: 500 });
   } finally {
     client.release();
   }

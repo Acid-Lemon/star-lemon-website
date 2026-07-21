@@ -88,7 +88,7 @@ function PostContent({content, douyinMode}: { content: string; douyinMode: Douyi
             h5: createHeading('h5'),
             h6: createHeading('h6'),
         }),
-        []
+        [douyinMode]
     );
 
     return (

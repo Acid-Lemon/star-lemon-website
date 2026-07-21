@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getSession } from '@/lib/auth';
 import { getSettings } from '@/lib/settings';
+import { createOAuthState, safeReturnUrl } from '@/lib/security';
 
 export async function GET(req: NextRequest) {
     const session = await getSession();
@@ -15,11 +16,13 @@ export async function GET(req: NextRequest) {
     }
 
     const baseUrl = settings.site_url || process.env.NEXT_PUBLIC_URL || 'http://localhost:3000';
-    const returnUrl = req.nextUrl.searchParams.get('returnUrl') || '/';
+    const returnUrl = safeReturnUrl(req.nextUrl.searchParams.get('returnUrl'));
     const redirectUri = `${baseUrl}/login`;
-    const state = encodeURIComponent(`qq-bind:${returnUrl}`);
+    const { nonce, state } = createOAuthState('qq', 'bind', returnUrl);
 
-    const authUrl = `https://graph.qq.com/oauth2.0/authorize?response_type=code&client_id=${qqAppId}&redirect_uri=${encodeURIComponent(redirectUri)}&state=${state}`;
+    const authUrl = `https://graph.qq.com/oauth2.0/authorize?response_type=code&client_id=${qqAppId}&redirect_uri=${encodeURIComponent(redirectUri)}&state=${encodeURIComponent(state)}`;
 
-    return NextResponse.redirect(authUrl);
+    const response = NextResponse.redirect(authUrl);
+    response.cookies.set('oauth_nonce', nonce, { httpOnly: true, secure: process.env.NODE_ENV === 'production', sameSite: 'lax', path: '/', maxAge: 600 });
+    return response;
 }

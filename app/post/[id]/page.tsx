@@ -129,7 +129,14 @@ export default async function PostPage({ params }: { params: Promise<{ id: strin
 
     const session = await getSession();
     const rawUser = session?.user;
-    let user = rawUser ? { ...rawUser, avatar: await getPublicUrl(rawUser.avatar) } : null;
+    const user = rawUser ? {
+        ...rawUser,
+        avatar: await getPublicUrl(rawUser.avatar),
+        bio: null,
+        birthday: null,
+        qq_identifier: null,
+        sl_coin: 0,
+    } : null;
 
     const authorColor = post.author_name === 'Star' ? 'bg-blue-500' : 'bg-yellow-500';
     const authorTextColor = post.author_name === 'Star' ? 'text-blue-500' : 'text-yellow-500';

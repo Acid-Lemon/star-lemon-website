@@ -13,7 +13,7 @@ export const revalidate = 0;
 export default async function EditPost({ params }: { params: Promise<{ id: string }> }) {
     const { id } = await params;
 
-    let post: any = null;
+    let post: { id: number; title: string; content: string; tags: string; cover: string } | null = null;
     try {
         const result = await db.query('SELECT * FROM posts WHERE id = $1', [id]);
         if (result.rows.length > 0) {

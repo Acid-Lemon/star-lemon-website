@@ -3,6 +3,7 @@ import type { Metadata } from 'next';
 import db from '@/lib/db';
 import { getPublicUrl } from '@/lib/oss';
 import FriendsClient from './friends-client';
+import type { FriendLink } from './friends-client';
 
 export const revalidate = 60;
 
@@ -12,13 +13,13 @@ export const metadata: Metadata = {
 };
 
 export default async function FriendsPage() {
-    let links: any[] = [];
+    let links: FriendLink[] = [];
     try {
         const result = await db.query(
             `SELECT * FROM friend_links WHERE status = 'approved' ORDER BY sort_order ASC, created_at DESC`
         );
         links = await Promise.all(
-            result.rows.map(async (row: any) => ({
+            result.rows.map(async (row) => ({
                 ...row,
                 avatar: await getPublicUrl(row.avatar),
             }))

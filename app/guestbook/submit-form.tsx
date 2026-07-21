@@ -5,6 +5,7 @@ import { useTransition, useState, useRef } from 'react';
 import { toast } from 'sonner';
 import { RiSendPlaneLine } from '@remixicon/react';
 import { EmojiPicker } from '../components/emoji-picker';
+import type { GuestbookMessage } from './types';
 
 const MAX_IMAGES = 9;
 
@@ -32,7 +33,7 @@ function SubmitButton() {
     );
 }
 
-export function SubmitMessageForm({ onSuccess }: { onSuccess?: (message: any) => void }) {
+export function SubmitMessageForm({ onSuccess }: { onSuccess?: (message: GuestbookMessage) => void }) {
     const [, startTransition] = useTransition();
     const [content, setContent] = useState('');
     const [imageUrls, setImageUrls] = useState<string[]>([]);

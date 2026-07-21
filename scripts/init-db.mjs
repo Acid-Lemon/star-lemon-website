@@ -465,7 +465,7 @@ async function init() {
       { key: 'bing_site_verification', value: '', category: 'site', label: 'Bing站点验证码' },
       { key: 'google_site_verification', value: '', category: 'site', label: 'Google站点验证码' },
     ];
-    for (const s of newSiteSettings) {
+    for (const s of ipapiSettings) {
       const exists = await client.query('SELECT 1 FROM settings WHERE key = $1', [s.key]);
       if (exists.rows.length === 0) {
         await client.query(

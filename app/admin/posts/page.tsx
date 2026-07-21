@@ -1,7 +1,6 @@
 import React from 'react';
 import Link from 'next/link';
 import db from '../../../lib/db';
-import { getSession } from '../../../lib/auth';
 import { DeletePostButton } from '../_components/delete-post-button';
 import { PostPublishForm } from '../_components/post-publish-form';
 
@@ -13,8 +12,16 @@ import { RiEditBoxLine } from '@remixicon/react';
 
 export const revalidate = 0;
 
+interface AdminPost {
+    id: number;
+    title: string;
+    created_at: string;
+    tags: string[] | null;
+    author_name: string | null;
+}
+
 export default async function AdminPosts() {
-    let posts: any[] = [];
+    let posts: AdminPost[] = [];
     try {
         const result = await db.query(`
             SELECT posts.id, posts.title, posts.created_at, posts.tags, users.nickname as author_name, users.avatar as author_avatar

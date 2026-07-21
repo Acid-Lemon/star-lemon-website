@@ -11,7 +11,8 @@ export interface ConversionPriceParams {
   dstFormat?: string;
 }
 
-export async function calculateConversionPrice(_params: ConversionPriceParams): Promise<number> {
+export async function calculateConversionPrice(params: ConversionPriceParams): Promise<number> {
+  void params;
   const settings = await (await import('./settings')).getSettings();
 
   const perFile = parseFloat(settings.fc_price_per_file as string) || DEFAULTS.fc_price_per_file;

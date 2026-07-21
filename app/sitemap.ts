@@ -23,7 +23,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         const result = await db.query(
             'SELECT id, title, updated_at FROM posts ORDER BY updated_at DESC'
         );
-        const postPages: MetadataRoute.Sitemap = result.rows.map((row: any) => ({
+        const postPages: MetadataRoute.Sitemap = result.rows.map((row) => ({
             url: `${siteUrl}/post/${row.id}`,
             lastModified: new Date(row.updated_at),
             changeFrequency: 'weekly' as const,

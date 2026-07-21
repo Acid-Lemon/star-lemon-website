@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { RiEyeLine } from '@remixicon/react';
 
 function getOrCreateVisitorId(): string {

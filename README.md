@@ -64,11 +64,11 @@ pnpm install
 
 ```env
 DATABASE_URL=postgresql://user:password@host:5432/star_lemon
-JWT_SECRET=your_jwt_secret
+JWT_SECRET=replace_with_at_least_32_random_characters
 NEXT_PUBLIC_URL=http://localhost:3000
 ```
 
-`DATABASE_URL` 是必需项。`JWT_SECRET` 建议显式配置，避免使用代码中的开发默认值。`NEXT_PUBLIC_URL` 用于 OAuth 回调、支付通知地址和站点链接生成。
+`DATABASE_URL` 和至少 32 个字符的 `JWT_SECRET` 是必需项，缺失时认证和验证码接口会明确报错。`NEXT_PUBLIC_URL` 用于 OAuth 回调、支付通知地址和站点链接生成。Ceru OAuth 的 App ID 和 App Secret 必须通过环境变量或后台设置配置，代码不再提供默认凭据。
 
 3. 初始化或迁移数据库：
 

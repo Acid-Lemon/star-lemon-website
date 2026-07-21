@@ -9,7 +9,6 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
-import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from '@/components/ui/table';
 import { toast } from 'sonner';
 import { RiUploadCloudLine, RiDownloadLine, RiFileLine, RiCloseLine, RiArrowRightLine, RiArrowLeftLine, RiWechatPayLine, RiCheckLine, RiFolderLine, RiBillLine, RiTimeLine, RiDeleteBinLine } from '@remixicon/react';
 import { AlertDialog, AlertDialogContent, AlertDialogHeader, AlertDialogMedia, AlertDialogTitle, AlertDialogDescription, AlertDialogFooter, AlertDialogCancel, AlertDialogAction } from '@/components/ui/alert-dialog';
@@ -59,6 +58,7 @@ interface UserOrder {
 
 interface DownloadFileInfo {
   id: number;
+  code: string;
   fileName: string;
   fileSize: number;
   maxDownloads: number;
@@ -622,7 +622,11 @@ function DownloadPanel() {
     if (!fileInfo) return;
     setDownloading(true);
     try {
-      const res = await fetch(`/api/file-transfer/${fileInfo.id}/download`, { method: 'POST' });
+      const res = await fetch(`/api/file-transfer/${fileInfo.id}/download`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ code: fileInfo.code }),
+      });
       const data = await res.json();
       if (data.downloadUrl) {
         window.open(data.downloadUrl, '_blank');

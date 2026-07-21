@@ -4,7 +4,6 @@ import { useState, useEffect, useMemo } from 'react';
 import { toast } from 'sonner';
 import { Button, buttonVariants } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
-import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
@@ -15,7 +14,7 @@ import { Badge } from '@/components/ui/badge';
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '@/components/ui/select';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { RiAddLine, RiEditLine, RiDeleteBinLine, RiTaskLine, RiArrowDownSLine, RiArrowRightLine } from '@remixicon/react';
+import { RiAddLine, RiEditLine, RiDeleteBinLine, RiArrowDownSLine, RiArrowRightLine } from '@remixicon/react';
 
 const STATUS_OPTIONS = ['待处理', '待开发', '开发中', '待讨论', '已完成', '暂不开发'] as const;
 const STATUS_SORT_ORDER: Record<string, number> = {

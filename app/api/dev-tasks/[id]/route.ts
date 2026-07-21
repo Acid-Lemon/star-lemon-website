@@ -17,7 +17,7 @@ export async function PUT(
     const { content, assignee_ids, status, type, priority } = body;
 
     const updates: string[] = [];
-    const values: any[] = [];
+    const values: unknown[] = [];
     let paramIndex = 1;
 
     if (content !== undefined) {
@@ -30,7 +30,7 @@ export async function PUT(
 
     if (assignee_ids !== undefined) {
       const assigneeIds = Array.isArray(assignee_ids)
-        ? assignee_ids.filter((id: any) => Number.isInteger(id))
+        ? assignee_ids.filter((id: unknown) => Number.isInteger(id))
         : [];
       updates.push(`assignee_ids = $${paramIndex++}`);
       values.push(assigneeIds.length > 0 ? `{${assigneeIds.join(',')}}` : '{}');

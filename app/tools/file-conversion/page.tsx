@@ -8,11 +8,12 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Badge } from '@/components/ui/badge';
 import { toast } from 'sonner';
 import { RiArrowLeftLine, RiFileLine, RiCloseLine, RiUploadCloudLine, RiWechatPayLine, RiCheckLine, RiDownloadLine, RiFolderLine, RiBillLine, RiRefreshLine, RiDeleteBinLine } from '@remixicon/react';
-import { AlertDialog, AlertDialogContent, AlertDialogHeader, AlertDialogMedia, AlertDialogTitle, AlertDialogDescription, AlertDialogFooter, AlertDialogCancel, AlertDialogAction } from '@/components/ui/alert-dialog';
+import { AlertDialog, AlertDialogContent, AlertDialogHeader, AlertDialogTitle, AlertDialogDescription, AlertDialogFooter, AlertDialogCancel, AlertDialogAction } from '@/components/ui/alert-dialog';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { getOutputFormats, getOutputFormatLabel, getSrcFormat } from '@/lib/convert-formats';
+import { CONVERSION_UPLOAD_TIMEOUT_MS, MAX_CONVERSION_FILE_SIZE } from '@/lib/convert-constants';
 
 const SUPPORTED_FORMATS: { category: string; exts: string }[] = [
   { category: '图片', exts: '.jpg .jpeg .png .gif .bmp .tiff .webp' },
@@ -37,6 +38,10 @@ function formatFileSize(bytes: number): string {
   if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
   if (bytes < 1024 * 1024 * 1024) return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
   return (bytes / (1024 * 1024 * 1024)).toFixed(2) + ' GB';
+}
+
+function markConversionUploadFailed(id: number) {
+  return fetch(`/api/file-conversion/${id}`, { method: 'PATCH' }).catch(() => undefined);
 }
 
 type Step = 'form' | 'uploading' | 'converting' | 'paying' | 'done';
@@ -80,6 +85,7 @@ function ConvertPanel() {
   const [autoPaying, setAutoPaying] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const pollingRef = useRef<NodeJS.Timeout | null>(null);
+  const uploadRef = useRef<XMLHttpRequest | null>(null);
   const conversionIdRef = useRef<number | null>(null);
   const dstFormatRef = useRef<string>('pdf');
 
@@ -94,15 +100,40 @@ function ConvertPanel() {
   }, []);
 
   useEffect(() => {
-    return () => stopPolling();
+    return () => {
+      stopPolling();
+      const xhr = uploadRef.current;
+      if (xhr) {
+        xhr.onload = null;
+        xhr.onerror = null;
+        xhr.ontimeout = null;
+        xhr.onabort = null;
+        xhr.abort();
+      }
+    };
   }, [stopPolling]);
 
   const startConvertPolling = useCallback((cid: number) => {
     stopPolling();
+    const startedAt = Date.now();
+    let consecutiveErrors = 0;
+    let requestInFlight = false;
     pollingRef.current = setInterval(async () => {
+      if (requestInFlight) return;
+      if (Date.now() - startedAt > 30 * 60 * 1000) {
+        stopPolling();
+        toast.error('转换超时，请稍后在转换记录中查看结果');
+        setStep('form');
+        return;
+      }
+      requestInFlight = true;
       try {
-        const res = await fetch(`/api/file-conversion/${cid}/status`);
+        const res = await fetch(`/api/file-conversion/${cid}/status`, {
+          signal: AbortSignal.timeout(10_000),
+        });
         const data = await res.json();
+        if (!res.ok) throw new Error(data.error || '查询转换状态失败');
+        consecutiveErrors = 0;
         if (data.status === 'completed') {
           stopPolling();
           setPrice(data.price);
@@ -118,7 +149,16 @@ function ConvertPanel() {
         } else if (data.status === 'converting') {
           setConvertProgress(data.progress || 0);
         }
-      } catch {}
+      } catch {
+        consecutiveErrors += 1;
+        if (consecutiveErrors >= 3) {
+          stopPolling();
+          toast.error('暂时无法查询转换状态，请稍后在转换记录中查看');
+          setStep('form');
+        }
+      } finally {
+        requestInFlight = false;
+      }
     }, 3000);
   }, [stopPolling]);
 
@@ -160,7 +200,12 @@ function ConvertPanel() {
       setUploadProgress(0);
 
       const xhr = new XMLHttpRequest();
+      uploadRef.current = xhr;
       xhr.open('POST', `/api/file-conversion/${createData.id}/upload`);
+      xhr.timeout = CONVERSION_UPLOAD_TIMEOUT_MS;
+      xhr.setRequestHeader('Content-Type', file.type || 'application/octet-stream');
+      xhr.setRequestHeader('X-File-Name', encodeURIComponent(file.name));
+      xhr.setRequestHeader('X-File-Size', String(file.size));
 
       xhr.upload.onprogress = (e) => {
         if (e.lengthComputable) {
@@ -170,9 +215,21 @@ function ConvertPanel() {
       };
 
       xhr.onload = () => {
+        uploadRef.current = null;
         if (xhr.status >= 200 && xhr.status < 300) {
-          const result = JSON.parse(xhr.responseText);
-          if (result.status === 'completed') {
+          let result: { status?: string; error?: string };
+          try {
+            result = JSON.parse(xhr.responseText) as { status?: string; error?: string };
+          } catch {
+            toast.error('服务器返回了无效的上传结果');
+            setStep('form');
+            void markConversionUploadFailed(createData.id);
+            return;
+          }
+          if (result.error) {
+            toast.error(result.error);
+            setStep('form');
+          } else if (result.status === 'completed') {
             setStep('paying');
             fetchPrice(createData.id);
           } else if (result.status === 'converting') {
@@ -182,6 +239,7 @@ function ConvertPanel() {
           } else {
             toast.error('上传处理异常');
             setStep('form');
+            void markConversionUploadFailed(createData.id);
           }
         } else {
           try {
@@ -191,17 +249,32 @@ function ConvertPanel() {
             toast.error('文件上传失败');
           }
           setStep('form');
+          void markConversionUploadFailed(createData.id);
         }
       };
 
       xhr.onerror = () => {
+        uploadRef.current = null;
         toast.error('上传失败');
         setStep('form');
+        void markConversionUploadFailed(createData.id);
       };
 
-      const formData = new FormData();
-      formData.append('file', file);
-      xhr.send(formData);
+      xhr.ontimeout = () => {
+        uploadRef.current = null;
+        toast.error('上传超时，请检查网络后重试');
+        setStep('form');
+        void markConversionUploadFailed(createData.id);
+      };
+
+      xhr.onabort = () => {
+        uploadRef.current = null;
+        toast.info('已取消上传');
+        setStep('form');
+        void markConversionUploadFailed(createData.id);
+      };
+
+      xhr.send(file);
     } catch {
       toast.error('操作失败');
       setStep('form');
@@ -453,6 +526,13 @@ setStep('form');
                 style={{ width: `${uploadProgress}%` }}
               />
             </div>
+            <p className="text-xs text-muted-foreground text-center">
+              {uploadProgress === 100 ? '文件已上传，正在提交转换任务...' : '正在上传到服务器...'}
+            </p>
+            <Button variant="outline" className="w-full" onClick={() => uploadRef.current?.abort()}>
+              <RiCloseLine className="w-4 h-4 mr-2" />
+              取消上传
+            </Button>
           </div>
         </CardContent>
       </Card>
@@ -478,6 +558,11 @@ setStep('form');
             onChange={(e) => {
               const f = e.target.files?.[0];
               if (f) {
+                if (f.size > MAX_CONVERSION_FILE_SIZE) {
+                  toast.error('文件不能超过 100 MB');
+                  e.target.value = '';
+                  return;
+                }
                 setFile(f);
                 const fmt = getSrcFormat(f.name);
                 const formats = fmt ? getOutputFormats(fmt) : [];
@@ -840,11 +925,7 @@ function MyConversionsPanel({ refreshKey }: { refreshKey?: number }) {
 }
 
 export default function FileConversionPage() {
-  const [refreshKey, setRefreshKey] = useState(0);
-
-  const handleRefresh = useCallback(() => {
-    setRefreshKey(prev => prev + 1);
-  }, []);
+  const [refreshKey] = useState(0);
 
   return (
     <div className="flex-1 flex flex-col items-center pt-16 pb-10 gap-8 px-4 w-full">

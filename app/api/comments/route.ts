@@ -28,7 +28,7 @@ export async function GET(request: NextRequest) {
     );
 
     const rows = await Promise.all(
-      result.rows.map(async (row: any) => ({
+      result.rows.map(async (row) => ({
         ...row,
         image_url: await getPublicUrl(row.image_url),
         avatar: await getPublicUrl(row.avatar),

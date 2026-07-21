@@ -6,8 +6,9 @@ import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { AlertDialog, AlertDialogContent, AlertDialogHeader, AlertDialogTitle, AlertDialogDescription, AlertDialogFooter, AlertDialogCancel, AlertDialogAction } from '@/components/ui/alert-dialog';
+import type { GuestbookMessage } from './types';
 
-function getRelativeTime(dateStr: any) {
+function getRelativeTime(dateStr: string) {
     try {
         if (!dateStr) return '';
         const str = String(dateStr);
@@ -59,7 +60,7 @@ function isLightColor(color: string): boolean {
     return lightKeywords.some(c => color.toLowerCase().includes(c.toLowerCase()));
 }
 
-export function MyMessages({ message, bgColor, isOwner, onDeleted, onImageClick }: { message: any, bgColor: string, isOwner?: boolean, onDeleted?: (id: number) => void, onImageClick?: (urls: string[], index: number) => void }) {
+export function MyMessages({ message, bgColor, isOwner, onDeleted, onImageClick }: { message: GuestbookMessage; bgColor: string; isOwner?: boolean; onDeleted?: (id: number) => void; onImageClick?: (urls: string[], index: number) => void }) {
     const [isPending, startTransition] = useTransition();
     const [showDeleteDialog, setShowDeleteDialog] = useState(false);
 

@@ -12,6 +12,12 @@ interface NavigationProps {
     user: UserInfo | null;
 }
 
+interface SearchResult {
+    id: number;
+    title: string;
+    summary?: string | null;
+}
+
 const navItems = [
     { href: '/post', label: '文章', activeColor: 'text-blue-500', hoverLine: 'via-blue-400' },
     { href: '/moments', label: '动态', activeColor: 'text-rose-500', hoverLine: 'via-rose-400' },
@@ -30,7 +36,7 @@ export function Navigation({user}: NavigationProps) {
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
     const [searchOpen, setSearchOpen] = useState(false);
     const [searchQuery, setSearchQuery] = useState('');
-    const [searchResults, setSearchResults] = useState<any[]>([]);
+    const [searchResults, setSearchResults] = useState<SearchResult[]>([]);
     const [searchLoading, setSearchLoading] = useState(false);
 
     const handleLogout = async () => {
@@ -274,7 +280,7 @@ export function Navigation({user}: NavigationProps) {
                                     </div>
                                 ) : searchResults.length > 0 ? (
                                     <div className="py-2">
-                                        {searchResults.map((post: any) => (
+                                        {searchResults.map((post) => (
                                             <Link key={post.id} href={`/post/${post.id}`}
                                                   className="block px-4 py-3 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
                                                   onClick={() => { setSearchOpen(false); setSearchQuery(''); }}>

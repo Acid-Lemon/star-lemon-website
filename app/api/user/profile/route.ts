@@ -4,7 +4,7 @@ import { getSession, loginUser } from '../../../../lib/auth';
 import { getPublicUrl } from '../../../../lib/oss';
 
 // 获取当前用户信息
-export async function GET(request: NextRequest) {
+export async function GET() {
   try {
     const session = await getSession();
     if (!session?.user) {

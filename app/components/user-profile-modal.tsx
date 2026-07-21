@@ -19,7 +19,7 @@ import {CaptchaInput} from './captcha-input';
 interface UserProfileModalProps {
     user: UserInfo | null;
     onClose: () => void;
-    onUpdate?: (updatedUser: any) => void;
+    onUpdate?: (updatedUser: UserInfo) => void;
 }
 
 export function UserProfileModal({user, onClose, onUpdate}: UserProfileModalProps) {
@@ -98,10 +98,10 @@ export function UserProfileModal({user, onClose, onUpdate}: UserProfileModalProp
         setBio(user?.bio || '');
         setBirthday(user?.birthday ? (() => { const d = new Date(user.birthday); return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`; })() : '');
         setPendingFile(null);
-        if (previewUrl) {
-            URL.revokeObjectURL(previewUrl);
-            setPreviewUrl('');
-        }
+        setPreviewUrl((current) => {
+            if (current) URL.revokeObjectURL(current);
+            return '';
+        });
     }, [user]);
 
     const [newPassword, setNewPassword] = useState('');
@@ -234,7 +234,7 @@ export function UserProfileModal({user, onClose, onUpdate}: UserProfileModalProp
             setProfileLoading(false);
             setUploading(false);
         }
-    }, [nickname, avatar, bio, birthday, pendingFile, previewUrl, onClose, onUpdate]);
+    }, [nickname, avatar, bio, birthday, pendingFile, onClose, onUpdate]);
 
     const handleSendEmailCode = async () => {
         if (!newEmail) {
@@ -356,7 +356,7 @@ export function UserProfileModal({user, onClose, onUpdate}: UserProfileModalProp
             const data = await res.json();
             if (res.ok) {
                 toast.success('QQ已解绑');
-                onUpdate?.({ ...user, qq_identifier: null });
+                if (user) onUpdate?.({ ...user, qq_identifier: null });
                 setTimeout(() => window.location.reload(), 500);
             } else {
                 toast.error(data.error || '解绑失败');

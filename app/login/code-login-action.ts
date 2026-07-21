@@ -3,11 +3,12 @@
 import db from '@/lib/db';
 import { loginUser } from '@/lib/auth';
 import { redirect } from 'next/navigation';
+import { safeReturnUrl } from '@/lib/security';
 
 export async function codeLoginAction(formData: FormData) {
     const email = formData.get('email')?.toString();
     const code = formData.get('code')?.toString();
-    const returnUrlPath = formData.get('returnUrl')?.toString() || '/';
+    const returnUrlPath = safeReturnUrl(formData.get('returnUrl')?.toString());
 
     if (!email || !code) {
         redirect(`/login?error=${encodeURIComponent('请输入邮箱和验证码')}&returnUrl=${encodeURIComponent(returnUrlPath)}`);
@@ -35,8 +36,8 @@ export async function codeLoginAction(formData: FormData) {
                 redirectUrl = returnUrlPath;
             }
         }
-    } catch (e: any) {
-        console.error('Code login error:', e);
+    } catch (error: unknown) {
+        console.error('Code login error:', error);
         redirectUrl = `/login?error=${encodeURIComponent('登录失败，请重试')}&returnUrl=${encodeURIComponent(returnUrlPath)}`;
     }
 

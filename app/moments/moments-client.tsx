@@ -210,30 +210,6 @@ export default function MomentsClient() {
         return () => observerRef.current?.disconnect();
     }, [loadMore, hasMore, loadingMore]);
 
-    useEffect(() => {
-        if (!selectedDate) {
-            setMoments(allMoments);
-            return;
-        }
-
-        const dateStr = format(selectedDate, 'yyyy-MM-dd');
-        const filtered = allMoments.filter(m => {
-            const mDate = parseISO(m.created_at);
-            return isSameDay(mDate, selectedDate);
-        });
-
-        if (filtered.length === 0) {
-            (async () => {
-                setLoading(true);
-                const data = await fetchMoments(0, dateStr);
-                setMoments(data);
-                setLoading(false);
-            })();
-        } else {
-            setMoments(filtered);
-        }
-    }, [selectedDate, allMoments, fetchMoments]);
-
     const handleImageClick = useCallback((urls: string[], index: number) => {
         setLightbox({ images: urls, index });
     }, []);
@@ -245,11 +221,21 @@ export default function MomentsClient() {
         return acc;
     }, new Set<string>());
 
-    const handleDateSelect = (date: Date | undefined) => {
+    const handleDateSelect = async (date: Date | undefined) => {
         setSelectedDate(date);
-        if (date) {
-            setCalendarOpen(false);
+        if (!date) {
+            setMoments(allMoments);
+            return;
         }
+        setCalendarOpen(false);
+        const filtered = allMoments.filter((moment) => isSameDay(parseISO(moment.created_at), date));
+        if (filtered.length > 0) {
+            setMoments(filtered);
+            return;
+        }
+        setLoading(true);
+        setMoments(await fetchMoments(0, format(date, 'yyyy-MM-dd')));
+        setLoading(false);
     };
 
     const clearDateFilter = () => {

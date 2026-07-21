@@ -58,7 +58,7 @@ export default function RegisterClient() {
                     });
                 }, 1000);
             }
-        } catch (e) {
+        } catch {
             setErrorMsg('发送请求失败，请检查网络');
         } finally {
             setSendingCode(false);
@@ -74,8 +74,8 @@ export default function RegisterClient() {
             return;
         }
 
-        if (password.length < 6) {
-            setErrorMsg('密码至少需要 6 位');
+        if (password.length < 8) {
+            setErrorMsg('密码至少需要 8 位');
             return;
         }
 
@@ -172,8 +172,8 @@ export default function RegisterClient() {
                                 value={password}
                                 onChange={(e) => setPassword(e.target.value)}
                                 required
-                                minLength={6}
-                                placeholder="设置你的密码（至少 6 位）"
+                                placeholder="设置你的密码（至少 8 位）"
+                                minLength={8}
                             />
                             <button
                                 type="button"

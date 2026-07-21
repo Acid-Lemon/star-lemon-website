@@ -10,7 +10,7 @@ import { MobileSidebar } from './_components/mobile-sidebar';
 import { LogoutButton } from './_components/logout-button';
 
 export default async function AdminLayout({children}: { children: React.ReactNode }) {
-    const session: any = await getSession();
+    const session = await getSession();
     if (!session || session.user?.role !== 'admin') {
         redirect('/');
     }
@@ -136,7 +136,7 @@ export default async function AdminLayout({children}: { children: React.ReactNod
                 <header
                     className="h-16 flex items-center justify-between px-6 border-b bg-background shadow-sm shrink-0">
                     <div className="flex items-center gap-2">
-                        <MobileSidebar adminName={admin.nickname || 'Admin'} />
+                        <MobileSidebar />
                     </div>
                     <div className="flex items-center gap-4">
                         <div className="flex items-center gap-2">

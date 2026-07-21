@@ -20,7 +20,7 @@ export async function GET() {
     );
 
     const rows = await Promise.all(
-      result.rows.map(async (row: any) => ({
+      result.rows.map(async (row) => ({
         ...row,
         avatar: await getPublicUrl(row.avatar),
       }))

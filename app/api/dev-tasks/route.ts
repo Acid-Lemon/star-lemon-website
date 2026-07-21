@@ -50,7 +50,7 @@ export async function POST(request: NextRequest) {
     }
 
     const assigneeIds = Array.isArray(assignee_ids)
-      ? assignee_ids.filter((id: any) => Number.isInteger(id))
+      ? assignee_ids.filter((id: unknown) => Number.isInteger(id))
       : [];
     const pgAssignees = assigneeIds.length > 0 ? `{${assigneeIds.join(',')}}` : '{}';
 

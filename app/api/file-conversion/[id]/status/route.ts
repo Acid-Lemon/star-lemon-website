@@ -2,17 +2,26 @@ import { NextRequest, NextResponse } from 'next/server';
 import db from '@/lib/db';
 import { getConversionTaskStatus } from '@/lib/convert-service';
 import { calculateConversionPrice } from '@/lib/convert-price-calc';
+import { getSession } from '@/lib/auth';
 
 export async function GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     const { id } = await params;
+    const conversionId = Number(id);
+    const session = await getSession();
+    if (!session?.user) {
+      return NextResponse.json({ error: '请先登录' }, { status: 401 });
+    }
+    if (!Number.isSafeInteger(conversionId) || conversionId <= 0) {
+      return NextResponse.json({ error: '无效的转换记录' }, { status: 400 });
+    }
 
     const result = await db.query(
       `SELECT fc.*, fco.price, fco.status as order_status
        FROM file_conversions fc
        LEFT JOIN file_conversion_orders fco ON fco.conversion_id = fc.id
-       WHERE fc.id = $1`,
-      [parseInt(id)]
+       WHERE fc.id = $1 AND fc.user_id = $2`,
+      [conversionId, session.user.id]
     );
 
     if (result.rows.length === 0) {
@@ -21,6 +30,15 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
 
     const conversion = result.rows[0];
     const dstFormat = conversion.dst_format || 'pdf';
+
+    if (conversion.status === 'uploading' && Date.now() - new Date(conversion.updated_at).getTime() > 15 * 60 * 1000) {
+      await db.query(
+        `UPDATE file_conversions SET status = 'failed', updated_at = CURRENT_TIMESTAMP
+         WHERE id = $1 AND status = 'uploading'`,
+        [conversion.id]
+      );
+      return NextResponse.json({ status: 'failed', error: '上传已超时' });
+    }
 
     if (conversion.status === 'completed') {
       const pageCount = conversion.page_count || 0;
@@ -74,9 +92,8 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
       } catch (err) {
         console.error('Get task status error:', err);
         return NextResponse.json({
-          status: 'converting',
-          progress: 0,
-        });
+          error: '转换服务暂时不可用',
+        }, { status: 502 });
       }
     }
 

@@ -28,7 +28,7 @@ export async function GET(req: NextRequest) {
             );
 
             const rows = await Promise.all(
-                result.rows.map(async (row: any) => ({
+                result.rows.map(async (row) => ({
                     ...row,
                     image_url: row.image_url
                         ? (await Promise.all(
@@ -63,8 +63,9 @@ export async function GET(req: NextRequest) {
         }
 
         const rows = await Promise.all(
-            result.rows.map(async (row: any) => {
-                const { ip_address, ...rest } = row;
+            result.rows.map(async (row) => {
+                const rest = { ...row };
+                delete rest.ip_address;
                 return {
                     ...rest,
                     image_url: rest.image_url
@@ -77,8 +78,8 @@ export async function GET(req: NextRequest) {
         );
 
         return NextResponse.json(rows);
-    } catch (e: any) {
-        console.error('Failed to fetch messages:', e);
+    } catch (error: unknown) {
+        console.error('Failed to fetch messages:', error);
         return NextResponse.json({ error: 'Failed to fetch messages' }, { status: 500 });
     }
 }
@@ -152,8 +153,9 @@ export async function POST(req: NextRequest) {
                 location: locationText,
             }
         });
-    } catch (e: any) {
-        console.error('Failed to submit message:', e);
-        return NextResponse.json({ success: false, message: '发送失败: ' + e.message }, { status: 500 });
+    } catch (error: unknown) {
+        console.error('Failed to submit message:', error);
+        const message = error instanceof Error ? error.message : '未知错误';
+        return NextResponse.json({ success: false, message: '发送失败: ' + message }, { status: 500 });
     }
 }

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import db from '@/lib/db';
 import { downloadConvertedFile } from '@/lib/convert-service';
+import { getSession } from '@/lib/auth';
 
 function getConvertedFileName(fileName: string, dstFormat: string) {
   const cleanFormat = dstFormat.replace(/^\.+/, '').toLowerCase() || 'pdf';
@@ -16,13 +17,17 @@ function getContentDisposition(fileName: string) {
 export async function POST(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     const { id } = await params;
+    const session = await getSession();
+    if (!session?.user) {
+      return NextResponse.json({ error: '请先登录' }, { status: 401 });
+    }
 
     const result = await db.query(
       `SELECT fc.*, fco.status as order_status
        FROM file_conversions fc
        JOIN file_conversion_orders fco ON fco.conversion_id = fc.id
-       WHERE fc.id = $1`,
-      [parseInt(id)]
+       WHERE fc.id = $1 AND fc.user_id = $2`,
+      [parseInt(id), session.user.id]
     );
 
     if (result.rows.length === 0) {

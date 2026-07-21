@@ -100,7 +100,7 @@ export function CommentForm({
             } else {
                 toast.error('评论提交失败');
             }
-        } catch (error) {
+        } catch {
             toast.error('评论提交失败');
         } finally {
             setSubmitting(false);

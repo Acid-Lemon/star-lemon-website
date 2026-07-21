@@ -17,7 +17,7 @@ export async function getSettings(): Promise<Record<string, string>> {
   try {
     const result = await db.query('SELECT key, value FROM settings');
     const settings: Record<string, string> = {};
-    result.rows.forEach((row: any) => {
+    result.rows.forEach((row) => {
       settings[row.key] = row.value || '';
     });
     

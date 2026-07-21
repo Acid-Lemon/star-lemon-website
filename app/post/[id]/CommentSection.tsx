@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { toast } from 'sonner';
 import { getRelativeTime } from '@/lib/utils';
 import { CommentForm } from './CommentForm';
@@ -31,11 +31,7 @@ export function CommentSection({ postId, user }: { postId: number; user: UserInf
     const [replyTo, setReplyTo] = useState<CommentItem | null>(null);
     const [deleteTarget, setDeleteTarget] = useState<number | null>(null);
 
-    useEffect(() => {
-        fetchComments();
-    }, [postId]);
-
-    const fetchComments = async () => {
+    const fetchComments = useCallback(async () => {
         try {
             const res = await fetch(`/api/comments?post_id=${postId}`);
             const data = await res.json();
@@ -45,7 +41,11 @@ export function CommentSection({ postId, user }: { postId: number; user: UserInf
         } finally {
             setLoading(false);
         }
-    };
+    }, [postId]);
+
+    useEffect(() => {
+        fetchComments();
+    }, [fetchComments]);
 
     const buildCommentTree = (comments: CommentItem[]) => {
         const map: Record<number, CommentItem> = {};

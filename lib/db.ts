@@ -10,7 +10,7 @@ let pool: Pool;
 if (process.env.NODE_ENV === 'production') {
   pool = new Pool(poolConfig);
 } else {
-  let globalWithPg = global as typeof globalThis & {
+  const globalWithPg = global as typeof globalThis & {
     _pgPool?: Pool;
   };
   if (!globalWithPg._pgPool) {
@@ -21,7 +21,7 @@ if (process.env.NODE_ENV === 'production') {
 
 const db = {
   // 直接包装 pg 的 query，返回标准的 pg result 对象
-  query: async (text: string, params?: any[]) => {
+  query: async (text: string, params?: unknown[]) => {
     return await pool.query(text, params);
   },
   pool,

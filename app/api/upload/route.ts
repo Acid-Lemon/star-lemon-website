@@ -19,6 +19,10 @@ export async function DELETE(request: NextRequest) {
     if (!ossKey) {
       return NextResponse.json({ error: 'Invalid key' }, { status: 400 });
     }
+    const ownedPrefix = `uploads/${session.user.id}/`;
+    if (session.user.role !== 'admin' && !ossKey.startsWith(ownedPrefix)) {
+      return NextResponse.json({ error: '无权删除该文件' }, { status: 403 });
+    }
 
     await deleteFile(ossKey);
     return NextResponse.json({ success: true });
@@ -57,7 +61,7 @@ export async function POST(request: NextRequest) {
 
     const ext = file.name.split('.').pop() || 'jpg';
     const fileName = `${Date.now()}-${Math.random().toString(36).substring(2, 9)}.${ext}`;
-    const key = `uploads/${fileName}`;
+    const key = `uploads/${session.user.id}/${fileName}`;
 
     const client = await getOssClient();
     await client.put(key, buffer);

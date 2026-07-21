@@ -14,6 +14,9 @@ export async function POST(request: Request) {
         if (!email || !code || !password || !nickname) {
             return NextResponse.json({ success: false, error: '请填写完整信息' }, { status: 400 });
         }
+        if (password.length < 8) {
+            return NextResponse.json({ success: false, error: '密码至少需要 8 个字符' }, { status: 400 });
+        }
 
         const userCheck = await db.query('SELECT id FROM users WHERE email = $1', [email]);
         if (userCheck.rows.length > 0) {

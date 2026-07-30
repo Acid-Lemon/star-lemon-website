@@ -1,9 +1,10 @@
-import { DouyinEmbedMode } from './douyin';
+import type { DouyinEmbedMode } from './douyin';
 
 export interface VideoSegment {
-  type: 'text' | 'douyin' | 'bilibili';
+  type: 'text' | 'douyin' | 'bilibili' | 'bilibili-space';
   content: string;
   bvid?: string;
+  mid?: string;
   time?: string;
 }
 
@@ -25,6 +26,12 @@ export function splitContentByVideo(content: string): VideoSegment[] {
       const bvid = biliMatch[1];
       const timeMatch = line.match(/[?&]t=(\d+)/);
       segments.push({ type: 'bilibili', content: bvid, bvid, time: timeMatch?.[1] });
+      continue;
+    }
+
+    const biliSpaceMatch = line.match(/https?:\/\/space\.bilibili\.com\/(\d+)(?:[/?#][^\s]*)?/);
+    if (biliSpaceMatch) {
+      segments.push({ type: 'bilibili-space', content: biliSpaceMatch[0], mid: biliSpaceMatch[1] });
       continue;
     }
 

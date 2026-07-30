@@ -1148,6 +1148,11 @@ body *::after {
     color: #4b5563;
 }
 
+.prose blockquote p:first-of-type::before,
+.prose blockquote p:last-of-type::after {
+    content: none;
+}
+
 .prose code::before,
 .prose code::after {
     content: none;

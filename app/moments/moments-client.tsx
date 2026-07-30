@@ -6,6 +6,7 @@ import { GalleryLightbox } from '../components/image-lightbox';
 import { DouyinVideoEmbed } from '../components/douyin-video-embed';
 import { DouyinIframeEmbed } from '../components/douyin-iframe-embed';
 import { BilibiliPlayer } from '../components/bilibili-player';
+import { BilibiliUserCard } from '../components/bilibili-user-card';
 import { IframeErrorBoundary } from '../components/iframe-error-boundary';
 import { splitContentByVideo, getDouyinEmbedMode } from '@/lib/video-embed';
 import { DouyinEmbedMode } from '@/lib/douyin';
@@ -280,6 +281,8 @@ export default function MomentsClient() {
                                         ? <div key={i} className="mt-2"><IframeErrorBoundary>{embedMode === 'iframe' ? <DouyinIframeEmbed shortUrl={seg.content} /> : <DouyinVideoEmbed shortUrl={seg.content} />}</IframeErrorBoundary></div>
                                         : seg.type === 'bilibili'
                                             ? <div key={i} className="mt-2"><IframeErrorBoundary><BilibiliPlayer bvid={seg.bvid!} time={seg.time} /></IframeErrorBoundary></div>
+                                            : seg.type === 'bilibili-space'
+                                                ? <BilibiliUserCard key={i} mid={seg.mid!} />
                                             : <span key={i} className="whitespace-pre-wrap">{seg.content}{i < arr.length - 1 ? '\n' : ''}</span>
                                 )}
                             </div>

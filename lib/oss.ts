@@ -41,7 +41,7 @@ export async function getOssClient() {
 
   const settings = await getSettings();
   const region = settings.oss_region || 'oss-cn-hangzhou';
-  const endpoint = settings.oss_endpoint?.trim();
+  const endpoint = settings.oss_endpoint?.trim().replace(/^https?:\/\//, '').replace(/\/$/, '');
   const accessKeyId = settings.oss_access_key_id || '';
   const accessKeySecret = settings.oss_access_key_secret || '';
   const bucket = settings.oss_bucket || '';
@@ -79,7 +79,10 @@ export async function generateUploadCredentials(transferId: number, fileName: st
   const client = await getOssClient();
   const key = `file-transfer/${transferId}/${fileName}`;
 
-  const credentials = await asV4Client(client).signatureUrlV4('PUT', 3600, undefined, key);
+  const credentials = client.signatureUrl(key, {
+    method: 'PUT',
+    expires: 3600,
+  });
 
   return { key, uploadUrl: credentials, bucket: settings.oss_bucket || '' };
 }

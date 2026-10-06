@@ -31,6 +31,7 @@ interface FileTransfer {
 interface OrderRecord {
   id: number;
   transfer_id: number | null;
+  file_key: string | null;
   code: string | null;
   file_name: string | null;
   file_size: number | null;
@@ -259,6 +260,9 @@ function OrderRecordsTab() {
     if (order.status === 'refunding') {
       return <Badge variant="outline" className="text-orange-600 border-orange-300">待退款</Badge>;
     }
+    if (order.status === 'paid' && !order.file_key) {
+      return <Badge variant="outline">待上传</Badge>;
+    }
     return <Badge variant="default">已完成</Badge>;
   };
 
@@ -328,7 +332,7 @@ function OrderRecordsTab() {
                       )}
                     </TableCell>
                     <TableCell>
-                       {order.status === 'paid' && !order.transfer_id && (
+                       {order.status === 'paid' && !order.file_key && (
                          <Button size="sm" variant="outline" onClick={() => void handleRefund(order)}>退款</Button>
                        )}
                      </TableCell>

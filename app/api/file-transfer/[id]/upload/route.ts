@@ -7,7 +7,8 @@ import {
   generatePartUploadUrl,
   getFileSize,
   getTransferObjectKey,
-  initTransferMultipartUpload,
+  generateUploadCredentials,
+
 } from '@/lib/oss';
 
 const MAX_SIGNED_PARTS_PER_REQUEST = 32;
@@ -39,16 +40,15 @@ export async function GET(_request: NextRequest, { params }: { params: Promise<{
     if (transfer.file_key) {
       return NextResponse.json({ error: '文件已上传' }, { status: 409 });
     }
-
-    const multipart = await initTransferMultipartUpload(transfer.id, transfer.file_name);
-    return NextResponse.json({
-      ...multipart,
-      partSize: 8 * 1024 * 1024,
-      concurrency: 4,
-    });
+     const upload = await generateUploadCredentials(transfer.id, transfer.file_name);
+     return NextResponse.json({ ...upload, mode: 'single', partSize: Number(transfer.file_size), concurrency: 1 });
   } catch (error) {
     console.error('Generate upload URL error:', error);
-    return NextResponse.json({ error: '获取上传地址失败' }, { status: 500 });
+    const detail = error instanceof Error ? error.message : String(error);
+    const code = typeof error === 'object' && error !== null && 'code' in error
+      ? String((error as { code?: unknown }).code || '')
+      : '';
+    return NextResponse.json({ error: `获取上传地址失败${code ? ` [${code}]` : ''}: ${detail}` }, { status: 500 });
   }
 }
 

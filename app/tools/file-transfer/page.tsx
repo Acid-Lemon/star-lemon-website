@@ -69,7 +69,7 @@ interface DownloadFileInfo {
   expireAt: string;
 }
 
-function UploadPanel({ onUploadSuccess }: { onUploadSuccess?: () => void }) {
+function UploadPanel({ onUploadSuccess, resumeOrder }: { onUploadSuccess?: () => void; resumeOrder?: UserOrder | null }) {
   const user = useUser();
   const { balance: coinBalance, refreshBalance } = useCoinBalance();
   const [file, setFile] = useState<File | null>(null);
@@ -107,6 +107,13 @@ function UploadPanel({ onUploadSuccess }: { onUploadSuccess?: () => void }) {
   }, []);
 
   useEffect(() => { fileRef.current = file; }, [file]);
+  useEffect(() => {
+    if (!resumeOrder || resumeOrder.status !== 'paid' || resumeOrder.file_key) return;
+    setOrderId(resumeOrder.transfer_id);
+    setCode(resumeOrder.code || '');
+    setPrice(Number(resumeOrder.price) || null);
+    setUploadError('该订单已付款，请选择原文件后直接继续上传，无需重复计价或支付');
+  }, [resumeOrder]);
   useEffect(() => { orderIdRef.current = orderId; }, [orderId]);
 
   const stopPolling = useCallback(() => {
@@ -138,8 +145,38 @@ function UploadPanel({ onUploadSuccess }: { onUploadSuccess?: () => void }) {
     try {
       const credentialsRes = await fetch(`/api/file-transfer/${oid}/upload`);
       const credentials = await credentialsRes.json();
-      if (!credentialsRes.ok || !credentials.uploadId || !credentials.partSize) {
+      if (!credentialsRes.ok || (!credentials.uploadId && !credentials.uploadUrl) || !credentials.partSize) {
         throw new Error(credentials.error || '获取上传地址失败');
+      }
+      if (credentials.uploadUrl) {
+        await new Promise<void>((resolve, reject) => {
+          const xhr = new XMLHttpRequest();
+          xhr.open('PUT', credentials.uploadUrl);
+          xhr.upload.onprogress = (event) => {
+            if (event.lengthComputable) {
+              setUploadedBytes(event.loaded);
+              setUploadProgress(Math.round((event.loaded / currentFile.size) * 100));
+            }
+          };
+          xhr.onload = async () => {
+            if (xhr.status < 200 || xhr.status >= 300) {
+              const detail = xhr.responseText.split('<Code>')[1]?.split('</Code>')[0] || xhr.responseText.slice(0, 200);
+              reject(new Error(`OSS 上传失败 (${xhr.status})${detail ? `: ${detail}` : ''}`));
+              return;
+            }
+            setUploadedBytes(currentFile.size); setUploadProgress(100); setMerging(true);
+            const confirmRes = await fetch(`/api/file-transfer/${oid}/upload`, { method: 'POST' });
+            const confirmData = await confirmRes.json();
+            if (!confirmRes.ok || !confirmData.success) { reject(new Error(confirmData.error || '确认上传失败')); return; }
+            resolve();
+          };
+          xhr.onerror = () => reject(new Error('无法连接到文件存储，请检查网络后重试'));
+          xhr.send(currentFile.slice(0, currentFile.size));
+        });
+        setMerging(false); setStep('done');
+         try { window.localStorage.removeItem(PENDING_UPLOAD_STORAGE_KEY); } catch {}
+         setRecoveryOrder(null);
+         toast.success('文件上传成功！'); onUploadSuccess?.(); return;
       }
       uploadId = credentials.uploadId;
       partSize = credentials.partSize;
@@ -314,6 +351,11 @@ function UploadPanel({ onUploadSuccess }: { onUploadSuccess?: () => void }) {
   const handleSubmit = async () => {
     if (!file || !price) {
       toast.error('请先选择文件并计算费用');
+      return;
+    }
+    if (orderIdRef.current && resumeOrder?.status === 'paid' && !resumeOrder.file_key) {
+      setAutoUploading(true);
+      await startUpload(orderIdRef.current);
       return;
     }
     setLoading(true);
@@ -522,7 +564,7 @@ function UploadPanel({ onUploadSuccess }: { onUploadSuccess?: () => void }) {
             onChange={(e) => {
               const f = e.target.files?.[0];
               if (f) {
-                setFile(f); setPrice(null);
+                setFile(f); if (!resumeOrder) setPrice(null);
                 if (recoveryOrder && recoveryOrder.fileName === f.name && recoveryOrder.fileSize === f.size) {
                   setOrderId(recoveryOrder.id);
                   setUploadError('检测到未完成的已付款订单，可以继续上传');
@@ -860,7 +902,7 @@ function MyFilesPanel({ refreshKey }: { refreshKey?: number }) {
   );
 }
 
-function MyOrdersPanel({ refreshKey }: { refreshKey?: number }) {
+function MyOrdersPanel({ refreshKey, onResume }: { refreshKey?: number; onResume?: (order: UserOrder) => void }) {
   const [orders, setOrders] = useState<UserOrder[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -920,7 +962,7 @@ function MyOrdersPanel({ refreshKey }: { refreshKey?: number }) {
         ) : (
           <div className="space-y-3">
             {orders.map((order) => (
-              <div key={order.id} className="border rounded-lg p-3 space-y-2">
+              <div key={order.id} className={`border rounded-lg p-3 space-y-2 ${order.status === 'paid' && !order.file_key ? 'cursor-pointer hover:border-primary' : ''}`} onClick={() => { if (order.status === 'paid' && !order.file_key) onResume?.(order); }}>
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
                     <RiFileLine className="w-4 h-4 text-primary" />
@@ -950,6 +992,8 @@ function MyOrdersPanel({ refreshKey }: { refreshKey?: number }) {
 
 export default function FileTransferPage() {
   const [refreshKey, setRefreshKey] = useState(0);
+  const [resumeOrder, setResumeOrder] = useState<UserOrder | null>(null);
+  const [activeTab, setActiveTab] = useState('download');
 
   const handleUploadSuccess = useCallback(() => {
     setRefreshKey(prev => prev + 1);
@@ -969,7 +1013,7 @@ export default function FileTransferPage() {
               <h1 className="text-3xl font-bold tracking-tight">文件快传</h1>
               <p className="text-muted-foreground">上传文件生成取件码，输入取件码即可下载</p>
             </div>
-            <Tabs defaultValue="download">
+            <Tabs value={activeTab} onValueChange={setActiveTab}>
               <TabsList className="grid w-full grid-cols-2">
                 <TabsTrigger value="download">取件下载</TabsTrigger>
                 <TabsTrigger value="upload">上传文件</TabsTrigger>
@@ -978,7 +1022,7 @@ export default function FileTransferPage() {
                 <DownloadPanel />
               </TabsContent>
               <TabsContent value="upload" className="mt-4">
-                <UploadPanel onUploadSuccess={handleUploadSuccess} />
+                <UploadPanel onUploadSuccess={handleUploadSuccess} resumeOrder={resumeOrder} />
               </TabsContent>
             </Tabs>
             <div className="text-xs text-muted-foreground text-center space-y-1 mt-6">
@@ -989,7 +1033,7 @@ export default function FileTransferPage() {
 
           <div className="lg:col-span-1 space-y-4">
             <MyFilesPanel refreshKey={refreshKey} />
-            <MyOrdersPanel refreshKey={refreshKey} />
+            <MyOrdersPanel refreshKey={refreshKey} onResume={(order) => { setResumeOrder(order); setActiveTab('upload'); }} />
           </div>
         </div>
       </div>

@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { Card, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { RiUploadCloudLine, RiArrowRightSLine, RiFilePdf2Line } from '@remixicon/react';
+import { RiUploadCloudLine, RiArrowRightSLine, RiFilePdf2Line, RiRadarLine } from '@remixicon/react';
 
 export const metadata: Metadata = {
     title: '工具',
@@ -9,6 +9,14 @@ export const metadata: Metadata = {
 };
 
 const tools = [
+  {
+    name: 'P2P互传',
+    description: '通过 WebRTC 实时聊天，点对点发送文件',
+    icon: RiRadarLine,
+    href: '/tools/p2p-transfer',
+    color: 'text-orange-500 dark:text-orange-400',
+    bg: 'bg-orange-50 dark:bg-orange-950/30',
+  },
   {
     name: '文件快传',
     description: '上传文件生成取件码，输入取件码即可下载',

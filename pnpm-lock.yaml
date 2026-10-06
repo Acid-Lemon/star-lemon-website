@@ -101,6 +101,9 @@ importers:
       tailwindcss-animate:
         specifier: ^1.0.7
         version: 1.0.7(tailwindcss@4.2.2)
+      trystero:
+        specifier: ^0.25.3
+        version: 0.25.3
       vaul:
         specifier: ^1.1.2
         version: 1.1.2(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
@@ -537,6 +540,9 @@ packages:
     cpu: [x64]
     os: [win32]
 
+  '@noble/secp256k1@3.1.0':
+    resolution: {integrity: sha512-+F7iS7tUMaNGXcc9X3PjmjvuQnXEuSjCRNzVVA2xAcKXgCaP0dHYz4SFyt4FKNHef7sOP//xihowcySSS7PK9g==}
+
   '@nodelib/fs.scandir@2.1.5':
     resolution: {integrity: sha512-vq24Bq3ym5HEQm2NKCr3yXDwjc7vTsEThRDnkp2DK9p1uqLR+DHurm/NOTo0KG7HYHU7eppKZj3MyqYuMBf62g==}
     engines: {node: '>= 8'}
@@ -870,6 +876,12 @@ packages:
     resolution: {integrity: sha512-w31dd8HOx3k9vPtcQh5QHP9GwKcgbMp87j58qi6xgiBnFFtKEAgCWnDw4qUT8aHwkCp8bKvb/KGKWWHedP0AAg==}
     peerDependencies:
       tailwindcss: '>=3.0.0 || insiders || >=4.0.0-alpha.20 || >=4.0.0-beta.1'
+
+  '@trystero-p2p/core@0.25.3':
+    resolution: {integrity: sha512-lQKNq/ha+vF6kQZrpaXJGzlzxLF/Fhizoy5dwJUYQlkqRrbPup/Jov2EpPX/CPr2X+f79HxVzonkeni3MxmCuQ==}
+
+  '@trystero-p2p/nostr@0.25.3':
+    resolution: {integrity: sha512-nZV9Fl/GXuhIkJSQ+wIkdMoRLO1oSTUL/+vZorukaojeAdOpT/61e8b9Vzbt8L1ktMTaGPEJHw2BG/B5BCwBuw==}
 
   '@tybys/wasm-util@0.10.1':
     resolution: {integrity: sha512-9tTaPJLSiejZKx+Bmog4uSubteqTvFrVrURwkmHixBo0G4seD0zUxp98E1DzUBJxLQ3NPwXrGKDiVjwx/DpPsg==}
@@ -3031,6 +3043,9 @@ packages:
   trough@2.2.0:
     resolution: {integrity: sha512-tmMpK00BjZiUyVyvrBK7knerNgmgvcV/KLVyuma/SC+TQN167GrMRciANTz09+k3zW8L8t60jWO1GpfkZdjTaw==}
 
+  trystero@0.25.3:
+    resolution: {integrity: sha512-mm6Mzmm10OXKfvOA0tUG6XXqlQDIPdHg0//mEqA4ayrtdqiie4ZQpSluEp6074L+dCtotCfCn/B/CWLWavZK6Q==}
+
   ts-api-utils@2.5.0:
     resolution: {integrity: sha512-OJ/ibxhPlqrMM0UiNHJ/0CKQkoKF243/AEmplt3qpRgkW8VG7IfOS41h7V8TjITqdByHzrjcS/2si+y4lIh8NA==}
     engines: {node: '>=18.12'}
@@ -3620,6 +3635,8 @@ snapshots:
   '@next/swc-win32-x64-msvc@16.2.6':
     optional: true
 
+  '@noble/secp256k1@3.1.0': {}
+
   '@nodelib/fs.scandir@2.1.5':
     dependencies:
       '@nodelib/fs.stat': 2.0.5
@@ -3894,6 +3911,13 @@ snapshots:
     dependencies:
       postcss-selector-parser: 6.0.10
       tailwindcss: 4.2.2
+
+  '@trystero-p2p/core@0.25.3': {}
+
+  '@trystero-p2p/nostr@0.25.3':
+    dependencies:
+      '@noble/secp256k1': 3.1.0
+      '@trystero-p2p/core': 0.25.3
 
   '@tybys/wasm-util@0.10.1':
     dependencies:
@@ -6552,6 +6576,10 @@ snapshots:
   trim-lines@3.0.1: {}
 
   trough@2.2.0: {}
+
+  trystero@0.25.3:
+    dependencies:
+      '@trystero-p2p/nostr': 0.25.3
 
   ts-api-utils@2.5.0(typescript@5.9.3):
     dependencies:

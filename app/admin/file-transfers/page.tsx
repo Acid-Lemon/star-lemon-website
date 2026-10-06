@@ -39,6 +39,7 @@ interface OrderRecord {
   retain_days: number | null;
   price: string | null;
   pay_order_no: string | null;
+  out_trade_no: string | null;
   user_id: number | null;
   user_nickname: string | null;
   user_email: string | null;
@@ -212,6 +213,8 @@ function FileManagementTab() {
 }
 
 function OrderRecordsTab() {
+  const [refundOrder, setRefundOrder] = useState<OrderRecord | null>(null);
+  const [refunding, setRefunding] = useState(false);
   const [orders, setOrders] = useState<OrderRecord[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -235,6 +238,20 @@ function OrderRecordsTab() {
     }
   };
 
+  const handleRefund = async (selected?: OrderRecord) => {
+    const target = selected || refundOrder;
+    if (!target) return;
+    setRefunding(true);
+    try {
+      const res = await fetch(`/api/admin/file-transfers/orders/${target.id}/refund`, { method: 'POST' });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || '退款失败');
+      toast.success(`已发起退款 ¥${Number(data.refundAmount).toFixed(2)}`);
+      setRefundOrder(null);
+      fetchOrders();
+    } catch (error) { toast.error(error instanceof Error ? error.message : '退款失败'); }
+    finally { setRefunding(false); }
+  };
   const getStatusBadge = (order: OrderRecord) => {
     if (order.status === 'refunded') {
       return <Badge variant="destructive">已退款</Badge>;
@@ -272,6 +289,7 @@ function OrderRecordsTab() {
                   <TableHead>支付金额</TableHead>
                   <TableHead>退款金额</TableHead>
                   <TableHead>用户</TableHead>
+                  <TableHead>操作</TableHead>
                   <TableHead>创建时间</TableHead>
                 </TableRow>
               </TableHeader>
@@ -309,7 +327,12 @@ function OrderRecordsTab() {
                         <span className="text-sm text-muted-foreground">匿名</span>
                       )}
                     </TableCell>
-                    <TableCell className="text-sm text-muted-foreground">
+                    <TableCell>
+                       {order.status === 'paid' && !order.transfer_id && (
+                         <Button size="sm" variant="outline" onClick={() => void handleRefund(order)}>退款</Button>
+                       )}
+                     </TableCell>
+                     <TableCell className="text-sm text-muted-foreground">
                       {new Date(order.created_at).toLocaleString('zh-CN')}
                     </TableCell>
                   </TableRow>

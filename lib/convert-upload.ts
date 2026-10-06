@@ -25,6 +25,9 @@ export function createConversionMultipartBody(params: {
     'Content-Disposition: form-data; name="src_format"\r\n\r\n' +
     `${params.srcFormat}\r\n` +
     `--${boundary}\r\n` +
+    'Content-Disposition: form-data; name="source_format"\r\n\r\n' +
+    `${params.srcFormat}\r\n` +
+    `--${boundary}\r\n` +
     'Content-Disposition: form-data; name="dst_format"\r\n\r\n' +
     `${params.dstFormat}\r\n` +
     `--${boundary}--\r\n`
@@ -35,44 +38,22 @@ export function createConversionMultipartBody(params: {
 
   const body = new ReadableStream<Uint8Array>({
     async pull(controller) {
-      if (phase === 'prefix') {
-        phase = 'file';
-        controller.enqueue(prefix);
-        return;
-      }
+      if (phase === 'prefix') { phase = 'file'; controller.enqueue(prefix); return; }
       if (phase === 'file') {
         const chunk = await reader.read();
         if (!chunk.done) {
           received += chunk.value.byteLength;
-          if (received > params.fileSize) {
-            await reader.cancel('File is larger than declared');
-            controller.error(new Error('上传文件大小与记录不一致'));
-            return;
-          }
-          controller.enqueue(chunk.value);
-          return;
+          if (received > params.fileSize) { await reader.cancel('File is larger than declared'); controller.error(new Error('上传文件大小与记录不一致')); return; }
+          controller.enqueue(chunk.value); return;
         }
-        if (received !== params.fileSize) {
-          controller.error(new Error('上传文件大小与记录不一致'));
-          return;
-        }
+        if (received !== params.fileSize) { controller.error(new Error('上传文件大小与记录不一致')); return; }
         phase = 'suffix';
       }
-      if (phase === 'suffix') {
-        phase = 'done';
-        controller.enqueue(suffix);
-        return;
-      }
+      if (phase === 'suffix') { phase = 'done'; controller.enqueue(suffix); return; }
       controller.close();
     },
-    cancel(reason) {
-      return reader.cancel(reason);
-    },
+    cancel(reason) { return reader.cancel(reason); },
   });
 
-  return {
-    body,
-    contentType: `multipart/form-data; boundary=${boundary}`,
-    contentLength: prefix.byteLength + params.fileSize + suffix.byteLength,
-  };
+  return { body, contentType: `multipart/form-data; boundary=${boundary}`, contentLength: prefix.byteLength + params.fileSize + suffix.byteLength };
 }

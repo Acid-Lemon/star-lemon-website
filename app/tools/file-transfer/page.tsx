@@ -12,6 +12,7 @@ import { Badge } from '@/components/ui/badge';
 import { toast } from 'sonner';
 import { RiUploadCloudLine, RiDownloadLine, RiFileLine, RiCloseLine, RiArrowRightLine, RiArrowLeftLine, RiWechatPayLine, RiCheckLine, RiFolderLine, RiBillLine, RiTimeLine, RiDeleteBinLine } from '@remixicon/react';
 import { AlertDialog, AlertDialogContent, AlertDialogHeader, AlertDialogMedia, AlertDialogTitle, AlertDialogDescription, AlertDialogFooter, AlertDialogCancel, AlertDialogAction } from '@/components/ui/alert-dialog';
+import { useCoinBalance } from '@/hooks/use-coin-balance';
 
 function formatFileSize(bytes: number): string {
   if (bytes < 1024) return bytes + ' B';
@@ -25,6 +26,7 @@ type Step = 'form' | 'paying' | 'uploading' | 'done';
 const SIGNED_PART_BATCH_SIZE = 24;
 const PROGRESS_UPDATE_INTERVAL_MS = 200;
 const SPEED_SAMPLE_WINDOW_MS = 2000;
+const PENDING_UPLOAD_STORAGE_KEY = 'star-lemon:file-transfer-pending';
 
 interface UserFile {
   id: number;
@@ -69,6 +71,7 @@ interface DownloadFileInfo {
 
 function UploadPanel({ onUploadSuccess }: { onUploadSuccess?: () => void }) {
   const user = useUser();
+  const { balance: coinBalance, refreshBalance } = useCoinBalance();
   const [file, setFile] = useState<File | null>(null);
   const [maxDownloads, setMaxDownloads] = useState(3);
   const [retainDays, setRetainDays] = useState(7);
@@ -84,12 +87,25 @@ function UploadPanel({ onUploadSuccess }: { onUploadSuccess?: () => void }) {
   const [merging, setMerging] = useState(false);
   const [autoUploading, setAutoUploading] = useState(false);
   const [uploadError, setUploadError] = useState<string | null>(null);
+  const [recoveryOrder, setRecoveryOrder] = useState<{ id: number; fileName: string; fileSize: number } | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const pollingRef = useRef<NodeJS.Timeout | null>(null);
   const fileRef = useRef<File | null>(null);
   const orderIdRef = useRef<number | null>(null);
 
-  // Keep refs in sync with state
+  useEffect(() => {
+    try {
+      const raw = window.localStorage.getItem(PENDING_UPLOAD_STORAGE_KEY);
+      if (!raw) return;
+      const pending = JSON.parse(raw) as { id?: number; fileName?: string; fileSize?: number };
+      if (Number.isSafeInteger(pending.id) && typeof pending.fileName === 'string' && Number.isSafeInteger(pending.fileSize)) {
+        setRecoveryOrder({ id: Number(pending.id), fileName: pending.fileName, fileSize: Number(pending.fileSize) });
+      }
+    } catch {
+      window.localStorage.removeItem(PENDING_UPLOAD_STORAGE_KEY);
+    }
+  }, []);
+
   useEffect(() => { fileRef.current = file; }, [file]);
   useEffect(() => { orderIdRef.current = orderId; }, [orderId]);
 
@@ -107,6 +123,9 @@ function UploadPanel({ onUploadSuccess }: { onUploadSuccess?: () => void }) {
   const startUpload = useCallback(async (oid: number) => {
     const currentFile = fileRef.current;
     if (!currentFile) return;
+    try {
+      window.localStorage.setItem(PENDING_UPLOAD_STORAGE_KEY, JSON.stringify({ id: oid, fileName: currentFile.name, fileSize: currentFile.size }));
+    } catch {}
     setStep('uploading');
     setMerging(false);
     setUploadError(null);
@@ -201,7 +220,8 @@ function UploadPanel({ onUploadSuccess }: { onUploadSuccess?: () => void }) {
         }
       };
       xhr.onerror = () => reject(new Error('无法连接到文件存储，请检查网络后重试'));
-      xhr.send(part);
+      reportPartProgress(partNumber, Math.min(1, part.size), part.size);
+       xhr.send(part);
     });
 
     try {
@@ -265,7 +285,8 @@ function UploadPanel({ onUploadSuccess }: { onUploadSuccess?: () => void }) {
           stopPolling();
           setAutoUploading(true);
           toast.success('支付成功，正在上传文件...');
-          startUpload(id);
+          await refreshBalance();
+         startUpload(id);
         }
       } catch {}
     }, 3000);
@@ -352,6 +373,7 @@ function UploadPanel({ onUploadSuccess }: { onUploadSuccess?: () => void }) {
       if (data.paid) {
         stopPolling();
         toast.success('支付成功！');
+        await refreshBalance();
         startUpload(oid);
       } else {
         toast.info('尚未检测到支付，请完成扫码支付后重试');
@@ -499,7 +521,13 @@ function UploadPanel({ onUploadSuccess }: { onUploadSuccess?: () => void }) {
             className="hidden"
             onChange={(e) => {
               const f = e.target.files?.[0];
-              if (f) { setFile(f); setPrice(null); }
+              if (f) {
+                setFile(f); setPrice(null);
+                if (recoveryOrder && recoveryOrder.fileName === f.name && recoveryOrder.fileSize === f.size) {
+                  setOrderId(recoveryOrder.id);
+                  setUploadError('检测到未完成的已付款订单，可以继续上传');
+                }
+              }
             }}
           />
           {file ? (
@@ -523,6 +551,12 @@ function UploadPanel({ onUploadSuccess }: { onUploadSuccess?: () => void }) {
             </>
           )}
         </div>
+
+        {recoveryOrder && file && recoveryOrder.fileName === file.name && recoveryOrder.fileSize === file.size && orderId === recoveryOrder.id && (
+          <Button className="w-full" variant="outline" onClick={() => startUpload(recoveryOrder.id)} disabled={loading}>
+            继续上传已付款订单
+          </Button>
+        )}
 
         <div className="grid grid-cols-2 gap-4">
           <div className="space-y-2">
@@ -574,8 +608,8 @@ function UploadPanel({ onUploadSuccess }: { onUploadSuccess?: () => void }) {
             {user && (
               <div className="flex justify-between text-xs pt-1">
                 <span className="text-muted-foreground">我的星柠币</span>
-                <span className={user.sl_coin >= Math.ceil(price * 100) ? 'text-green-600' : 'text-orange-500'}>
-                  {user.sl_coin} 枚 {user.sl_coin >= Math.ceil(price * 100) ? '（可抵扣）' : '（不足抵扣）'}
+                <span className={coinBalance >= Math.ceil(price * 100) ? 'text-green-600' : 'text-orange-500'}>
+                  {coinBalance} 枚 {coinBalance >= Math.ceil(price * 100) ? '（可抵扣）' : '（不足抵扣）'}
                 </span>
               </div>
             )}

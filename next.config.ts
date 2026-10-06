@@ -26,6 +26,15 @@ const nextConfig: NextConfig = {
         ],
     },
     serverExternalPackages: ['ali-oss', 'urllib', 'proxy-agent', 'svg-captcha'],
+    async redirects() {
+        return [
+            {
+                source: '/tools/lan-transfer',
+                destination: '/tools/p2p-transfer',
+                permanent: true,
+            },
+        ];
+    },
     async headers() {
         return [
             {

@@ -14,6 +14,7 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { getOutputFormats, getOutputFormatLabel, getSrcFormat } from '@/lib/convert-formats';
 import { CONVERSION_UPLOAD_TIMEOUT_MS, MAX_CONVERSION_FILE_SIZE } from '@/lib/convert-constants';
+import { useCoinBalance } from '@/hooks/use-coin-balance';
 
 const SUPPORTED_FORMATS: { category: string; exts: string }[] = [
   { category: '图片', exts: '.jpg .jpeg .png .gif .bmp .tiff .webp' },
@@ -72,6 +73,7 @@ interface UserOrder {
 
 function ConvertPanel() {
   const user = useUser();
+  const { balance: coinBalance, refreshBalance } = useCoinBalance();
   const [file, setFile] = useState<File | null>(null);
   const [dstFormat, setDstFormat] = useState('pdf');
   const [availableFormats, setAvailableFormats] = useState<string[]>([]);
@@ -138,7 +140,8 @@ function ConvertPanel() {
           stopPolling();
           setPrice(data.price);
           if (data.paid) {
-            setStep('done');
+            await refreshBalance();
+         setStep('done');
           } else {
             setStep('paying');
           }
@@ -172,7 +175,8 @@ function ConvertPanel() {
           stopPolling();
           setAutoPaying(false);
           toast.success('支付成功！');
-          setStep('done');
+          await refreshBalance();
+         setStep('done');
         }
       } catch {}
     }, 3000);
@@ -439,8 +443,8 @@ setStep('form');
             {user && (
               <div className="flex justify-between text-xs pt-1">
                 <span className="text-muted-foreground">我的星柠币</span>
-                <span className={user.sl_coin >= Math.ceil((price || 0) * 100) ? 'text-green-600' : 'text-orange-500'}>
-                  {user.sl_coin} 枚 {user.sl_coin >= Math.ceil((price || 0) * 100) ? '（可抵扣）' : '（不足抵扣）'}
+                <span className={coinBalance >= Math.ceil((price || 0) * 100) ? 'text-green-600' : 'text-orange-500'}>
+                  {coinBalance} 枚 {coinBalance >= Math.ceil((price || 0) * 100) ? '（可抵扣）' : '（不足抵扣）'}
                 </span>
               </div>
             )}

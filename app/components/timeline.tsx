@@ -23,27 +23,20 @@ export function Timeline() {
   const fetchTimeline = async () => {
     try {
       const res = await fetch('/api/timeline');
-      const data = await res.json();
+      if (!res.ok) {
+        throw new Error('Failed to fetch timeline');
+      }
+
+      const data: unknown = await res.json();
+      if (!Array.isArray(data)) {
+        throw new Error('Invalid timeline response');
+      }
+
       data.sort((a: TimelineItem, b: TimelineItem) => a.date.localeCompare(b.date));
       setTimelineData(data.filter((item: TimelineItem & { is_active: boolean }) => item.is_active));
     } catch (error) {
       console.error('Failed to fetch timeline:', error);
-      setTimelineData([
-        {
-          id: 1,
-          date: '2024-12',
-          title: '网站全新改版',
-          description: '采用卡片式布局，优化用户体验，新增时间轴功能。',
-          type: 'milestone'
-        },
-        {
-          id: 2,
-          date: '2024-08',
-          title: '网站正式上线',
-          description: 'Star & Lemon 的小站正式上线，开始记录我们的故事。',
-          type: 'milestone'
-        }
-      ]);
+      setTimelineData([]);
     } finally {
       setLoading(false);
     }

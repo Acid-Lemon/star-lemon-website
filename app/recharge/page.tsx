@@ -24,6 +24,7 @@ import {
 } from '@remixicon/react';
 import type { RechargeTier } from '@/lib/coin-recharge';
 import { calcCustomCoin } from '@/lib/coin-recharge';
+import { useCoinBalance } from '@/hooks/use-coin-balance';
 
 const tierIcons: Record<string, React.ReactNode> = {
   t1: <RiCoinLine className="w-6 h-6" />,
@@ -55,10 +56,10 @@ interface RechargeResult {
 
 export default function RechargePage() {
   const user = useUser();
+  const { balance: slCoin, refreshBalance } = useCoinBalance();
   const [tiers, setTiers] = useState<RechargeTier[]>([]);
   const [selectedTier, setSelectedTier] = useState<string | null>(null);
   const [customAmount, setCustomAmount] = useState('');
-  const [slCoin, setSlCoin] = useState<number>(user?.sl_coin || 0);
   const [loading, setLoading] = useState(false);
   const [step, setStep] = useState<'select' | 'paying' | 'success'>('select');
   const [qrCodeUrl, setQrCodeUrl] = useState('');
@@ -74,12 +75,6 @@ export default function RechargePage() {
       })
       .catch(() => toast.error('获取充值档位失败'));
   }, []);
-
-  useEffect(() => {
-    if (user?.sl_coin !== undefined) {
-      setSlCoin(user.sl_coin);
-    }
-  }, [user]);
 
   const stopPolling = useCallback(() => {
     if (pollingRef.current) {
@@ -101,7 +96,7 @@ export default function RechargePage() {
         if (data.paid) {
           stopPolling();
           setStep('success');
-          setSlCoin((prev) => prev + (data.coinAmount || 0) + (data.bonusCoin || 0));
+          await refreshBalance();
           toast.success(`充值成功！获得 ${(data.coinAmount || 0) + (data.bonusCoin || 0)} 星柠币`);
         }
       } catch {}
@@ -175,7 +170,7 @@ export default function RechargePage() {
       if (data.paid) {
         stopPolling();
         setStep('success');
-        setSlCoin((prev) => prev + (data.coinAmount || 0) + (data.bonusCoin || 0));
+        await refreshBalance();
         toast.success(`充值成功！获得 ${(data.coinAmount || 0) + (data.bonusCoin || 0)} 星柠币`);
       } else {
         toast.info('尚未检测到支付，请完成扫码支付后重试');

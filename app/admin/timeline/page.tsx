@@ -84,7 +84,15 @@ export default function TimelinePage() {
   const fetchTimeline = async () => {
     try {
       const res = await fetch('/api/timeline');
-      const data = await res.json();
+      if (!res.ok) {
+        throw new Error('Failed to fetch timeline');
+      }
+
+      const data: unknown = await res.json();
+      if (!Array.isArray(data)) {
+        throw new Error('Invalid timeline response');
+      }
+
       data.sort((a: TimelineItem, b: TimelineItem) => a.date.localeCompare(b.date));
       setTimeline(data);
     } catch {

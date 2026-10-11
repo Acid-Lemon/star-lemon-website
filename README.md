@@ -113,6 +113,14 @@ pnpm lint     # 运行 ESLint
 
 配置读取优先级通常为：数据库设置 > 环境变量 > 默认值。
 
+### 文件快传过期清理
+
+过期文件的清理不依赖外部 cron 程序：服务器进程启动时（`instrumentation.ts` 的 `register()`）会自动创建进程内定时器，每 10 分钟清理一轮过期记录，进程重启后自动恢复。清理逻辑：先删 OSS 对象、成功后才删数据库行，失败则保留记录等待下轮重试；多实例部署由 PostgreSQL advisory lock 防止并发重复执行。
+
+`POST /api/file-transfer/cleanup` 端点保留用于手动触发，需在后台 `settings` 表配置 `cleanup_cron_secret`（或仅允许本机调用），请求头携带 `x-cleanup-secret`。
+
+另外建议在阿里云 OSS Bucket 上配置生命周期规则：`file-transfer/` 前缀对象保留 35 天（大于最大保留天数 30 天）自动删除，作为应用层所有删除路径的最后兜底防线。
+
 ## 数据库表
 
 初始化脚本会维护以下核心表：

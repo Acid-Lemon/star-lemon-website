@@ -1,10 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
 import db from '../../../lib/db';
 import { getSession } from '../../../lib/auth';
+import { ensureTimelineSchema } from '../../../lib/timeline';
 
 // 获取所有时间轴项目
 export async function GET() {
   try {
+    await ensureTimelineSchema();
     const result = await db.query(
       'SELECT * FROM timeline ORDER BY date ASC'
     );
@@ -26,6 +28,7 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     const { date, title, description, type, is_active } = body;
 
+    await ensureTimelineSchema();
     const result = await db.query(
       `INSERT INTO timeline (date, title, description, type, is_active) 
        VALUES ($1, $2, $3, $4, $5) 

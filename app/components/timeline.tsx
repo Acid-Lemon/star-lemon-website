@@ -105,7 +105,12 @@ export function Timeline() {
   }
 
   return (
-    <div className="relative">
+    <section className="w-full max-w-4xl mx-auto">
+      <div className="text-center mb-10">
+        <h2 className="text-3xl font-serif text-gray-800 dark:text-gray-100 mb-3">发展时间轴</h2>
+        <p className="text-gray-500 dark:text-gray-400">记录我们的成长历程</p>
+      </div>
+      <div className="relative">
       <div className="absolute left-8 top-10 bottom-2 w-0.5 bg-gradient-to-b from-orange-200 via-orange-300 to-orange-200 dark:from-orange-800 dark:via-orange-700 dark:to-orange-800" />
 
       <div className="space-y-6">
@@ -144,6 +149,7 @@ export function Timeline() {
           </div>
         ))}
       </div>
-    </div>
+      </div>
+    </section>
   );
 }

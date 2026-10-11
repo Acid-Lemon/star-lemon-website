@@ -192,13 +192,7 @@ export default function About() {
                 </div>
             </section>
 
-            <section className="w-full max-w-4xl mx-auto">
-                <div className="text-center mb-10">
-                    <h2 className="text-3xl font-serif text-gray-800 dark:text-gray-100 mb-3">发展时间轴</h2>
-                    <p className="text-gray-500 dark:text-gray-400">记录我们的成长历程</p>
-                </div>
-                <Timeline />
-            </section>
+            <Timeline />
         </div>
     );
 }

@@ -1,6 +1,7 @@
 import { Pool } from 'pg';
 import fs from 'fs';
 import path from 'path';
+import { timelineSchemaSql } from './timeline-schema.mjs';
 
 const envPath = path.resolve(process.cwd(), '.env.local');
 const envContent = fs.readFileSync(envPath, 'utf-8');
@@ -191,22 +192,8 @@ async function init() {
     }
 
     // timeline
-    if (!await tableExists(client, 'timeline')) {
-      await client.query(`
-        CREATE TABLE timeline (
-          id SERIAL PRIMARY KEY,
-          year INTEGER NOT NULL,
-          month INTEGER,
-          title VARCHAR(255) NOT NULL,
-          description TEXT,
-          type VARCHAR(50) DEFAULT 'milestone',
-          created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-        )
-      `);
-      console.log('✅ timeline 表创建成功');
-    } else {
-      console.log('⏭️ timeline 表已存在，跳过创建');
-    }
+    await client.query(timelineSchemaSql);
+    console.log('✅ timeline 表结构已同步');
 
     // quotes
     if (!await tableExists(client, 'quotes')) {

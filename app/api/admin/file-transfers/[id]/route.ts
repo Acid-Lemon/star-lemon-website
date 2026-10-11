@@ -108,8 +108,15 @@ export async function DELETE(
 
       await client.query('DELETE FROM file_transfers WHERE id = $1', [transfer.id]);
 
+      // 事务提交前先删 OSS：失败则整体回滚，记录保留，等待管理员重试或定时清理兜底，
+      // 避免行已删而文件残留（不可恢复的孤儿文件）
       if (transfer.file_key) {
-        await deleteFile(transfer.file_key);
+        try {
+          await deleteFile(transfer.file_key);
+        } catch (error) {
+          console.error(`[file-transfer] 删除 OSS 文件失败，已回滚 (key=${transfer.file_key}):`, error);
+          throw error;
+        }
       }
 
       await client.query('COMMIT');

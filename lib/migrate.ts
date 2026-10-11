@@ -1,4 +1,5 @@
 import db from './db';
+import { timelineSchemaSql } from '../scripts/timeline-schema.mjs';
 
 async function tableExists(tableName: string): Promise<boolean> {
   const result = await db.query(
@@ -84,15 +85,7 @@ export async function migrate(): Promise<string[]> {
       status VARCHAR(50) DEFAULT 'approved',
       created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     )`],
-    ['timeline', `CREATE TABLE timeline (
-      id SERIAL PRIMARY KEY,
-      year INTEGER NOT NULL,
-      month INTEGER,
-      title VARCHAR(255) NOT NULL,
-      description TEXT,
-      type VARCHAR(50) DEFAULT 'milestone',
-      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-    )`],
+    ['timeline', timelineSchemaSql],
     ['quotes', `CREATE TABLE quotes (
       id SERIAL PRIMARY KEY,
       content TEXT NOT NULL,
@@ -215,6 +208,8 @@ export async function migrate(): Promise<string[]> {
       logs.push(`表 ${name} 创建成功`);
     }
   }
+
+  await db.query(timelineSchemaSql);
 
   for (const sql of indexes) {
     await db.query(sql);

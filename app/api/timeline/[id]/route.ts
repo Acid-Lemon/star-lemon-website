@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import db from '../../../../lib/db';
 import { getSession } from '../../../../lib/auth';
+import { ensureTimelineSchema } from '../../../../lib/timeline';
 
 // 获取单个时间轴项目
 export async function GET(
@@ -9,6 +10,7 @@ export async function GET(
 ) {
   try {
     const { id } = await params;
+    await ensureTimelineSchema();
     const result = await db.query('SELECT * FROM timeline WHERE id = $1', [id]);
     
     if (result.rows.length === 0) {
@@ -37,6 +39,7 @@ export async function PUT(
     const body = await request.json();
     const { date, title, description, type, is_active } = body;
 
+    await ensureTimelineSchema();
     const result = await db.query(
       `UPDATE timeline 
        SET date = $1, title = $2, description = $3, type = $4, is_active = $5, updated_at = CURRENT_TIMESTAMP
@@ -68,6 +71,7 @@ export async function DELETE(
     }
 
     const { id } = await params;
+    await ensureTimelineSchema();
     const result = await db.query('DELETE FROM timeline WHERE id = $1 RETURNING *', [id]);
 
     if (result.rows.length === 0) {

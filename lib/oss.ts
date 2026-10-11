@@ -26,10 +26,6 @@ function asV4Client(client: InstanceType<typeof OSS>): OssClientV4 {
   return client as OssClientV4;
 }
 
-function getErrorMessage(error: unknown): string | undefined {
-  return error instanceof Error ? error.message : undefined;
-}
-
 function getErrorCode(error: unknown): string | undefined {
   return typeof error === 'object' && error !== null && 'code' in error
     ? String((error as { code?: unknown }).code)
@@ -183,12 +179,14 @@ export async function generateDownloadUrl(key: string, fileName: string): Promis
 }
 
 export async function deleteFile(key: string): Promise<void> {
+  const client = await getOssClient();
   try {
-    const client = await getOssClient();
     await client.delete(key);
   } catch (error: unknown) {
+    // 对象不存在视为删除成功（幂等），其余错误必须抛出，
+    // 由调用方决定是否保留数据库记录等待重试，避免静默产生孤儿文件
     if (getErrorCode(error) !== 'NoSuchKey') {
-      console.error('Failed to delete OSS file:', key, getErrorMessage(error));
+      throw error;
     }
   }
 }
